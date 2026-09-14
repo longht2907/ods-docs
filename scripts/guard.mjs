@@ -102,7 +102,11 @@ if (nextConfig && /output\s*:\s*['"]export['"]/.test(nextConfig)) {
 
 if (hasInternal) {
 	// 4. internalSource chi duoc import o vung duoc phep
-	const ALLOW = [/^lib\/source\.ts$/, /^app\/internal\//, /^app\/api\/search\/internal\//]
+	const ALLOW = [
+		/^src\/lib\/source\.ts$/,
+		/^src\/app\/internal\//,
+		/^src\/app\/api\/search\/internal\//,
+	]
 	for (const file of walk('.', (p) => /\.(ts|tsx)$/.test(p))) {
 		if (file.startsWith('scripts/')) continue
 		const src = readIfExists(file)
@@ -113,13 +117,17 @@ if (hasInternal) {
 	}
 
 	// 5. Public search khong duoc dung internalSource
-	const publicSearch = readIfExists('app/api/search/route.ts')
+	const publicSearch = readIfExists('src/app/api/search/route.ts')
 	if (publicSearch && publicSearch.includes('internalSource')) {
-		fail('5-public-search', 'app/api/search/route.ts dung internalSource - se lo tai lieu noi bo')
+		fail('5-public-search', 'src/app/api/search/route.ts dung internalSource - se lo tai lieu noi bo')
 	}
 
 	// 6. proxy.ts phai bao ve /internal
-	const proxy = readIfExists('proxy.ts') ?? readIfExists('middleware.ts')
+	const proxy =
+		readIfExists('src/proxy.ts') ??
+		readIfExists('proxy.ts') ??
+		readIfExists('src/middleware.ts') ??
+		readIfExists('middleware.ts')
 	if (!proxy) {
 		fail('6-proxy', 'da co content/internal nhung thieu proxy.ts - vung noi bo dang mo')
 	} else {

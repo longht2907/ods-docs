@@ -11,7 +11,29 @@ const { rewrite: rewriteSuffix } = rewritePath(
   `${docsContentRoute}{/*path}/content.md`,
 );
 
+function hasInternalAccess() {
+  return process.env.ODS_INTERNAL_DEV_OPEN === 'true';
+}
+
+function isInternalPath(pathname: string) {
+  return (
+    pathname === '/internal' ||
+    pathname.startsWith('/internal/') ||
+    pathname === '/api/search/internal'
+  );
+}
+
 export default function proxy(request: NextRequest) {
+  if (isInternalPath(request.nextUrl.pathname) && !hasInternalAccess()) {
+    return new NextResponse('Unauthorized', {
+      status: 401,
+      headers: {
+        'Cache-Control': 'private, no-store, must-revalidate',
+        'X-Robots-Tag': 'noindex, nofollow',
+      },
+    });
+  }
+
   const result = rewriteSuffix(request.nextUrl.pathname);
   if (result) {
     return NextResponse.rewrite(new URL(result, request.nextUrl));

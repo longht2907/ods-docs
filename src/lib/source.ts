@@ -1,6 +1,6 @@
 import { llms, loader } from 'fumadocs-core/source';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
-import { docsContentRoute, docsImageRoute, docsRoute } from './shared';
+import { docsContentRoute, docsImageRoute, docsRoute, internalRoute } from './shared';
 import { defineDocs } from 'fumadocs-mdx/macro';
 import { metaSchema, pageSchema } from 'fumadocs-core/source/schema';
 
@@ -17,10 +17,26 @@ const docs = defineDocs({
   },
 });
 
+const internalDocs = defineDocs({
+  dir: 'content/internal',
+  docs: {
+    schema: pageSchema,
+  },
+  meta: {
+    schema: metaSchema,
+  },
+});
+
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
   baseUrl: docsRoute,
   source: docs.toFumadocsSource(),
+  plugins: [lucideIconsPlugin()],
+});
+
+export const internalSource = loader({
+  baseUrl: internalRoute,
+  source: internalDocs.toFumadocsSource(),
   plugins: [lucideIconsPlugin()],
 });
 

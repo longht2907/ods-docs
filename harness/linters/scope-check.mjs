@@ -21,8 +21,11 @@ function runCmd(cmd) {
   }
 }
 
-// 1. Lấy tên branch hiện tại
-let branch = runCmd('git branch --show-current');
+// 1. Lấy tên branch hiện tại (ưu tiên biến môi trường CI trước khi hỏi git)
+let branch = process.env.GITHUB_HEAD_REF?.trim() || process.env.GITHUB_REF_NAME?.trim();
+if (!branch) {
+  branch = runCmd('git branch --show-current');
+}
 if (!branch) {
   branch = runCmd('git rev-parse --abbrev-ref HEAD');
 }

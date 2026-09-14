@@ -8,7 +8,7 @@
     "start": "next start",
     "types:check": "next typegen && tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "guard": "node scripts/guard.mjs",
+    "guard": "node harness/guard.mjs",
     "check:links": "node harness/linters/broken-links.mjs",
     "check:scope": "node harness/linters/scope-check.mjs",
     "check:env": "node harness/linters/env-guard.mjs",

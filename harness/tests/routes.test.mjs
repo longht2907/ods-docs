@@ -53,11 +53,7 @@ async function waitForServer(url, maxRetries = 40, interval = 1000) {
 async function checkRoute(baseUrl, path, expectedStatus, desc) {
   const url = `${baseUrl}${path}`;
   try {
-    let res = await fetch(url, { redirect: 'manual' });
-    // Nếu Next.js redirect trailing slash (308), follow redirect để kiểm tra mã bảo vệ cuối cùng
-    if (res.status === 308 && path.endsWith('/')) {
-      res = await fetch(url);
-    }
+    const res = await fetch(url, { redirect: 'manual' });
     const pass = res.status === expectedStatus;
     const mark = pass ? '✓' : '✗';
     console.log(`  ${mark} ${desc} [${path}] -> mong đợi ${expectedStatus}, thực tế ${res.status}`);
@@ -71,14 +67,14 @@ async function checkRoute(baseUrl, path, expectedStatus, desc) {
 async function main() {
   const port = await getFreePort();
   const baseUrl = `http://127.0.0.1:${port}`;
-  console.log(`\n[test:routes] Khởi động Next dev server tại ${baseUrl}...`);
+  console.log(`\n[test:routes] Khởi động Next production server tại ${baseUrl}...`);
 
   // Ép ODS_INTERNAL_DEV_OPEN về undefined trong tiến trình con
   const env = { ...process.env };
   delete env.ODS_INTERNAL_DEV_OPEN;
 
   const isWin = process.platform === 'win32';
-  const serverProc = spawn('npx', ['next', 'dev', '-p', String(port)], {
+  const serverProc = spawn('npx', ['next', 'start', '-p', String(port)], {
     env,
     shell: true,
     detached: !isWin,

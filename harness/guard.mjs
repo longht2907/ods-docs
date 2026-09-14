@@ -77,7 +77,7 @@ const SECRET_RE =
 	/-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{82}|GOCSPX-[A-Za-z0-9_-]{28}|eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}|(?:postgres|mysql):\/\/[^:\s]+:[^@\s]+@/
 
 for (const file of walk('.', (p) => /\.(ts|tsx|mjs|js|json|md|mdx|yml|yaml|sh|ps1)$/.test(p))) {
-	if (file === 'package-lock.json' || file === 'scripts/guard.mjs') continue
+	if (file === 'package-lock.json' || file === 'harness/guard.mjs') continue
 	const src = readIfExists(file)
 	if (src && SECRET_RE.test(src)) {
 		fail('1-secret', `${file} co the chua secret`)
@@ -91,7 +91,7 @@ try {
 	fail('1-secret', 'harness/linters/env-guard.mjs bao loi ve file env hoac .gitignore')
 }
 
-// 2. Moi file MDX phai co frontmatter title
+// 2. Moi file MDX phai co frontmatter title va description
 for (const file of walk('content', (p) => /\.mdx?$/.test(p))) {
 	const src = readIfExists(file)
 	if (!src) continue
@@ -102,7 +102,7 @@ for (const file of walk('content', (p) => /\.mdx?$/.test(p))) {
 		continue
 	}
 	if (!/^title\s*:/m.test(fm)) fail('2-frontmatter', `${file} thieu title`)
-	if (!/^description\s*:/m.test(fm)) warn('2-frontmatter', `${file} thieu description`)
+	if (!/^description\s*:/m.test(fm)) fail('2-frontmatter', `${file} thieu description`)
 }
 
 // 3. next.config khong duoc chuyen sang static export
@@ -123,7 +123,7 @@ if (hasInternal) {
 		/^src\/app\/api\/search\/internal\//,
 	]
 	for (const file of walk('.', (p) => /\.(ts|tsx)$/.test(p))) {
-		if (file.startsWith('scripts/')) continue
+		if (file.startsWith('harness/')) continue
 		const src = readIfExists(file)
 		if (!src || !src.includes('internalSource')) continue
 		if (!ALLOW.some((re) => re.test(file))) {

@@ -232,3 +232,176 @@ Guard PASS.
    ```bash
    git config core.hooksPath harness/hooks
    ```
+
+---
+
+## 6. Sửa lỗi CI (TASK-002-FIX)
+
+### 6.1. Nguyên nhân gốc rễ
+
+- **Cơ chế type route của Next.js**: Trong Next.js 15+, file `next-env.d.ts` tự động import `./.next/types/routes.d.ts` và `./.next/types/root-params.d.ts`.
+- **Sự khác biệt giữa Local và CI**:
+  - Trên máy **local**, dev server và build đã từng chạy nhiều lần, thư mục `.next/types/*` đã có sẵn trên đĩa. Do đó, lệnh `npm run typecheck` (`tsc --noEmit`) dễ dàng đọc được các declaration files này và báo PASS.
+  - Trên **GitHub Actions CI**, code được checkout mới hoàn toàn vào runner sạch. Vì `/.next/` nằm trong `.gitignore`, các file type trên chưa hề tồn tại.
+  - CI chạy `npm run typecheck` **trước** `npm run build`, khiến `tsc` không tìm thấy các file trong `.next/types/*` và lập tức quăng lỗi sau 18s.
+- **Biện pháp phòng ngừa cho tương lai**: Không bao giờ kết luận nghiệm thu khi chưa xóa sạch `.next` (hoặc các build artifacts phụ thuộc). Mọi quy trình nghiệm thu harness bắt buộc phải test từ trạng thái clean checkout (`rm -rf .next && npm run verify:task`).
+
+### 6.2. Diff thật của các file đã sửa
+
+#### `package.json`
+```diff
+--- a/package.json
++++ b/package.json
+@@ -16,3 +16,3 @@
+-    "verify:code": "npm run typecheck && npm run check:env && npm run check:links && npm run guard",
++    "verify:code": "npm run types:check && npm run check:env && npm run check:links && npm run guard",
+     "verify": "npm run verify:code && npm run build",
+```
+
+#### `.github/workflows/ci.yml`
+```diff
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -33,2 +33,2 @@
+       - name: Typecheck
+-        run: npm run typecheck
++        run: npm run types:check
+```
+
+#### `harness/tests/routes.test.mjs` (Human approved: Khắc phục lỗi process hang trên Linux CI)
+```diff
+--- a/harness/tests/routes.test.mjs
++++ b/harness/tests/routes.test.mjs
+@@ -24,4 +24,8 @@ function killProcessTree(pid) {
+     if (process.platform === 'win32') {
+       execSync(`taskkill /pid ${pid} /T /F`, { stdio: 'ignore' });
+     } else {
+-      process.kill(-pid, 'SIGKILL');
++      try {
++        process.kill(-pid, 'SIGKILL');
++      } catch {
++        process.kill(pid, 'SIGKILL');
++      }
+     }
+@@ -77,2 +81,3 @@ async function main() {
++  const isWin = process.platform === 'win32';
+   const serverProc = spawn('npx', ['next', 'dev', '-p', String(port)], {
+     env,
+     shell: true,
++    detached: !isWin,
+     stdio: ['ignore', 'pipe', 'pipe'],
+@@ -140,2 +145,3 @@ async function main() {
+     killProcessTree(serverProc.pid);
++    process.exit(allPassed ? 0 : 1);
+   }
+```
+
+### 6.3. Output thật của `npm run verify:task` sau khi xoá sạch `.next` và `npm ci`
+
+```
+> ods-docs@0.0.28 verify:task
+> npm run verify:code && npm run check:scope && npm run build && npm run test:routes
+
+> ods-docs@0.0.28 verify:code
+> npm run types:check && npm run check:env && npm run check:links && npm run guard
+
+> ods-docs@0.0.28 types:check
+> next typegen && tsc --noEmit
+
+Generating route types...
+✓ Types generated successfully
+
+> ods-docs@0.0.28 check:env
+> node harness/linters/env-guard.mjs
+
+[env-guard PASS] Toàn bộ file cấu hình môi trường đều an toàn.
+
+> ods-docs@0.0.28 check:links
+> node harness/linters/broken-links.mjs
+
+[Linter] Toàn bộ liên kết nội bộ trong MDX đều hợp lệ.
+
+> ods-docs@0.0.28 guard
+> node scripts/guard.mjs
+
+Guard - giai doan: internal
+
+Guard PASS.
+
+> ods-docs@0.0.28 check:scope
+> node harness/linters/scope-check.mjs
+
+[scope-check PASS] Toàn bộ file thay đổi đều nằm trong phạm vi của TASK-002.
+
+> ods-docs@0.0.28 build
+> next build
+
+▲ Next.js 16.3.4 (Turbopack)
+✓ Running next.config.mjs took 155ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 38.3s
+  Running TypeScript ...
+  Finished TypeScript in 1607ms ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (14/14) in 1138ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/search
+├ ƒ /api/search/internal
+├   /docs/[[...slug]]
+│ └ ● /docs
+├   /internal/[[...slug]]
+│ ├ ● /internal
+│ ├ ● /internal/onboarding
+│ ├ ● /internal/quy-trinh
+│ └ ● /internal/runbook
+├ ○ /llms-full.txt
+├   /llms.mdx/docs/[[...slug]]
+│ └ ● /llms.mdx/docs/content.md
+├ ○ /llms.txt
+└   /og/docs/[...slug]
+  └ ● /og/docs/image.png
+
+ƒ Proxy (Middleware)
+
+> ods-docs@0.0.28 test:routes
+> node harness/tests/routes.test.mjs
+
+[test:routes] Khởi động Next dev server tại http://127.0.0.1:10917...
+[test:routes] Server đã sẵn sàng. Bắt đầu kiểm tra 7 cases:
+  ✓ Public docs accessible [/docs] -> mong đợi 200, thực tế 200
+  ✓ Internal root blocked [/internal] -> mong đợi 401, thực tế 401
+  ✓ Internal trailing slash blocked [/internal/] -> mong đợi 401, thực tế 401
+  ✓ Internal subpage blocked [/internal/onboarding] -> mong đợi 401, thực tế 401
+  ✓ Internal search API blocked [/api/search/internal] -> mong đợi 401, thực tế 401
+  ✓ Internal search API trailing slash blocked [/api/search/internal/] -> mong đợi 401, thực tế 401
+  ✓ Public search API accessible [/api/search] -> mong đợi 200, thực tế 200
+
+[test:routes PASS] Toàn bộ 7/7 route test case đều đạt chuẩn.
+
+[test:routes] Đang tắt server...
+```
+
+### 6.4. Kết quả CI Run đã xanh toàn bộ
+
+- **PR #1**: [https://github.com/longht2907/ods-docs/pull/1](https://github.com/longht2907/ods-docs/pull/1)
+- **CI Run ID**: `34819617190`
+- **URL CI Run đã Xanh (Status: completed, Conclusion: success)**:
+  👉 [https://github.com/longht2907/ods-docs/actions/runs/34819617190](https://github.com/longht2907/ods-docs/actions/runs/34819617190)
+- **Danh sách 11/11 Steps đều PASS**:
+  1. `Set up job` — success
+  2. `Run actions/checkout@v4` — success
+  3. `Run actions/setup-node@v4` — success
+  4. `Cai dependency (npm ci)` — success
+  5. `Check Env (npm run check:env)` — success
+  6. `Check Links (npm run check:links)` — success
+  7. `Check Scope (npm run check:scope)` — success
+  8. `Typecheck (npm run types:check)` — success
+  9. `Guard (npm run guard)` — success
+  10. `Build (npm run build)` — success
+  11. `Test Routes (npm run test:routes)` — success
+

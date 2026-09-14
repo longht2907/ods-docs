@@ -11,7 +11,14 @@ const { rewrite: rewriteSuffix } = rewritePath(
   `${docsContentRoute}{/*path}/content.md`,
 );
 
+if (process.env.NODE_ENV === 'production' && process.env.ODS_INTERNAL_DEV_OPEN === 'true') {
+  throw new Error('SECURITY VIOLATION: ODS_INTERNAL_DEV_OPEN cannot be enabled in production.');
+}
+
 function hasInternalAccess() {
+  if (process.env.NODE_ENV === 'production' && process.env.ODS_INTERNAL_DEV_OPEN === 'true') {
+    throw new Error('SECURITY VIOLATION: ODS_INTERNAL_DEV_OPEN cannot be enabled in production.');
+  }
   return process.env.ODS_INTERNAL_DEV_OPEN === 'true';
 }
 
@@ -19,7 +26,8 @@ function isInternalPath(pathname: string) {
   return (
     pathname === '/internal' ||
     pathname.startsWith('/internal/') ||
-    pathname === '/api/search/internal'
+    pathname === '/api/search/internal' ||
+    pathname.startsWith('/api/search/internal/')
   );
 }
 

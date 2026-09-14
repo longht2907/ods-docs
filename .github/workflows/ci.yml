@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -19,6 +21,15 @@ jobs:
       - name: Cai dependency
         run: npm ci
 
+      - name: Check Env
+        run: npm run check:env
+
+      - name: Check Links
+        run: npm run check:links
+
+      - name: Check Scope
+        run: npm run check:scope
+
       - name: Typecheck
         run: npm run typecheck
 
@@ -28,5 +39,5 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Guard tren artifact da build
-        run: npm run guard
+      - name: Test Routes
+        run: npm run test:routes

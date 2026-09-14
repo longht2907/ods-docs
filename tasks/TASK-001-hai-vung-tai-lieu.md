@@ -1,3 +1,10 @@
+---
+status: done
+branch: main
+commit: 8f3f891
+verified-by: npm run verify
+---
+
 # TASK-001 — Tách hai vùng tài liệu: công khai và nội bộ
 
 ## Bối cảnh

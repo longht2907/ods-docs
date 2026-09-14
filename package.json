@@ -6,7 +6,11 @@
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
-    "types:check": "next typegen && tsc --noEmit"
+    "types:check": "next typegen && tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "guard": "node scripts/guard.mjs",
+    "verify:code": "npm run typecheck && npm run guard",
+    "verify": "npm run typecheck && npm run guard && npm run build"
   },
   "dependencies": {
     "cn": "^0.2.6",
@@ -27,5 +31,8 @@
     "postcss": "^8.5.28",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

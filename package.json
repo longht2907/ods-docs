@@ -9,11 +9,12 @@
     "types:check": "next typegen && tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "guard": "node scripts/guard.mjs",
+    "check:links": "node harness/linters/broken-links.mjs",
+    "test:routes": "node harness/tests/routes.test.mjs",
     "verify:code": "npm run typecheck && npm run guard",
     "verify": "npm run typecheck && npm run guard && npm run build"
   },
   "dependencies": {
-    "cn": "^0.2.6",
     "fumadocs-core": "16.15.10",
     "fumadocs-mdx": "15.4.0",
     "fumadocs-ui": "npm:@fumadocs/base-ui@16.15.10",

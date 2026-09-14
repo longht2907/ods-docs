@@ -1,3 +1,10 @@
+---
+status: draft
+branch: task/TASK-XXX-ten-task
+commit: ""
+verified-by: npm run verify:task
+---
+
 # TASK-XXX — [Tên nhiệm vụ ngắn gọn]
 
 ## Bối cảnh
@@ -28,7 +35,7 @@ Mục tiêu cụ thể cần đạt được sau khi hoàn thành task (kèm b�
 
 ## Ràng buộc kiến trúc & Kỹ thuật
 
-- Tuân thủ nghiêm ngặt các nguyên tắc trong [AGENTS.md](file:///e:/Project/ods-docs/AGENTS.md) và [DECISIONS.md](file:///e:/Project/ods-docs/DECISIONS.md).
+- Tuân thủ nghiêm ngặt các nguyên tắc trong [AGENTS.md](../AGENTS.md) và [DECISIONS.md](../DECISIONS.md).
 - Giữ vững tính tương thích của API và Typescript strict mode.
 
 ## Tiêu chí nghiệm thu (Acceptance Criteria)

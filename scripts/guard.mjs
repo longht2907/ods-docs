@@ -11,6 +11,7 @@
  * Nho vay ban chay duoc guard ngay tu ngay dau, khong can cho du tinh nang.
  */
 
+import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -55,12 +56,26 @@ function walk(dir, filter) {
 const hasInternal = exists('content/internal')
 const hasCaddy = exists('Caddyfile')
 
+// Doc phase tu .harness/phase.json neu co
+let declaredPhase = null
+const phaseFile = readIfExists('.harness/phase.json')
+if (phaseFile) {
+	try {
+		const parsed = JSON.parse(phaseFile)
+		declaredPhase = parsed.phase
+	} catch {
+		fail('10-phase-lock', '.harness/phase.json khong dung dinh dang JSON')
+	}
+}
+
 // ---------------------------------------------------------------
 // LUON KIEM TRA
 // ---------------------------------------------------------------
 
 // 1. Khong commit secret
-const SECRET_RE = /-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}/
+const SECRET_RE =
+	/-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{82}|GOCSPX-[A-Za-z0-9_-]{28}|eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}|(?:postgres|mysql):\/\/[^:\s]+:[^@\s]+@/
+
 for (const file of walk('.', (p) => /\.(ts|tsx|mjs|js|json|md|mdx|yml|yaml|sh|ps1)$/.test(p))) {
 	if (file === 'package-lock.json' || file === 'scripts/guard.mjs') continue
 	const src = readIfExists(file)
@@ -68,12 +83,12 @@ for (const file of walk('.', (p) => /\.(ts|tsx|mjs|js|json|md|mdx|yml|yaml|sh|ps
 		fail('1-secret', `${file} co the chua secret`)
 	}
 }
-for (const envFile of ['.env', '.env.local', '.env.production']) {
-	if (!exists(envFile)) continue
-	const ignore = readIfExists('.gitignore') ?? ''
-	if (!ignore.includes('.env')) {
-		fail('1-secret', `${envFile} ton tai nhung .gitignore khong loai tru .env`)
-	}
+
+// Kiem tra env thong qua harness/linters/env-guard.mjs
+try {
+	execSync('node harness/linters/env-guard.mjs', { stdio: 'pipe' })
+} catch (err) {
+	fail('1-secret', 'harness/linters/env-guard.mjs bao loi ve file env hoac .gitignore')
 }
 
 // 2. Moi file MDX phai co frontmatter title
@@ -165,15 +180,87 @@ if (hasInternal) {
 }
 
 // ---------------------------------------------------------------
+// CAC CHECK MO RONG CHO HARNESS
+// ---------------------------------------------------------------
+
+// 10. Phase Lock: Doc .harness/phase.json
+const PHASE_RANKS = {
+	basic: 1,
+	internal: 2,
+	full: 3,
+	deploy: 4,
+}
+
+if (declaredPhase) {
+	const rank = PHASE_RANKS[declaredPhase] ?? 0
+	if (rank >= PHASE_RANKS.internal && !hasInternal) {
+		fail('10-phase-lock', `Phase khai bao la '${declaredPhase}' nhung content/internal khong ton tai`)
+	}
+}
+
+// 11. Proxy Matcher
+const proxyContent =
+	readIfExists('src/proxy.ts') ??
+	readIfExists('proxy.ts') ??
+	readIfExists('src/middleware.ts') ??
+	readIfExists('middleware.ts')
+
+if (proxyContent && /export\s+const\s+config\s*=\s*\{/.test(proxyContent)) {
+	const matcherMatch = proxyContent.match(/matcher\s*:\s*(\[[^\]]+\]|'[^']+'|"[^"]+")/)
+	if (matcherMatch && !matcherMatch[1].includes('/internal')) {
+		fail('11-proxy-matcher', 'Proxy co export config voi matcher nhung pattern khong bao phu /internal')
+	}
+}
+
+// 12. Prod Flag: ODS_INTERNAL_DEV_OPEN trong production configs, Dockerfile hoac process.env
+if (process.env.NODE_ENV === 'production' && process.env.ODS_INTERNAL_DEV_OPEN === 'true') {
+	fail('12-prod-flag', 'ODS_INTERNAL_DEV_OPEN dang duoc bat trong moi truong production (process.env)')
+}
+
+const PROD_CONFIG_FILES = [
+	'.env.production',
+	'.env.prod',
+	'Dockerfile',
+	'docker-compose.prod.yml',
+	'docker-compose.production.yml',
+]
+
+for (const prodFile of PROD_CONFIG_FILES) {
+	const content = readIfExists(prodFile)
+	if (content && content.includes('ODS_INTERNAL_DEV_OPEN')) {
+		fail('12-prod-flag', `Tim thay ODS_INTERNAL_DEV_OPEN trong file production ${prodFile}`)
+	}
+}
+
+// 13. Task Evidence: Moi task co status: done phai co report
+const taskFiles = walk('tasks', (p) => /TASK-[A-Za-z0-9_-]+\.md$/.test(p))
+for (const tf of taskFiles) {
+	if (tf === 'tasks/TASK-TEMPLATE.md') continue
+	const content = readIfExists(tf)
+	if (!content) continue
+	const statusMatch = content.match(/^status\s*:\s*['"]?([a-zA-Z0-9_-]+)['"]?/m)
+	if (statusMatch && statusMatch[1].toLowerCase() === 'done') {
+		const taskIdMatch = tf.match(/TASK-\d+/i)
+		const taskId = taskIdMatch ? taskIdMatch[0].toUpperCase() : null
+		if (taskId) {
+			const reportFile = `.harness/reports/${taskId}-report.md`
+			if (!exists(reportFile)) {
+				fail('13-task-evidence', `${tf} co status: done nhung thieu ${reportFile}`)
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------
 // KET QUA
 // ---------------------------------------------------------------
 
-const phase = hasInternal
+const displayPhase = declaredPhase || (hasInternal
 	? hasCaddy
 		? 'day du (public + internal + trien khai)'
 		: 'co vung noi bo'
-	: 'co ban (chua co content/internal)'
-console.log(`Guard - giai doan: ${phase}`)
+	: 'co ban (chua co content/internal)')
+console.log(`Guard - giai doan: ${displayPhase}`)
 
 if (warnings.length) {
 	console.log('\nCanh bao:')

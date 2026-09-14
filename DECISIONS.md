@@ -31,7 +31,7 @@ Tài liệu này lưu trữ các quyết định kiến trúc quan trọng của
   - Framework: Next.js 16 (App Router), React 19, TypeScript strict mode.
   - Documentation Engine: Fumadocs Core 16.x + Fumadocs MDX 15.x + Fumadocs UI (`@fumadocs/base-ui`).
   - Styling: Tailwind CSS v4 với `@tailwindcss/postcss`.
-  - Kiểm tra an toàn: Script tự động [scripts/guard.mjs](file:///e:/Project/ods-docs/scripts/guard.mjs) chạy cơ học, không tốn token, phát hiện secret và vi phạm ranh giới.
+  - Kiểm tra an toàn: Script tự động [scripts/guard.mjs](scripts/guard.mjs) chạy cơ học, không tốn token, phát hiện secret và vi phạm ranh giới.
 - **Lý do**:
   - Fumadocs cung cấp sẵn tích hợp MDX hiệu năng cao, tìm kiếm nhanh, khả năng tùy biến layout linh hoạt và hỗ trợ chuẩn xuất dữ liệu cho LLM (`llms.txt`, `llms.mdx`).
 
@@ -46,3 +46,19 @@ Tài liệu này lưu trữ các quyết định kiến trúc quan trọng của
 - **Quyết định**:
   - Gỡ bỏ `cn` khỏi `package.json` và xóa `src/lib/cn.ts`.
   - Nếu sau này cần tiện ích nối class Tailwind, sẽ cân nhắc giải pháp chuẩn của hệ sinh thái (`clsx` + `tailwind-merge`) hoặc sử dụng helper có sẵn của Fumadocs.
+
+---
+
+## ADR-004: Gate CI, Phase Lock và Scope Enforcement
+
+- **Ngày quyết định**: 2026-09-14
+- **Trạng thái**: Đã áp dụng (Chấp thuận)
+- **Bối cảnh**:
+  - Hạ tầng kiểm chứng trước đó còn rời rạc; CI chỉ kích hoạt trên pull request; guard có nguy cơ bị bypass nếu thư mục nội bộ bị xóa; agent có thể sửa vượt phạm vi cho phép mà không bị máy phát hiện.
+- **Quyết định**:
+  1. **Phase Lock**: Khởi tạo `.harness/phase.json` khai báo trạng thái kỳ vọng tối thiểu. Guard sẽ FAIL nếu phase thực tế thấp hơn phase khai báo (Monotonic Phase).
+  2. **Scope Enforcement**: Sử dụng `harness/linters/scope-check.mjs` để so sánh git diff với allowlist trong mục "Phạm vi" của task file tương ứng với branch.
+  3. **Env Guard & Fail-Closed**: Dùng `git check-ignore` xác thực triệt để các biến môi trường; ném lỗi ngay khi build production nếu bật cờ dev `ODS_INTERNAL_DEV_OPEN=true`.
+  4. **Single Command of Truth**: Thống nhất quy trình nghiệm thu qua lệnh `npm run verify:task`.
+- **Hệ quả**:
+  - Mọi task chuyển sang `status: done` bắt buộc phải kèm báo cáo nghiệm thu `.harness/reports/TASK-XXX-report.md`.

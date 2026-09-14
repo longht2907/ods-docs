@@ -13,7 +13,7 @@
     "check:scope": "node harness/linters/scope-check.mjs",
     "check:env": "node harness/linters/env-guard.mjs",
     "test:routes": "node harness/tests/routes.test.mjs",
-    "verify:code": "npm run typecheck && npm run check:env && npm run check:links && npm run guard",
+    "verify:code": "npm run types:check && npm run check:env && npm run check:links && npm run guard",
     "verify": "npm run verify:code && npm run build",
     "verify:task": "npm run verify:code && npm run check:scope && npm run build && npm run test:routes"
   },

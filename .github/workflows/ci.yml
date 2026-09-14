@@ -31,7 +31,7 @@ jobs:
         run: npm run check:scope
 
       - name: Typecheck
-        run: npm run typecheck
+        run: npm run types:check
 
       - name: Guard
         run: npm run guard

@@ -2,7 +2,7 @@
 
 - **Task**: `tasks/TASK-002-dong-vong-harness.md`
 - **Branch**: `task/TASK-002-dong-vong-harness`
-- **Commit**: `282d448`
+- **Commit**: `f419613`
 - **Trạng thái**: done
 - **Kiểm chứng bởi**: `npm run verify:task`
 
@@ -22,7 +22,7 @@
 ### Sửa đổi (10/10 theo spec):
 - `.gitignore` — khớp spec. Tách dòng lỗi thành `next-env.d.ts` và `.env`; bổ sung `.env*.local`, `.env.production`, `.env.development`.
 - `package.json` — khớp spec. Thêm `check:scope`, `check:env`, `verify:task`; nối `check:links`, `check:env` vào `verify` và `verify:code`.
-- `scripts/guard.mjs` — khớp spec. Giữ nguyên 1–9, thêm checks 10 (phase-lock), 11 (proxy-matcher), 12 (prod-flag), 13 (task-evidence), mở rộng secret regex và gọi `env-guard.mjs`.
+- `harness/guard.mjs` — khớp spec. Giữ nguyên 1–9, thêm checks 10 (phase-lock), 11 (proxy-matcher), 12 (prod-flag), 13 (task-evidence), mở rộng secret regex và gọi `env-guard.mjs`.
 - `src/proxy.ts` — khớp spec. Chặn prefix `/api/search/internal/` (trailing slash/subpath), thêm fail-closed throw error nếu `NODE_ENV === 'production' && ODS_INTERNAL_DEV_OPEN === 'true'`.
 - `harness/tests/routes.test.mjs` — khớp spec. Tự spawn `next dev`, ép `ODS_INTERNAL_DEV_OPEN=undefined`, test 7 cases (gồm `/internal/` và `/api/search/internal/`), tự kill server.
 - `.github/workflows/ci.yml` — khớp spec. Thêm trigger `push: [main]`, thêm steps `check:env`, `check:links`, `check:scope`, thay guard lặp bằng `test:routes`.
@@ -55,7 +55,7 @@
 ### 2.3. `npm run guard` (Exit code: 0)
 ```
 > ods-docs@0.0.28 guard
-> node scripts/guard.mjs
+> node harness/guard.mjs
 
 Guard - giai doan: internal
 
@@ -149,7 +149,7 @@ Route (app)
 [Linter] Toàn bộ liên kết nội bộ trong MDX đều hợp lệ.
 
 > ods-docs@0.0.28 guard
-> node scripts/guard.mjs
+> node harness/guard.mjs
 Guard - giai doan: internal
 Guard PASS.
 
@@ -322,7 +322,7 @@ Generating route types...
 [Linter] Toàn bộ liên kết nội bộ trong MDX đều hợp lệ.
 
 > ods-docs@0.0.28 guard
-> node scripts/guard.mjs
+> node harness/guard.mjs
 
 Guard - giai doan: internal
 

@@ -20,7 +20,7 @@ Trạng thái thật của repo (đã kiểm tra, đừng giả định khác):
 - `src/lib/source.ts` dùng `defineDocs` từ `fumadocs-mdx/macro`, `pageSchema` và
   `metaSchema` từ `fumadocs-core/source/schema`.
 - `proxy.ts` ở thư mục gốc, hiện làm nhiệm vụ rewrite Markdown negotiation.
-- Đã có `scripts/guard.mjs`, `AGENTS.md`, `.github/workflows/ci.yml`.
+- Đã có `harness/guard.mjs`, `AGENTS.md`, `.github/workflows/ci.yml`.
 - `content/docs/` có `index.mdx` và `test.mdx` (trang mẫu của scaffold).
 
 ## Mục tiêu

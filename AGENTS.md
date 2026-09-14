@@ -2,7 +2,7 @@
 
 Quy tắc cho coding agent làm việc trong repo này.
 
-Ngắn gọn có chủ đích: mọi thứ kiểm tra được bằng máy đều nằm trong `scripts/guard.mjs`, không nằm ở đây.
+Ngắn gọn có chủ đích: mọi thứ kiểm tra được bằng máy đều nằm trong `harness/guard.mjs`, không nằm ở đây.
 
 ## Mục tiêu
 
@@ -46,6 +46,13 @@ Mọi thay đổi phải đi qua quy trình task file và branch/PR:
 - Bắt đầu bằng task spec tại `tasks/TASK-XXX-*.md` (theo chuẩn `tasks/TASK-TEMPLATE.md`).
 - Tạo branch riêng `task/TASK-XXX-*` và mở Pull Request vào `main` khi hoàn thành.
 - Mọi tuyên bố "đã xong" phải kèm báo cáo nghiệm thu `.harness/reports/TASK-XXX-report.md`.
+- Khi test FAIL: sửa code cho đúng test. **Cấm sửa test, nới ngưỡng, hoặc thêm
+  ngoại lệ để test đi qua.** Nếu tin rằng test sai, dừng lại và hỏi Human kèm
+  output thật của lệnh.
+- `status: done` trong task file chỉ được đặt **sau khi CI trên Pull Request
+  đã xanh**. Trong suốt quá trình làm việc, giữ `status: in-progress`.
+- Trường `commit` trong frontmatter phải là hash commit thật cuối cùng trên
+  nhánh, lấy bằng `git rev-parse --short HEAD`. Không ghi từ trí nhớ.
 
 ```bash
 npm run check:env     # kiểm tra an toàn biến môi trường .env

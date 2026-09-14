@@ -32,7 +32,7 @@ verified-by: npm run verify:task
 
 Khi một task được đánh dấu `status: done`:
 - Bắt buộc phải có file báo cáo nghiệm thu tương ứng tại `.harness/reports/TASK-XXX-report.md`.
-- Script `scripts/guard.mjs` (check `13-task-evidence`) sẽ kiểm tra điều kiện này và báo **FAIL** nếu thiếu báo cáo.
+- Script `harness/guard.mjs` (check `13-task-evidence`) sẽ kiểm tra điều kiện này và báo **FAIL** nếu thiếu báo cáo.
 - Báo cáo phải ghi lại output thật từ terminal của các lệnh kiểm chứng, các bài test negative và danh sách file thay đổi thực tế.
 
 ---

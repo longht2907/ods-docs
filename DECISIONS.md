@@ -31,7 +31,7 @@ Tài liệu này lưu trữ các quyết định kiến trúc quan trọng của
   - Framework: Next.js 16 (App Router), React 19, TypeScript strict mode.
   - Documentation Engine: Fumadocs Core 16.x + Fumadocs MDX 15.x + Fumadocs UI (`@fumadocs/base-ui`).
   - Styling: Tailwind CSS v4 với `@tailwindcss/postcss`.
-  - Kiểm tra an toàn: Script tự động [scripts/guard.mjs](scripts/guard.mjs) chạy cơ học, không tốn token, phát hiện secret và vi phạm ranh giới.
+  - Kiểm tra an toàn: Script tự động [harness/guard.mjs](harness/guard.mjs) chạy cơ học, không tốn token, phát hiện secret và vi phạm ranh giới.
 - **Lý do**:
   - Fumadocs cung cấp sẵn tích hợp MDX hiệu năng cao, tìm kiếm nhanh, khả năng tùy biến layout linh hoạt và hỗ trợ chuẩn xuất dữ liệu cho LLM (`llms.txt`, `llms.mdx`).
 
@@ -62,3 +62,28 @@ Tài liệu này lưu trữ các quyết định kiến trúc quan trọng của
   4. **Single Command of Truth**: Thống nhất quy trình nghiệm thu qua lệnh `npm run verify:task`.
 - **Hệ quả**:
   - Mọi task chuyển sang `status: done` bắt buộc phải kèm báo cáo nghiệm thu `.harness/reports/TASK-XXX-report.md`.
+
+---
+
+## ADR-005: Phân tách ba tầng cấu trúc: Sản phẩm, Kiểm soát và Kết quả kiểm soát
+
+- **Ngày quyết định**: 2026-09-14
+- **Trạng thái**: Đã áp dụng (Chấp thuận)
+- **Bối cảnh**:
+  - Ban đầu `guard.mjs` nằm đơn lẻ trong thư mục `scripts/`, và không có tài liệu phân biệt rõ giữa `harness/` và `.harness/`, dẫn đến nhầm lẫn giữa mã nguồn kiểm soát và kết quả kiểm soát do máy sinh.
+- **Quyết định**:
+  1. **Tiêu chí phân loại rõ ràng**: Đặt câu hỏi: *"Nếu xoá file/thư mục này đi thì website có đổi hành vi hoặc ngừng hoạt động không?"*
+     - **Có** $\rightarrow$ Thuộc nhóm **Sản phẩm**.
+     - **Không** $\rightarrow$ Thuộc nhóm **Kiểm soát**.
+  2. **Ba nhóm thư mục**:
+     - **Sản phẩm (Product code)**: `src/`, `content/`, `public/`, `next.config.mjs` — mã nguồn và nội dung trực tiếp phục vụ người dùng cuối.
+     - **Kiểm soát (Harness & Specifications)**: `harness/`, `tasks/`, `AGENTS.md`, `DECISIONS.md`, `.github/`, `.agents/` — mã kiểm soát chất lượng do con người/agent viết, cần được review nghiêm ngặt trong PR.
+     - **Kết quả kiểm soát (Artifacts & Evidence)**: `.harness/` (`phase.json`, `reports/`) — dữ liệu đầu ra do máy sinh ra để làm bằng chứng nghiệm thu, không yêu cầu review thủ công.
+  3. **Lý do không gom toàn bộ kiểm soát vào một thư mục duy nhất**:
+     - Bốn đường dẫn bị các công cụ và nền tảng chuẩn hoá khoá cứng:
+       - `.github/workflows/` do GitHub Actions quy định.
+       - `AGENTS.md` đặt tại thư mục gốc để AI coding agent tự động nhận diện.
+       - `.agents/skills/` do Antigravity CLI và agent framework quy định.
+       - `package.json` bắt buộc nằm tại root theo chuẩn Node.js/npm.
+  4. **Vị trí của `src/proxy.ts`**:
+     - `src/proxy.ts` bắt buộc ở lại trong `src/` vì nó thực thi bảo vệ ranh giới lúc runtime (Edge proxy). Nếu xoá file này, vùng `/internal` sẽ bị mở toang — đây là hành vi trực tiếp của sản phẩm, không phải code kiểm soát kiểm thử.

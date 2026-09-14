@@ -1,7 +1,7 @@
 ---
 status: done
 branch: task/TASK-002-dong-vong-harness
-commit: 282d448
+commit: f419613
 verified-by: npm run verify:task
 ---
 
@@ -9,7 +9,7 @@ verified-by: npm run verify:task
 
 ## Bối cảnh
 
-Repo `ods-docs` đã có `AGENTS.md`, `DECISIONS.md`, `scripts/guard.mjs`, `harness/**`, `tasks/**` và `.github/workflows/ci.yml`. Tuy nhiên hạ tầng kiểm chứng chưa được nối thành vòng kín. Trạng thái thật tại commit `8a5ac49` (đã kiểm tra, đừng giả định khác):
+Repo `ods-docs` đã có `AGENTS.md`, `DECISIONS.md`, `harness/guard.mjs`, `harness/**`, `tasks/**` và `.github/workflows/ci.yml`. Tuy nhiên hạ tầng kiểm chứng chưa được nối thành vòng kín. Trạng thái thật tại commit `8a5ac49` (đã kiểm tra, đừng giả định khác):
 
 - `harness/linters/broken-links.mjs`, `harness/tests/routes.test.mjs`, `harness/hooks/check-commit.mjs` tồn tại nhưng không được gọi bởi `verify`, `verify:code`, hay CI.
 - `ci.yml` chỉ trigger trên `pull_request` và `workflow_dispatch`. Chưa có PR nào; cả 4 commit push trực tiếp lên `main`.
@@ -40,7 +40,7 @@ Sửa:
 
 - `.gitignore` — tách dòng lỗi thành `next-env.d.ts` và `.env`; bổ sung `.env*.local`, `.env.production`, `.env.development`. Giữ nguyên các dòng khác.
 - `package.json` — chỉ thêm scripts, không đổi dependency: `check:scope`, `check:env`, `verify:task`; nối `check:links` và `check:env` vào `verify` và `verify:code`.
-- `scripts/guard.mjs` — thêm 4 check, giữ nguyên toàn bộ check 1–9 hiện có:
+- `harness/guard.mjs` — thêm 4 check, giữ nguyên toàn bộ check 1–9 hiện có:
     - `10-phase-lock`: đọc `.harness/phase.json`; nếu phase khai là `internal` hoặc cao hơn mà `content/internal` không tồn tại → FAIL.
     - `11-proxy-matcher`: nếu proxy có `export const config` với `matcher` mà pattern không phủ `/internal` → FAIL.
     - `12-prod-flag`: nếu tìm thấy `ODS_INTERNAL_DEV_OPEN` trong file cấu hình production hoặc trong `Dockerfile` → FAIL.

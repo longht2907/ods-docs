@@ -24,7 +24,11 @@ function killProcessTree(pid) {
     if (process.platform === 'win32') {
       execSync(`taskkill /pid ${pid} /T /F`, { stdio: 'ignore' });
     } else {
-      process.kill(-pid, 'SIGKILL');
+      try {
+        process.kill(-pid, 'SIGKILL');
+      } catch {
+        process.kill(pid, 'SIGKILL');
+      }
     }
   } catch {
     // Process da ket thuc hoac khong the kill tiep
@@ -73,9 +77,11 @@ async function main() {
   const env = { ...process.env };
   delete env.ODS_INTERNAL_DEV_OPEN;
 
+  const isWin = process.platform === 'win32';
   const serverProc = spawn('npx', ['next', 'dev', '-p', String(port)], {
     env,
     shell: true,
+    detached: !isWin,
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 
@@ -87,6 +93,7 @@ async function main() {
     serverOutput += d.toString();
   });
 
+  let allPassed = false;
   try {
     const ready = await waitForServer(`${baseUrl}/docs`, 45, 1000);
     if (!ready) {
@@ -97,45 +104,47 @@ async function main() {
 
     console.log('[test:routes] Server đã sẵn sàng. Bắt đầu kiểm tra 7 cases:');
 
-    let allPassed = true;
+    let passedCases = true;
 
     // 1. /docs public phải trả về 200
     const t1 = await checkRoute(baseUrl, '/docs', 200, 'Public docs accessible');
-    allPassed = allPassed && t1;
+    passedCases = passedCases && t1;
 
     // 2. /internal phải bị chặn 401
     const t2 = await checkRoute(baseUrl, '/internal', 401, 'Internal root blocked');
-    allPassed = allPassed && t2;
+    passedCases = passedCases && t2;
 
     // 3. /internal/ (trailing slash) phải bị chặn 401
     const t3 = await checkRoute(baseUrl, '/internal/', 401, 'Internal trailing slash blocked');
-    allPassed = allPassed && t3;
+    passedCases = passedCases && t3;
 
     // 4. /internal/onboarding subpage phải bị chặn 401
     const t4 = await checkRoute(baseUrl, '/internal/onboarding', 401, 'Internal subpage blocked');
-    allPassed = allPassed && t4;
+    passedCases = passedCases && t4;
 
     // 5. /api/search/internal phải bị chặn 401
     const t5 = await checkRoute(baseUrl, '/api/search/internal', 401, 'Internal search API blocked');
-    allPassed = allPassed && t5;
+    passedCases = passedCases && t5;
 
     // 6. /api/search/internal/ (trailing slash) phải bị chặn 401
     const t6 = await checkRoute(baseUrl, '/api/search/internal/', 401, 'Internal search API trailing slash blocked');
-    allPassed = allPassed && t6;
+    passedCases = passedCases && t6;
 
     // 7. /api/search public phải trả về 200
     const t7 = await checkRoute(baseUrl, '/api/search', 200, 'Public search API accessible');
-    allPassed = allPassed && t7;
+    passedCases = passedCases && t7;
 
-    if (!allPassed) {
+    if (!passedCases) {
       console.error('\n[test:routes FAIL] Một hoặc nhiều route không đạt mã HTTP mong đợi.');
-      process.exit(1);
+      allPassed = false;
     } else {
       console.log('\n[test:routes PASS] Toàn bộ 7/7 route test case đều đạt chuẩn.\n');
+      allPassed = true;
     }
   } finally {
     console.log('[test:routes] Đang tắt server...');
     killProcessTree(serverProc.pid);
+    process.exit(allPassed ? 0 : 1);
   }
 }
 

@@ -1,0 +1,40 @@
+---
+title: "Tạo tài khoản và Phân quyền"
+description: "Hướng dẫn đăng ký tài khoản khách hàng, kích hoạt xác thực 2 lớp và quản lý phân quyền thành viên."
+---
+
+import { Steps } from 'fumadocs-ui/components/steps';
+
+## Mục tiêu
+
+Hướng dẫn bạn tạo tài khoản ODS Portal thành công, kích hoạt các lớp bảo vệ cần thiết và mời thành viên trong tổ chức vào cùng quản lý tài nguyên.
+
+## Điều kiện cần
+
+- Địa chỉ email doanh nghiệp hợp lệ.
+- Số điện thoại di động chính chủ để nhận mã xác thực OTP.
+
+## Các bước thực hiện
+
+<Steps>
+### Bước 1: Đăng ký tài khoản trên Portal
+
+1. Truy cập cổng quản trị khách hàng tại địa chỉ `https://portal.ods.vn`.
+2. Nhấn chọn **Đăng ký tài khoản mới**.
+3. Điền các thông tin doanh nghiệp bắt buộc: Tên công ty, Mã số thuế, Họ tên người đại diện, Email và Số điện thoại.
+
+### Bước 2: Xác thực email và số điện thoại
+
+1. Kiểm tra hòm thư và nhấn vào liên kết kích hoạt do hệ thống gửi về.
+2. Nhập mã OTP 6 chữ số được gửi qua tin nhắn SMS để hoàn tất quá trình định danh.
+
+### Bước 3: Thiết lập bảo mật 2 lớp (2FA)
+
+1. Vào mục **Cài đặt tài khoản** $\rightarrow$ **Bảo mật**.
+2. Bật tính năng **Xác thực hai yếu tố (2FA)** bằng ứng dụng Google Authenticator hoặc Microsoft Authenticator.
+3. Lưu trữ mã khôi phục dự phòng ở nơi an toàn.
+</Steps>
+
+## Kiểm tra kết quả
+
+Sau khi hoàn tất, bạn có thể đăng nhập thành công vào bảng điều khiển quản trị ODS Portal và thấy huy hiệu **Đã xác thực** bên cạnh tên tài khoản.

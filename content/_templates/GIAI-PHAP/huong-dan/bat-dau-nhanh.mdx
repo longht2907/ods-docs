@@ -1,0 +1,40 @@
+---
+title: "Bắt đầu nhanh"
+description: "Các bước cơ bản để kích hoạt và vận hành giải pháp trong thời gian ngắn nhất."
+---
+
+import { Steps } from 'fumadocs-ui/components/steps';
+
+## Mục tiêu
+
+Tài liệu này giúp bạn khởi tạo và chạy thử nghiệm giải pháp lần đầu tiên, đảm bảo kết nối thông suốt với hệ thống ODS.
+
+## Điều kiện cần
+
+- Tài khoản ODS Portal có quyền quản trị dịch vụ.
+- Thông tin định danh dịch vụ (Service ID và Access Token).
+
+## Các bước thực hiện
+
+<Steps>
+### Bước 1: Khởi tạo cấu hình
+
+Truy cập bảng điều khiển, vào phần cài đặt dịch vụ và lấy thông tin xác thực.
+
+### Bước 2: Thiết lập kết nối
+
+Nhập thông tin định danh vào tệp cấu hình môi trường hoặc giao diện ứng dụng.
+
+### Bước 3: Xác thực dịch vụ
+
+Gửi yêu cầu kiểm tra trạng thái để xác nhận luồng kết nối hoạt động bình thường.
+</Steps>
+
+## Kiểm tra kết quả
+
+Hệ thống ghi nhận trạng thái `Hoạt động` trên trang tổng quan và phản hồi kiểm tra đạt mã `200 OK`.
+
+## Xem thêm
+
+- [Tổng quan giải pháp](../) — Tìm hiểu thêm về tính năng và kiến trúc.
+- [Xử lý sự cố](../xu-ly-su-co) — Hướng dẫn xử lý khi gặp lỗi kết nối.

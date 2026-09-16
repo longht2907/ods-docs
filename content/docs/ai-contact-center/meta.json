@@ -1,0 +1,11 @@
+{
+  "title": "AI Contact Center",
+  "root": true,
+  "pages": [
+    "index",
+    "huong-dan",
+    "autocall",
+    "api",
+    "xu-ly-su-co"
+  ]
+}

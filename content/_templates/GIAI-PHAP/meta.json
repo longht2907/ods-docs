@@ -1,0 +1,10 @@
+{
+  "title": "[Tên Giải Pháp]",
+  "root": true,
+  "pages": [
+    "index",
+    "huong-dan",
+    "api",
+    "xu-ly-su-co"
+  ]
+}

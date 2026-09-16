@@ -1,0 +1,74 @@
+---
+title: "[Tên Endpoint hoặc Nhóm API]"
+description: "Đặc tả kỹ thuật chi tiết về phương thức HTTP, tham số yêu cầu, phản hồi và mã lỗi của API."
+---
+
+{/*
+  KHUÔN MẪU: API-REFERENCE
+  Mục đích: Dành cho bài viết đặc tả API tại api/<ten-endpoint>.mdx hoặc api/index.mdx.
+  Cấu trúc bắt buộc:
+  1. Method + Path: Hiển thị rõ phương thức HTTP (GET/POST/PUT/DELETE) và endpoint path.
+  2. Mô tả: Chức năng của API, giới hạn tần suất (rate limit), cơ chế xác thực.
+  3. Bảng tham số: Gồm Query/Path params hoặc Request Body (Tên, Kiểu, Bắt buộc, Mô tả).
+  4. Ví dụ Request: Mã lệnh cURL hoặc HTTP payload chuẩn.
+  5. Ví dụ Response: JSON phản hồi mẫu thành công (200 OK / 201 Created).
+  6. Bảng mã lỗi: Danh sách các mã lỗi HTTP và mã lỗi nghiệp vụ thường gặp.
+*/}
+
+`POST` `/api/v1/resources`
+
+API này cho phép khởi tạo một tài nguyên mới trong hệ thống. Yêu cầu gửi kèm Bearer Token xác thực trong tiêu đề HTTP `Authorization`.
+
+## Bảng tham số
+
+### Headers
+
+| Tên header | Kiểu | Bắt buộc | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `Authorization` | string | Có | Định dạng: `Bearer <token>` |
+| `Content-Type` | string | Có | Phải là `application/json` |
+
+### Body (JSON)
+
+| Thuộc tính | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :--- | :--- | :--- | :--- |
+| `name` | string | Có | Tên tài nguyên (tối đa 100 ký tự) |
+| `type` | string | Có | Loại tài nguyên: `standard` hoặc `premium` |
+| `description` | string | Không | Mô tả mục đích sử dụng |
+
+## Ví dụ Request
+
+```bash
+curl -X POST "https://api.ods.vn/v1/resources" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "res-demo-01",
+    "type": "standard",
+    "description": "Tai nguyen thu nghiem"
+  }'
+```
+
+## Ví dụ Response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "res_987654321",
+    "name": "res-demo-01",
+    "type": "standard",
+    "state": "provisioning",
+    "created_at": "2026-09-16T08:00:00Z"
+  }
+}
+```
+
+## Bảng mã lỗi
+
+| Mã HTTP | Mã lỗi nghiệp vụ | Nguyên nhân & Cách khắc phục |
+| :--- | :--- | :--- |
+| `400` | `INVALID_PAYLOAD` | Tham số gửi lên không đúng định dạng JSON hoặc thiếu trường bắt buộc. |
+| `401` | `UNAUTHORIZED` | Token xác thực không hợp lệ hoặc đã hết hạn truy cập. |
+| `409` | `RESOURCE_CONFLICT` | Tên tài nguyên đã tồn tại trong không gian tên hiện tại. |
+| `500` | `INTERNAL_ERROR` | Lỗi nội bộ hệ thống trong quá trình khởi tạo tài nguyên. |

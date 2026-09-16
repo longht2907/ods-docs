@@ -1,0 +1,70 @@
+---
+title: "API Tích hợp cuộc gọi"
+description: "Đặc tả API khởi tạo cuộc gọi tự động (Click-to-Call), tra cứu lịch sử cuộc gọi và webhook sự kiện."
+---
+
+Hệ thống AI Contact Center cung cấp bộ REST API chuẩn hóa giúp các ứng dụng thứ ba (như CRM, ERP, Helpdesk) tích hợp trực tiếp các thao tác gọi điện và nhận dữ liệu thời gian thực.
+
+`POST` `/api/v1/calls/make`
+
+Khởi tạo một cuộc gọi từ máy nhánh hoặc đầu số tổng đài tới số điện thoại khách hàng (Click-to-Call).
+
+## Bảng tham số
+
+### Headers
+
+| Tên header | Kiểu | Bắt buộc | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `Authorization` | string | Có | Định dạng: `Bearer <YOUR_API_TOKEN>` |
+| `Content-Type` | string | Có | Giá trị cố định: `application/json` |
+
+### Body (JSON)
+
+| Thuộc tính | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :--- | :--- | :--- | :--- |
+| `extension` | string | Có | Số máy nhánh thực hiện cuộc gọi (ví dụ: `101`) |
+| `customer_phone` | string | Có | Số điện thoại người nhận (định dạng E.164 hoặc số nội địa, ví dụ: `0901234567`) |
+| `caller_id` | string | Không | Đầu số hiển thị khi gọi ra. Mặc định dùng đầu số chính của tổng đài |
+| `custom_data` | object | Không | Dữ liệu tùy biến đính kèm để nhận lại qua Webhook khi cuộc gọi kết thúc |
+
+## Ví dụ Request
+
+```bash
+curl -X POST "https://api-cc.ods.vn/v1/calls/make" \
+  -H "Authorization: Bearer cc_sec_8723498a7b6c5d4e" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "extension": "101",
+    "customer_phone": "0901234567",
+    "caller_id": "02873006634",
+    "custom_data": {
+      "ticket_id": "TCK-9921",
+      "agent_name": "Nguyen Van A"
+    }
+  }'
+```
+
+## Ví dụ Response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "call_id": "call_1726470000_a8f9",
+    "status": "originating",
+    "extension": "101",
+    "customer_phone": "0901234567",
+    "created_at": "2026-09-16T08:30:00Z"
+  }
+}
+```
+
+## Bảng mã lỗi
+
+| Mã HTTP | Mã nghiệp vụ | Giải thích nguyên nhân & Khắc phục |
+| :--- | :--- | :--- |
+| `400` | `INVALID_PHONE_NUMBER` | Số điện thoại khách hàng không đúng định dạng hoặc thiếu mã vùng. |
+| `401` | `UNAUTHORIZED` | API Token sai hoặc quyền truy cập của máy nhánh bị khóa. |
+| `404` | `EXTENSION_OFFLINE` | Máy nhánh chỉ định hiện không online (chưa đăng ký SIP thành công). |
+| `429` | `RATE_LIMIT_EXCEEDED` | Vượt quá giới hạn số lượng cuộc gọi khởi tạo mỗi giây của gói cước. |
+| `500` | `SIP_GATEWAY_ERROR` | Cổng kết nối viễn thông gặp sự cố tạm thời, vui lòng thử lại sau 30 giây. |

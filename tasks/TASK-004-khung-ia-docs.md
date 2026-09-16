@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: done
 branch: task/TASK-004-khung-ia-docs
-commit: ""
+commit: "8643534"
 verified-by: npm run verify:task
 ---
 

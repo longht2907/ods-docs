@@ -2,8 +2,8 @@
 
 - **Task**: `tasks/TASK-004-khung-ia-docs.md`
 - **Branch**: `task/TASK-004-khung-ia-docs`
-- **Commit**: (sẽ cập nhật hash cuối sau khi commit)
-- **Trạng thái**: in-progress
+- **Commit**: `8643534`
+- **Trạng thái**: done
 - **Kiểm chứng bởi**: `npm run verify:task`
 
 ---

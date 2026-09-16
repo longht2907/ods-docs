@@ -1,4 +1,12 @@
 {
   "title": "Tài liệu ODS",
-  "pages": ["index"]
+  "pages": [
+    "index",
+    "bat-dau",
+    "---Giải pháp phần mềm---",
+    "ai-contact-center",
+    "cloudfile",
+    "---Tham chiếu---",
+    "tham-chieu-chung"
+  ]
 }

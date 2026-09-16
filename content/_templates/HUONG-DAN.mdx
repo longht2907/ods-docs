@@ -1,0 +1,65 @@
+---
+title: "[Tên bài hướng dẫn]"
+description: "Hướng dẫn từng bước thực hiện tác vụ cụ thể kèm điều kiện tiên quyết và cách kiểm tra kết quả."
+---
+
+import { Steps } from 'fumadocs-ui/components/steps';
+
+{/*
+  KHUÔN MẪU: HUONG-DAN
+  Mục đích: Dành cho toàn bộ bài viết thao tác kỹ thuật tại huong-dan/<ten-bai>.mdx hoặc xu-ly-su-co/<ten-bai>.mdx.
+  Cấu trúc bắt buộc:
+  1. Mục tiêu: Mô tả rõ ràng kết quả đạt được sau khi làm xong bài này.
+  2. Điều kiện cần: Các tài nguyên, quyền hạn hoặc công cụ cần chuẩn bị trước.
+  3. Các bước thực hiện: Đánh số thứ tự 1, 2, 3... (sử dụng component <Steps> hoặc markdown heading có số).
+  4. Kiểm tra kết quả: Cách xác nhận tác vụ đã thành công (lệnh test, log, trạng thái UI).
+  5. Xem thêm: Các bài liên quan để đi tiếp.
+*/}
+
+## Mục tiêu
+
+Bài viết này hướng dẫn bạn thực hiện [nêu rõ thao tác cụ thể, ví dụ: kích hoạt tính năng X hoặc tích hợp SIP trunking]. Sau khi hoàn tất, hệ thống sẽ sẵn sàng phục vụ lưu lượng thực tế.
+
+## Điều kiện cần
+
+Trước khi bắt đầu, hãy đảm bảo bạn đã chuẩn bị:
+
+- Tài khoản quản trị viên với quyền truy cập vào cổng quản lý dịch vụ.
+- Thông tin xác thực hệ thống (API Key hoặc Secret Token nếu thao tác qua API).
+- Dịch vụ nền tảng đã được khởi tạo và ở trạng thái `Active`.
+
+## Các bước thực hiện
+
+<Steps>
+### Bước 1: Chuẩn bị thông tin cấu hình
+
+Đăng nhập vào bảng điều khiển quản trị, điều hướng đến mục **Cài đặt hệ thống** và sao chép các tham số kết nối cần thiết.
+
+### Bước 2: Khai báo tham số dịch vụ
+
+Cập nhật các giá trị cấu hình tương ứng vào tệp cấu hình hoặc giao diện người dùng theo mẫu sau:
+
+```json
+{
+  "service_id": "srv_example_123",
+  "endpoint": "https://api.ods.vn/v1",
+  "timeout": 30
+}
+```
+
+### Bước 3: Áp dụng và kích hoạt
+
+Nhấn **Lưu cấu hình** và chọn **Khởi động lại dịch vụ** để các thay đổi có hiệu lực. Quá trình nạp lại diễn ra trong vòng 10 đến 30 giây.
+</Steps>
+
+## Kiểm tra kết quả
+
+Để xác nhận cấu hình đã hoạt động chính xác:
+
+1. Quan sát trạng thái kết nối trên bảng điều khiển: biểu tượng trạng thái hiển thị màu xanh lá cây (`Operational` hoặc `Connected`).
+2. Thực hiện một yêu cầu thử nghiệm hoặc kiểm tra nhật ký (logs) hệ thống để xác nhận không có mã lỗi `5xx` hoặc `Connection Refused`.
+
+## Xem thêm
+
+- [Tổng quan giải pháp](/docs) — Xem lại kiến trúc và khái niệm chung.
+- [Sổ tay khắc phục sự cố](/docs) — Cách xử lý khi gặp sự cố trong quá trình thiết lập.

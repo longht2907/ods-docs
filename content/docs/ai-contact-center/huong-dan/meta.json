@@ -6,11 +6,11 @@
   "defaultOpen": true,
   "pages": [
     "index",
-    "---Bắt đầu---",
+    "---[Rocket]Bắt đầu---",
     "bat-dau-nhanh",
-    "---Vận hành---",
+    "---[PhoneCall]Vận hành---",
     "autocall",
-    "---Hỗ trợ---",
+    "---[Wrench]Hỗ trợ---",
     "xu-ly-su-co"
   ]
 }

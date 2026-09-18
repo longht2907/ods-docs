@@ -1,7 +1,16 @@
 {
-  "title": "Hướng dẫn sử dụng",
+  "title": "Hướng dẫn",
+  "description": "Hướng dẫn dành cho người quản trị và người sử dụng portal AI Contact Center.",
+  "icon": "BookOpen",
+  "root": "audience",
+  "defaultOpen": true,
   "pages": [
     "index",
-    "bat-dau-nhanh"
+    "---Bắt đầu---",
+    "bat-dau-nhanh",
+    "---Vận hành---",
+    "autocall",
+    "---Hỗ trợ---",
+    "xu-ly-su-co"
   ]
 }

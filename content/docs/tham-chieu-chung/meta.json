@@ -1,6 +1,11 @@
 {
   "title": "Tham chiếu chung",
+  "description": "Thông tin tham chiếu áp dụng chung cho các dịch vụ ODS.",
+  "icon": "BookText",
+  "defaultOpen": false,
   "pages": [
+    "index",
+    "---Thông tin tham chiếu---",
     "thuat-ngu",
     "cam-ket-sla",
     "cau-hoi-thuong-gap"

@@ -1,8 +1,13 @@
 {
   "title": "Bắt đầu",
+  "description": "Thông tin cần thiết để bắt đầu sử dụng các dịch vụ ODS.",
+  "icon": "Rocket",
+  "defaultOpen": true,
   "pages": [
     "index",
+    "---Tổng quan---",
     "he-sinh-thai-giai-phap",
+    "---Bắt đầu sử dụng---",
     "tao-tai-khoan",
     "lien-he-ho-tro"
   ]

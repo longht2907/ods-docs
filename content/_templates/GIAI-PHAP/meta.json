@@ -1,10 +1,10 @@
 {
-  "title": "[Tên Giải Pháp]",
+  "title": "TEN_GIAI_PHAP",
+  "description": "MO_TA_GIAI_PHAP",
+  "icon": "Box",
   "root": true,
+  "defaultOpen": true,
   "pages": [
-    "index",
-    "huong-dan",
-    "api",
-    "xu-ly-su-co"
+    "index"
   ]
 }

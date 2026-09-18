@@ -1,3 +1,8 @@
+---
+title: "Hướng dẫn sử dụng template giải pháp"
+description: "Quy tắc mở rộng template giải pháp theo Solution root và Audience root trong ODS Docs."
+---
+
 # Template giải pháp
 
 Template mặc định chỉ tạo solution root và landing page.

@@ -1,12 +1,16 @@
 {
   "title": "Tài liệu ODS",
+  "description": "Tài liệu sử dụng và tích hợp các giải pháp ODS.",
+  "icon": "Library",
+  "defaultOpen": true,
   "pages": [
     "index",
+    "---[Compass]Khám phá tài liệu---",
     "bat-dau",
-    "---Giải pháp phần mềm---",
+    "giai-phap",
     "ai-contact-center",
     "cloudfile",
-    "---Tham chiếu---",
+    "---[BookOpen]Tham chiếu---",
     "tham-chieu-chung"
   ]
 }

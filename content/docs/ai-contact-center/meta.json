@@ -1,11 +1,12 @@
 {
   "title": "AI Contact Center",
+  "description": "Hướng dẫn vận hành và API tích hợp hệ thống AI Contact Center.",
+  "icon": "Bot",
   "root": true,
+  "defaultOpen": true,
   "pages": [
     "index",
     "huong-dan",
-    "autocall",
-    "api",
-    "xu-ly-su-co"
+    "api"
   ]
 }

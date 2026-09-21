@@ -10,3 +10,30 @@ html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
 }
+
+.ods-docs-header {
+  grid-area: header;
+  min-width: 0;
+  width: 100%;
+}
+
+.ods-docs-layout:has(.ods-context-tabs) {
+  --fd-header-height: 6.25rem;
+}
+
+.ods-context-tabs {
+  scrollbar-width: none;
+}
+
+.ods-context-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .ods-docs-layout {
+    grid-template:
+      "header"
+      "toc-popover"
+      "main" 1fr / minmax(0, 1fr) !important;
+  }
+}

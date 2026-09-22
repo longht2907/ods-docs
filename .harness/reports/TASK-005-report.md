@@ -2,7 +2,7 @@
 
 - **Task**: `tasks/TASK-005-hoan-thien-bo-cuc-docs.md`
 - **Branch**: `task/TASK-005-hoan-thien-bo-cuc-docs`
-- **Trạng thái**: `in-progress`
+- **Trạng thái**: `done`
 - **Kiểm chứng bởi**: `npm run verify:task`
 
 ## 1. File thay đổi
@@ -69,4 +69,4 @@ In-app browser connector không có `node_repl` callable trong phiên nghiệm t
 
 ## 5. Trạng thái bàn giao
 
-Implementation và local verification đã hoàn tất. Task tiếp tục giữ `status: in-progress`; chỉ Human/CI workflow mới chuyển sang `done` sau khi Pull Request xanh.
+Implementation và local verification đã hoàn tất. Pull Request #5 đã được merge vào `main` tại commit `3ebeaf5`; required check `verify` hoàn tất với kết quả `success`. TASK-005 được chuyển sang `done`, với commit implementation `732faa6` được ghi trong task frontmatter.

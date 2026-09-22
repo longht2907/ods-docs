@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: done
 branch: task/TASK-005-hoan-thien-bo-cuc-docs
-commit: ""
+commit: "732faa6"
 verified-by: npm run verify:task
 ---
 

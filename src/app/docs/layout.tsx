@@ -3,6 +3,8 @@ import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions } from '@/lib/layout.shared';
 import Link from 'next/link';
 import { BookOpenText, CircleHelp, Gauge, Rocket } from 'lucide-react';
+import { DocsContainer } from '@/components/docs-container';
+import { TopNav } from '@/components/top-nav';
 
 function SharedDocsNavigation() {
   return (
@@ -37,13 +39,10 @@ export default function Layout({ children }: LayoutProps<'/docs'>) {
     <DocsLayout
       tree={source.getPageTree()}
       {...baseOptions()}
-      tabs={{
-        transform(option, node) {
-          return {
-            ...option,
-            icon: 'icon' in node && node.icon ? node.icon : option.icon,
-          };
-        },
+      tabs={false}
+      slots={{
+        container: DocsContainer,
+        header: TopNav,
       }}
       sidebar={{
         defaultOpenLevel: 1,

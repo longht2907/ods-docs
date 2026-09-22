@@ -1,0 +1,9 @@
+{
+  "title": "Tích hợp đa kênh",
+  "icon": "Share2",
+  "pages": [
+    "index",
+    "tich-hop-zalo-oa",
+    "tich-hop-facebook-messenger"
+  ]
+}

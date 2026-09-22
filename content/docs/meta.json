@@ -5,12 +5,10 @@
   "defaultOpen": true,
   "pages": [
     "index",
-    "---[Compass]Khám phá tài liệu---",
-    "bat-dau",
-    "giai-phap",
-    "ai-contact-center",
-    "cloudfile",
-    "---[BookOpen]Tham chiếu---",
-    "tham-chieu-chung"
+    "---[Compass]Giải pháp ODS---",
+    "[Bot][AI Contact Center](/docs/ai-contact-center)",
+    "[Cloud][CloudFile](/docs/cloudfile)",
+    "!ai-contact-center",
+    "!cloudfile"
   ]
 }

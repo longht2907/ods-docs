@@ -1,0 +1,91 @@
+---
+title: "Hướng dãn tạo, cấu hình và kiểm tra trạng thái số máy nhánh"
+description: "Số máy nhánh là máy là một số điện thoại nội bộ được gán cho từng người dùng, phòng ban hoặc nhóm trong hệ thống tổng đài ảo. Nó cho phép các cuộc gọi được chuy..."
+---
+
+Số máy nhánh là máy là một số điện thoại nội bộ được gán cho từng người dùng, phòng ban hoặc nhóm trong hệ thống tổng đài ảo. Nó cho phép các cuộc gọi được chuyển trực tiếp đến đúng người hoặc bộ phận
+
+## Tạo số máy nhánh
+
+### Số máy nhánh là gì?
+
+Số máy nhánh là một chuỗi số gồm 1 đến 5 chữ số mà khách hàng có thể tạo tùy ý, dùng để cấp cho nhân viên. Nhân viên có thể đăng ký sử dụng trên các thiết bị như:
+
+* Điện thoại để bàn (IP Phone)
+* Softphone trên laptop/PC
+* Ứng dụng di động
+
+<Callout type="warn">
+### Lưu ý khi sử dụng số máy nhánh:
+
+* Số lượng số máy nhánh được tạo giới hạn theo gói dịch vụ tổng đài.
+* Không được trùng với các số SOS đặc biệt như 113, 114, ...
+* Một số máy nhánh có thể sử dụng tối đa trên 3 thiết bị.
+* Khi có cuộc gọi đến, có thể đổ chuông trên cả 3 thiết bị.
+* Khi gọi ra, chỉ được thực hiện trên 1 thiết bị tại một thời điểm.
+* Mật khẩu số máy nhánh cần được bảo mật.
+</Callout>
+
+### Cách tạo số máy nhánh:
+
+1. Để thiết lập tạo máy nhánh (tài khoản nhân viên) trên hệ thống tổng đài, người dùng truy cập vào: **Tổng đài → Cài đặt tổng đài → Nhân viên**<br />
+
+   ![](/media/ai-contact-center/user-guider-portal/img-Hx1oADM6adP9N9tUbqUP.png)
+2. Điền các thông tin:
+   * **Số máy nhánh**: có thể đặt tùy ý (VD: 1234, 678, ...).
+   * **Tên nhân viên**: đặt tùy ý, không dấu.
+   * **Mật khẩu**: ít nhất 8 ký tự, gồm chữ hoa, số và ký tự đặc biệt.
+   * **Bỏ qua mã PIN gọi ra**: sử dụng khi thiết lập mã PIN trong mục "Định tuyến".
+   * **Sử dụng Matbao One Phone**: tối ưu push app khi dùng trên di động.\ <br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-QitWZe3FB428sbkKBzob.png)
+
+## Cấu hình số máy nhánh
+
+Người quản trị có thể thiết lập các thông số sau:
+
+### 1. Thời gian đổ chuông
+
+* **Thời gian đổ chuông**: thời gian tối đa trước khi cuộc gọi bị ngắt.
+* **Thời gian chuyển cuộc gọi**: thời gian đổ chuông khi chuyển tiếp.
+* **Báo cuộc gọi đến khi đang gọi**: bật/tắt chờ cuộc gọi.<br />
+
+  ![](/media/ai-contact-center/user-guider-portal/img-iXgu0aVvJ3LYirZ9uYYy.png)
+
+### 2. Ghi âm số máy nhánh
+
+* **Luôn luôn**: ghi âm mọi cuộc gọi.
+* **Theo yêu cầu**: chỉ ghi âm khi bấm phím chức năng.
+* **Không bao giờ**: không cho phép ghi âm.<br />
+
+  ![](/media/ai-contact-center/user-guider-portal/img-HTGKsOKCqd18VXjz1oFR.png)
+
+### 3. Cập nhật số máy nhánh
+
+* Chọn **Sửa** để thay đổi thông tin tên nhân viên, mật khẩu.
+
+### 4. Xóa số máy nhánh
+
+* Chọn **Xóa** để loại bỏ số máy nhánh khỏi hệ thống.<br />
+
+  ![](/media/ai-contact-center/user-guider-portal/img-Bg45CtaYjaRzO4tuzwBp.png)
+
+## Kiểm tra trạng thái của số máy nhánh
+
+Sau khi tạo số máy nhánh, có thể kiểm tra trạng thái đăng ký:
+
+* **Màu xanh**: Trực tuyến (đăng ký thành công).
+* **Màu đỏ**: Không trực tuyến (chưa đăng ký hoặc mất kết nối).
+* **Màu vàng**: Kết nối chậm.<br />
+
+  ![](/media/ai-contact-center/user-guider-portal/img-7nWutqbX2IHMtn8ge4P8.png)
+
+<Callout type="warn">
+### Lưu ý:
+
+* Khi dùng Matbao One Phone, Wi-Fi không ổn định có thể khiến trạng thái chuyển sang màu vàng.
+* Một số trường hợp đăng ký thất bại:
+  * Nhập sai mật khẩu.
+  * Sai thông tin IP tổng đài hoặc port kết nối.
+  * Nhập sai thông tin 3 lần sẽ bị chặn IP.
+</Callout>

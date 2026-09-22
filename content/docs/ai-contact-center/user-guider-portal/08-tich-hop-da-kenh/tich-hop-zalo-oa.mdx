@@ -1,0 +1,71 @@
+---
+title: "Hướng Dẫn Tích Hợp Zalo OA"
+description: "Tích hợp Zalo Official Account Zalo OA vào hệ thống giúp doanh nghiệp tận dụng kênh Zalo để:"
+---
+
+## 1. Mục Đích Tích Hợp Zalo OA
+
+Tích hợp Zalo Official Account (Zalo OA) vào hệ thống giúp doanh nghiệp tận dụng kênh Zalo để:
+
+* Tự động hóa việc gửi tin nhắn chăm sóc khách hàng.
+* Quản lý khách hàng hiệu quả hơn thông qua API của Zalo.
+* Gửi thông báo quan trọng như đơn hàng, khuyến mãi, hỗ trợ khách hàng.
+* Tạo chatbot để hỗ trợ khách hàng 24/7 mà không cần nhân viên trực tiếp xử lý.
+
+## 2. Hướng Dẫn Tích Hợp Zalo OA
+
+Có hai cách để tích hợp Zalo OA vào hệ thống :
+
+**Cách 1: Tích Hợp Thông Qua App Ủy Quyền Của ODS**
+
+ODS cung cấp sẵn một ứng dụng giúp bạn dễ dàng kết nối Zalo OA với hệ thống của mình mà không cần lập trình phức tạp.
+
+Các bước thực hiện:
+
+1. Truy cập trang quản lý Zalo Token
+   * Đăng nhập vào tài khoản quản trị tổng đài.
+   * Vào phần "Thiết lập nâng cao" ⇒ Thiết lập Zalo token<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-AKUymV2gGB2DeSaP5Rfn.png)
+2. Thêm mới tài khoản Zalo OA
+   * Nhấn vào nút "Thêm Mới Zalo".<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-YouwrYhPKLsMAmzyvJKY.png)
+   * Hệ thống sẽ hiển thị hộp thoại xác nhận liên kết với Zalo OA.
+3. Ủy quyền ứng dụng
+   * Nhấn "Liên Kết Ứng Dụng".<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-yRTQ1Mu8v8IckXU4ruu2.png)
+   * Đăng nhập vào tài khoản Zalo OA của bạn.
+   * Cho phép ứng dụng Mắt Bão One sử dụng API của Zalo OA.<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-zWHKVxrLC6RAew7aAbH1.png)
+4. Kiểm tra và sử dụng
+   * Sau khi liên kết thành công, bạn có thể bắt đầu gửi tin nhắn và quản lý khách hàng thông qua Mắt Bão One.
+
+![](/media/ai-contact-center/user-guider-portal/img-6qFRdWzA3DvUxam8f3bI.png)
+
+**Cách 2: Tích Hợp Sử Dụng App Riêng Của Người Dùng**
+
+Nếu bạn muốn tự xây dựng hệ thống tích hợp Zalo OA mà không thông qua bên thứ ba, bạn có thể sử dụng API chính thức của Zalo OA.
+
+Các bước thực hiện:
+
+1. Đăng ký ứng dụng trên Zalo Developer
+   * Truy cập Zalo for Developers.
+   * Đăng ký tài khoản và tạo ứng dụng mới.
+2. Lấy Zalo OA Access Token
+   * Vào mục "Quản lý ứng dụng".
+   * Lấy thông tin `app_id`, `app_secret` và `access_token` để tích hợp.
+3. Tích hợp API vào hệ thống
+   * Sử dụng API của Zalo để gửi tin nhắn, lấy danh sách người quan tâm, gửi thông báo...
+   * Tham khảo tài liệu API của Zalo: [https://developers.zalo.me/docs/](https://developers.zalo.me/docs/)
+4. Xác thực Webhook (nếu có)
+   * Đăng ký Webhook để nhận thông báo từ Zalo OA khi có tin nhắn hoặc sự kiện mới.
+
+## 3. Các Lưu Ý Khi Tích Hợp Zalo OA
+
+* **Chọn cách tích hợp phù hợp:** Nếu bạn không có đội ngũ lập trình, nên sử dụng giải pháp có sẵn như Mắt Bão One.
+* **Đảm bảo quyền truy cập API:** Nếu sử dụng app riêng, cần đảm bảo quyền truy cập API Zalo OA đã được cấp đúng.
+* **Kiểm tra hạn của Access Token:** Token Zalo có thời gian hết hạn, cần cập nhật định kỳ để tránh gián đoạn.
+* **Tuân thủ chính sách Zalo:** Không gửi tin nhắn spam, quảng cáo không đúng quy định để tránh bị khóa OA.

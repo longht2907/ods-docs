@@ -1,0 +1,148 @@
+---
+title: "HƯỚNG DẪN CÀI ĐẶT ỨNG DỤNG ZOIPER TRÊN MÁY TÍNH"
+description: "Hướng dẫn sẽ được chia làm 2 phần, phần I là hướng dẫn cài đặt ứng dụng Zoiper 3 và phần II là ứng dụng Zoiper 5.\ Chúng ta chỉ sử dụng chức năng nghe gọi miễn ..."
+---
+
+Hướng dẫn sẽ được chia làm 2 phần, phần I là hướng dẫn cài đặt ứng dụng Zoiper 3 và phần II là ứng dụng Zoiper 5.\
+Chúng ta chỉ sử dụng chức năng nghe gọi miễn phí nên mặt tính năng hai ứng dụng hoàn toàn giống nhau, chỉ có khác biệt về mặt giao diện.
+
+## Mục lục
+
+* **I/ Cài đặt ứng dụng Zoiper 3**
+  * Bước 1. Tải và cài đặt Zoiper 3
+  * Bước 2. Nhập thông tin đăng kí số máy nhánh (số nội bộ)
+  * Bước 3. Thực hiện cuộc gọi và chuyển cuộc gọi
+* **II/ Cài đặt ứng dụng Zoiper 5**
+  * Bước 1. Tải và cài đặt Zoiper 5
+  * Bước 2. Nhập thông tin đăng kí số máy nhánh (số nội bộ)
+  * Bước 3. Thực hiện cuộc gọi và chuyển cuộc gọi
+
+## I/ Cài đặt ứng dụng Zoiper 3
+
+### Bước 1. Tải và cài đặt Zoiper 3
+
+Link tải: [https://www.zoiper.com/en/voip-softphone/download/classic](https://www.zoiper.com/en/voip-softphone/download/classic)
+
+![](/media/ai-contact-center/user-guider-portal/img-qqC7gwovAHtT2BOVQ5cS.png)
+
+Sau đó tiến hành cài đặt, ta sẽ để mặc định tất cả các lựa chọn trong quá trình cài đặt.
+
+### Bước 2. Nhập thông tin đăng kí số máy nhánh (số nội bộ)
+
+1. **Lấy thông tin đăng nhập:**
+   * Truy cập vào trang quản trị tổng đài: `https://app.matbao.one/`
+   * Vào mục **Tổng đài** => **Cài đặt tổng đài** => **Nhân viên**.
+   * Chọn một số máy nhánh cần đăng kí (ví dụ: số `11`).<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-3ToW7puR4brBMWxPjFNM.png)
+   * Bấm vào nút “Sửa” (biểu tượng cây bút hoặc tương tự) để xem thông tin chi tiết và lấy **Mật khẩu** (Password) của số máy nhánh đó.<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-dFmT5pkzsqIy2xWopBSQ.png)
+   * Lấy thông tin **Server tổng đài** (Địa chỉ IP hoặc domain của tổng đài) và **Port** (thường là 5060 cho SIP) đã được cung cấp khi bàn giao dịch vụ.
+2. **Nhập thông tin vào Zoiper 3:**
+   * Mở ứng dụng Zoiper 3.
+   * Chọn **Settings** => **Create a new account**.\
+     ![](/media/ai-contact-center/user-guider-portal/img-4DTBvdDZngbOMgFdkleP.png)
+   * Ở phần “Account type”, chọn **SIP** nếu được hỏi, sau đó nhấn **NEXT**.<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-ESAiJ0l1hCqnQfYR4zr8.png)
+   * Điền thông tin đăng kí:
+     * **User / user\@host:** `số_máy_nhánh@địa_chỉ_tổng_đài:port` (Ví dụ: `11@172.16.148.29:5060`)
+     * **Password:** Mật khẩu của số máy nhánh đã lấy ở trên.\ <br />
+
+       ![](/media/ai-contact-center/user-guider-portal/img-fY4z2BAt7dSnw2L6NKGi.png)
+   * Nhấn **NEXT** 2 lần.
+   * Chờ ứng dụng kiểm tra. Nếu thành công, sẽ có thông báo xác nhận.<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-WrIxL8R234r8ByANbQIN.png)
+   * Bấm **Close**.
+3. **Kiểm tra lại:**
+   * Chọn **Settings** => **Preferences**.\
+     ![](/media/ai-contact-center/user-guider-portal/img-ljjnZdK4lVRjL4TcjK8X.png)
+   * Trong danh sách tài khoản (thường là dưới mục **Accounts** hoặc **SIP**), nếu số nội bộ đăng kí thành công sẽ có dấu tích xanh bên cạnh.<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-0scZ4AfdRtWx0FaLHeH1.png)
+   * Nếu muốn xóa số nội bộ, chọn tài khoản và nhấn **Remove account**.
+   * Nhấn **OK** để đóng cửa sổ Preferences.
+
+### Bước 3. Thực hiện cuộc gọi và chuyển cuộc gọi
+
+* **Gọi đi:**
+  * Nhập số điện thoại cần gọi vào ô nhập số.
+  * Nhấn nút **CALL** hoặc phím **Enter**.
+  * Để kết thúc cuộc gọi, nhấn nút **Hang Up**.\
+    ![](/media/ai-contact-center/user-guider-portal/img-0WvSPsTaXzzAh7YgGO7S.png)![](/media/ai-contact-center/user-guider-portal/img-bG6xCmsGEBeuVEebpBMU.png)
+* **Nhận cuộc gọi:**
+  * Khi có cuộc gọi đến, một bảng thông báo sẽ hiện ra.
+  * Nhấn **Answer** để nghe máy hoặc **Reject** để từ chối.<br />
+
+    ![](/media/ai-contact-center/user-guider-portal/img-xgOtwAid6ZqQfuzVk62q.png)
+* **Chuyển cuộc gọi (Transfer):**
+  * Khi đang trong cuộc gọi, nhấn vào tab **Dialpad** (bàn phím).
+  * Nhấn cú pháp: `*2<Số nội bộ cần chuyển>#`
+    * Ví dụ: Để chuyển đến số nội bộ `100`, nhấn `*2100#`
+  * Sau khi nhấn cú pháp, người gọi ban đầu (người thứ 1) sẽ nghe nhạc chờ. Bạn sẽ được kết nối đến người cần chuyển đến (người thứ 3).
+  * Sau khi người thứ 3 nghe máy, bạn chỉ cần gác máy (nhấn **Hang Up**) để người thứ 1 và người thứ 3 nói chuyện trực tiếp với nhau.<br />
+
+    ![](/media/ai-contact-center/user-guider-portal/img-8RQ4y5J2EmKMFDAM0L7a.png)
+
+## II/ Cài đặt ứng dụng Zoiper 5
+
+### Bước 1. Tải và cài đặt Zoiper 5
+
+Link tải: [https://www.zoiper.com/en/voip-softphone/download/current](https://www.zoiper.com/en/voip-softphone/download/current)
+
+![](/media/ai-contact-center/user-guider-portal/img-zgsbQxcD35PLcZC4fIzE.png)
+
+Tiến hành cài đặt, để mặc định tất cả các lựa chọn. Sau khi hoàn tất cài đặt và mở ứng dụng lần đầu, chọn **Continue as a Free user**.
+
+![](/media/ai-contact-center/user-guider-portal/img-0EQ6fLqvgYludHnZna0y.png)
+
+### Bước 2. Nhập thông tin đăng kí số máy nhánh (số nội bộ)
+
+1. **Lấy thông tin đăng nhập:**
+   * Thực hiện tương tự như Phần I, Bước 2, Mục 1 để lấy **Số máy nhánh**, **Mật khẩu**, **Địa chỉ tổng đài** và **Port**.
+   * Ví dụ: Số máy nhánh: `11`, Mật khẩu: `your_password`, Địa chỉ/Port: `172.16.148.29:5060`.
+2. **Nhập thông tin vào Zoiper 5:**
+   * Tại màn hình đăng nhập ban đầu của Zoiper 5:
+     * Nhập vào ô **Username / Login:** `số_máy_nhánh@địa_chỉ_tổng_đài:port` (Ví dụ: `11@172.16.148.29:5060`)
+     * Nhập **Password:** Mật khẩu của số máy nhánh.
+     * Nhấn **Login**.
+   * Ứng dụng sẽ yêu cầu nhập **Hostname or Provider**. Nhập `địa_chỉ_tổng_đài:port` (Ví dụ: `172.16.148.29:5060`) và nhấn **Next**.<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-Q4copPV8TRTNDBImfEF7.png)
+   * Bước tiếp theo ("Authentication and Outbound proxy") thường không cần nhập gì, nhấn **Skip**.<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-hOQLKfucMvTKEaBf1mb6.png)
+   * Chờ ứng dụng kiểm tra cấu hình (Searching for configuration). Nếu cấu hình **SIP UDP** được tìm thấy (Found), nhấn **Next**.<br />
+
+     ![](/media/ai-contact-center/user-guider-portal/img-COX5P1f0Bd4J1pQbwdEN.png)
+   * Quá trình đăng ký hoàn tất.
+3. **Kiểm tra và thay đổi tài khoản:**
+   * Để kiểm tra hoặc thay đổi tài khoản đã đăng ký:
+   * Nhấn vào biểu tượng bánh răng (Settings) ở góc trên bên phải.
+   * Chọn mục **Accounts**.
+   * Bạn sẽ thấy tài khoản đang hoạt động.
+   * Để xóa tài khoản, chọn tài khoản đó và nhấn biểu tượng thùng rác. Sau đó bạn có thể thêm tài khoản mới từ màn hình chính.
+
+### Bước 3. Thực hiện cuộc gọi và chuyển cuộc gọi
+
+1. **Tắt STUN (Khuyến nghị):**
+   * Để tránh các vấn đề tiềm ẩn về kết nối, nên tắt STUN.
+   * Vào **Settings** (biểu tượng bánh răng).
+   * Chọn **Accounts**.
+   * Chọn tài khoản SIP của bạn.
+   * Chọn **Advanced**.
+   * Tìm mục **Network related settings** hoặc tương tự và bỏ chọn (uncheck) ô **Use STUN** hoặc **Enable STUN**.
+   * Lưu lại thay đổi nếu có yêu cầu.
+   * Nhấn dấu **X** để quay lại giao diện chính.
+2. **Gọi đi:**
+   * Nhập số điện thoại cần gọi vào ô tìm kiếm/nhập số.
+   * Nhấn phím **Enter** hoặc biểu tượng gọi điện.
+3. **Chuyển cuộc gọi (Transfer):**
+   * Khi đang trong cuộc gọi:
+   * Nhấn vào nút **Transfer** (thường là biểu tượng mũi tên chuyển hướng). *Lưu ý: Cách thực hiện transfer có thể khác Zoiper 3. Nếu nút Transfer trực tiếp không có trong bản Free, bạn có thể thử cách dùng Keypad.*
+   * *Cách dùng Keypad (tương tự Zoiper 3):* Nhấn vào biểu tượng **Keypad** (bàn phím).
+   * Nhấn cú pháp: `*2<Số nội bộ cần chuyển>#`
+     * Ví dụ: `*2100#` (Giả sử `3333` trong văn bản gốc là ví dụ sai, nên dùng số nội bộ thực tế như `100`).
+   * Khi nhấn xong cú pháp trên thì người gọi ban đầu (người thứ 1) sẽ rơi vào trạng thái chờ, còn chúng ta sẽ kết nối đến người thứ 3. Sau khi người thứ 3 nghe máy, chúng ta sẽ gác máy để người thứ 1...

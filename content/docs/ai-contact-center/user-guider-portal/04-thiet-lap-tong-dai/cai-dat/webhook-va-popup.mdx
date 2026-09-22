@@ -1,0 +1,66 @@
+---
+title: "Cấu hình webhook và popup trên tổng đài"
+description: "Tổng đài MatBao One hỗ trợ gửi dữ liệu chi tiết các sự kiện event khi phát sinh cuộc gọi ra bên ngoài."
+---
+
+## Thiết lập webhook trên tổng đài
+
+Tổng đài MatBao One hỗ trợ gửi dữ liệu chi tiết các sự kiện (event) khi phát sinh cuộc gọi ra bên ngoài.
+
+Người dùng có thể thiết lập webhook để nhận các sự kiện của cuộc gọi từ hệ thống tổng đài đẩy qua. Sau đó sử dụng thông tin tùy vào mục đích của mình.
+
+Để thiết lập cấu hình webhook trên tổng đài, người dùng cần thực hiện như sau:
+
+Vào mục **Cấu hình API => Cấu hình Webhook** để tiến hành cập nhật link webhook của mình.
+
+Sau khi cập nhật webhook vào tổng đài, hệ thống tổng đài sẽ bắt đầu gửi sự kiện cuộc gọi ra webhook.
+
+![](/media/ai-contact-center/user-guider-portal/img-aUHROdHsYlvmtunxALE3.png)
+
+<Callout type="warn">
+**Lưu ý:** Sau 30 giây khi cập nhật webhook thì hệ thống sẽ bắt đầu gửi dữ liệu cuộc gọi.
+
+Tài liệu mô tả chi tiết các sự kiện bạn có thể xem ở trang này: Webhooks - API Docs cfotel (cloudfone.vn)
+</Callout>
+
+## Thông báo popup trên tổng đài
+
+Thông báo popup trên tổng đài là tính năng cho phép hệ thống tổng đài gửi các thông báo hay các sự kiện trên tổng đài ra bên ngoài. Người dùng có thể sử dụng các tính năng trên để tích hợp với các đơn vị triển khai CRM/ERP bên ngoài.
+
+Để thiết lập nhận thông báo popup trên tổng đài người dùng cần thực hiện theo 2 bước sau:
+
+**Bước 1: Cấu hình link webhook nhận thông báo**
+
+Người dùng cần nhập link webhook để nhận thông báo từ tổng đài gửi qua.
+
+Vào mục **Cấu hình API => Cấu hình API => Thiết lập khóa API** để nhập thông tin link webhook.
+
+Trong đó:
+
+* **API URL**: link url (webhook) nhận thông báo
+* **API KEY**: Key cho url (webhook) nếu có<br />
+
+  ![](/media/ai-contact-center/user-guider-portal/img-0pKSyfNEE4srRGWMOX6s.png)
+
+Sau khi thiết lập key và url nhận thông báo. Người dùng có thể thiết lập hiện thông báo popup theo nhu cầu.
+
+Trong đó:
+
+* Gửi thông báo khi đang đổ chuông cuộc gọi vào.
+* Gửi thông báo khi bắt đầu nghe máy cuộc gọi vào.
+* Gửi thông báo khi kết thúc cuộc gọi vào.
+* Gửi thông báo khi đang đổ chuông cuộc gọi ra.
+* Gửi thông báo khi bắt đầu nghe máy cuộc gọi ra.
+* Gửi thông báo khi kết thúc cuộc gọi ra.
+
+**Bước 2: Bật tính năng nhận thông báo**
+
+Tiếp theo người dùng cần bật tính năng thông báo popup trên tổng đài và lựa chọn số máy nhánh hiển thị thông báo.
+
+Trường hợp không muốn hiển thị thông báo cho số máy nhánh nào thì người dùng chỉ cần không click chọn cho số máy nhánh đó.
+
+Nút “Hiển thị thông báo” dùng để thiết lập chế độ hiển thị thông báo cho một hoặc nhiều số máy nhánh.
+
+Vào Mục **Cấu hình API => Thông báo popup** để tiến hành bật thông báo popup và hiển thị thông báo cho số máy nhánh.
+
+![](/media/ai-contact-center/user-guider-portal/img-b2Y5igoXaGZvNiaGnIgM.png)

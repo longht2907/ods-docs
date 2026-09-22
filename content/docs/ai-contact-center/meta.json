@@ -6,7 +6,7 @@
   "defaultOpen": true,
   "pages": [
     "index",
-    "huong-dan",
+    "user-guider-portal",
     "api"
   ]
 }

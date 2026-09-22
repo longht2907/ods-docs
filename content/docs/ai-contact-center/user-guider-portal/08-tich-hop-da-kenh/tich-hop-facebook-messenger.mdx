@@ -1,0 +1,90 @@
+---
+title: "HƯỚNG DẪN TÍCH HỢP FACEBOOK MESSENGER"
+description: "Hướng dẫn chi tiết về hướng dẫn tích hợp facebook messenger trên hệ thống ODS AI Contact Center."
+---
+
+### 1. Giới thiệu & Yêu cầu tích hợp
+
+**🔹 Mô tả tính năng**
+
+Tính năng **Tích hợp Facebook Messenger vào AI Contact Center ODS** cho phép doanh nghiệp:
+
+* Kết nối trực tiếp Fanpage Facebook thông qua **Messenger Platform (Graph API & Webhooks)**.
+* Tiếp nhận và phản hồi tin nhắn của khách hàng **ngay trong giao diện ODS**, không cần chuyển đổi ứng dụng.
+* Quản lý hội thoại đa kênh tập trung (Messenger, Call, Email, Zalo) trên **một nền tảng duy nhất**.
+* Tự động lưu trữ và đồng bộ lịch sử chat vào **CRM**, giúp xây dựng hồ sơ khách hàng để cá nhân hóa chăm sóc.
+* Giám sát, phân công và báo cáo hiệu quả hoạt động của đội ngũ CSKH trên một Dashboard duy nhất.
+
+Nhờ đó, ODS giúp doanh nghiệp **không bỏ sót khách hàng**, **nâng cao tốc độ phản hồi**, và **tối ưu hóa vận hành CSKH** trong chiến lược Omnichannel.
+
+**🔹 Yêu cầu tích hợp ở phía người dùng**
+
+Để sử dụng tính năng này, doanh nghiệp cần đáp ứng các điều kiện sau:
+
+1. **Fanpage Facebook hợp lệ**
+   * Doanh nghiệp phải sở hữu Fanpage chính thức.
+   * Tài khoản Facebook dùng để tích hợp cần có quyền **Quản trị viên (Admin)**.
+2. **Ứng dụng ODS được chứng thực**
+   * Việc kết nối được thực hiện thông qua **App ODS đã đăng ký trên Facebook Developer**.
+   * Người dùng chỉ cần đăng nhập Facebook và cấp quyền cho App ODS (không cần tự tạo ứng dụng riêng).
+3. **Cấp quyền cho App ODS**\
+   Khi tích hợp, cần cấp các quyền sau:
+   * pages\_messaging: Nhắn tin và trả lời khách hàng.
+   * pages\_manage\_metadata: Quản lý webhook & cấu hình Fanpage.
+   * pages\_read\_engagement: Đọc nội dung và tương tác tin nhắn.
+4. **Hạ tầng ODS**
+   * Người dùng cần có tài khoản quản trị trong hệ thống ODS.
+
+**2. Các bước tích hợp**
+
+**Bước 1: Truy cập cấu hình tích hợp trong ODS**
+
+* Đăng nhập **ODS Admin Portal**: [https://app.ods.vn/](https://app.ods.vn/)
+
+![](/media/ai-contact-center/user-guider-portal/img-WfRl5dJ0OZx65HQ2I4oa.png)
+
+* Chọn menu **Thiết lập nâng cao → Tích hợp Facebook**.
+
+![](/media/ai-contact-center/user-guider-portal/img-QawboWnzvusa8KUi5jaD.png)
+
+**Bước 2: Đăng nhập và chọn Fanpage**
+
+* Nhấn **Thêm mới Fanpage** → hệ thống mở giao diện xác thực Facebook.
+
+![](/media/ai-contact-center/user-guider-portal/img-i8YSrCk7hb1Msimz6mXk.png)
+
+* Đăng nhập bằng tài khoản quản trị Fanpage.
+* Chọn Fanpage cần tích hợp và cấp các quyền cần thiết cho App ODS:
+  * Quản lý và trả lời tin nhắn trên Messenger.
+  * Quản lý webhook và cấu hình Page.
+  * Hiển thị danh sách Page đã quản lý.
+
+![](/media/ai-contact-center/user-guider-portal/img-hkrPTr8NlZTYhJGTSYCN.png)
+
+**Bước 3: Xác nhận kết nối**
+
+* Sau khi cấp quyền, Fanpage sẽ hiển thị trạng thái **Đã kết nối** trong ODS.
+* Hệ thống tự động đăng ký Webhook và quản lý Page Access Token an toàn.
+
+![](/media/ai-contact-center/user-guider-portal/img-X44nTMOCvLjOgMGEiZ19.png)
+
+**Bước 4: Kiểm thử và hoàn tất**
+
+* Gửi tin nhắn thử từ Fanpage → kiểm tra hiển thị trong giao diện ODS.
+* Agent phản hồi trực tiếp trên ODS → khách hàng nhận tin nhắn trên Messenger.
+
+**3. Hướng dẫn chat và quản lý contact trên giao diện Contact Center ODS**
+
+Sau khi tích hợp, toàn bộ tin nhắn từ khách hàng sẽ hiển thị trong giao diện ODS. Quy trình quản lý cơ bản:
+
+1. **Nhận hội thoại**
+   * Khi có tin nhắn mới từ Messenger, Agent nhận thông báo real-time trong giao diện ODS.
+   * Tin nhắn hiển thị kèm thông tin khách hàng (nếu đã tồn tại trong CRM).
+2. **Xử lý hội thoại**
+   * Agent mở cửa sổ chat, xem lịch sử trao đổi với khách hàng.
+   * Trả lời trực tiếp trên giao diện ODS → tin nhắn được gửi ngược về Messenger qua API.
+   * Nếu cần, Agent có thể gắn nhãn (tag), thêm ghi chú hoặc chuyển hội thoại cho Agent khác.
+3. **Quản lý contact**
+   * Thông tin khách hàng (tên, ID Messenger, lịch sử chat, hành vi) được lưu trong **CRM tích hợp**.
+
+![](/media/ai-contact-center/user-guider-portal/img-esZbvdDeXaPFwgjKLLEG.png)

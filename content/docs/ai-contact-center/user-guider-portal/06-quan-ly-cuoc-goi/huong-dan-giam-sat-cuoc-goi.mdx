@@ -1,0 +1,293 @@
+---
+title: "Hướng dẫn giám sát cuộc gọi"
+description: "Dành cho: Admin/Supervisor · Trưởng nhóm · QA Lead"
+---
+
+## Tính năng Giám sát Cuộc gọi trên hệ thống tổng đài ODS
+
+*Dành cho: **Admin/Supervisor** · Trưởng nhóm · QA Lead*
+
+***
+
+| **Tài liệu này hướng dẫn**                                         |
+| ------------------------------------------------------------------ |
+| ▸ **Cách truy cập màn hình Giám sát Cuộc gọi**                     |
+| ▸ **Sử dụng 3 chế độ: Theo dõi, Hỗ trợ riêng, Can thiệp cuộc gọi** |
+| ▸ **Kết thúc phiên giám sát an toàn**                              |
+| ▸ **Câu hỏi thường gặp & lưu ý quan trọng**                        |
+
+***
+
+## 1. Tổng quan Tính năng
+
+Tính năng Giám sát Cuộc gọi cho phép admin/supervisor theo dõi và hỗ trợ Agent đang trong cuộc gọi với Khách hàng — theo thời gian thực và hoàn toàn không làm gián đoạn trải nghiệm của Khách hàng.
+
+| **Chế độ**         | **Ai nghe thấy Supervisor?** | **Khi nào dùng?**                               |
+| ------------------ | ---------------------------- | ----------------------------------------------- |
+| Theo dõi           | **Không ai**                 | QA đánh giá, theo dõi Agent mới, audit cuộc gọi |
+| Hỗ trợ riêng       | **Chỉ Agent nghe**           | Coach Agent đang xử lý tình huống khó           |
+| Can thiệp cuộc gọi | **Agent và KH đều nghe**     | Xử lý khẩn cấp, KH yêu cầu gặp quản lý          |
+
+![](/media/ai-contact-center/user-guider-portal/img-TgfFxzWjaSPyI204hYYi.png)
+
+<Callout type="info">
+▸ **Tính năng này chỉ dành cho tài khoản có quyền admin hoặc Supervisor — Agent thông thường không thấy các nút này**\
+▸ **Chỉ có thể giám sát Agent đang trong cuộc gọi — nút sẽ bị mờ (disabled) nếu Agent đang rảnh hoặc offline**
+</Callout>
+
+***
+
+## 2. Truy cập Màn hình Giám sát
+
+### 2.1 Hướng dẫn đăng nhập và thiết lập với tài khoản admin
+
+
+
+
+## ODS
+
+→ Mở trình duyệt (khuyến nghị Chrome hoặc Edge)\
+→ Truy cập địa chỉ tổng đài ODS của công ty: [https://app.ods.vn/](https://app.ods.vn/)\
+→ Đăng nhập bằng tài khoản admin được cấp khi sử dụng dịch vụ ODS\ ![](/media/ai-contact-center/user-guider-portal/img-2GU1Z2nUO4AsAqmap4H7.png)
+
+
+
+
+## Menu Giám sát cuộc gọi
+
+→ Từ menu chính, chọn **Tổng quan → Giám sát cuộc gọi**\
+![](/media/ai-contact-center/user-guider-portal/img-CSuMF063QhpTWv5A7eWL.png)\
+→ Hoặc truy cập trực tiếp qua URL: [https://app.ods.vn/call-monitoring](https://app.ods.vn/call-monitoring)\
+→ Màn hình sẽ tải dữ liệu Agent và cập nhật real-time tự động
+
+
+
+
+## Kiểm tra kết nối
+
+🔧 **Thiết lập ban đầu:** Để sử dụng tính năng giám sát cuộc gọi, người dùng cần gắn tài khoản với một máy nhánh tổng đài.\
+→ Có thể chọn máy nhánh cá nhân đã có sẵn trên hệ thống\
+→ Nếu chưa có máy nhánh, tạo mới tại: **Tổng đài → Cài đặt tổng đài → Nhân viên**\
+→ Có thể thay đổi máy nhánh giám sát khi cần\
+→ Khi thiết lập thành công, góc trên phải màn hình hiển thị badge **"Sẵn sàng giám sát"** màu xanh\
+→ Nếu badge màu vàng hoặc đỏ: kiểm tra lại microphone và cho phép trình duyệt truy cập mic\
+![](/media/ai-contact-center/user-guider-portal/img-PAdU6wtiLiQx0BlucYHV.png)
+
+Sau khi vào màn hình, bạn sẽ thấy 4 thẻ thống kê ở trên cùng: số Agent online, offline, số cuộc gọi đang diễn ra và số phiên giám sát đang hoạt động. Bên dưới là vùng Priority Zone hiển thị các cuộc gọi đang cần chú ý.\
+![](/media/ai-contact-center/user-guider-portal/img-rm7RKTMiJ52QvLqicsqO.png)
+
+
+
+### 2.2 Thiết lập phân quyền sử dụng tính năng giám sát cuộc gọi
+
+Người dùng Admin có thể tạo nhóm quyền và phân quyền các thao tác trong tính năng giám sát cuộc gọi cho tài khoản Supervisor.
+
+#### Bước 1: Tạo nhóm quyền
+
+Vào menu: **Người dùng → Phân quyền**
+
+Tạo nhóm quyền mới cho người dùng Supervisor.\ ![](/media/ai-contact-center/user-guider-portal/img-pr5YXoEMbQCijNI6S5GX.png)
+
+Tại phần phân quyền, chọn module **Giám sát cuộc gọi**, sau đó cấp các quyền thao tác cần sử dụng, bao gồm:
+
+* Theo dõi
+* Hỗ trợ riêng
+* Can thiệp cuộc gọi
+* Gác máy
+* Gác máy hàng loạt\
+  ![](/media/ai-contact-center/user-guider-portal/img-fyH7wpKadi1JluzKDhzK.png)
+
+#### Bước 2: Tạo tài khoản Supervisor
+
+Vào menu: **Người dùng → Danh sách người dùng**
+
+Chọn **Thêm mới người dùng** và nhập các thông tin cần thiết cho tài khoản Supervisor.\
+![](/media/ai-contact-center/user-guider-portal/img-eDVkDBRPQuscwqwoaqJ7.png)
+
+> **Lưu ý:** cần gắn số máy nhánh và nhóm quyền đã thiết lập ở bước trước để người dùng có thể sử dụng tính năng giám sát cuộc gọi.
+
+#### Bước 3: Gửi thông tin đăng nhập
+
+Sau khi tạo tài khoản thành công, Admin gửi thông tin đăng nhập cho Supervisor.
+
+Supervisor sử dụng tài khoản được cấp để đăng nhập vào giao diện hệ thống và bắt đầu sử dụng tính năng giám sát cuộc gọi.
+
+***
+
+## 3. Hướng dẫn Sử dụng Chi tiết
+
+### 3.1 Theo dõi — Theo dõi cuộc gọi (không để lộ)
+
+*Phù hợp: Đánh giá chất lượng cuộc gọi, theo dõi Agent mới, audit ngẫu nhiên*
+
+
+
+
+## Xác định Agent cần giám sát
+
+→ Tìm Agent trong danh sách — chỉ những Agent có trạng thái **"Đang gọi"** mới cho phép thao tác\
+→ Quan sát cột **"Thời lượng"** để ưu tiên cuộc gọi đang kéo dài\
+→ Số điện thoại KH hiển thị ngay dưới tên Agent khi họ đang trong cuộc gọi
+
+
+
+
+## Nhấn nút
+
+→ Tìm hàng của Agent cần giám sát trong danh sách\
+→ Nhấn nút 🎧 **Theo dõi** (màu xanh) ở cột Thao tác\
+![](/media/ai-contact-center/user-guider-portal/img-qiINaTNhnkJt8xFZaovp.png)\
+→ Popup xác nhận hiện ra — hiển thị tên Agent, EXT, chế độ Theo dõi\
+![](/media/ai-contact-center/user-guider-portal/img-gbSysiQKlH1JvI1DNTKo.png)
+
+
+
+
+## Xác nhận và bắt đầu
+
+→ Đọc thông tin xác nhận, nhấn **"Bắt đầu Theo dõi"**\
+→ Hệ thống tự động kết nối\
+→ Banner màu xanh hiện ở đầu trang: **"Đang giám sát: \[Tên Agent] · Chế độ: Theo dõi"**\
+→ Bạn có thể nghe toàn bộ cuộc gọi — Agent và KH không biết
+
+
+
+| **Khi đang theo dõi — bạn có thể làm gì?**                                              |
+| --------------------------------------------------------------------------------------- |
+| ▸ **Nghe toàn bộ cuộc gọi trong thời gian thực qua tai nghe**                           |
+| ▸ **Xem timer đang đếm trên banner — biết bạn đã nghe bao lâu**                         |
+| ▸ **Chuyển sang Hỗ trợ riêng hoặc Can thiệp cuộc gọi bất cứ lúc nào nếu cần can thiệp** |
+| ▸ **Kết thúc phiên bằng nút "Kết thúc giám sát" trên banner**                           |
+
+***
+
+### 3.2 Hỗ trợ riêng — Coaching riêng với Agent
+
+*Phù hợp: Hỗ trợ Agent đang lúng túng, nhắc thông tin, hướng dẫn cách xử lý*
+
+
+
+
+## Xác định tình huống cần coaching
+
+→ Agent đang trong cuộc gọi với dấu hiệu khó khăn: thời gian dài, hoặc bạn đang nghe qua theo dõi\
+→ Nhấn nút **Hỗ trợ riêng** ở cột Thao tác của Agent đó
+
+
+
+
+## Xác nhận
+
+→ Popup hiển thị: **"KH sẽ KHÔNG nghe thấy bạn — chỉ Agent nghe"**
+
+
+
+
+## Nói chuyện với Agent
+
+→ Sẵn sàng giám sát — bạn có thể nói chuyện ngay qua micro\
+→ Agent nghe thấy bạn nhưng KH hoàn toàn không nghe
+
+
+
+| **Lưu ý khi dùng Hỗ trợ riêng**                                                               |
+| --------------------------------------------------------------------------------------------- |
+| ▸ **KH hoàn toàn không nghe thấy Supervisor — an toàn để coaching thẳng thắn**                |
+| ▸ **Agent không nên trả lời trực tiếp với Supervisor trong khi đang nói với KH — gây khó xử** |
+| ▸ **Nếu cần Agent phản hồi, dùng hệ thống chat nội bộ song song**                             |
+| ▸ **Tránh nói quá dài — chỉ nhắc key point để Agent xử lý được ngay**                         |
+
+***
+
+### 3.3 Can thiệp cuộc gọi — Tham gia 3-way (Cả Agent và KH nghe thấy)
+
+*Phù hợp: KH yêu cầu gặp quản lý, tình huống khẩn cấp, cuộc gọi leo thang*
+
+
+
+
+## Đánh giá tình huống cần can thiệp
+
+→ Cuộc gọi kéo dài bất thường (hiển thị màu đỏ > 10 phút) và Agent không tự xử lý được\
+→ KH đang bức xúc và yêu cầu nói chuyện với cấp cao hơn\
+→ Nhấn nút **Can thiệp cuộc gọi** ở cột Thao tác
+
+
+
+
+## Đọc kỹ xác nhận
+
+→ Popup hiển thị cảnh báo: **"Cả Agent VÀ KH đều nghe thấy bạn ngay khi kết nối"**\
+→ Xác nhận bạn đã chuẩn bị sẵn lời mở đầu trước khi nhấn **"Can thiệp vào cuộc gọi"**
+
+
+
+
+## Tham gia và xử lý
+
+→ Cả ba bên đều nghe và nói chuyện được — dẫn dắt cuộc trò chuyện từ đây\
+→ Sau khi giải quyết xong, kết thúc phiên — cuộc gọi Agent-KH tiếp tục bình thường
+
+
+
+| **Checklist trước khi Can thiệp cuộc gọi**                                             |
+| -------------------------------------------------------------------------------------- |
+| ▸ **Bạn đã chuẩn bị lời chào mở đầu chuyên nghiệp chưa?**                              |
+| ▸ **Bạn đã nắm được vấn đề KH đang gặp phải chưa? (nghe qua Listen trước nếu có thể)** |
+| ▸ **Micro của bạn hoạt động tốt không? Không gian xung quanh có yên tĩnh không?**      |
+| ▸ **Bạn có đủ thẩm quyền để giải quyết vấn đề KH đang nêu không?**                     |
+
+***
+
+### Các nút bị mờ (disabled) — tại sao?
+
+<Callout type="warn">
+▸ **Agent đang ở trạng thái Online (rảnh) — không có cuộc gọi nào để giám sát**\
+▸ **Agent đang Offline — không thể kết nối**\
+▸ **Agent đang trong Wrap-up (xử lý sau cuộc gọi) — cuộc gọi đã kết thúc**\
+▸ **Bạn đang trong phiên giám sát khác — hệ thống chỉ cho phép 1 phiên cùng lúc**
+</Callout>
+
+***
+
+## 4. Câu hỏi Thường gặp
+
+<details>
+
+<summary>❓ <strong>Khi tôi bật Theo dõi, Agent và KH có biết không?</strong></summary>
+
+Không. Chế độ Theo dõi hoàn toàn ẩn danh — cả Agent lẫn KH đều không nhận được bất kỳ thông báo hay âm thanh nào. Đây là thiết kế cố ý để đảm bảo hành vi tự nhiên của Agent khi giám sát.
+
+</details>
+
+<details>
+
+<summary>❓ <strong>Khi tôi kết thúc phiên giám sát, cuộc gọi Agent–KH có bị ngắt không?</strong></summary>
+
+Không. Đây là điểm quan trọng nhất: Hệ thống chỉ ngắt kết nối channel của Supervisor. Agent và KH vẫn đang trong cuộc gọi bình thường và không bị ảnh hưởng gì.
+
+</details>
+
+<details>
+
+<summary>❓ <strong>Tôi có thể giám sát nhiều Agent cùng lúc không?</strong></summary>
+
+Mỗi phiên đăng nhập Supervisor chỉ cho phép 1 phiên giám sát đang hoạt động cùng lúc. Để giám sát Agent khác, cần kết thúc phiên hiện tại trước. Tuy nhiên, bạn có thể quan sát toàn bộ danh sách Agent và Priority Zone trong khi đang giám sát.
+
+</details>
+
+<details>
+
+<summary>❓ <strong>Sự khác biệt giữa Hỗ trợ riêng và Can thiệp trực tiếp là gì?</strong></summary>
+
+**Whisper:** Supervisor nói — chỉ Agent nghe, KH không nghe. **Barge:** Supervisor tham gia — cả Agent và KH đều nghe thấy Supervisor và ba bên có thể nói chuyện cùng nhau. Whisper dùng để coaching riêng; Barge dùng khi cần tham gia công khai vào cuộc gọi.
+
+</details>
+
+<details>
+
+<summary>❓ <strong>Tôi có thể dùng tính năng này trên điện thoại di động không?</strong></summary>
+
+Tính năng hoạt động tốt nhất trên máy tính để bàn hoặc laptop với màn hình rộng. Trên thiết bị di động, giao diện có thể bị thu nhỏ và có thể gặp giới hạn trên một số trình duyệt mobile.
+
+</details>

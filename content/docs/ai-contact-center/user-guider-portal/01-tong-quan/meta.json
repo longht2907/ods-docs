@@ -1,0 +1,10 @@
+{
+  "title": "Tổng quan & Làm quen",
+  "icon": "Compass",
+  "defaultOpen": true,
+  "pages": [
+    "index",
+    "bang-tinh-nang-tong-dai-ao",
+    "quickstart"
+  ]
+}

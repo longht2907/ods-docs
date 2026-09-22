@@ -1,0 +1,60 @@
+---
+title: "Hướng dẫn tạo và cấu hình nhóm nhân viên"
+description: "Các công ty thường phân chia nhân sự theo chức năng các phòng ban, phòng kỹ thuật, phòng kinh doanh, phòng chăm sóc khách hàng. Tương ứng với mỗi phòng ban là m..."
+---
+
+## Tạo nhóm nhân viên
+
+Các công ty thường phân chia nhân sự theo chức năng các phòng ban, phòng kỹ thuật, phòng kinh doanh, phòng chăm sóc khách hàng. Tương ứng với mỗi phòng ban là mỗi nhóm trên hệ thống tổng đài. Ví dụ như nhóm kỹ thuật có số nhóm là 1000, sau đó thêm các số máy nhánh của các nhân viên vào nhóm này. Cuộc gọi vào nhóm kỹ thuật sẽ đổ chuông các máy nhánh của các nhân viên trong nhóm.
+
+Để tạo một nhóm nhân viên, ta chọn mục: **Tổng đài => Cài đặt tổng đài => Nhóm nhân viên**
+
+![](/media/ai-contact-center/user-guider-portal/img-8fLIGDE8ppc2gazv2qOs.png)
+
+* **Chọn số máy nhánh**: thêm các số máy nhánh (nhân viên) vào nhóm
+* **Số nhóm**: số đại diện cho nhóm này, gồm 4 hoặc 5 chữ số và không được trùng với các nhóm khác (ví dụ: 1000, 12345)
+* **Tên nhóm**: tên đại diện cho nhóm
+* **Chế độ đổ chuông**: gồm có 4 chế độ
+  * **Đổ chuông toàn bộ**: khi có cuộc gọi vào thì tất cả các số máy nhánh đồng loạt đổ chuông, người bắt máy đầu tiên sẽ nghe cuộc gọi
+  * **Đổ chuông ngẫu nhiên**: khi có cuộc gọi vào thì ngẫu nhiên một số máy nhánh trong nhóm sẽ đổ chuông
+  * **Đổ chuông xoay vòng**: cuộc gọi vào sẽ được chia đều cho các máy nhánh trong nhóm. Cuộc gọi thứ 1 sẽ vào máy nhánh thứ 1, cuộc gọi thứ 2 sẽ vào máy nhánh thứ 2. Nếu máy nhánh thứ 1 không nghe máy, hệ thống sẽ bỏ qua và cuộc gọi được chuyển cho máy nhánh thứ 2. Như vậy cuộc gọi tiếp theo sẽ đổ chuông máy nhánh thứ 3
+  * **Đổ chuông theo thứ tự sắp xếp sẵn trong danh sách**: các máy nhánh sẽ đổ chuông theo thứ tự được sắp xếp trong danh sách từ trên xuống dưới
+
+![](/media/ai-contact-center/user-guider-portal/img-dMuQGa1AiYZunprqFiiG.png)
+
+<Callout type="warn">
+**Lưu ý**: Đối với trường hợp cấu hình đổ chuông theo thứ tự sắp xếp sẵn trong danh sách, người dùng có thể điều chỉnh thứ tự đổ chuông bằng cách chỉnh sửa cột thứ tự đổ chuông.
+
+* **Thời gian đổ chuông**: thời gian đổ chuông tối đa cho một số máy nhánh trong nhóm, nếu hết thời gian đổ chuông mà máy nhánh đó không nghe máy thì sẽ chuyển cho máy nhánh khác.
+</Callout>
+
+## Cấu hình nhóm
+
+Tương tự với số máy nhánh, nhóm cũng có các chức năng để tùy chỉnh theo yêu cầu:
+
+* **Cập nhật nhạc chờ**: chọn nhạc chờ cho nhóm
+* **Thời gian đổ chuông**: thời gian đổ chuông của nhóm trước khi chuyển sang đích đến tiếp theo
+* **Sửa**: chỉnh sửa nhóm, thêm/bớt số máy nhánh, sửa thời gian đổ chuông của máy nhánh, chế độ đổ chuông, …
+* **Xóa**: xóa nhóm khỏi tổng đài
+
+### Cập nhật nhạc chờ
+
+* **Nhạc chờ**: tùy chỉnh nhạc chờ để người gọi vào nhóm này sẽ nghe trong lúc chờ có tổng đài viên bắt máy
+  * **Chỉ nhạc chờ**: các cuộc gọi vào nhóm chỉ nghe nhạc chờ mà không nghe tiếng chuông reo
+  * **Khi số máy nhánh đổ chuông**: chỉ bắt đầu phát nhạc chờ khi số máy nhánh trong nhóm đổ chuông
+  * **Chỉ đổ chuông**: các cuộc gọi vào nhóm chỉ nghe tiếng chuông mà không phát nhạc chờ
+* **Thông báo**: chọn file âm thanh để thông báo cho người gọi biết hiện các số máy nhánh trong nhóm đang bận hoặc không online, gồm 3 chế độ:
+  * **Luôn luôn**: thông báo sẽ được phát mỗi khi có cuộc gọi tới mà không cần quan tâm trong nhóm được gọi có nhân viên sẵn sàng hay không
+  * **Khi số máy nhánh bận**: thông báo sẽ được phát khi toàn bộ số máy nhánh trong nhóm đều trong trạng thái bận
+  * **Khi số máy nhánh không online**: thông báo sẽ được phát khi toàn bộ số máy nhánh trong nhóm không online hoặc chưa đăng ký trên tổng đài
+
+![](/media/ai-contact-center/user-guider-portal/img-VOckVwDtTpWeBz52oXan.png)
+
+### Thời gian đổ chuông
+
+* **Thời gian chờ tối đa**: là thời gian tối đa để người gọi có thể chờ một số máy nhánh trong nhóm bắt máy, nếu hết thời gian này mà trong nhóm không có ai bắt máy thì cuộc gọi sẽ được chuyển hướng
+* **Chuyển hướng cuộc gọi**: chuyển cuộc gọi đến hướng khác sau khi hết thời gian chờ tối đa (chỉ hiển thị mục này khi chọn lựa thời gian chờ tối đa cụ thể)
+* **Sửa**: cho phép chỉnh sửa lại các thông tin của nhóm
+* **Xóa**: xóa nhóm đã tạo
+
+![](/media/ai-contact-center/user-guider-portal/img-AIKeW8AeJldLcYjKKGIt.png)

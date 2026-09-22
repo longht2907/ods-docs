@@ -1,0 +1,11 @@
+{
+  "title": "Quản lý khách hàng",
+  "icon": "UserCheck",
+  "pages": [
+    "index",
+    "tong-quan-chuc-nang",
+    "nhap-du-lieu-khach-hang",
+    "xem-va-chinh-sua-thong-tin",
+    "cai-dat"
+  ]
+}

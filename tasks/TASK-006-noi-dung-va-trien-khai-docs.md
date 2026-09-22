@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: done
 branch: task/TASK-006-noi-dung-va-trien-khai-docs
-commit: ""
+commit: "7174611"
 verified-by: npm run verify:task
 ---
 
@@ -69,4 +69,4 @@ hoặc cần thêm dependency/service ngoài phạm vi.
 
 - Liệt kê file/nhóm file thực tế và phần snapshot cũ bị loại bỏ.
 - Ghi output kiểm thử, trạng thái Docker validation và giới hạn còn lại.
-- Giữ `status: in-progress` cho đến khi Pull Request CI xanh.
+- Chỉ chuyển `status` sang `done` sau khi Pull Request CI xanh.

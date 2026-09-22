@@ -2,7 +2,7 @@
 
 - **Task**: `tasks/TASK-006-noi-dung-va-trien-khai-docs.md`
 - **Branch**: `task/TASK-006-noi-dung-va-trien-khai-docs`
-- **Trạng thái**: `in-progress`
+- **Trạng thái**: `done`
 - **Snapshot khôi phục**: local commit `fb85610`
 - **Kiểm chứng bởi**: `npm run verify:task`
 
@@ -49,4 +49,4 @@ Build vẫn có cảnh báo baseline `metadataBase` chưa được cấu hình; 
 
 ## 5. Trạng thái bàn giao
 
-Implementation và local verification đã hoàn tất. Task tiếp tục giữ `status: in-progress` cho đến khi Pull Request CI xanh; sau đó mới cập nhật `done` và commit implementation thật trong task frontmatter.
+Implementation và local verification đã hoàn tất. Pull Request #7 chạy required check `verify` thành công cho commit implementation `7174611`; TASK-006 được chuyển sang `done` và giữ nguyên PR để chạy lại CI cho commit finalize trước khi Human merge.

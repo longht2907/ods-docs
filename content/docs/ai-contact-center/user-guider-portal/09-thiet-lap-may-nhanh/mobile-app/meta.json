@@ -1,0 +1,9 @@
+{
+  "title": "Mobile App",
+  "icon": "Smartphone",
+  "pages": [
+    "index",
+    "cai-dat-ods-phone-android",
+    "cai-dat-ods-phone-ios"
+  ]
+}

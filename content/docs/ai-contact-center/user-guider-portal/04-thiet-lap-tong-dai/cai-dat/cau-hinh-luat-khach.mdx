@@ -1,0 +1,84 @@
+---
+title: "Hướng dẫn cấu hình luật khách"
+description: "Luật khách quen là tính năng cho phép tổng đài ghi nhớ cuộc gọi của nhân viên với khách hàng theo các chế độ ghi nhớ khác nhau. Chế độ ưu tiên trước/sau là khi ..."
+---
+
+## Cấu hình luật khách quen
+
+Luật khách quen là tính năng cho phép tổng đài ghi nhớ cuộc gọi của nhân viên với khách hàng theo các chế độ ghi nhớ khác nhau. Chế độ ưu tiên trước/sau là khi số máy nhánh (nhân viên) gọi ra cho khách hàng hoặc tiếp nhận cuộc gọi vào thì tổng đài tự động lưu lại nhật ký cuộc gọi đó, để lần sau khách hàng gọi lại thì gặp đúng nhân viên đó.
+
+<Callout type="warn">
+**Lưu ý:**
+
+* Nếu cuộc gọi nhỡ, cuộc gọi sẽ không được tự động lưu lại trên hệ thống và lần sau khách hàng gọi tới sẽ không gặp được nhân viên đó.
+* Số điện thoại được lưu trong danh sách ưu tiên, khi khách hàng gọi lại sẽ chạy theo quy luật khách quen và bỏ qua kịch bản tổng đài.
+</Callout>
+
+**Các bước cấu hình:**
+
+1. Vào mục “Định tuyến” => “Luật khách quen”.<br />
+
+   ![](/media/ai-contact-center/user-guider-portal/img-SGn0yrQ1EvmsCKN9q2aH.png)
+2. Chọn đầu số cần sử dụng tính năng luật khách quen, bật tự động ghi nhớ cuộc gọi.<br />
+
+   * **Tự động ghi nhớ cuộc gọi**: là nút cho phép tổng đài tự động ghi nhớ cuộc gọi giữa nhân viên và khách hàng, nếu tắt cuộc gọi sẽ không tự động lưu và khi khách hàng gọi lại sẽ không gặp được nhân viên trước đó.
+
+   ![](/media/ai-contact-center/user-guider-portal/img-zqDLHpXGUKVzOeGqKJrz.png)
+3. Chọn chế độ ghi nhớ cuộc gọi:<br />
+
+   * **Chế độ ưu tiên trước**: trường hợp các số máy nhánh khác nhau cùng gọi cho một khách hàng thì hệ thống tự động lưu duy nhất số máy nhánh (nhân viên) đầu tiên thực hiện cuộc gọi.
+   * **Chế độ ưu tiên sau**: trường hợp các số máy nhánh khác nhau cùng gọi cho một khách hàng thì hệ thống tự động lưu duy nhất số máy nhánh (nhân viên) cuối cùng thực hiện cuộc gọi.
+   * **Chế độ dừng**: Khi chọn chế độ này sẽ tắt tính năng luật khách quen.
+
+   ![](/media/ai-contact-center/user-guider-portal/img-fbDeW8Emk2ldncFpjlTP.png)
+4. (Tùy chọn): Bật lưu luật khách quen khi không bắt máy.<br />
+
+   * **Lưu luật khách quen khi không bắt máy**: lưu những cuộc gọi ra không thành công từ nhân viên tới khách hàng. Nếu tắt hệ thống sẽ lưu theo cấu hình ở bước 2.
+
+   ![](/media/ai-contact-center/user-guider-portal/img-jV8KPtPX2hgSHw3RyX1b.png)
+5. Chọn nút “Sửa” để kiểm tra nhật ký cuộc gọi đã lưu cho mỗi chế độ lưu.<br />
+
+   ![](/media/ai-contact-center/user-guider-portal/img-8IgGwFn7Xn8TaDixzC8Z.png)
+
+## Cấu hình danh sách ưu tiên
+
+### Thêm số điện thoại vào danh sách ưu tiên:
+
+Ngoài cách hệ thống tự động lưu ở phần trước, người quản trị cũng có thể lưu thủ công bằng cách thêm số điện thoại và chọn số máy nhánh muốn nhận.
+
+Để vào danh sách ưu tiên chọn **“Định tuyến” => “Luật khách quen” => nút “Sửa”** ở cuối dòng của đầu số cần cấu hình.
+
+Có 2 cách thêm số điện thoại vào danh sách ưu tiên:
+
+**Cách 1**: Thêm theo từng số điện thoại, chọn mục **“Thêm số điện thoại”**. Nhập thông tin cần thiết:
+
+* Số điện thoại: Số điện thoại khách hàng
+* Số máy nhánh: Chọn số máy nhánh của nhân viên<br />
+
+  ![](/media/ai-contact-center/user-guider-portal/img-UUQ2zdtaFmecg2lUGtUV.png)
+
+Để chọn lại nhân viên khác nghe cuộc gọi từ số điện thoại đã thiết lập, bạn chọn nút “Sửa”.
+
+**Cách 2**: Thêm nhiều số điện thoại từ file
+
+Chọn nút “Import số điện thoại” => “Choose File” để tải lên file số điện thoại có sẵn từ máy tính. File excel hỗ trợ định dạng .xlsx
+
+![](/media/ai-contact-center/user-guider-portal/img-fHOhhUhZ9dNaJNF3oFQ7.png)
+
+<Callout type="warn">
+**Lưu ý**: Để thuận tiện hơn, bạn chọn nút “Tải file mẫu” để tải xuống file mẫu, chỉnh sửa thông tin và tải lên lại, sau đó chọn thêm mới.
+</Callout>
+
+### Xóa số điện thoại ra khỏi danh sách đã lưu
+
+Xóa nhật ký cuộc gọi đã lưu tự động hoặc danh sách ưu tiên đã lưu bằng cách thêm thủ công. Khi xóa mọi dữ liệu sẽ mất hoàn toàn và không thể khôi phục lại và hệ thống sẽ ghi nhận lại nhật ký từ đầu.
+
+Để vào danh sách ưu tiên chọn “Định tuyến” => “Luật khách quen” => nút “Sửa” ở cuối dòng của đầu số cần cấu hình.
+
+![](/media/ai-contact-center/user-guider-portal/img-n0CMPfdfyRfxLYYq6OrO.png)
+
+Bạn nhấn chọn ô trống tại dòng số điện thoại muốn xóa để xóa từng số, hoặc nhấn chọn ô trống trên cùng để chọn tất cả.
+
+Chọn nút “Xóa mục đã chọn” để tiến hành xóa.
+
+Chọn OK ở popup để xác nhận xóa các mục đã chọn.

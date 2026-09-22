@@ -1,0 +1,9 @@
+{
+  "title": "Quản lý hội thoại",
+  "icon": "MessageSquare",
+  "pages": [
+    "index",
+    "quan-ly-tin-nhan-cuoc-goi",
+    "hop-nhat-thong-tin-khach-hang"
+  ]
+}

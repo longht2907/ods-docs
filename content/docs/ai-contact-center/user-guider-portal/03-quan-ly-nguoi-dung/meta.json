@@ -1,0 +1,9 @@
+{
+  "title": "Quản lý người dùng",
+  "icon": "Users",
+  "pages": [
+    "index",
+    "tao-tai-khoan-nguoi-dung",
+    "thiet-lap-phan-quyen"
+  ]
+}

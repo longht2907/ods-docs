@@ -1,0 +1,10 @@
+{
+  "title": "Thiết lập tổng đài",
+  "icon": "SlidersHorizontal",
+  "pages": [
+    "index",
+    "cai-dat",
+    "lich-su-cuoc-goi",
+    "thong-ke-bao-cao-cuoc-goi"
+  ]
+}

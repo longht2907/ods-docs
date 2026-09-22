@@ -1,0 +1,10 @@
+{
+  "title": "Quản lý dịch vụ",
+  "icon": "Briefcase",
+  "pages": [
+    "index",
+    "danh-sach-dich-vu",
+    "don-hang",
+    "hoa-don"
+  ]
+}

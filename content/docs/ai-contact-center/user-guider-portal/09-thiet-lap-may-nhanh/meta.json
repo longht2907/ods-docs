@@ -1,0 +1,10 @@
+{
+  "title": "Thiết lập máy nhánh",
+  "icon": "PhoneCall",
+  "pages": [
+    "index",
+    "ip-phone",
+    "softphone",
+    "mobile-app"
+  ]
+}

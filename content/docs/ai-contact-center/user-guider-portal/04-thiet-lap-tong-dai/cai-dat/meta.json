@@ -1,0 +1,16 @@
+{
+  "title": "Cài đặt tổng đài",
+  "icon": "Settings",
+  "pages": [
+    "index",
+    "tao-cau-hinh-may-nhanh",
+    "cau-hinh-nhom-nhan-vien",
+    "loi-chao-thong-bao-hop-thu-thoai",
+    "dinh-tuyen-cuoc-goi-ma-pin",
+    "chuyen-cuoc-goi",
+    "cau-hinh-luat-khach",
+    "quan-ly-cuoc",
+    "webhook-va-popup",
+    "phan-tich-cuoc-goi"
+  ]
+}

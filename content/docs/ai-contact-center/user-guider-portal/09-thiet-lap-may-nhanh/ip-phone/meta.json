@@ -1,0 +1,8 @@
+{
+  "title": "IP Phone",
+  "icon": "Phone",
+  "pages": [
+    "index",
+    "cau-hinh-yealink-t19x-t30x"
+  ]
+}

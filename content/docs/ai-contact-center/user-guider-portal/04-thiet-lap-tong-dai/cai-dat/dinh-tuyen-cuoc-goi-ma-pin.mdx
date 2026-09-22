@@ -1,0 +1,101 @@
+---
+title: "Thiết lập định tuyến cuộc gọi,tạo mã pin và điều hướng cuộc gọi theo quy luật thời gian"
+description: "Với các doanh nghiệp thì ngoài nhu cầu gọi nội bộ trong công ty thì còn phải liên hệ với các khách hàng, do đó hệ thống tổng đài nội bộ cần được kết nối với mạn..."
+---
+
+## Định tuyến cuộc gọi
+
+### Điều hướng gọi ra:
+
+Với các doanh nghiệp thì ngoài nhu cầu gọi nội bộ trong công ty thì còn phải liên hệ với các khách hàng, do đó hệ thống tổng đài nội bộ cần được kết nối với mạng điện thoại truyền thống, di động, quốc tế,... Để làm được điều đó thì công ty cần phải đăng ký dịch vụ trung kế với các nhà mạng viễn thông, có thể sử dụng kết nối CO, E1 hoặc sip trunk. Tiếp theo cấu hình cuộc gọi ra để định tuyến cuộc gọi đến nhà cung cấp khi các nhân viên có nhu cầu gọi ra ngoài.
+
+Chọn mục **Tổng đài => Cài đặt tổng đài => Định tuyến => Gọi ra** để thiết lập tạo định tuyến gọi ra
+
+![](/media/ai-contact-center/user-guider-portal/img-ywTp7Cxj0l9cUsNiMCoG.png)
+
+Để thiết lập định tuyến gọi ra ta chọn vào **Thêm mới gọi ra**
+
+![](/media/ai-contact-center/user-guider-portal/img-gG8T3bZZe3Ua5isVXx9l.png)
+
+* **Tên hiển thị**: đặt tên hiển thị cho định tuyến các cuộc gọi ra tổng đài.
+* **Cấu hình độ ưu tiên**: lựa chọn độ ưu tiên gọi ra nếu trên tổng đài có nhiều đầu số gọi ra khách nhau.
+* **Chọn đầu số**: lựa chọn đầu số hotline cần cấu hình.
+* **Quy định gọi ra**: thêm quy định cho việc bấm số máy gọi ra, có 4 thành phần như sau:
+  * **Prepend**: Áp dụng cho các cuộc gọi ra cần mã quốc gia hay mã tỉnh, tính năng cho phép tự động thêm tiền tố trên vào đầu số gọi ra nếu đã được thiết lập Ví dụ: gọi ra số 02873007788, nếu thêm prepend 028 thì khi gọi ra chỉ cần bấm 73007788. Hệ thống tổng đài sẽ tự động thêm mã vùng 028 vào số điện thoại
+  * **Prefix**: thêm tiền tố gắn trước số điện thoại khi gọi ra, thường áp dụng cho khách hàng có nhiều hơn một đầu số hotline gắn trên tổng đài Ví dụ: tổng đài có hai đầu số 02873007788 và 02862888999. Kịch bản yêu cầu cho đầu số 02873007788 gọi mặc định, 02862888999 nhấn prefix 9 để gọi ra. Khi nhân viên gọi ra bằng đầu số 02862888999 cần nhập từ bàn phím: 902862888999
+  * **Match Patten**: Tính năng quy định số được phép gọi ra. Bao gồm:
+    * X: Match với các số từ 0 đến 9
+    * Z: Match với các số từ 1 đến 9
+    * N: Match với các số từ 2 đến 9
+  * **CallerID**: cho phép số máy nhánh nào được phép gọi ra từ đầu số hotline nào Ví dụ cho thiết lập như hình bên dưới:
+    * Các số khác 1000 muốn dùng đầu số ITEL842877777788 gọi ra cho tất cả các số phải bấm prefix 123 theo cú pháp: 1230877779999
+    * Đầu số ITEL842877777788 cho phép số máy nhánh 1000 gọi ra cho tất cả các số, không cần phải bấm prefix.<br />
+
+      ![](/media/ai-contact-center/user-guider-portal/img-ZPaKBZzyQAXaBzRJUpjL.png)
+
+Để thêm nhiều số máy nhánh (không phải tất cả) cho mục CallerID, có thể thêm theo 2 cách sau: Ví dụ: 100 tới 105 được gọi ra từ đầu số ITEL842877777788
+
+* Cách thông thường: Match Pattern: ta thêm dấu “ . ” và CallerID điền từ 100 lần lượt tới 105.
+* Cách rút gọn theo quy tắc: Match Pattern “ . ” và CallerID điền: 10\[0-5]
+
+### Điều hướng cuộc gọi vào tổng đài
+
+Để nhận cuộc gọi từ bên ngoài vào hotline cần cấu hình điều hướng cuộc gọi vào. Việc này tùy theo nhu cầu của từng công ty, với các kịch bản tiếp nhận cuộc gọi khác nhau như: có thể phát lời chào, phát thông báo, …
+
+Chọn mục **Tổng đài => Cài đặt tổng đài => Định tuyến => Gọi vào** để thiết lập với thông số:
+
+![](/media/ai-contact-center/user-guider-portal/img-lwxlE24xEO8lzMU59B5E.png)
+
+* **Tên hiển thị**: đặt tên hiển thị cho định tuyến các cuộc gọi vào
+* **Số cố định**: nhập đầu số hotline cần gắn lên tổng đài
+* **Chuyến cuộc gọi**: điều hướng cuộc gọi tới đích đến xác định như: kịch bản lời chào
+
+## Tạo mã Pin
+
+Khi tạo mã pin, người gọi ra phải nhập đúng mã pin đã thiết lập, nếu sai sẽ phát thông báo và kết thúc cuộc gọi.
+
+Chọn mục **Tổng đài => Cài đặt tổng đài => Định tuyến => Thiết lập mã PIN** để thiết lập mã PIN mới:
+
+![](/media/ai-contact-center/user-guider-portal/img-Rnyh8E07dAFZUgoLuqML.png)
+
+Sau khi tạo xong mã PIN, chọn tiếp mục “Định tuyến” => “Gọi ra” chọn vào của đầu số nào cần thiết lập mã PIN.
+
+<Callout type="warn">
+**Lưu ý**: Nếu người quản trị muốn quy định những số nội bộ nào gọi ra không cần nhập mã PIN, thì người quản trị vào mục “Nhân Viên” => “Sửa”, sau đó bật chức năng “Bỏ qua xác thực mã PIN”.
+</Callout>
+
+## Điều hướng cuộc gọi theo quy luật thời gian
+
+Điều hướng cuộc gọi theo mốc thời gian được thiết lập sẵn và có thể áp dụng cho cả cuộc gọi vào hotline tổng đài hoặc cuộc gọi ra. Tính năng này dùng để tạo một mốc thời gian nhất định để nhân viên trực điện thoại nhận cuộc gọi (ví dụ trong giờ làm việc), ngoài giờ làm việc thì chuyển cuộc gọi vào đích đến khác:như phát thông báo ngoài giờ, chuyển sang hộp thư thoại,…
+
+Người quản trị cũng có thể dùng thời gian thiết lập ở trên cấu hình cho cuộc gọi ra, nghĩa là chỉ cho phép nhân viên trực điện thoại gọi ra trong khoảng thời gian cho phép (ví dụ trong giờ làm việc).
+
+### Tạo quy luật thời gian gọi
+
+Để tạo quy luật thời gian, chọn mục **Tổng đài => Cài đặt tổng đài => Thời gian gọi => Quy luật thời gian**
+
+Chọn nút “**Thêm danh mục**” để thêm danh mục thời gian mới:
+
+![](/media/ai-contact-center/user-guider-portal/img-e3fAIwDXjZwu2ruYz5Ea.png)
+
+Sau khi tạo danh mục thời gian, ta chọn vào danh mục vừa tạo để thiết lập mốc thời gian cần thiết lập.
+
+Ví dụ kịch bản: tạo danh mục thời gian với tên là “GLV” và thiết lập mốc thời gian được đặt là từ 8h - 17h T2 - T6 và 8h – 11h30 T7
+
+![](/media/ai-contact-center/user-guider-portal/img-jAIYX8ua4JEkhxCgAXUo.png)
+
+Chọn nút “**Xoá danh mục**” vào để xóa danh mục thời gian đã tạo.
+
+### Điều hướng cuộc gọi
+
+Sau khi thiết lập xong quy luật thời gian, người quản trị tiếp tục cấu hình điều hướng cuộc gọi cho quy luật thời gian vừa thiết lập.
+
+Chọn mục **Tổng đài => Cài đặt tổng đài => Thời gian gọi => Điều hướng cuộc gọi** để tạo một điều hướng cuộc gọi với các thông số sau:
+
+![](/media/ai-contact-center/user-guider-portal/img-CE5sK3Oei8n02nKTzkiZ.png)
+
+* **Tên hiển thị**: đặt tên hiển thị
+* **Chọn quy luật thời gian**: lựa chọn mốc thời gian được thiết lập trước đó
+* **Chuyển hướng cuộc gọi**: trong trường hợp trùng với quy luật thời gian đặt ra thì điều hướng cuộc gọi sẽ theo kịch bản một, nếu không trùng với quy luật thời gian thì điều hướng cuộc gọi đến một đích khác
+
+Ví dụ kịch bản: Tạo danh mục thời gian với tên là “GioLamViec” và thiết lập mốc thời gian được đặt là từ 8h - 17h T2 - T6 & 8h – 11h30 T7. Trung quy luật thì chuyển hướng cuộc gọi vào Lời Chào – LC\_MBO. Không trùng quy luật thời gian thì chuyển tới đích đến Lời chào- NgoaiGio

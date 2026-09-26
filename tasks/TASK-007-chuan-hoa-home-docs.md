@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: done
 branch: task/TASK-007-chuan-hoa-home-docs
-commit: "4985362"
+commit: "7243e60"
 verified-by: npm run verify:task
 ---
 
@@ -149,4 +149,4 @@ dependency, test hoặc cấu hình deploy để hoàn thành task.
 
 - Liệt kê file tạo/sửa/xóa.
 - Ghi kết quả thật của các lệnh kiểm tra và runtime routes.
-- Giữ `status: in-progress` cho tới khi Pull Request CI xanh; không tự đặt `done`.
+- Chỉ chuyển `status` sang `done` sau khi Pull Request CI xanh.

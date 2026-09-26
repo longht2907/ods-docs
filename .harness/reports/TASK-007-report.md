@@ -147,5 +147,7 @@ phạm vi TASK-007 và không làm build thất bại.
 
 ## Trạng thái bàn giao
 
-- Task giữ `status: in-progress` cho tới khi Pull Request CI xanh.
-- Chưa commit, push, mở Pull Request hoặc deploy production.
+- Pull Request #8 đã chạy required check thành công cho commit implementation `7243e60`
+  và được Human merge vào `main` tại merge commit `97032fd`.
+- TASK-007 được chuyển sang `done`; không có thay đổi production hoặc deploy trong commit
+  hoàn tất metadata này.

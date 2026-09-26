@@ -2,13 +2,11 @@
   "title": "Tài liệu ODS",
   "description": "Tài liệu sử dụng và tích hợp các giải pháp ODS.",
   "icon": "Library",
-  "defaultOpen": true,
+  "defaultOpen": false,
   "pages": [
     "index",
     "---[Compass]Giải pháp ODS---",
-    "[Bot][AI Contact Center](/docs/ai-contact-center)",
-    "[Cloud][CloudFile](/docs/cloudfile)",
-    "!ai-contact-center",
-    "!cloudfile"
+    "ai-contact-center",
+    "cloudfile"
   ]
 }

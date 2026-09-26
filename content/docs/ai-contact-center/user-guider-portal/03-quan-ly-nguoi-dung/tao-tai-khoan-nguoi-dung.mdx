@@ -1,37 +1,60 @@
 ---
 title: "Tạo tài khoản người dùng"
-description: "Trong hệ thống quản trị tổng đài, việc thêm người dùng giúp quản lý và phân quyền sử dụng hệ thống một cách hiệu quả. Mỗi tài khoản có thể được gán quyền phù hợ..."
+description: "Tạo tài khoản Portal, gán tổng đài và nhóm quyền phù hợp để nhân sự bắt đầu sử dụng AI Contact Center an toàn."
 ---
 
-## 1. Thêm Người Dùng Để Làm Gì?
+<Callout title="Kết quả sau khi hoàn thành" type="info">
+Bạn có một tài khoản Portal mới, được gắn với đúng tổng đài và nhóm quyền để sẵn sàng đăng nhập sử dụng.
+</Callout>
 
-Trong hệ thống quản trị tổng đài, việc thêm người dùng giúp quản lý và phân quyền sử dụng hệ thống một cách hiệu quả. Mỗi tài khoản có thể được gán quyền phù hợp với vai trò trong doanh nghiệp, giúp đảm bảo an toàn và tối ưu hóa quy trình làm việc.
+## Mục tiêu
 
-Các mục đích chính khi thêm người dùng:
+Mỗi nhân sự cần một tài khoản riêng để truy cập đúng chức năng theo vai trò. Không dùng chung tài khoản vì sẽ khó kiểm soát quyền truy cập và truy vết thao tác khi có sự cố.
 
-* Phân quyền theo chức năng, đảm bảo mỗi người chỉ có quyền truy cập vào các tính năng cần thiết.
-* Quản lý danh sách nhân sự sử dụng hệ thống tổng đài và dịch vụ liên quan.
-* Tích hợp bảo mật với xác thực hai lớp (2FA) để bảo vệ tài khoản.
+## Trước khi bắt đầu
 
-## 2. Hướng Dẫn Cách Thêm Người Dùng
+- Đăng nhập bằng tài khoản có quyền quản lý người dùng.
+- Xác định tổng đài, số máy nhánh và nhóm quyền của nhân sự mới.
+- Chuẩn bị địa chỉ email nếu doanh nghiệp sử dụng xác thực hai lớp (2FA).
 
-**Bước 1: Truy Cập Trang Quản Lý Người Dùng**
+## Các bước thực hiện
 
-* Đăng nhập vào hệ thống **giao diện quản trị tổng đài**.
-* Trên thanh menu bên trái, chọn `Người dùng` → `Danh sách người dùng`.
-* Nhấn nút `Thêm mới người dùng` (nút màu xanh ở góc phải màn hình).
+### Bước 1: Mở danh sách người dùng
 
-**Bước 2: Nhập Thông Tin Người Dùng**
+1. Đăng nhập vào giao diện quản trị tổng đài.
+2. Trên menu bên trái, chọn `Người dùng` → `Danh sách người dùng`.
+3. Chọn `Thêm mới người dùng` ở góc phải màn hình.
 
-Một cửa sổ popup xuất hiện với các trường cần điền:
+### Bước 2: Nhập thông tin tài khoản
 
-* `Tên người dùng` (\*): Nhập họ và tên đầy đủ của người dùng.
-* `Tên tài khoản` (\*): Tên đăng nhập vào hệ thống.
-* `Mật khẩu` (\*): Mật khẩu đăng nhập.
-* `Xác nhận mật khẩu` (\*): Nhập lại mật khẩu để xác minh.
-* `Danh sách hiển thị GSM`: (Tùy chọn) Nhập số điện thoại hoặc danh sách hiển thị nếu cần.
-* `Email gửi thông tin OTP`: Email nhận mã xác thực khi bật 2FA.
-* `Bật xác thực 2 lớp OTP`: Chọn nếu muốn kích hoạt bảo mật hai lớp.
-* `Tổng đài` (\*): Chọn tổng đài mà người dùng này sẽ sử dụng.
-* `Số máy nhánh`: Chọn số máy nhánh (nếu có).
-* `Nhóm quyền` (\*): Chọn nhóm quyền phù hợp với vai trò của người dùng.
+Trong cửa sổ tạo mới, nhập các trường sau:
+
+| Trường | Cách nhập |
+| --- | --- |
+| `Tên người dùng` (bắt buộc) | Họ và tên đầy đủ của nhân sự. |
+| `Tên tài khoản` (bắt buộc) | Tên dùng để đăng nhập Portal. |
+| `Mật khẩu` và `Xác nhận mật khẩu` (bắt buộc) | Nhập cùng một mật khẩu cho tài khoản mới. |
+| `Danh sách hiển thị GSM` | Chọn số điện thoại hoặc danh sách hiển thị khi có yêu cầu. |
+| `Email gửi thông tin OTP` | Email nhận mã xác thực khi bật 2FA. |
+| `Bật xác thực 2 lớp OTP` | Bật để tăng lớp bảo vệ cho tài khoản. |
+| `Tổng đài` (bắt buộc) | Chọn tổng đài mà người dùng sẽ sử dụng. |
+| `Số máy nhánh` | Chọn extension đã cấp cho nhân sự, nếu có. |
+| `Nhóm quyền` (bắt buộc) | Chọn nhóm quyền đúng với vai trò công việc. |
+
+### Bước 3: Lưu tài khoản
+
+Kiểm tra lại thông tin, đặc biệt là `Tổng đài`, `Số máy nhánh` và `Nhóm quyền`, sau đó lưu tài khoản.
+
+## Kiểm tra kết quả
+
+Sau khi lưu, xác nhận ba điều kiện:
+
+- Tài khoản mới xuất hiện trong danh sách người dùng.
+- Người dùng đăng nhập được bằng thông tin đã cấp.
+- Người dùng chỉ nhìn thấy và thao tác được các chức năng thuộc nhóm quyền đã chọn.
+
+Nếu một trong các điều kiện chưa đạt, kiểm tra lại trạng thái tài khoản, tổng đài được gán và cấu hình nhóm quyền.
+
+## Bước tiếp theo
+
+Tiếp tục với [Thiết lập phân quyền người dùng](./thiet-lap-phan-quyen) để rà soát chi tiết quyền truy cập theo vai trò.

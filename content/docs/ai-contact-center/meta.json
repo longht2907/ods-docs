@@ -3,7 +3,7 @@
   "description": "Hướng dẫn vận hành và API tích hợp hệ thống AI Contact Center.",
   "icon": "Bot",
   "root": true,
-  "defaultOpen": true,
+  "defaultOpen": false,
   "pages": [
     "index",
     "user-guider-portal",

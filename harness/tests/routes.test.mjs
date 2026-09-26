@@ -50,13 +50,22 @@ async function waitForServer(url, maxRetries = 40, interval = 1000) {
   return false;
 }
 
-async function checkRoute(baseUrl, path, expectedStatus, desc) {
+async function checkRoute(baseUrl, path, expectedStatus, desc, expectedText = []) {
   const url = `${baseUrl}${path}`;
   try {
     const res = await fetch(url, { redirect: 'manual' });
-    const pass = res.status === expectedStatus;
+    let contentPass = true;
+    if (expectedText.length > 0) {
+      const html = await res.text();
+      const visibleText = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
+      contentPass = expectedText.every((text) => visibleText.includes(text));
+    }
+    const pass = res.status === expectedStatus && contentPass;
     const mark = pass ? '✓' : '✗';
-    console.log(`  ${mark} ${desc} [${path}] -> mong đợi ${expectedStatus}, thực tế ${res.status}`);
+    const contentResult = expectedText.length > 0
+      ? `, nội dung ${contentPass ? 'đúng' : 'thiếu dữ liệu Home'}`
+      : '';
+    console.log(`  ${mark} ${desc} [${path}] -> mong đợi ${expectedStatus}, thực tế ${res.status}${contentResult}`);
     return pass;
   } catch (err) {
     console.error(`  ✗ Lỗi kết nối tới ${url}: ${err.message}`);
@@ -103,7 +112,14 @@ async function main() {
     let passedCases = true;
 
     // 1-7. Các route public chính phải trả về 200
-    const t1 = await checkRoute(baseUrl, '/', 200, 'Home hub accessible');
+    const t1 = await checkRoute(baseUrl, '/', 200, 'Home hub accessible', [
+      '9 chương Portal',
+      'REST API và Webhook',
+      '2 sản phẩm có tài liệu',
+      'Portal',
+      'API',
+      'CloudFile',
+    ]);
     passedCases = passedCases && t1;
 
     const t2 = await checkRoute(baseUrl, '/docs', 200, 'Public docs accessible');

@@ -2,25 +2,29 @@
 
 import { usePathname } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
+import { docsProducts } from '@/lib/docs-products';
 
 export function DocsThemeScope({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-
-  const theme = pathname.startsWith('/docs/ai-contact-center')
-    ? 'ai-contact-center'
-    : pathname.startsWith('/docs/cloudfile')
-      ? 'cloudfile'
-      : 'docs-default';
+  const product = docsProducts.find(
+    (item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
+  );
+  const theme = product?.slug ?? 'docs-default';
+  const accent = product?.accent;
 
   useEffect(() => {
     document.documentElement.setAttribute('data-doc-theme', theme);
+    if (accent) document.documentElement.setAttribute('data-product-accent', accent);
+    else document.documentElement.removeAttribute('data-product-accent');
+
     return () => {
       document.documentElement.removeAttribute('data-doc-theme');
+      document.documentElement.removeAttribute('data-product-accent');
     };
-  }, [theme]);
+  }, [accent, theme]);
 
   return (
-    <div data-doc-theme={theme} className="contents">
+    <div data-doc-theme={theme} data-product-accent={accent} className="contents">
       {children}
     </div>
   );

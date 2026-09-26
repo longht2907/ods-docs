@@ -1,23 +1,73 @@
 ---
-title: "Tổng quan AI Contact Center"
-description: "Giải pháp tổng đài thông minh đa kênh tích hợp trợ lý ảo AI, gọi tự động Autocall và quản lý cuộc gọi doanh nghiệp."
+title: "AI Contact Center"
+description: "Bắt đầu vận hành Portal, thiết lập tổng đài và tích hợp AI Contact Center với hệ thống doanh nghiệp."
+full: true
 ---
 
-**AI Contact Center** là giải pháp tổng đài đám mây thế hệ mới của ODS, kết hợp sức mạnh của trí tuệ nhân tạo (AI) với hạ tầng viễn thông ổn định. Hệ thống giúp doanh nghiệp tự động hóa các luồng tương tác thoại, nâng cao năng suất tư vấn viên và tối ưu hóa chi phí vận hành.
+<div className="not-prose mb-8 flex flex-wrap items-center gap-3">
+  <a
+    href="/docs/ai-contact-center/user-guider-portal/01-tong-quan/quickstart"
+    className="inline-flex h-10 items-center rounded-lg bg-fd-primary px-4 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90"
+  >
+    Bắt đầu sử dụng Portal
+  </a>
+  <a
+    href="/docs/ai-contact-center/api"
+    className="inline-flex h-10 items-center rounded-lg border border-fd-border bg-fd-secondary/50 px-4 text-sm font-medium text-fd-foreground transition-colors hover:bg-fd-accent"
+  >
+    Xem API Reference
+  </a>
+</div>
 
-## Danh mục tài liệu
+## Chọn tài liệu theo nhu cầu
 
-Tài liệu AI Contact Center được phân chia thành 2 chuyên mục chính:
-
-<Cards>
+<Cards className="grid-cols-1 md:grid-cols-2">
   <Card
-    title="Hướng dẫn sử dụng Portal"
-    description="Tài liệu hướng dẫn thao tác, cấu hình máy nhánh, quản trị chiến dịch Autocall và giám sát tổng đài trên giao diện web."
+    title="Vận hành trên Portal"
+    description="Dành cho Agent và Administrator cần quản lý người dùng, khách hàng, cuộc gọi, hội thoại và thiết bị."
     href="/docs/ai-contact-center/user-guider-portal"
+    className="min-h-40"
   />
   <Card
-    title="API Reference"
-    description="Tài liệu đặc tả REST API tích hợp hệ thống dành cho developer."
+    title="Tích hợp hệ thống"
+    description="Dành cho Developer và Solutions Engineer tích hợp AI Contact Center với CRM, ERP hoặc workflow nội bộ."
     href="/docs/ai-contact-center/api"
+    className="min-h-40"
   />
 </Cards>
+
+## Tác vụ phổ biến
+
+<Cards className="grid-cols-1 md:grid-cols-2">
+  <Card
+    title="Những việc cần làm khi bắt đầu"
+    description="Checklist thiết lập ban đầu dành cho quản trị viên hệ thống."
+    href="/docs/ai-contact-center/user-guider-portal/01-tong-quan/quickstart/nhung-viec-can-lam-khi-bat-dau"
+  />
+  <Card
+    title="Tạo tài khoản người dùng"
+    description="Thêm người dùng mới và chuẩn bị cho bước phân quyền."
+    href="/docs/ai-contact-center/user-guider-portal/03-quan-ly-nguoi-dung/tao-tai-khoan-nguoi-dung"
+  />
+  <Card
+    title="Tạo cấu hình máy nhánh"
+    description="Khởi tạo extension trước khi kết nối IP Phone hoặc Softphone."
+    href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/tao-cau-hinh-may-nhanh"
+  />
+  <Card
+    title="Webhook và Popup"
+    description="Kết nối sự kiện cuộc gọi với CRM hoặc ứng dụng nghiệp vụ."
+    href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/webhook-va-popup"
+  />
+</Cards>
+
+## Luồng triển khai khuyến nghị
+
+1. Xác nhận dịch vụ và tài khoản quản trị trên Portal.
+2. Tạo người dùng, phân quyền và cấu hình máy nhánh.
+3. Thiết lập luồng nhận/gọi ra, lời chào và quy tắc phân phối cuộc gọi.
+4. Kiểm thử cuộc gọi hai chiều trước khi tích hợp CRM, Webhook hoặc kênh số.
+
+<Callout title="Cần hỗ trợ triển khai?" type="info">
+Liên hệ `support@ods.vn` hoặc gọi `1900 6634` để được đội ngũ kỹ thuật ODS hỗ trợ.
+</Callout>

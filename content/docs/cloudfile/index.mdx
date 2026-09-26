@@ -1,23 +1,66 @@
 ---
 title: "CloudFile"
-description: "Dịch vụ lưu trữ và chia sẻ tệp tin đám mây bảo mật cao cho doanh nghiệp."
+description: "Lưu trữ, đồng bộ và chia sẻ dữ liệu doanh nghiệp với mô hình phân quyền rõ ràng."
+full: true
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout';
+<div className="not-prose mb-8 flex flex-wrap items-center gap-3">
+  <a
+    href="https://support.ods.vn/"
+    className="inline-flex h-10 items-center rounded-lg bg-fd-primary px-4 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90"
+  >
+    Yêu cầu hỗ trợ CloudFile
+  </a>
+  <a
+    href="/docs"
+    className="inline-flex h-10 items-center rounded-lg border border-fd-border bg-fd-secondary/50 px-4 text-sm font-medium text-fd-foreground transition-colors hover:bg-fd-accent"
+  >
+    Trở về Documentation Directory
+  </a>
+</div>
 
-# CloudFile
-
-<Callout type="warn" title="Thông báo">
-  Tài liệu đang được xây dựng. Chúng tôi đang hoàn thiện hướng dẫn chi tiết và sẽ cập nhật trong thời gian sớm nhất.
+<Callout title="Tài liệu đang được mở rộng" type="warn">
+ODS đang chuẩn hóa các hướng dẫn chi tiết cho Desktop, mobile, phân quyền thư mục và chia sẻ
+dữ liệu. Product workspace này sẽ được cập nhật theo từng đợt phát hành.
 </Callout>
 
-**CloudFile** là giải pháp lưu trữ đám mây chuyên biệt dành cho doanh nghiệp, cho phép lưu trữ, đồng bộ hóa và chia sẻ tệp tin an toàn với khả năng phân quyền chi tiết theo phòng ban và dự án.
+## Phạm vi tài liệu CloudFile
 
-## Kế hoạch phát hành tài liệu
+<Cards className="grid-cols-1 md:grid-cols-2">
+  <Card
+    title="Cài đặt & đồng bộ"
+    description="Cài ứng dụng trên Windows, macOS và thiết bị di động; thiết lập thư mục đồng bộ."
+    href="https://support.ods.vn/"
+    className="min-h-36"
+  />
+  <Card
+    title="Phân quyền dữ liệu"
+    description="Tổ chức dữ liệu theo phòng ban, dự án và vai trò người dùng."
+    href="https://support.ods.vn/"
+    className="min-h-36"
+  />
+  <Card
+    title="Chia sẻ bảo mật"
+    description="Tạo liên kết chia sẻ, mật khẩu truy cập và thời hạn sử dụng."
+    href="https://support.ods.vn/"
+    className="min-h-36"
+  />
+  <Card
+    title="Vận hành & hỗ trợ"
+    description="Troubleshooting đồng bộ, quản lý dung lượng và yêu cầu hỗ trợ kỹ thuật."
+    href="https://support.ods.vn/"
+    className="min-h-36"
+  />
+</Cards>
 
-Nội dung tài liệu sẽ bao gồm:
-- Hướng dẫn cài đặt ứng dụng đồng bộ hóa trên Windows, macOS và thiết bị di động.
-- Quản lý phân quyền thư mục và liên kết chia sẻ công khai có mật khẩu.
-- Tích hợp xác thực một lần (SSO) và sao lưu dữ liệu tự động.
+## Chuẩn bị trước khi triển khai
 
-Nếu bạn cần hỗ trợ kỹ thuật hoặc tài liệu hướng dẫn tạm thời về CloudFile, vui lòng liên hệ trực tiếp qua email [support@ods.vn](mailto:support@ods.vn) hoặc [Kênh hỗ trợ kỹ thuật](/docs).
+1. Xác nhận tenant CloudFile và tài khoản quản trị đã được cấp.
+2. Xác định cấu trúc phòng ban, nhóm người dùng và quyền truy cập dữ liệu.
+3. Chọn thư mục cần đồng bộ trên từng thiết bị.
+4. Thử nghiệm chính sách chia sẻ với một nhóm nhỏ trước khi áp dụng toàn doanh nghiệp.
+
+<Callout title="Cần hướng dẫn trong thời gian tài liệu đang hoàn thiện?" type="info">
+Gửi yêu cầu tại [Support Portal](https://support.ods.vn/) để đội ngũ kỹ thuật ODS cung cấp
+tài liệu triển khai phù hợp với tenant của doanh nghiệp.
+</Callout>

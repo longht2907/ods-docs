@@ -1,7 +1,6 @@
 {
   "title": "CloudFile",
   "description": "Hướng dẫn sử dụng dịch vụ CloudFile của ODS.",
-  "icon": "Cloud",
   "root": true,
   "defaultOpen": false,
   "pages": [

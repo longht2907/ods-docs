@@ -12,7 +12,6 @@ import {
   PhoneCall,
   Rocket,
   Server,
-  ShieldCheck,
   Wrench,
 } from 'lucide-react';
 import { FullSearchTrigger } from 'fumadocs-ui/layouts/shared/slots/search-trigger';
@@ -42,7 +41,8 @@ const docsProductIcons: Record<DocsProductIcon, LucideIcon> = {
   phone: PhoneCall,
   cloud: Cloud,
   server: Server,
-  shield: ShieldCheck,
+  managed: Wrench,
+  license: KeyRound,
 };
 
 const productAccentStyles: Record<
@@ -212,34 +212,48 @@ export default function HomePage() {
           <div className="ods-solution-nodes">
             {solutions.map((solution, index) => {
               const SolutionIcon = solutionIcons[solution.icon];
-              const href = solution.docsUrl ?? solution.productUrl;
-              const external = solution.docsUrl === undefined;
 
               return (
-                <Link
+                <article
                   key={solution.id}
-                  href={href}
-                  target={external ? '_blank' : undefined}
-                  rel={external ? 'noopener noreferrer' : undefined}
                   className={`ods-solution-node ods-solution-node-${index + 1} group`}
                 >
                   <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-fd-muted text-fd-muted-foreground transition-colors group-hover:bg-orange-500/10 group-hover:text-orange-500">
                     <SolutionIcon className="size-4" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <strong className="line-clamp-2 block text-xs leading-tight font-semibold">
+                    <a
+                      href={solution.productUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs leading-tight font-semibold hover:text-orange-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+                    >
                       {solution.title}
-                    </strong>
-                    <span className="mt-0.5 block truncate text-[10px] text-fd-muted-foreground">
-                      {solution.products.slice(0, 2).join(' · ')}
+                      <ArrowUpRight className="size-3 shrink-0" />
+                    </a>
+                    <span className="mt-1.5 flex flex-wrap gap-x-2 gap-y-1">
+                      {solution.products.map((product) => {
+                        const href = product.docsSlug
+                          ? `/docs/${product.docsSlug}`
+                          : product.productUrl;
+                        const external = product.docsSlug === undefined;
+
+                        return (
+                          <Link
+                            key={product.name}
+                            href={href}
+                            target={external ? '_blank' : undefined}
+                            rel={external ? 'noopener noreferrer' : undefined}
+                            className="inline-flex items-center gap-0.5 text-[10px] leading-tight text-fd-muted-foreground underline-offset-2 hover:text-fd-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+                          >
+                            {product.name}
+                            {external ? <ArrowUpRight className="size-2.5 shrink-0" /> : null}
+                          </Link>
+                        );
+                      })}
                     </span>
                   </span>
-                  {external ? (
-                    <ArrowUpRight className="size-4 shrink-0 text-fd-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fd-foreground" />
-                  ) : (
-                    <ArrowRight className="size-4 shrink-0 text-fd-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-fd-foreground" />
-                  )}
-                </Link>
+                </article>
               );
             })}
           </div>

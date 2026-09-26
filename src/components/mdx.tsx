@@ -6,6 +6,7 @@ import {
   ApiReferenceLayout,
   ApiReferenceMain,
 } from '@/components/docs/api-reference-layout';
+import { DocsProductDirectory } from '@/components/docs/docs-product-directory';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -14,6 +15,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ApiReferenceLayout,
     ApiReferenceMain,
     ApiReferenceCode,
+    DocsProductDirectory,
     ...components,
   } satisfies MDXComponents;
 }

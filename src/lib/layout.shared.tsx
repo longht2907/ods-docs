@@ -4,12 +4,13 @@ import {
   BookOpen,
   Cloud,
   Headphones,
+  KeyRound,
   Layers3,
   Library,
   Newspaper,
   PhoneCall,
   Server,
-  ShieldCheck,
+  Wrench,
 } from 'lucide-react';
 import { docsProducts, odsExternalLinks, type DocsProductIcon } from './docs-products';
 import { gitConfig } from './shared';
@@ -18,7 +19,8 @@ const productIcons: Record<DocsProductIcon, LucideIcon> = {
   phone: PhoneCall,
   cloud: Cloud,
   server: Server,
-  shield: ShieldCheck,
+  managed: Wrench,
+  license: KeyRound,
 };
 
 function getProductIcon(icon: DocsProductIcon) {

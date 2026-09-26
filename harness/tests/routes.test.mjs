@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * routes.test.mjs - Tự khởi động Next.js dev server trên port rảnh,
- * chạy 7 test case bảo vệ ranh giới và tự tắt server khi kết thúc.
+ * chạy các test route public/internal và tự tắt server khi kết thúc.
  */
 
 import { spawn, execSync } from 'node:child_process';
@@ -98,43 +98,53 @@ async function main() {
       process.exit(1);
     }
 
-    console.log('[test:routes] Server đã sẵn sàng. Bắt đầu kiểm tra 7 cases:');
+    console.log('[test:routes] Server đã sẵn sàng. Bắt đầu kiểm tra 12 cases:');
 
     let passedCases = true;
 
-    // 1. /docs public phải trả về 200
-    const t1 = await checkRoute(baseUrl, '/docs', 200, 'Public docs accessible');
+    // 1-7. Các route public chính phải trả về 200
+    const t1 = await checkRoute(baseUrl, '/', 200, 'Home hub accessible');
     passedCases = passedCases && t1;
 
-    // 2. /internal phải bị chặn 401
-    const t2 = await checkRoute(baseUrl, '/internal', 401, 'Internal root blocked');
+    const t2 = await checkRoute(baseUrl, '/docs', 200, 'Public docs accessible');
     passedCases = passedCases && t2;
 
-    // 3. /internal/ (trailing slash) phải bị chặn 401
-    const t3 = await checkRoute(baseUrl, '/internal/', 401, 'Internal trailing slash blocked');
+    const t3 = await checkRoute(baseUrl, '/docs/ai-contact-center', 200, 'AI Contact Center docs accessible');
     passedCases = passedCases && t3;
 
-    // 4. /internal/onboarding subpage phải bị chặn 401
-    const t4 = await checkRoute(baseUrl, '/internal/onboarding', 401, 'Internal subpage blocked');
+    const t4 = await checkRoute(baseUrl, '/docs/cloudfile', 200, 'CloudFile docs accessible');
     passedCases = passedCases && t4;
 
-    // 5. /api/search/internal phải bị chặn 401
-    const t5 = await checkRoute(baseUrl, '/api/search/internal', 401, 'Internal search API blocked');
+    const t5 = await checkRoute(baseUrl, '/docs/ai-contact-center/user-guider-portal', 200, 'Portal guide accessible');
     passedCases = passedCases && t5;
 
-    // 6. /api/search/internal/ (trailing slash) phải bị chặn 401
-    const t6 = await checkRoute(baseUrl, '/api/search/internal/', 401, 'Internal search API trailing slash blocked');
+    const t6 = await checkRoute(baseUrl, '/docs/ai-contact-center/api', 200, 'API reference accessible');
     passedCases = passedCases && t6;
 
-    // 7. /api/search public phải trả về 200
     const t7 = await checkRoute(baseUrl, '/api/search', 200, 'Public search API accessible');
     passedCases = passedCases && t7;
+
+    // 8-12. Vùng internal tiếp tục fail-closed
+    const t8 = await checkRoute(baseUrl, '/internal', 401, 'Internal root blocked');
+    passedCases = passedCases && t8;
+
+    const t9 = await checkRoute(baseUrl, '/internal/', 401, 'Internal trailing slash blocked');
+    passedCases = passedCases && t9;
+
+    const t10 = await checkRoute(baseUrl, '/internal/onboarding', 401, 'Internal subpage blocked');
+    passedCases = passedCases && t10;
+
+    const t11 = await checkRoute(baseUrl, '/api/search/internal', 401, 'Internal search API blocked');
+    passedCases = passedCases && t11;
+
+    const t12 = await checkRoute(baseUrl, '/api/search/internal/', 401, 'Internal search API trailing slash blocked');
+    passedCases = passedCases && t12;
 
     if (!passedCases) {
       console.error('\n[test:routes FAIL] Một hoặc nhiều route không đạt mã HTTP mong đợi.');
       allPassed = false;
     } else {
-      console.log('\n[test:routes PASS] Toàn bộ 7/7 route test case đều đạt chuẩn.\n');
+      console.log('\n[test:routes PASS] Toàn bộ 12/12 route test case đều đạt chuẩn.\n');
       allPassed = true;
     }
   } finally {

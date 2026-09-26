@@ -14,6 +14,7 @@
 import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
+import babelParser from 'next/dist/compiled/babel/parser.js'
 
 const root = process.cwd()
 const errors = []
@@ -30,6 +31,91 @@ function readIfExists(rel) {
 	const full = path.join(root, rel)
 	if (!fs.existsSync(full)) return null
 	return fs.readFileSync(full, 'utf8')
+}
+
+function unwrapTsExpression(node) {
+	let current = node
+	while (
+		current.type === 'TSAsExpression' ||
+		current.type === 'TSSatisfiesExpression' ||
+		current.type === 'ParenthesizedExpression'
+	) {
+		current = current.expression
+	}
+	return current
+}
+
+function readTsLiteral(node, file) {
+	const current = unwrapTsExpression(node)
+
+	if (current.type === 'StringLiteral') {
+		return current.value
+	}
+	if (current.type === 'NumericLiteral' || current.type === 'BooleanLiteral') {
+		return current.value
+	}
+	if (current.type === 'NullLiteral') return null
+	if (current.type === 'ArrayExpression') {
+		return current.elements.map((item) => {
+			if (!item) throw new Error(`${file} chua array hole khong ho tro`)
+			return readTsLiteral(item, file)
+		})
+	}
+	if (current.type === 'ObjectExpression') {
+		const value = {}
+		for (const property of current.properties) {
+			if (property.type !== 'ObjectProperty') {
+				throw new Error(`${file} chua property khong phai literal`)
+			}
+			const name = property.key
+			const key = name.type === 'Identifier' || name.type === 'StringLiteral' ? name.name ?? name.value : null
+			if (!key) throw new Error(`${file} chua property name khong ho tro`)
+			value[key] = readTsLiteral(property.value, file)
+		}
+		return value
+	}
+
+	throw new Error(`${file} chua expression khong phai literal`)
+}
+
+function readTsConst(rel, variableName) {
+	const source = readIfExists(rel)
+	if (!source) throw new Error(`khong tim thay ${rel}`)
+	const sourceFile = babelParser.parse(source, {
+		sourceType: 'module',
+		plugins: ['typescript'],
+	})
+
+	for (const statement of sourceFile.program.body) {
+		if (statement.type !== 'ExportNamedDeclaration' || statement.declaration?.type !== 'VariableDeclaration') {
+			continue
+		}
+		for (const declaration of statement.declaration.declarations) {
+			if (
+				declaration.id.type === 'Identifier' &&
+				declaration.id.name === variableName &&
+				declaration.init
+			) {
+				return readTsLiteral(declaration.init, rel)
+			}
+		}
+	}
+
+	throw new Error(`khong tim thay const ${variableName} trong ${rel}`)
+}
+
+function readJsonObject(rel, check) {
+	const source = readIfExists(rel)
+	if (!source) {
+		fail(check, `khong tim thay ${rel}`)
+		return null
+	}
+	try {
+		return JSON.parse(source)
+	} catch {
+		fail(check, `${rel} khong dung dinh dang JSON`)
+		return null
+	}
 }
 
 function walk(dir, filter) {
@@ -249,6 +335,94 @@ for (const tf of taskFiles) {
 			}
 		}
 	}
+}
+
+// 14. Docs Registry: catalog, presentation registry va Fumadocs roots phai dong bo
+try {
+	const solutionGroups = readTsConst('src/lib/ods-solutions.ts', 'odsSolutionGroups')
+	const docsProfiles = readTsConst('src/lib/docs-products.ts', 'docsProductProfiles')
+	if (!Array.isArray(solutionGroups) || !Array.isArray(docsProfiles)) {
+		fail('14-docs-registry', 'odsSolutionGroups va docsProductProfiles phai la array literal')
+	} else {
+		const documentedProducts = []
+		for (const group of solutionGroups) {
+			if (Object.hasOwn(group, 'docsUrl')) {
+				fail('14-docs-registry', `solution group ${group.id ?? 'unknown'} khong duoc khai bao docsUrl`)
+			}
+			if (!Array.isArray(group.products)) {
+				fail('14-docs-registry', `solution group ${group.id ?? 'unknown'} thieu products array`)
+				continue
+			}
+			for (const product of group.products) {
+				if (typeof product.docsSlug === 'string') documentedProducts.push(product)
+			}
+		}
+
+		const documentedSlugs = documentedProducts.map((product) => product.docsSlug)
+		const profileSlugs = docsProfiles.map((profile) => profile.slug)
+		if (new Set(documentedSlugs).size !== documentedSlugs.length) {
+			fail('14-docs-registry', 'docsSlug bi trung trong odsSolutionGroups')
+		}
+		if (new Set(profileSlugs).size !== profileSlugs.length) {
+			fail('14-docs-registry', 'slug bi trung trong docsProductProfiles')
+		}
+
+		const documentedSet = new Set(documentedSlugs)
+		const profileSet = new Set(profileSlugs)
+		for (const slug of documentedSet) {
+			if (!profileSet.has(slug)) fail('14-docs-registry', `docs slug ${slug} thieu profile`)
+		}
+		for (const slug of profileSet) {
+			if (!documentedSet.has(slug)) fail('14-docs-registry', `profile ${slug} thieu product canonical`)
+		}
+
+		const contentRoots = []
+		const docsRoot = path.join(root, 'content/docs')
+		for (const entry of fs.readdirSync(docsRoot, { withFileTypes: true })) {
+			if (!entry.isDirectory()) continue
+			const metaRel = `content/docs/${entry.name}/meta.json`
+			const meta = readJsonObject(metaRel, '14-docs-registry')
+			if (meta?.root === true) contentRoots.push(entry.name)
+		}
+		for (const slug of documentedSet) {
+			if (!contentRoots.includes(slug)) {
+				fail('14-docs-registry', `content/docs/${slug}/meta.json phai co root: true`)
+			}
+		}
+		for (const slug of contentRoots) {
+			if (!documentedSet.has(slug)) {
+				fail('14-docs-registry', `Fumadocs product root ${slug} thieu product canonical`)
+			}
+		}
+
+		for (const product of documentedProducts) {
+			const metaRel = `content/docs/${product.docsSlug}/meta.json`
+			const meta = readJsonObject(metaRel, '14-docs-registry')
+			if (meta && meta.title !== product.name) {
+				fail('14-docs-registry', `${metaRel} title phai la "${product.name}"`)
+			}
+			const profile = docsProfiles.find((item) => item.slug === product.docsSlug)
+			if (!profile || !Array.isArray(profile.sections)) continue
+
+			for (const section of profile.sections) {
+				if (typeof section.href !== 'string' || !section.href.startsWith('/docs/')) {
+					fail('14-docs-registry', `section ${section.kind ?? 'unknown'} co href khong hop le`)
+					continue
+				}
+				const sectionPath = section.href.slice('/docs/'.length)
+				const sectionMetaRel = `content/docs/${sectionPath}/meta.json`
+				const sectionMeta = readJsonObject(sectionMetaRel, '14-docs-registry')
+				if (sectionMeta?.root !== true) {
+					fail('14-docs-registry', `${sectionMetaRel} phai co root: true`)
+				}
+				if (sectionPath !== product.docsSlug && sectionMeta && sectionMeta.title !== section.title) {
+					fail('14-docs-registry', `${sectionMetaRel} title phai la "${section.title}"`)
+				}
+			}
+		}
+	}
+} catch (error) {
+	fail('14-docs-registry', error instanceof Error ? error.message : String(error))
 }
 
 // ---------------------------------------------------------------

@@ -1,7 +1,7 @@
 {
-  "title": "Hướng dẫn sử dụng Portal",
+  "title": "Hướng dẫn sử dụng",
   "description": "Tài liệu hướng dẫn sử dụng và quản trị AI Contact Center trên giao diện Portal.",
-  "icon": "LayoutDashboard",
+  "root": true,
   "defaultOpen": true,
   "pages": [
     "index",

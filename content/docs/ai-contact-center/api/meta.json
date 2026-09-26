@@ -1,7 +1,7 @@
 {
   "title": "API Reference",
   "description": "API dành cho developer tích hợp AI Contact Center với hệ thống bên ngoài.",
-  "icon": "Braces",
+  "root": true,
   "defaultOpen": true,
   "pages": [
     "index"

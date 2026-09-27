@@ -1,55 +1,20 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import type { LucideIcon } from 'lucide-react';
 import {
   BookOpen,
-  Cloud,
   Headphones,
-  KeyRound,
   Layers3,
-  Library,
   Newspaper,
-  PhoneCall,
-  Server,
-  Wrench,
 } from 'lucide-react';
-import { docsProducts, odsExternalLinks, type DocsProductIcon } from './docs-products';
+import { odsExternalLinks } from './docs-products';
 import { gitConfig } from './shared';
-
-const productIcons: Record<DocsProductIcon, LucideIcon> = {
-  phone: PhoneCall,
-  cloud: Cloud,
-  server: Server,
-  managed: Wrench,
-  license: KeyRound,
-};
-
-function getProductIcon(icon: DocsProductIcon) {
-  const ProductIcon = productIcons[icon];
-  return <ProductIcon />;
-}
 
 function publicLinks(): NonNullable<BaseLayoutProps['links']> {
   return [
     {
-      type: 'menu',
       text: 'Tài liệu',
+      url: '/docs',
       icon: <BookOpen />,
-      items: [
-        {
-          text: 'Tất cả tài liệu',
-          description: 'Duyệt không gian tài liệu và hướng dẫn theo từng sản phẩm.',
-          url: '/docs',
-          icon: <Library />,
-          active: 'nested-url',
-        },
-        ...docsProducts.map((product) => ({
-          text: product.name,
-          description: product.description,
-          url: product.href,
-          icon: getProductIcon(product.icon),
-          active: 'nested-url' as const,
-        })),
-      ],
+      active: 'nested-url',
     },
     {
       text: 'Giải pháp ODS',

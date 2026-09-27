@@ -1,14 +1,7 @@
-import { getPageTreeRoots, type Folder, type Node, type Root } from 'fumadocs-core/page-tree';
-import type { ReactNode } from 'react';
 import { docsProducts, type DocsProduct } from './docs-products';
 import { source } from './source';
 
 export type HomeInternalHref = `/docs${string}`;
-
-export interface HomeChapter {
-  title: string;
-  href: HomeInternalHref;
-}
 
 export interface HomeLink {
   title: string;
@@ -17,7 +10,7 @@ export interface HomeLink {
 }
 
 export interface HomeRoleGroup {
-  id: 'admin' | 'developer' | 'operations';
+  id: 'admin' | 'developer' | 'agent' | 'operations';
   label: string;
   eyebrow: string;
   description: string;
@@ -26,12 +19,7 @@ export interface HomeRoleGroup {
 
 export interface HomeContentModel {
   searchSuggestions: readonly HomeSearchSuggestion[];
-  portalChapters: readonly HomeChapter[];
-  featuredPortalChapters: readonly HomeChapter[];
-  documentedProductCount: number;
-  apiCapability: string;
-  aiProduct: DocsProduct;
-  cloudFileProduct: DocsProduct;
+  products: readonly DocsProduct[];
   roleGroups: readonly HomeRoleGroup[];
 }
 
@@ -39,8 +27,6 @@ export interface HomeSearchSuggestion {
   label: string;
   href: HomeInternalHref;
 }
-
-const portalHref = '/docs/ai-contact-center/user-guider-portal';
 
 const searchSuggestions: readonly HomeSearchSuggestion[] = [
   {
@@ -102,9 +88,32 @@ const roleGroups: readonly HomeRoleGroup[] = [
     ],
   },
   {
+    id: 'agent',
+    label: 'Agent',
+    eyebrow: 'Làm việc với khách hàng',
+    description: 'Tra cứu khách hàng, xử lý hội thoại và sử dụng các công cụ liên lạc hằng ngày.',
+    links: [
+      {
+        title: 'Bắt đầu sử dụng Tổng đài ảo',
+        description: 'Nắm các bước cần thiết trước khi tiếp nhận và thực hiện cuộc gọi.',
+        href: '/docs/ai-contact-center/user-guider-portal/01-tong-quan/quickstart/nhung-viec-can-lam-khi-bat-dau',
+      },
+      {
+        title: 'Quản lý hội thoại',
+        description: 'Theo dõi tin nhắn và cuộc gọi trong một luồng làm việc.',
+        href: '/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/quan-ly-tin-nhan-cuoc-goi',
+      },
+      {
+        title: 'Tra cứu khách hàng',
+        description: 'Xem và cập nhật thông tin khách hàng trong quá trình hỗ trợ.',
+        href: '/docs/ai-contact-center/user-guider-portal/05-quan-ly-khach-hang/xem-va-chinh-sua-thong-tin',
+      },
+    ],
+  },
+  {
     id: 'operations',
-    label: 'Vận hành',
-    eyebrow: 'Giám sát hằng ngày',
+    label: 'Giám sát',
+    eyebrow: 'Theo dõi vận hành',
     description: 'Theo dõi chất lượng cuộc gọi, lịch sử hoạt động và trạng thái đồng bộ.',
     links: [
       {
@@ -126,62 +135,6 @@ const roleGroups: readonly HomeRoleGroup[] = [
   },
 ] as const;
 
-function getTextName(name: ReactNode, context: string): string {
-  if (typeof name === 'string' || typeof name === 'number') return String(name);
-  throw new Error(`${context} phải có tên dạng text để hiển thị trên Home.`);
-}
-
-function findFolderByIndexUrl(nodes: readonly Node[], url: string): Folder | undefined {
-  for (const node of nodes) {
-    if (node.type !== 'folder') continue;
-    if (node.index?.url === url) return node;
-    const nested = findFolderByIndexUrl(node.children, url);
-    if (nested) return nested;
-  }
-
-  return undefined;
-}
-
-function isHomeInternalHref(url: string): url is HomeInternalHref {
-  return url === '/docs' || url.startsWith('/docs/');
-}
-
-function getFolderPageUrl(folder: Folder): string | undefined {
-  return folder.index?.url
-    ?? folder.children.find((node) => node.type === 'page')?.url;
-}
-
-function getPortalChapters(tree: Root): readonly HomeChapter[] {
-  const portal = getPageTreeRoots(tree).find((root) => {
-    if (root.type === 'folder') return getFolderPageUrl(root) === portalHref;
-    return root.children.some((node) => node.type === 'page' && node.url === portalHref);
-  }) ?? findFolderByIndexUrl(tree.children, portalHref);
-  if (!portal) throw new Error(`Không tìm thấy Portal root "${portalHref}" trong Page Tree.`);
-
-  const chapters = portal.children.flatMap<HomeChapter>((node) => {
-    if (node.type !== 'folder') return [];
-    const chapterUrl = getFolderPageUrl(node);
-    if (!chapterUrl?.startsWith(`${portalHref}/`) || !isHomeInternalHref(chapterUrl)) return [];
-
-    return [{
-      title: getTextName(node.name, `Chapter ${chapterUrl}`),
-      href: chapterUrl,
-    }];
-  });
-
-  if (chapters.length === 0) {
-    throw new Error('Portal Page Tree không có chapter top-level để hiển thị trên Home.');
-  }
-
-  return chapters;
-}
-
-function getProduct(slug: string): DocsProduct {
-  const product = docsProducts.find((item) => item.slug === slug);
-  if (!product) throw new Error(`Không tìm thấy docs product "${slug}".`);
-  return product;
-}
-
 function validateInternalLinks(groups: readonly HomeRoleGroup[], suggestions: readonly HomeSearchSuggestion[]) {
   const links = [
     ...suggestions.map((suggestion) => suggestion.href),
@@ -196,27 +149,11 @@ function validateInternalLinks(groups: readonly HomeRoleGroup[], suggestions: re
 }
 
 export function getHomeContentModel(): HomeContentModel {
-  const portalChapters = getPortalChapters(source.getPageTree());
-  const aiProduct = getProduct('ai-contact-center');
-  const cloudFileProduct = getProduct('cloudfile');
-  const apiCapability = aiProduct.capabilities.find(
-    (capability) => capability.includes('API') && capability.includes('Webhook'),
-  );
-
-  if (!apiCapability) {
-    throw new Error('AI Contact Center chưa khai báo capability REST API và Webhook.');
-  }
-
   validateInternalLinks(roleGroups, searchSuggestions);
 
   return {
     searchSuggestions,
-    portalChapters,
-    featuredPortalChapters: portalChapters.slice(0, 3),
-    documentedProductCount: docsProducts.length,
-    apiCapability,
-    aiProduct,
-    cloudFileProduct,
+    products: docsProducts,
     roleGroups,
   };
 }

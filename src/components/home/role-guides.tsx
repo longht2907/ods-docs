@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import type { KeyboardEvent } from 'react';
 import { useId, useRef, useState } from 'react';
-import { Activity, ArrowRight, Code2, ShieldCheck, type LucideIcon } from 'lucide-react';
+import { Activity, ArrowRight, Code2, Headset, ShieldCheck, type LucideIcon } from 'lucide-react';
 import type { HomeRoleGroup } from '@/lib/home-content';
 
 interface RoleGuidesProps {
@@ -13,6 +13,7 @@ interface RoleGuidesProps {
 const roleIcons: Record<HomeRoleGroup['id'], LucideIcon> = {
   admin: ShieldCheck,
   developer: Code2,
+  agent: Headset,
   operations: Activity,
 };
 

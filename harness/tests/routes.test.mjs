@@ -50,7 +50,7 @@ async function waitForServer(url, maxRetries = 40, interval = 1000) {
   return false;
 }
 
-async function checkRoute(baseUrl, path, expectedStatus, desc, expectedText = []) {
+async function checkRoute(baseUrl, path, expectedStatus, desc, expectedText = [], forbiddenText = []) {
   const url = `${baseUrl}${path}`;
   try {
     const res = await fetch(url, { redirect: 'manual' });
@@ -58,7 +58,8 @@ async function checkRoute(baseUrl, path, expectedStatus, desc, expectedText = []
     if (expectedText.length > 0) {
       const html = await res.text();
       const visibleText = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
-      contentPass = expectedText.every((text) => visibleText.includes(text));
+      contentPass = expectedText.every((text) => visibleText.includes(text))
+        && forbiddenText.every((text) => !visibleText.includes(text));
     }
     const pass = res.status === expectedStatus && contentPass;
     const mark = pass ? '✓' : '✗';
@@ -113,12 +114,21 @@ async function main() {
 
     // 1-7. Các route public chính phải trả về 200
     const t1 = await checkRoute(baseUrl, '/', 200, 'Home hub accessible', [
-      '9 chương Portal',
-      'REST API và Webhook',
-      '2 sản phẩm có tài liệu',
-      'Portal',
-      'API',
+      'Trung tâm tài liệu ODS',
+      'AI Contact Center',
+      'Dịch vụ Cloud',
+      'Hạ tầng số',
+      'Dịch vụ quản trị',
+      'Bản quyền phần mềm',
       'CloudFile',
+      'Quản trị viên',
+      'Developer',
+      'Agent',
+      'Giám sát',
+    ], [
+      'sản phẩm có tài liệu',
+      'Xem toàn bộ tài liệu',
+      'Tất cả tài liệu',
     ]);
     passedCases = passedCases && t1;
 

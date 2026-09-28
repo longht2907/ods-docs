@@ -113,12 +113,13 @@ async function main() {
 
     // 1-7. Các route public chính phải trả về 200
     const t1 = await checkRoute(baseUrl, '/', 200, 'Home hub accessible', [
-      '9 chương Portal',
-      'REST API và Webhook',
-      '2 sản phẩm có tài liệu',
-      'Portal',
-      'API',
+      'Trung tâm tài liệu ODS',
+      'Tài liệu sản phẩm ODS',
+      'AI Contact Center',
       'CloudFile',
+      'Hướng dẫn sử dụng',
+      'API Reference',
+      'Support Portal',
     ]);
     passedCases = passedCases && t1;
 

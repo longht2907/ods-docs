@@ -46,7 +46,7 @@ export const odsSolutionGroups: readonly OdsSolutionGroup[] = [
   },
   {
     id: 'cloud-services',
-    title: 'Dịch vụ Cloud',
+    title: 'Cloud Services',
     description:
       'Hạ tầng điện toán đám mây Private Cloud hiệu năng cao, lưu trữ Object Storage S3 và dịch vụ CloudFile chuẩn doanh nghiệp.',
     productUrl: 'https://ods.vn/private-cloud',
@@ -63,7 +63,7 @@ export const odsSolutionGroups: readonly OdsSolutionGroup[] = [
   },
   {
     id: 'digital-infrastructure',
-    title: 'Hạ tầng số',
+    title: 'Datacenter',
     description:
       'Chỗ đặt máy chủ Colocation tại Trung tâm dữ liệu tiêu chuẩn Tier 3, Server dùng riêng, Rack riêng và phòng chống DDoS đa lớp.',
     productUrl: 'https://ods.vn/cho-dat-may-chu-da-dich-vu',
@@ -86,7 +86,7 @@ export const odsSolutionGroups: readonly OdsSolutionGroup[] = [
   },
   {
     id: 'managed-services',
-    title: 'Dịch vụ quản trị',
+    title: 'Managed Services',
     description:
       'Dịch vụ quản trị hệ thống 24/7/365, tối ưu hiệu năng hạ tầng, giám sát chủ động và ứng cứu sự cố theo cam kết SLA.',
     productUrl: 'https://ods.vn/dich-vu-quan-tri-may-chu',
@@ -108,7 +108,7 @@ export const odsSolutionGroups: readonly OdsSolutionGroup[] = [
   },
   {
     id: 'software-license',
-    title: 'Bản quyền phần mềm',
+    title: 'License',
     description:
       'Cung cấp bản quyền phần mềm doanh nghiệp chính hãng, Microsoft SPLA (Windows Server, SQL Server) và các control panel quản trị.',
     productUrl: 'https://ods.vn/ban-quyen-microsoft',

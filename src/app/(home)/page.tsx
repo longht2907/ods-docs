@@ -1,337 +1,325 @@
 import Link from 'next/link';
-import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRight,
   ArrowUpRight,
   BookOpen,
-  Braces,
-  Check,
-  Cloud,
-  Code2,
-  ExternalLink,
-  FileCheck2,
-  GitBranch,
-  Globe2,
   Headphones,
-  KeyRound,
   LifeBuoy,
-  Newspaper,
-  PhoneCall,
-  Server,
-  Sparkles,
-  Wrench,
+  Mail,
+  Phone,
 } from 'lucide-react';
 import { FullSearchTrigger } from 'fumadocs-ui/layouts/shared/slots/search-trigger';
-import { HeroPreview } from '@/components/home/hero-preview';
-import { RoleGuides } from '@/components/home/role-guides';
-import { docsProducts, odsExternalLinks } from '@/lib/docs-products';
+import { odsExternalLinks } from '@/lib/docs-products';
 import { getHomeContentModel } from '@/lib/home-content';
-import {
-  odsSolutionGroups,
-  type OdsSolutionIcon,
-} from '@/lib/ods-solutions';
+import { SolutionOrbit } from '@/components/home/solution-orbit';
+import { ProductDirectory } from '@/components/home/product-directory';
 import { gitConfig } from '@/lib/shared';
-
-const solutionIcons: Record<OdsSolutionIcon, LucideIcon> = {
-  phone: PhoneCall,
-  cloud: Cloud,
-  server: Server,
-  managed: Wrench,
-  license: KeyRound,
-};
-
-const apiSnippet = `curl -X POST https://api.ods.vn/v1/calls/make \\
-  -H "Authorization: Bearer <YOUR_API_TOKEN>"`;
 
 export default function HomePage() {
   const content = getHomeContentModel();
-  const metrics = [
-    {
-      value: String(content.portalChapters.length),
-      label: 'chương Portal',
-      detail: 'Lộ trình quản trị hoàn chỉnh',
-    },
-    {
-      value: 'REST',
-      label: content.apiCapability,
-      detail: 'Sẵn sàng cho tích hợp',
-    },
-    {
-      value: String(content.documentedProductCount),
-      label: 'sản phẩm có tài liệu',
-      detail: 'Được mở rộng liên tục',
-    },
-    {
-      value: '24/7',
-      label: 'hỗ trợ kỹ thuật',
-      detail: 'Đồng hành khi vận hành',
-    },
-  ] as const;
 
   return (
-    <main className="ods-home-page relative isolate overflow-hidden bg-fd-background text-fd-foreground">
-      <div className="ods-home-aurora pointer-events-none absolute inset-x-0 top-0 -z-10 h-[900px]" />
+    <main className="ods-home-page bg-fd-background text-fd-foreground">
+      {/* 1. HERO */}
+      <section className="ods-hero-section relative isolate overflow-hidden px-5 pb-16 pt-16 sm:px-8 sm:pb-20 sm:pt-24 lg:px-12">
+        <div className="ods-hero-bg pointer-events-none absolute inset-x-0 top-0 -z-10 h-[450px]" />
+        
+        <div className="mx-auto flex max-w-[1120px] flex-col items-center text-center">
+          <p className="ods-section-label">Trung tâm tài liệu ODS</p>
 
-      {/* 1. Hero */}
-      <section className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] gap-12 px-5 pb-14 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-16 lg:px-12 lg:pb-20">
-        <div className="relative z-10 min-w-0">
-          <div className="inline-flex items-center gap-2 rounded-full border border-fd-border/80 bg-fd-card/75 px-3 py-1.5 text-xs font-semibold text-fd-muted-foreground shadow-sm backdrop-blur">
-            <span className="relative flex size-2" aria-hidden="true">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-60" />
-              <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-            </span>
-            Trung tâm tài liệu chính thức của ODS
-          </div>
-
-          <h1 className="mt-6 max-w-3xl text-balance text-4xl font-bold tracking-[-0.045em] sm:text-5xl lg:text-[3.6rem] lg:leading-[1.02]">
-            Một nơi để triển khai, vận hành và{' '}
-            <span className="block bg-gradient-to-r from-orange-600 via-orange-500 to-sky-700 bg-clip-text text-transparent dark:from-orange-500 dark:via-amber-400 dark:to-sky-400">
-              tích hợp giải pháp ODS
-            </span>
+          <h1 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+            Tài liệu sản phẩm ODS
           </h1>
 
-          <p className="mt-6 max-w-2xl text-pretty text-base leading-7 text-fd-muted-foreground sm:text-lg">
-            Tra cứu hướng dẫn kỹ thuật, cẩm nang vận hành và tài liệu tích hợp cho AI
-            Contact Center, CloudFile cùng hệ sinh thái Hạ tầng số, Cloud và AI của ODS.
+          <p className="mt-4 max-w-2xl text-pretty text-base leading-relaxed text-fd-muted-foreground sm:text-lg">
+            Hướng dẫn sử dụng và tài liệu tích hợp chính thức cho các giải pháp ODS cung cấp cho doanh nghiệp.
           </p>
 
-          <div className="mt-8 max-w-2xl">
+          <div className="mt-8 w-full max-w-[620px]">
             <FullSearchTrigger
               hideIfDisabled
-              className="h-16 w-full rounded-2xl border border-fd-border/90 bg-fd-card/90 px-5 text-left shadow-xl shadow-black/5 backdrop-blur transition-colors hover:border-orange-500/45 hover:bg-fd-accent"
+              className="h-14 w-full rounded-xl border border-fd-border/80 bg-fd-card px-4 text-left shadow-sm backdrop-blur transition-all hover:border-orange-500/40 hover:bg-fd-accent/50"
             />
-            <div className="mt-3 flex flex-wrap items-center gap-2" aria-label="Gợi ý tài liệu">
-              <span className="mr-1 text-xs text-fd-muted-foreground">Thử tìm:</span>
+            <div
+              className="mt-3 flex flex-wrap items-center justify-center gap-2"
+              aria-label="Gợi ý tìm kiếm phổ biến"
+            >
+              <span className="text-xs font-medium text-fd-muted-foreground">Phổ biến:</span>
               {content.searchSuggestions.map((suggestion) => (
-                <Link key={suggestion.href} href={suggestion.href} className="ods-search-suggestion">
-                  {suggestion.label} <ArrowRight aria-hidden="true" />
+                <Link
+                  key={suggestion.href}
+                  href={suggestion.href}
+                  className="ods-search-suggestion"
+                >
+                  {suggestion.label} <ArrowRight aria-hidden="true" className="size-3" />
                 </Link>
               ))}
             </div>
           </div>
-
-          <div className="mt-7 flex flex-wrap gap-3">
-            <a href="#tai-lieu-san-pham" className="ods-button ods-button-primary">
-              Chọn sản phẩm <ArrowRight aria-hidden="true" />
-            </a>
-            <Link href="/docs" className="ods-button ods-button-secondary">
-              Xem toàn bộ tài liệu <ArrowRight aria-hidden="true" />
-            </Link>
-          </div>
         </div>
-
-        <HeroPreview chapters={content.featuredPortalChapters} />
       </section>
 
-      {/* 2. Metrics */}
-      <section className="ods-metrics-strip border-y border-fd-border/70" aria-label="Tổng quan nội dung">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 px-5 sm:px-8 lg:grid-cols-4 lg:px-12">
-          {metrics.map((metric) => (
-            <div key={metric.label} className="ods-metric">
-              <strong>{metric.value}</strong>
-              <span>{metric.label}</span>
-              <small>{metric.detail}</small>
+      {/* 2. DẢI GIỚI THIỆU ODS — SHOWCASE 5 TRỤ CỘT GIẢI PHÁP */}
+      <SolutionOrbit />
+
+      {/* 3. DANH MỤC TÀI LIỆU SẢN PHẨM CHUẨN HÓA */}
+      <ProductDirectory />
+
+      {/* 4. HỖ TRỢ & ĐỒNG HÀNH DOANH NGHIỆP */}
+      <section className="border-t border-fd-border/70 bg-fd-card/40 py-16 sm:py-20">
+        <div className="mx-auto max-w-[1120px] px-5 sm:px-8 lg:px-12">
+          {/* Header */}
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <div className="inline-flex items-center gap-2">
+                <span className="grid size-5 place-items-center rounded-md bg-orange-500/10 text-orange-600 dark:text-orange-400">
+                  <Headphones className="size-3.5" aria-hidden="true" />
+                </span>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-600 dark:text-orange-400">
+                  Hỗ trợ &amp; Đồng hành
+                </p>
+              </div>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-fd-foreground sm:text-3xl">
+                Bạn cần thêm trợ giúp kỹ thuật?
+              </h2>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 3. Product Bento */}
-      <section id="tai-lieu-san-pham" className="ods-reveal mx-auto max-w-7xl scroll-mt-20 px-5 py-16 sm:px-8 sm:py-24 lg:px-12">
-        <div className="grid gap-5 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
-          <div>
-            <p className="ods-section-label">Tài liệu theo sản phẩm</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Thấy ngay thứ bạn có thể làm</h2>
+            <p className="max-w-md text-xs text-fd-muted-foreground sm:text-sm">
+              Đội ngũ kỹ sư ODS luôn sẵn sàng giải đáp thắc mắc, hỗ trợ tích hợp API và vận hành hệ thống 24/7/365.
+            </p>
           </div>
-          <p className="max-w-2xl text-base leading-7 text-fd-muted-foreground lg:justify-self-end">
-            Không chỉ là một đường dẫn vào sản phẩm. Mỗi không gian cho bạn thấy chương hướng dẫn,
-            bề mặt API và tác vụ vận hành trước khi mở tài liệu.
-          </p>
-        </div>
 
-        <div className="ods-product-bento mt-10">
-          <article className="ods-bento-card ods-bento-ai" data-product-accent={content.aiProduct.accent}>
-            <div className="ods-bento-heading">
-              <span className="ods-product-mark"><PhoneCall aria-hidden="true" /></span>
+          {/* 3 Thẻ Hỗ trợ Glassmorphism */}
+          <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3">
+            {/* Card 1: Support Portal & Hotline */}
+            <div className="ods-support-hub-card group relative flex flex-col justify-between rounded-2xl border border-fd-border/80 bg-fd-card/80 p-6 shadow-sm backdrop-blur transition-all duration-200 hover:-translate-y-1 hover:border-orange-500/40 hover:shadow-xl">
               <div>
-                <p>{content.aiProduct.category}</p>
-                <h3>{content.aiProduct.name}</h3>
+                <div className="flex items-center justify-between">
+                  <span className="grid size-11 place-items-center rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 transition-transform group-hover:scale-110">
+                    <Headphones className="size-5" aria-hidden="true" />
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-2.5 py-0.5 text-[10px] font-bold text-orange-600 dark:text-orange-400">
+                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+                    24/7/365 SLA
+                  </span>
+                </div>
+                <h3 className="mt-4 text-base font-bold text-fd-foreground group-hover:text-orange-600 dark:group-hover:text-orange-400">
+                  Support Portal &amp; Kỹ thuật 24/7
+                </h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-fd-muted-foreground">
+                  Gửi ticket yêu cầu kỹ thuật, tra cứu tiến độ xử lý sự cố và cam kết thời gian phản hồi SLA tức thì.
+                </p>
+
+                {/* Direct Contact Info */}
+                <div className="mt-4 space-y-2 rounded-xl border border-fd-border/70 bg-fd-muted/50 p-3 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-fd-muted-foreground flex items-center gap-1.5">
+                      <Phone className="size-3.5 text-orange-500" aria-hidden="true" /> Hotline:
+                    </span>
+                    <a
+                      href="tel:19006634"
+                      className="font-bold text-fd-foreground hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+                    >
+                      1900 6634
+                    </a>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-fd-border/50 pt-2">
+                    <span className="text-fd-muted-foreground flex items-center gap-1.5">
+                      <Mail className="size-3.5 text-orange-500" aria-hidden="true" /> Email:
+                    </span>
+                    <a
+                      href="mailto:support@ods.vn"
+                      className="font-semibold text-fd-foreground hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+                    >
+                      support@ods.vn
+                    </a>
+                  </div>
+                </div>
               </div>
-              <a href={content.aiProduct.productUrl} target="_blank" rel="noopener noreferrer">
-                Giải pháp <ArrowUpRight aria-hidden="true" />
+
+              <a
+                href="mailto:support@ods.vn?subject=[ODS%20Docs]%20Y%C3%AAu%20c%E1%BA%A7u%20h%E1%BB%97%20tr%E1%BB%A3%20k%E1%BB%B9%20thu%E1%BA%ADt"
+                className="mt-6 flex items-center justify-between border-t border-fd-border/60 pt-3 text-xs font-semibold text-orange-600 dark:text-orange-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring rounded hover:underline"
+              >
+                <span>Gửi email hỗ trợ kỹ thuật</span>
+                <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
               </a>
             </div>
 
-            <p className="ods-bento-summary">{content.aiProduct.landingSummary}</p>
-
-            <div className="ods-ai-entry-grid">
-              <div className="ods-bento-entry">
-                <span className="ods-entry-icon"><BookOpen aria-hidden="true" /></span>
-                <div>
-                  <span className="ods-entry-kicker">Portal Guide</span>
-                  <h4>Đi từ thiết lập đến vận hành</h4>
+            {/* Card 2: Knowledge Base & Tech Blog */}
+            <a
+              href={odsExternalLinks.blog}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ods-support-hub-card group relative flex flex-col justify-between rounded-2xl border border-fd-border/80 bg-fd-card/80 p-6 shadow-sm backdrop-blur transition-all duration-200 hover:-translate-y-1 hover:border-sky-500/40 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="grid size-11 place-items-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 transition-transform group-hover:scale-110">
+                    <BookOpen className="size-5" aria-hidden="true" />
+                  </span>
+                  <span className="rounded-full border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-[10px] font-bold text-sky-600 dark:text-sky-400">
+                    Tech Blog &amp; Case Study
+                  </span>
                 </div>
-                <ol>
-                  {content.featuredPortalChapters.map((chapter, index) => (
-                    <li key={chapter.href}>
-                      <Link href={chapter.href}>
-                        <span>0{index + 1}</span>{chapter.title}<ArrowRight aria-hidden="true" />
-                      </Link>
-                    </li>
-                  ))}
-                </ol>
-                <Link href="/docs/ai-contact-center/user-guider-portal" className="ods-text-link">
-                  Mở hướng dẫn Portal <ArrowRight aria-hidden="true" />
-                </Link>
+                <h3 className="mt-4 text-base font-bold text-fd-foreground group-hover:text-sky-600 dark:group-hover:text-sky-400">
+                  Trung tâm Kiến thức
+                </h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-fd-muted-foreground">
+                  Bài viết chuyên sâu, kinh nghiệm triển khai thực tế, kiến trúc Cloud và cẩm nang công nghệ từ ODS.
+                </p>
               </div>
 
-              <div className="ods-bento-entry ods-bento-code">
-                <span className="ods-entry-icon"><Braces aria-hidden="true" /></span>
-                <div>
-                  <span className="ods-entry-kicker">API Reference</span>
-                  <h4>Kết nối cuộc gọi vào workflow</h4>
+              <div className="mt-6 flex items-center justify-between border-t border-fd-border/60 pt-3 text-xs font-semibold text-sky-600 dark:text-sky-400">
+                <span>Đọc bài viết mới nhất</span>
+                <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+              </div>
+            </a>
+
+            {/* Card 3: Consultation */}
+            <a
+              href={odsExternalLinks.contact}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ods-support-hub-card group relative flex flex-col justify-between rounded-2xl border border-fd-border/80 bg-fd-card/80 p-6 shadow-sm backdrop-blur transition-all duration-200 hover:-translate-y-1 hover:border-emerald-500/40 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="grid size-11 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 transition-transform group-hover:scale-110">
+                    <LifeBuoy className="size-5" aria-hidden="true" />
+                  </span>
+                  <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                    Tư vấn 1-1
+                  </span>
                 </div>
-                <pre><code>{apiSnippet}</code></pre>
-                <Link href="/docs/ai-contact-center/api" className="ods-text-link">
-                  Xem API Reference <ArrowRight aria-hidden="true" />
-                </Link>
+                <h3 className="mt-4 text-base font-bold text-fd-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+                  Liên hệ Tư vấn
+                </h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-fd-muted-foreground">
+                  Trao đổi trực tiếp với đội ngũ tư vấn giải pháp ODS về kiến trúc hệ thống và nhu cầu doanh nghiệp.
+                </p>
+              </div>
+
+              <div className="mt-6 flex items-center justify-between border-t border-fd-border/60 pt-3 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <span>Kết nối với chuyên gia</span>
+                <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. FOOTER 2 TẦNG DOANH NGHIỆP */}
+      <footer className="border-t border-fd-border/80 bg-fd-card/70 backdrop-blur">
+        <div className="mx-auto max-w-[1120px] px-5 py-12 sm:px-8 lg:px-12">
+          {/* Tầng trên: Brand & Multi-column Links */}
+          <div className="grid grid-cols-1 gap-8 pb-10 border-b border-fd-border/60 md:grid-cols-4">
+            {/* Cột 1: Brand & Status */}
+            <div className="space-y-3 md:col-span-2">
+              <div className="flex items-center gap-2">
+                <span className="size-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)]" aria-hidden="true" />
+                <span className="text-base font-extrabold tracking-tight text-fd-foreground">
+                  ODS Docs
+                </span>
+                <span className="rounded-md border border-fd-border bg-fd-muted px-1.5 py-0.5 text-[10px] font-mono text-fd-muted-foreground">
+                  v1.0
+                </span>
+              </div>
+              <p className="max-w-sm text-xs leading-relaxed text-fd-muted-foreground">
+                Trung tâm tài liệu kỹ thuật và cẩm nang vận hành chính thức cho các giải pháp Hạ tầng số, Cloud và AI của Công ty Cổ phần ODS.
+              </p>
+              <div className="inline-flex items-center gap-2 rounded-full border border-fd-border/80 bg-fd-muted/50 px-2.5 py-1 text-[11px] font-medium text-fd-muted-foreground">
+                <span className="size-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+                <span>Hệ thống tài liệu: Trực tuyến 24/7</span>
               </div>
             </div>
-          </article>
 
-          <article className="ods-bento-card ods-bento-cloud" data-product-accent={content.cloudFileProduct.accent}>
-            <div className="ods-bento-heading">
-              <span className="ods-product-mark"><Cloud aria-hidden="true" /></span>
-              <a href={content.cloudFileProduct.productUrl} target="_blank" rel="noopener noreferrer">
-                Giải pháp <ArrowUpRight aria-hidden="true" />
+            {/* Cột 2: Không gian tài liệu */}
+            <div className="space-y-2.5 text-xs">
+              <p className="font-bold text-fd-foreground tracking-wide uppercase text-[11px]">
+                Tài liệu Sản phẩm
+              </p>
+              <ul className="space-y-2 text-fd-muted-foreground">
+                <li>
+                  <Link href="/docs/ai-contact-center" className="transition-colors hover:text-fd-foreground">
+                    AI Contact Center
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/docs/cloudfile" className="transition-colors hover:text-fd-foreground">
+                    ODS CloudFile
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/docs/ai-contact-center/api/overview" className="transition-colors hover:text-fd-foreground">
+                    API Reference
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Cột 3: Hệ sinh thái & Kênh liên hệ */}
+            <div className="space-y-2.5 text-xs">
+              <p className="font-bold text-fd-foreground tracking-wide uppercase text-[11px]">
+                Hệ sinh thái &amp; Liên hệ
+              </p>
+              <ul className="space-y-2 text-fd-muted-foreground">
+                <li>
+                  <a
+                    href={odsExternalLinks.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 transition-colors hover:text-fd-foreground"
+                  >
+                    Website ODS <ArrowUpRight className="size-3" aria-hidden="true" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={odsExternalLinks.identity}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 transition-colors hover:text-fd-foreground"
+                  >
+                    ODS ID Portal <ArrowUpRight className="size-3" aria-hidden="true" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="tel:19006634"
+                    className="inline-flex items-center gap-1 font-semibold text-orange-600 dark:text-orange-400 hover:underline"
+                  >
+                    Hotline: 1900 6634
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="mailto:support@ods.vn"
+                    className="inline-flex items-center gap-1 hover:text-fd-foreground"
+                  >
+                    Email: support@ods.vn
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Tầng dưới: Bản quyền & Slogan */}
+          <div className="flex flex-col justify-between gap-4 pt-8 text-xs text-fd-muted-foreground sm:flex-row sm:items-center">
+            <p>© {new Date().getFullYear()} Công ty Cổ phần ODS. Toàn quyền bảo lưu.</p>
+            <div className="flex items-center gap-4">
+              <span className="font-medium text-fd-foreground/80">
+                Hạ tầng số · Cloud · AI
+              </span>
+              <span aria-hidden="true" className="text-fd-border">·</span>
+              <a
+                href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-fd-foreground"
+              >
+                GitHub
               </a>
             </div>
-            <p className="ods-entry-kicker">{content.cloudFileProduct.category}</p>
-            <h3>{content.cloudFileProduct.name}</h3>
-            <p className="ods-bento-summary">{content.cloudFileProduct.landingSummary}</p>
-            <div className="ods-cloud-flow" aria-label="Luồng sử dụng CloudFile">
-              <span><Cloud aria-hidden="true" /> Cloud</span>
-              <i aria-hidden="true" />
-              <span><FileCheck2 aria-hidden="true" /> Đồng bộ</span>
-              <i aria-hidden="true" />
-              <span><Check aria-hidden="true" /> Chia sẻ</span>
-            </div>
-            <ul className="ods-capability-list">
-              {content.cloudFileProduct.capabilities.map((capability) => (
-                <li key={capability}><Check aria-hidden="true" />{capability}</li>
-              ))}
-            </ul>
-            <Link href={content.cloudFileProduct.href} className="ods-button ods-button-accent">
-              Mở tài liệu CloudFile <ArrowRight aria-hidden="true" />
-            </Link>
-          </article>
-        </div>
-      </section>
-
-      {/* 4. Role-based start */}
-      <section className="ods-role-section ods-reveal border-y border-fd-border/70">
-        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24 lg:px-12">
-          <div className="max-w-3xl">
-            <p className="ods-section-label">Bắt đầu theo vai trò</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Một điểm bắt đầu phù hợp với công việc của bạn</h2>
-            <p className="mt-4 text-base leading-7 text-fd-muted-foreground">
-              Chọn vai trò để mở đúng tác vụ cần làm, không cần đoán tài liệu thuộc sản phẩm hay chương nào.
-            </p>
-          </div>
-          <RoleGuides groups={content.roleGroups} />
-        </div>
-      </section>
-
-      {/* 5. ODS ecosystem */}
-      <section className="ods-reveal mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24 lg:px-12">
-        <div className="grid gap-8 lg:grid-cols-[0.58fr_1.42fr] lg:items-start">
-          <div className="lg:sticky lg:top-24">
-            <p className="ods-section-label">Hệ sinh thái ODS</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Từ tài liệu đến toàn bộ giải pháp số</h2>
-            <p className="mt-4 text-base leading-7 text-fd-muted-foreground">
-              Sản phẩm có tài liệu được làm nổi bật để đi thẳng vào hướng dẫn. Các giải pháp còn lại mở trang sản phẩm chính thức trên ODS.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-4 text-xs text-fd-muted-foreground">
-              <span className="inline-flex items-center gap-2"><i className="ods-legend-dot is-documented" /> Có tài liệu</span>
-              <span className="inline-flex items-center gap-2"><i className="ods-legend-dot" /> Trang giải pháp</span>
-            </div>
-          </div>
-
-          <div className="ods-ecosystem-map">
-            <div className="ods-ecosystem-core">
-              <Sparkles aria-hidden="true" />
-              <span>ODS</span>
-              <small>Hệ sinh thái số</small>
-            </div>
-            <div className="ods-ecosystem-groups">
-              {odsSolutionGroups.map((solution) => {
-                const SolutionIcon = solutionIcons[solution.icon];
-                const hasDocs = solution.products.some((product) => product.docsSlug);
-                return (
-                  <article key={solution.id} className={hasDocs ? 'has-documented-product' : undefined}>
-                    <div className="ods-ecosystem-group-heading">
-                      <span><SolutionIcon aria-hidden="true" /></span>
-                      <div><h3>{solution.title}</h3><p>{solution.description}</p></div>
-                      <a href={solution.productUrl} target="_blank" rel="noopener noreferrer" aria-label={`Xem giải pháp ${solution.title}`}>
-                        <ArrowUpRight aria-hidden="true" />
-                      </a>
-                    </div>
-                    <div className="ods-ecosystem-products">
-                      {solution.products.map((product) => {
-                        if (product.docsSlug) {
-                          return (
-                            <Link key={product.name} href={`/docs/${product.docsSlug}`} className="is-documented">
-                              {product.name}<ArrowRight aria-hidden="true" />
-                            </Link>
-                          );
-                        }
-                        return (
-                          <a key={product.name} href={product.productUrl} target="_blank" rel="noopener noreferrer">
-                            {product.name}<ExternalLink aria-hidden="true" />
-                          </a>
-                        );
-                      })}
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Support strip */}
-      <section className="ods-reveal mx-auto max-w-7xl px-5 pb-16 sm:px-8 sm:pb-24 lg:px-12">
-        <div className="ods-support-strip">
-          <div>
-            <span>Kiến thức &amp; Hỗ trợ</span>
-            <h2>Không để bạn dừng lại ở một trang tài liệu</h2>
-            <p>Đọc kinh nghiệm triển khai hoặc kết nối trực tiếp với đội ngũ ODS khi cần hỗ trợ chuyên sâu.</p>
-          </div>
-          <nav aria-label="Kênh kiến thức và hỗ trợ">
-            <a href={odsExternalLinks.blog} target="_blank" rel="noopener noreferrer"><Newspaper aria-hidden="true" /> Blog<ArrowUpRight aria-hidden="true" /></a>
-            <a href={odsExternalLinks.support} target="_blank" rel="noopener noreferrer"><Headphones aria-hidden="true" /> Support<ArrowUpRight aria-hidden="true" /></a>
-            <a href={odsExternalLinks.contact} target="_blank" rel="noopener noreferrer"><LifeBuoy aria-hidden="true" /> Liên hệ<ArrowUpRight aria-hidden="true" /></a>
-          </nav>
-        </div>
-      </section>
-
-      {/* 7. Footer */}
-      <footer className="ods-footer border-t border-fd-border/70">
-        <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-12">
-          <div className="ods-footer-brand">
-            <Link href="/">ODS Docs</Link>
-            <p>Trung tâm tri thức để triển khai, vận hành và tích hợp giải pháp ODS.</p>
-          </div>
-          <div className="ods-footer-grid">
-            <div><h2>Sản phẩm</h2>{docsProducts.map((product) => <Link key={product.slug} href={product.href}>{product.name}</Link>)}</div>
-            <div><h2>Tài liệu</h2><Link href="/docs">Danh mục tài liệu</Link><Link href="/docs/ai-contact-center/user-guider-portal">Hướng dẫn Portal</Link><Link href="/docs/ai-contact-center/api">API Reference</Link></div>
-            <div><h2>Hỗ trợ</h2><a href={odsExternalLinks.blog} target="_blank" rel="noopener noreferrer">Blog ODS</a><a href={odsExternalLinks.support} target="_blank" rel="noopener noreferrer">Support Portal</a><a href={odsExternalLinks.contact} target="_blank" rel="noopener noreferrer">Liên hệ ODS</a></div>
-            <div><h2>ODS</h2><a href={odsExternalLinks.website} target="_blank" rel="noopener noreferrer"><Globe2 aria-hidden="true" /> Website ODS</a><a href={odsExternalLinks.identity} target="_blank" rel="noopener noreferrer">ODS ID</a><a href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`} target="_blank" rel="noopener noreferrer"><GitBranch aria-hidden="true" /> GitHub</a></div>
-          </div>
-          <div className="ods-footer-bottom">
-            <p>© {new Date().getFullYear()} Công ty Cổ phần ODS</p>
-            <span>Hạ tầng số · Cloud · AI</span>
           </div>
         </div>
       </footer>

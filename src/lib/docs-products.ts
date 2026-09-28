@@ -8,6 +8,14 @@ export type DocsProductIcon = OdsSolutionIcon;
 export type DocsProductAccent = 'orange' | 'sky' | 'violet' | 'emerald';
 export type DocsSectionIcon = 'book-open' | 'braces';
 export type DocsSectionKind = 'guide' | 'api';
+export type DocsProductEntryIcon = 'guide' | 'api';
+
+export interface DocsProductEntry {
+  label: string;
+  description?: string;
+  href: `/docs/${string}`;
+  icon: DocsProductEntryIcon;
+}
 
 export interface DocsProductSection {
   kind: DocsSectionKind;
@@ -30,6 +38,7 @@ export interface DocsProduct {
   accent: DocsProductAccent;
   capabilities: readonly string[];
   sections: readonly DocsProductSection[];
+  entries: readonly DocsProductEntry[];
 }
 
 export interface DocsProductProfile {
@@ -41,6 +50,7 @@ export interface DocsProductProfile {
   accent: DocsProductAccent;
   capabilities: readonly string[];
   sections: readonly DocsProductSection[];
+  entries: readonly DocsProductEntry[];
 }
 
 /**
@@ -80,6 +90,20 @@ export const docsProductProfiles: readonly DocsProductProfile[] = [
         icon: 'braces',
       },
     ],
+    entries: [
+      {
+        label: 'Hướng dẫn sử dụng',
+        description: 'Portal',
+        href: '/docs/ai-contact-center/user-guider-portal',
+        icon: 'guide',
+      },
+      {
+        label: 'API Reference',
+        description: 'REST & Webhook',
+        href: '/docs/ai-contact-center/api',
+        icon: 'api',
+      },
+    ],
   },
   {
     slug: 'cloudfile',
@@ -102,6 +126,13 @@ export const docsProductProfiles: readonly DocsProductProfile[] = [
         description: 'Thiết lập, đồng bộ và quản trị dữ liệu CloudFile.',
         href: '/docs/cloudfile',
         icon: 'book-open',
+      },
+    ],
+    entries: [
+      {
+        label: 'Hướng dẫn sử dụng',
+        href: '/docs/cloudfile',
+        icon: 'guide',
       },
     ],
   },

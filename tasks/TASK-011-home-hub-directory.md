@@ -1,7 +1,7 @@
 ---
 status: in-progress
 branch: task/TASK-011-home-hub-directory
-commit: "b1785ba"
+commit: "bdaeca1"
 verified-by: npm run verify:task
 ---
 
@@ -29,13 +29,19 @@ Xây dựng Home hub tinh gọn với 5 phần từ trên xuống:
 ## Phạm vi
 
 ### Tạo mới:
+- `src/components/home/solution-orbit.tsx`
+- `src/components/home/product-directory.tsx`
+- `src/components/navigation/docs-mega-menu.tsx`
+- `public/ods-logo.png`
 - `tasks/TASK-011-home-hub-directory.md`
 - `.harness/reports/TASK-011-report.md`
 - `.harness/reports/assets/TASK-011/**`
 
 ### Sửa đổi:
+- `src/lib/ods-solutions.ts`
 - `src/lib/docs-products.ts`
 - `src/lib/home-content.ts`
+- `src/lib/layout.shared.tsx`
 - `src/app/(home)/page.tsx`
 - `src/app/global.css`
 - `harness/tests/routes.test.mjs`

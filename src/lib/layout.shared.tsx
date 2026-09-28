@@ -1,75 +1,44 @@
+import Image from 'next/image';
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import type { LucideIcon } from 'lucide-react';
 import {
-  BookOpen,
-  Cloud,
-  Headphones,
-  KeyRound,
-  Layers3,
+  Braces,
   Library,
-  Newspaper,
-  PhoneCall,
-  Server,
-  Wrench,
 } from 'lucide-react';
-import { docsProducts, odsExternalLinks, type DocsProductIcon } from './docs-products';
-import { gitConfig } from './shared';
+import { DocsMegaMenu } from '@/components/navigation/docs-mega-menu';
 
-const productIcons: Record<DocsProductIcon, LucideIcon> = {
-  phone: PhoneCall,
-  cloud: Cloud,
-  server: Server,
-  managed: Wrench,
-  license: KeyRound,
-};
-
-function getProductIcon(icon: DocsProductIcon) {
-  const ProductIcon = productIcons[icon];
-  return <ProductIcon />;
-}
+const brandNavTitle = (
+  <div className="flex items-center gap-2.5">
+    <Image
+      src="/ods-logo.png"
+      alt="ODS"
+      width={78}
+      height={26}
+      className="h-5.5 w-auto object-contain dark:brightness-125"
+      priority
+    />
+    <span className="hidden sm:inline-block text-sm font-semibold tracking-tight text-fd-foreground">
+      Platform Documentation
+    </span>
+  </div>
+);
 
 function publicLinks(): NonNullable<BaseLayoutProps['links']> {
   return [
     {
-      type: 'menu',
-      text: 'Tài liệu',
-      icon: <BookOpen />,
-      items: [
-        {
-          text: 'Tất cả tài liệu',
-          description: 'Duyệt không gian tài liệu và hướng dẫn theo từng sản phẩm.',
-          url: '/docs',
-          icon: <Library />,
-          active: 'nested-url',
-        },
-        ...docsProducts.map((product) => ({
-          text: product.name,
-          description: product.description,
-          url: product.href,
-          icon: getProductIcon(product.icon),
-          active: 'nested-url' as const,
-        })),
-      ],
+      type: 'custom',
+      children: <DocsMegaMenu />,
     },
     {
-      text: 'Giải pháp ODS',
-      url: odsExternalLinks.website,
-      icon: <Layers3 />,
-      external: true,
+      text: 'API Reference',
+      url: '/docs/ai-contact-center/api/overview',
+      icon: <Braces className="size-3.5 text-orange-500" />,
+      active: 'nested-url',
     },
     {
-      text: 'Kiến thức',
-      url: odsExternalLinks.blog,
-      icon: <Newspaper />,
-      external: true,
-    },
-    {
-      type: 'button',
-      text: 'Hỗ trợ',
-      url: odsExternalLinks.support,
-      external: true,
-      secondary: true,
-      icon: <Headphones />,
+      text: 'Tất cả tài liệu',
+      url: '/docs',
+      icon: <Library className="size-3.5" />,
+      active: 'nested-url',
     },
   ];
 }
@@ -78,10 +47,9 @@ export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
       enabled: true,
-      title: 'ODS Docs',
+      title: brandNavTitle,
       url: '/',
     },
-    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
   };
 }
 
@@ -89,11 +57,10 @@ export function docsOptions(): BaseLayoutProps {
   return {
     nav: {
       enabled: true,
-      title: 'ODS Docs',
+      title: brandNavTitle,
       url: '/',
     },
     links: publicLinks(),
-    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
   };
 }
 
@@ -101,11 +68,10 @@ export function homeOptions(): BaseLayoutProps {
   return {
     nav: {
       enabled: true,
-      title: 'ODS Docs',
+      title: brandNavTitle,
       url: '/',
       transparentMode: 'top',
     },
     links: publicLinks(),
-    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
   };
 }

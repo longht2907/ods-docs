@@ -4,6 +4,7 @@
 
 - **Mã task**: TASK-011 — Home hub dạng danh mục tài liệu
 - **Nhánh**: `task/TASK-011-home-hub-directory`
+- **Commit**: `bdaeca1`
 - **Trạng thái**: `in-progress` (sẵn sàng mở PR)
 - **Lệnh kiểm chứng**: `npm run verify:task`
 
@@ -13,28 +14,32 @@
 
 Chuyển trang chủ (`src/app/(home)/page.tsx`) từ bố cục 7 section phân tán chi tiết sang Home hub 5 khối tinh gọn định hướng danh mục tài liệu ODS:
 
-1. **Hero**: Căn giữa, eyebrow "Trung tâm tài liệu ODS", H1 "Tài liệu sản phẩm ODS", mô tả ngắn, `FullSearchTrigger` lớn và gợi ý tìm kiếm phổ biến.
-2. **Dải giới thiệu ODS**: Banner nền tối cao ~80px hiển thị 5 nhóm giải pháp ODS (nhóm có tài liệu viền cam, nhóm chưa có viền xám) và link tìm hiểu ods.vn.
-3. **Danh mục sản phẩm**: Nhóm theo giải pháp ODS (grid 240px | 1fr):
-   - Cột trái: Icon nhóm + Tên + Mô tả ngắn.
-   - Cột phải: Thẻ sản phẩm có tài liệu (AI Contact Center & CloudFile) hiển thị các entry link dẫn vào tài liệu (`user-guider-portal`, `api`, `cloudfile`), kèm danh sách chip viền đứt cho các sản phẩm chưa có docs trong cùng nhóm.
-   - Hàng cuối "Giải pháp khác": Gom các nhóm giải pháp chưa có tài liệu trên site dạng chip viền đứt liên kết tới ods.vn.
-4. **Hỗ trợ**: 3 thẻ liên kết ngang tới Support Portal, Kiến thức (Blog) và Liên hệ tư vấn.
-5. **Footer**: 1 dòng tinh gọn bản quyền và liên kết ODS Website, ODS ID, GitHub.
+1. **Header & Navigation**: Logo ODS + `Platform Documentation`, tích hợp **DocsMegaMenu** 2 cột trực quan cho tài liệu sản phẩm và API Reference.
+2. **Hero**: Căn giữa, eyebrow "Trung tâm tài liệu ODS", H1 "Tài liệu sản phẩm ODS", mô tả ngắn, `FullSearchTrigger` lớn và gợi ý tìm kiếm phổ biến.
+3. **Dải giới thiệu ODS**: Banner tương tác 5 trụ cột giải pháp ODS (`AI Contact Center`, `Cloud Services`, `Datacenter`, `Managed Services`, `License`) với kiến trúc năng lực thực tế và metrics SLA.
+4. **Danh mục sản phẩm**: Filter bar theo 5 trụ cột ODS, card tài liệu chuẩn hóa Stripe-style (AI Contact Center, CloudFile) với các entry link trực tiếp vào User Guide & API.
+5. **Hỗ trợ**: 3 thẻ Support Hub (Support Portal & Hotline 24/7 `1900 6634`, Email `support@ods.vn`, Trung tâm Kiến thức, Tư vấn 1-1).
+6. **Footer**: 2 tầng đa cột chuẩn Enterprise.
 
 ---
 
 ## 2. Danh sách file thay đổi
 
 ### Tạo mới:
+- `src/components/home/solution-orbit.tsx`
+- `src/components/home/product-directory.tsx`
+- `src/components/navigation/docs-mega-menu.tsx`
+- `public/ods-logo.png`
 - `tasks/TASK-011-home-hub-directory.md`
 - `.harness/reports/TASK-011-report.md`
 - `.harness/reports/assets/TASK-011/desktop-1440px.png`
 - `.harness/reports/assets/TASK-011/mobile-390px.png`
 
 ### Sửa đổi:
+- `src/lib/ods-solutions.ts` (tiêu đề 5 trụ cột chuẩn hóa tiếng Anh)
 - `src/lib/docs-products.ts` (thêm `entries` cho từng product profile)
-- `src/lib/home-content.ts` (thu gọn model, chỉ giữ lại `searchSuggestions` và hàm validate internal link)
+- `src/lib/home-content.ts` (thu gọn model, search suggestions)
+- `src/lib/layout.shared.tsx` (tích hợp ODS logo, Platform Documentation, Mega Menu)
 - `src/app/(home)/page.tsx` (viết lại bố cục 5 khối, không hard-code bất kỳ href `/docs/...` nào)
 - `src/app/global.css` (làm sạch CSS cũ, thêm style cho hero, chip, product card, entry link, support card)
 - `harness/tests/routes.test.mjs` (cập nhật chuỗi kiểm tra nội dung trang Home phù hợp contract mới)

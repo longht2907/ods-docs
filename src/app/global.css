@@ -151,6 +151,17 @@ html > body[data-scroll-locked] {
   background: rgba(63, 63, 70, 0.6);
 }
 
+/* Orbit solution map radius */
+.ods-orbit-container {
+  --orbit-radius: 105px;
+}
+
+@media (min-width: 640px) {
+  .ods-orbit-container {
+    --orbit-radius: 155px;
+  }
+}
+
 /* Product Card */
 .ods-product-card {
   display: flex;

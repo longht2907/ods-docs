@@ -1,7 +1,7 @@
 ---
 status: in-progress
 branch: task/TASK-011-home-hub-directory
-commit: ""
+commit: "b1785ba"
 verified-by: npm run verify:task
 ---
 

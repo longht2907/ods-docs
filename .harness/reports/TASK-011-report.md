@@ -4,7 +4,7 @@
 
 - **Mã task**: TASK-011 — Home hub dạng danh mục tài liệu
 - **Nhánh**: `task/TASK-011-home-hub-directory`
-- **Commit**: `bdaeca1`
+- **Commit**: `39e21e6`
 - **Trạng thái**: `in-progress` (sẵn sàng mở PR)
 - **Lệnh kiểm chứng**: `npm run verify:task`
 

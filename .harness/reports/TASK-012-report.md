@@ -3,8 +3,7 @@
 ## Trạng thái
 
 - Branch: `task/TASK-012-product-docs-sites`
-- Implementation baseline revision: `f7ae259`
-- Sidebar refinement: working tree hiện tại, chờ commit cuối
+- Implementation revision: `4122149`
 - Task status: `in-progress`
 - Pull Request: chưa mở; TASK-011 đã merge vào `main` tại `fdaf658`
 
@@ -41,7 +40,7 @@
 
 ### Gate tổng
 
-TASK-011 đã merge vào `origin/main` tại `fdaf658`. `npm run check:scope` hiện PASS; branch TASK-012 cần được cập nhật trên revision này và chạy lại toàn bộ `npm run verify:task` trước khi push/open PR.
+TASK-011 đã merge vào `origin/main` tại `fdaf658`. Branch TASK-012 đã rebase sạch trên revision này. `npm run verify:task` PASS toàn bộ `verify:code`, `check:scope`, production build 194/194 pages và 12/12 route tests.
 
 ## Kiểm tra runtime và UI
 

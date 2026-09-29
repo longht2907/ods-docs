@@ -1,7 +1,7 @@
 ---
 status: in-progress
 branch: task/TASK-012-product-docs-sites
-commit: "d65d599"
+commit: "4122149"
 verified-by: npm run verify:task
 ---
 
@@ -89,7 +89,7 @@ TASK-012 kế thừa nguyên trạng Home của TASK-011 và chỉ sửa link AP
 - [x] Không còn link public tới `/docs/ai-contact-center/api/overview`.
 - [x] Toàn bộ URL Guide 01–09 tiếp tục trả 200.
 - [x] Không có horizontal overflow ở 1440px và 390px; keyboard focus và mobile drawer hoạt động.
-- [ ] `git diff --check`, `npm run typecheck`, `npm run check:links`, `npm run guard` và `npm run verify:task` pass; không sửa test.
+- [x] `git diff --check`, `npm run typecheck`, `npm run check:links`, `npm run guard` và `npm run verify:task` pass; không sửa test.
 - [ ] Report có 14 ảnh runtime cho bảy route bắt buộc ở desktop và mobile.
 
 ## Điều kiện dừng

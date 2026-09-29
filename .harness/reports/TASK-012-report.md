@@ -3,9 +3,10 @@
 ## Trạng thái
 
 - Branch: `task/TASK-012-product-docs-sites`
-- Implementation revision: `d65d599`
+- Implementation baseline revision: `f7ae259`
+- Sidebar refinement: working tree hiện tại, chờ commit cuối
 - Task status: `in-progress`
-- Pull Request: chưa mở; chờ TASK-011 merge vào `main`
+- Pull Request: chưa mở; TASK-011 đã merge vào `main` tại `fdaf658`
 
 ## Kết quả triển khai
 
@@ -14,6 +15,9 @@
 - Guide và API không còn là nested root; cả hai xuất hiện trong cùng sidebar AI Contact Center.
 - Loại bỏ navigation Home bị lặp trong sidebar docs: Tài liệu Sản phẩm, API Reference và Tất cả tài liệu; Home vẫn giữ menu này.
 - Sidebar dùng `defaultOpenLevel: 0`; Guide/API mở ở cấp cần thiết, các folder chi tiết 01–09 vẫn đóng.
+- Sidebar ACC giữ hai wrapper `Hướng dẫn sử dụng` và `API Reference`; mỗi wrapper chứa landing item cùng cây nội dung tương ứng, mỗi URL chỉ xuất hiện một lần.
+- Sidebar transform nhận diện section bằng `$ref.folder`, vì vậy product root AI Contact Center vẫn tồn tại trong switcher và cây CloudFile không rò sang sidebar ACC.
+- `Tổng quan & Làm quen` không còn `defaultOpen: true`; chỉ nhánh chứa trang hiện tại tự mở, đúng progressive disclosure của cây tài liệu dài.
 - Thêm Guide Gọi tự động gồm trang tổng quan và ba trang con.
 - API Reference được chia thành Tổng đài, Autocall và Webhook.
 - Nội dung Click-to-Call và bốn code tab được chuyển nguyên vẹn sang `api/tong-dai/khoi-tao-cuoc-goi`.
@@ -29,13 +33,15 @@
 - `git diff --check` — PASS; chỉ có cảnh báo LF/CRLF của Git trên Windows.
 - `npm run build` — PASS, **194/194 static pages**.
 - `npm run test:routes` — PASS, **12/12 cases**; public route trả `200`, internal route tiếp tục trả `401`.
+- Runtime HTML refinement — PASS: có đúng một link `Tổng quan Portal`, đúng một link `Tổng quan API`, đúng wrapper Guide/API và không còn navigation Home dư thừa.
+- Root Page Tree có đúng ba node `root: true`: Bắt đầu, AI Contact Center và CloudFile; `/docs` serialize đầy đủ cả ba lựa chọn cho product switcher.
+- `/docs/ai-contact-center` hiển thị trigger `AI Contact Center`, không có node CloudFile trong sidebar; CloudFile chỉ tồn tại như lựa chọn chuyển site.
+- Dev runtime sau khi tải `/docs` và `/docs/ai-contact-center` không còn warning React `Invalid value for prop className`.
 - Runtime matrix — toàn bộ root Guide 01–09, Guide Autocall, ba trang con, ba nhóm API, Click-to-Call và CloudFile trả `200`; `/docs/ai-contact-center/api/overview` trả `404`.
 
 ### Gate tổng
 
-`npm run verify:task` chạy thật và PASS toàn bộ `verify:code`, sau đó dừng tại `check:scope` vì `origin/main` chưa chứa bốn commit TASK-011. Scope checker liệt kê 12 file TASK-011 nằm ngoài TASK-012, đúng với dependency đã khóa trong kế hoạch. Không sửa test, không nới allowlist và không thêm ngoại lệ.
-
-Gate này phải được chạy lại sau khi TASK-011 merge và branch TASK-012 được cập nhật trên `main`. Chỉ khi đó mới push/open PR TASK-012 và ghi nhận `verify:task` hoàn chỉnh.
+TASK-011 đã merge vào `origin/main` tại `fdaf658`. `npm run check:scope` hiện PASS; branch TASK-012 cần được cập nhật trên revision này và chạy lại toàn bộ `npm run verify:task` trước khi push/open PR.
 
 ## Kiểm tra runtime và UI
 
@@ -50,6 +56,8 @@ Gate này phải được chạy lại sau khi TASK-011 merge và branch TASK-01
 - Trang Khởi tạo cuộc gọi vẫn hiển thị code tabs cURL, Python, Node.js và PHP.
 
 ## Evidence
+
+> Bộ ảnh dưới đây được chụp trước sidebar refinement hiện tại. Cần chụp lại sau khi có browser backend trước khi Human finalization; không dùng ảnh cũ để chứng minh hai landing item mới.
 
 ### Desktop 1440 × 1000
 
@@ -75,4 +83,4 @@ Gate này phải được chạy lại sau khi TASK-011 merge và branch TASK-01
 
 - Browser backend `iab` không khả dụng vì phiên không có Node REPL. Evidence được chụp bằng Edge DevTools Protocol trên production build thực tế.
 - Warning `metadataBase` là baseline ngoài phạm vi và không làm build thất bại.
-- TASK-012 giữ `status: in-progress`; chưa push, chưa mở PR và chưa finalization trước khi TASK-011 merge.
+- TASK-012 giữ `status: in-progress`; chưa push, chưa mở PR và chưa Human finalization trước khi CI của PR xanh.

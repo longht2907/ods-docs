@@ -41,6 +41,8 @@ TASK-012 kế thừa nguyên trạng Home của TASK-011 và chỉ sửa link AP
 - `content/docs/meta.json`
 - `content/docs/ai-contact-center/meta.json`
 - `content/docs/ai-contact-center/user-guider-portal/meta.json`
+- `content/docs/ai-contact-center/user-guider-portal/01-tong-quan/meta.json`
+- `content/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/meta.json`
 - `content/docs/ai-contact-center/api/meta.json`
 - `content/docs/ai-contact-center/api/index.mdx`
 - `src/app/docs/layout.tsx`
@@ -69,6 +71,9 @@ TASK-012 kế thừa nguyên trạng Home của TASK-011 và chỉ sửa link AP
 - Mọi MDX mới có `title` và `description`, viết tiếng Việt và giữ thuật ngữ kỹ thuật English khi phù hợp.
 - Nội dung Click-to-Call hiện tại được chuyển nguyên vẹn, tiếp tục dùng placeholder `<YOUR_API_TOKEN>`.
 - Cùng một page URL không xuất hiện hai lần trong Page Tree.
+- Sidebar giữ đúng wrapper folder `Hướng dẫn sử dụng` và `API Reference`; mỗi wrapper chứa landing item (`Tổng quan Portal`, `Tổng quan API`) cùng cây nội dung tương ứng.
+- Transform sidebar chỉ nhận diện hai wrapper bằng `$ref.folder`, không được flatten product root hoặc làm rò cây CloudFile sang AI Contact Center.
+- Chỉ nhánh chứa page hiện tại tự mở; các folder nội dung 01–10 mặc định thu gọn.
 
 ## Tiêu chí nghiệm thu
 
@@ -76,6 +81,7 @@ TASK-012 kế thừa nguyên trạng Home của TASK-011 và chỉ sửa link AP
 - [x] Switcher có đúng Bắt đầu, AI Contact Center và CloudFile.
 - [x] Sidebar ACC có Guide và API; Guide/API không còn là root tab riêng.
 - [x] Sidebar `/docs` không lặp navigation Home: Tài liệu Sản phẩm, API Reference và Tất cả tài liệu.
+- [x] Sidebar ACC có đúng wrapper `Hướng dẫn sử dụng`/`API Reference`, không làm mất product root, không rò cây sản phẩm khác và không lặp URL.
 - [x] Guide Gọi tự động và ba trang con trả 200, nằm sau Quản lý cuộc gọi và trước Quản lý hội thoại.
 - [x] `/docs/ai-contact-center/api` là mục lục ba nhóm.
 - [x] Route Khởi tạo cuộc gọi giữ đủ nội dung Click-to-Call và bốn code tab.

@@ -12,6 +12,7 @@
 - `/docs` được chuyển thành Fumadocs root **Bắt đầu** qua route group `(bat-dau)` mà không đổi URL.
 - Layout Tabs có ba product site cấp cao: Bắt đầu, AI Contact Center và CloudFile.
 - Guide và API không còn là nested root; cả hai xuất hiện trong cùng sidebar AI Contact Center.
+- Loại bỏ navigation Home bị lặp trong sidebar docs: Tài liệu Sản phẩm, API Reference và Tất cả tài liệu; Home vẫn giữ menu này.
 - Sidebar dùng `defaultOpenLevel: 0`; Guide/API mở ở cấp cần thiết, các folder chi tiết 01–09 vẫn đóng.
 - Thêm Guide Gọi tự động gồm trang tổng quan và ba trang con.
 - API Reference được chia thành Tổng đài, Autocall và Webhook.

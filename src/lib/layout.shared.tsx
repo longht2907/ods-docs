@@ -60,7 +60,6 @@ export function docsOptions(): BaseLayoutProps {
       title: brandNavTitle,
       url: '/',
     },
-    links: publicLinks(),
   };
 }
 

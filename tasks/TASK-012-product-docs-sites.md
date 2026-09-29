@@ -75,6 +75,7 @@ TASK-012 kế thừa nguyên trạng Home của TASK-011 và chỉ sửa link AP
 - [x] `/docs` trả 200 và là root tab Bắt đầu với `<DocsProductDirectory />`.
 - [x] Switcher có đúng Bắt đầu, AI Contact Center và CloudFile.
 - [x] Sidebar ACC có Guide và API; Guide/API không còn là root tab riêng.
+- [x] Sidebar `/docs` không lặp navigation Home: Tài liệu Sản phẩm, API Reference và Tất cả tài liệu.
 - [x] Guide Gọi tự động và ba trang con trả 200, nằm sau Quản lý cuộc gọi và trước Quản lý hội thoại.
 - [x] `/docs/ai-contact-center/api` là mục lục ba nhóm.
 - [x] Route Khởi tạo cuộc gọi giữ đủ nội dung Click-to-Call và bốn code tab.

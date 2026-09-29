@@ -30,7 +30,7 @@ function publicLinks(): NonNullable<BaseLayoutProps['links']> {
     },
     {
       text: 'API Reference',
-      url: '/docs/ai-contact-center/api/overview',
+      url: '/docs/ai-contact-center/api',
       icon: <Braces className="size-3.5 text-orange-500" />,
       active: 'nested-url',
     },

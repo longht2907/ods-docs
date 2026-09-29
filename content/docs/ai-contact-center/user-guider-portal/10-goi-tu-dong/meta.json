@@ -1,0 +1,10 @@
+{
+  "title": "Gọi tự động",
+  "description": "Hướng dẫn thiết lập và vận hành chiến dịch gọi tự động (Autocall) trên Portal.",
+  "pages": [
+    "index",
+    "tao-chien-dich",
+    "danh-ba-va-du-lieu",
+    "lich-va-bao-cao"
+  ]
+}

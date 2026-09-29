@@ -1,7 +1,6 @@
 {
   "title": "Hướng dẫn sử dụng",
   "description": "Tài liệu hướng dẫn sử dụng và quản trị AI Contact Center trên giao diện Portal.",
-  "root": true,
   "defaultOpen": true,
   "pages": [
     "index",
@@ -13,6 +12,7 @@
     "04-thiet-lap-tong-dai",
     "05-quan-ly-khach-hang",
     "06-quan-ly-cuoc-goi",
+    "10-goi-tu-dong",
     "07-quan-ly-hoi-thoai",
     "---[PhoneForwarded]Kết nối & Thiết bị---",
     "08-tich-hop-da-kenh",

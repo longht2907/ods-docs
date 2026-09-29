@@ -1,9 +1,11 @@
 {
   "title": "API Reference",
-  "description": "API dành cho developer tích hợp AI Contact Center với hệ thống bên ngoài.",
-  "root": true,
+  "description": "REST API và Webhook tích hợp AI Contact Center.",
   "defaultOpen": true,
   "pages": [
-    "index"
+    "index",
+    "tong-dai",
+    "autocall",
+    "webhook"
   ]
 }

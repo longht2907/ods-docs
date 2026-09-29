@@ -1,10 +1,8 @@
 {
   "title": "Tài liệu ODS",
   "description": "Tài liệu sử dụng và tích hợp các giải pháp ODS.",
-  "icon": "Library",
-  "defaultOpen": false,
   "pages": [
-    "index",
+    "(bat-dau)",
     "ai-contact-center",
     "cloudfile"
   ]

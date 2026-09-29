@@ -376,23 +376,29 @@ try {
 			if (!documentedSet.has(slug)) fail('14-docs-registry', `profile ${slug} thieu product canonical`)
 		}
 
-		const contentRoots = []
-		const docsRoot = path.join(root, 'content/docs')
-		for (const entry of fs.readdirSync(docsRoot, { withFileTypes: true })) {
-			if (!entry.isDirectory()) continue
-			const metaRel = `content/docs/${entry.name}/meta.json`
+		const expectedRootMeta = new Set([
+			'content/docs/(bat-dau)/meta.json',
+			...documentedSlugs.map((slug) => `content/docs/${slug}/meta.json`),
+		])
+		const actualRootMeta = new Set()
+		for (const metaRel of walk('content/docs', (p) => path.basename(p) === 'meta.json')) {
 			const meta = readJsonObject(metaRel, '14-docs-registry')
-			if (meta?.root === true) contentRoots.push(entry.name)
+			if (meta?.root === true) actualRootMeta.add(metaRel)
 		}
-		for (const slug of documentedSet) {
-			if (!contentRoots.includes(slug)) {
-				fail('14-docs-registry', `content/docs/${slug}/meta.json phai co root: true`)
+		for (const metaRel of expectedRootMeta) {
+			if (!actualRootMeta.has(metaRel)) {
+				fail('14-docs-registry', `${metaRel} phai co root: true`)
 			}
 		}
-		for (const slug of contentRoots) {
-			if (!documentedSet.has(slug)) {
-				fail('14-docs-registry', `Fumadocs product root ${slug} thieu product canonical`)
+		for (const metaRel of actualRootMeta) {
+			if (!expectedRootMeta.has(metaRel)) {
+				fail('14-docs-registry', `${metaRel} khong duoc la Fumadocs root`)
 			}
+		}
+
+		const startMeta = readJsonObject('content/docs/(bat-dau)/meta.json', '14-docs-registry')
+		if (startMeta && startMeta.title !== 'Bắt đầu') {
+			fail('14-docs-registry', 'content/docs/(bat-dau)/meta.json title phai la "Bắt đầu"')
 		}
 
 		for (const product of documentedProducts) {
@@ -412,12 +418,39 @@ try {
 				const sectionPath = section.href.slice('/docs/'.length)
 				const sectionMetaRel = `content/docs/${sectionPath}/meta.json`
 				const sectionMeta = readJsonObject(sectionMetaRel, '14-docs-registry')
-				if (sectionMeta?.root !== true) {
-					fail('14-docs-registry', `${sectionMetaRel} phai co root: true`)
+				if (sectionPath !== product.docsSlug && sectionMeta?.root === true) {
+					fail('14-docs-registry', `${sectionMetaRel} khong duoc co root: true`)
 				}
 				if (sectionPath !== product.docsSlug && sectionMeta && sectionMeta.title !== section.title) {
 					fail('14-docs-registry', `${sectionMetaRel} title phai la "${section.title}"`)
 				}
+			}
+		}
+
+		const requiredDocsNodes = [
+			'content/docs/(bat-dau)/index.mdx',
+			'content/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/meta.json',
+			'content/docs/ai-contact-center/api/tong-dai/meta.json',
+			'content/docs/ai-contact-center/api/autocall/meta.json',
+			'content/docs/ai-contact-center/api/webhook/meta.json',
+		]
+		for (const rel of requiredDocsNodes) {
+			if (!exists(rel)) fail('14-docs-registry', `${rel} khong ton tai`)
+		}
+		if (exists('content/docs/index.mdx')) {
+			fail('14-docs-registry', 'content/docs/index.mdx phai duoc chuyen vao (bat-dau)')
+		}
+		if (exists('content/docs/ai-contact-center/api/overview.mdx')) {
+			fail('14-docs-registry', 'khong duoc tao API overview route')
+		}
+		const legacyApiUrl = '/docs/ai-contact-center/api/overview'
+		const publicFiles = [
+			...walk('content/docs', (p) => /\.mdx?$/.test(p)),
+			...walk('src', (p) => /\.[cm]?[jt]sx?$/.test(p)),
+		]
+		for (const rel of publicFiles) {
+			if (readIfExists(rel)?.includes(legacyApiUrl)) {
+				fail('14-docs-registry', `${rel} con link toi ${legacyApiUrl}`)
 			}
 		}
 	}

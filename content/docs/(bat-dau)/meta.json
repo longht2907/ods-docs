@@ -1,0 +1,9 @@
+{
+  "title": "Bắt đầu",
+  "description": "Quick Start và danh mục tài liệu ODS.",
+  "icon": "Library",
+  "root": true,
+  "pages": [
+    "index"
+  ]
+}

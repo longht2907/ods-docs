@@ -1,20 +1,20 @@
 {
   "title": "Hướng dẫn sử dụng",
   "description": "Tài liệu hướng dẫn sử dụng và quản trị AI Contact Center trên giao diện Portal.",
-  "root": true,
   "defaultOpen": true,
   "pages": [
     "index",
-    "---[Compass]Tổng quan & Dịch vụ---",
+    "---TỔNG QUAN & DỊCH VỤ---",
     "01-tong-quan",
     "02-quan-ly-dich-vu",
     "03-quan-ly-nguoi-dung",
-    "---[Settings]Vận hành tổng đài---",
+    "---VẬN HÀNH TỔNG ĐÀI---",
     "04-thiet-lap-tong-dai",
     "05-quan-ly-khach-hang",
     "06-quan-ly-cuoc-goi",
+    "10-goi-tu-dong",
     "07-quan-ly-hoi-thoai",
-    "---[PhoneForwarded]Kết nối & Thiết bị---",
+    "---KẾT NỐI & THIẾT BỊ---",
     "08-tich-hop-da-kenh",
     "09-thiet-lap-may-nhanh"
   ]

@@ -250,7 +250,7 @@ export default function HomePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/docs/ai-contact-center/api/overview" className="transition-colors hover:text-fd-foreground">
+                  <Link href="/docs/ai-contact-center/api" className="transition-colors hover:text-fd-foreground">
                     API Reference
                   </Link>
                 </li>

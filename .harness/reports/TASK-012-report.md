@@ -3,7 +3,7 @@
 ## Trạng thái
 
 - Branch: `task/TASK-012-product-docs-sites`
-- Implementation revision: `9dbf65d`
+- Implementation revision: `d65d599`
 - Task status: `in-progress`
 - Pull Request: chưa mở; chờ TASK-011 merge vào `main`
 

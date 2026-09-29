@@ -1,7 +1,7 @@
 ---
 status: in-progress
 branch: task/TASK-012-product-docs-sites
-commit: "9dbf65d"
+commit: "d65d599"
 verified-by: npm run verify:task
 ---
 

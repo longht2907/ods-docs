@@ -1,72 +1,163 @@
 ---
-title: "Thiết lập chuyển cuộc gọi theo thời gian,trạng thái và hộp thư thoại"
-description: "Tính năng cho phép người dùng cấu hình thiết lập chuyển tiếp cuộc gọi sang một đích khác theo một khoảng thời gian nhất định."
+title: "Thiết lập chuyển cuộc gọi theo thời gian, trạng thái và hộp thư thoại"
+description: "Hướng dẫn chi tiết cấu hình 3 tính năng chuyển tiếp cuộc gọi độc lập: Theo thời gian (Follow-Me), Theo trạng thái (bận/không trả lời/mất mạng) và Chuyển vào Hộp thư thoại trên Portal ODS."
 ---
 
-## Chuyển hướng cuộc gọi theo thời gian
+Hệ thống **Chuyển cuộc gọi (Call Forwarding)** trên Portal ODS hỗ trợ 3 tính năng rẽ nhánh độc lập. Tùy thuộc vào nhu cầu vận hành thực tế của từng phòng ban, quản trị viên có thể cấu hình linh hoạt từng trường hợp dưới đây để đảm bảo không bỏ lỡ bất kỳ cuộc gọi nào của khách hàng.
 
-Tính năng cho phép người dùng cấu hình thiết lập chuyển tiếp cuộc gọi sang một đích khác theo một khoảng thời gian nhất định.
+---
 
-Ví dụ: cuộc gọi đổ vào số máy nhánh 7877, đổ chuông 15 giây không nghe máy sẽ được chuyển tiếp đến một số máy nhánh khác hoặc một đích đến khác.
+## 1. Tổng quan & Điều kiện tiên quyết
 
-Vào **Tổng đài => Cài đặt tổng đài => Chuyển cuộc gọi => Chuyển cuộc gọi theo thời gian**
+### Mục đích & Phạm vi áp dụng
+- **Mục đích:** Tự động điều hướng cuộc gọi đến máy nhánh đồng nghiệp, nhóm trực dự phòng, số di động cá nhân ngoài văn phòng hoặc thu thập lời nhắn Voicemail.
+- **Đối tượng áp dụng:** Quản trị viên hệ thống (**Administrator**) và Tổng đài viên trực máy (**Agent**).
 
-![](/media/ai-contact-center/user-guider-portal/img-tLlGNwnNgKUJSGjVeRo0.png)
+3 tính năng rẽ nhánh cuộc gọi độc lập trên phân hệ:
+1. **Chuyển cuộc gọi theo thời gian:** Đổ chuông máy nhánh chính trong $N$ giây, nếu không nhấc máy sẽ tự động đổ chuông tiếp sang các số máy khác (hỗ trợ đổ chuông đồng thời hoặc nối tiếp).
+2. **Chuyển cuộc gọi theo trạng thái:** Xử lý riêng biệt khi máy nhánh *Không trả lời*, *Đang bận* hoặc *Mất kết nối*.
+3. **Chuyển cuộc gọi đến hộp thư thoại:** Thu thập lời nhắn âm thanh của khách và tự động gửi đính kèm file audio `.wav` về email cá nhân.
 
-Chọn nút “Sửa” để thiết lập thời gian chuyển tiếp cho máy nhánh:
+### Điều kiện tiên quyết (Prerequisites)
+- Tài khoản quản trị đã đăng nhập thành công vào Portal [https://app.ods.vn](https://app.ods.vn).
+- Đã khởi tạo danh sách [Số máy nhánh](/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/tao-cau-hinh-may-nhanh) và [Nhóm nhân viên](/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/cau-hinh-nhom-nhan-vien).
+- Đã cài đặt máy chủ Mail Server tại [Cài đặt Hộp thư thoại](/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/loi-chao-thong-bao-hop-thu-thoai) nếu dùng tính năng gửi Voicemail.
 
-![](/media/ai-contact-center/user-guider-portal/img-X0Y9NbjoHnegE6Vfw8vS.png)
+---
 
-* **Thời gian để số máy nhánh đổ chuông**: là thời gian tối đa cho phép số máy nhánh đổ chuông trước khi thực hiện việc chuyển hướng cuộc gọi sang một đích khác.
-* **Thời gian để số được chuyển đến đổ chuông**: là thời gian đổ chuông tối đa cho số máy nhánh hoặc số di động được chuyển đến.
+## 2. Trường hợp 1: Chuyển cuộc gọi theo thời gian
 
-Ví dụ: số A đổ chuông N giây, tiếp tới số B đổ chuông N giây cho tới hết lượng số trong mục “Số được chuyển đến”.
+Tính năng này cho phép thiết lập thời gian reo chuông tối đa tại máy nhánh chính trước khi cuộc gọi tự động được chuyển tiếp sang danh sách số máy nhánh hoặc số di động ngoài.
 
-* **Đổ chuông nối tiếp**: đổ chuông nối tiếp các số đang đổ trước đó trong mục “Chuyển tới số”.
+### Bảng thông số cấu hình
 
-Ví dụ: số A đổ chuông N giây, N giây tiếp theo số A và B đổ chuông, N giây tiếp theo số A, B và C đổ chuông cho tới hết lượng số trong mục “Số được chuyển đến”.
+| Tên trường | Loại trường | Bắt buộc | Diễn giải & Tùy chọn cấu hình |
+| :--- | :--- | :---: | :--- |
+| **Thời gian đổ chuông máy nhánh** | Dropdown | **Có** | Thời gian máy nhánh chính reo chuông (`10s`, `15s`, `20s`, `30s`...) trước khi chuyển tiếp. |
+| **Thời gian đổ chuông số chuyển đến** | Dropdown | **Có** | Thời lượng chuông reo tối đa tại số máy nhánh/số di động được chuyển đến. |
+| **Số được chuyển đến** | Text / Dropdown | **Có** | Nhập số máy nhánh nội bộ hoặc số điện thoại di động cá nhân nhận chuyển tiếp. |
+| **Đổ chuông nối tiếp** | Dropdown | Tùy chọn | `Tất cả` hoặc `Theo thứ tự`. Nếu chọn nối tiếp: Máy A reo $\rightarrow$ Máy A và B cùng reo $\rightarrow$ Máy A, B và C cùng reo. |
+| **Thông báo chuyển hướng** | Dropdown | Tùy chọn | File âm thanh phát thông báo cho khách biết cuộc gọi đang được chuyển tiếp. |
+| **Nhạc chờ** | Dropdown | Tùy chọn | Nhạc nền phát cho khách nghe trong khi chờ máy nhánh chuyển tiếp nhấc máy. |
+| **Chuyển cuộc gọi khi không trả lời** | Dropdown | Tùy chọn | Đích đến cuối cùng nếu tất cả số chuyển tiếp đều không bắt máy (VD: Lời chào ngoài giờ, Hộp thư thoại). |
 
-* **Chọn nhanh số máy nhánh**: cho phép chọn nhanh một số máy nhánh có trên tổng đài.
-* **Thông báo**: cho phép chọn file thông báo khi tính năng “Chuyển cuộc gọi theo thời gian” hoạt động trên tổng đài.
-* **Nhạc chờ**: phát nhạc chờ trong lúc người gọi chờ số trong mục “Số được chuyển đến” bắt máy.
-* **Chuyển cuộc gọi khi không trả lời**: chuyển cuộc gọi của người gọi tới một đích đến khác sau khi rời khỏi nhóm gọi và các số máy trong nhóm gọi không tiếp nhận cuộc gọi.
+### Hướng dẫn thiết lập từng bước
 
-Tiếp theo, bật tắt tính năng chuyển cuộc gọi theo thời gian cho số máy nhánh.
+<Steps>
+  <Step>
+    ### Bước 1: Mở cấu hình Chuyển theo thời gian
+    Từ menu **Tổng đài** > **Cài đặt tổng đài** > **Chuyển cuộc gọi**. Tại bảng danh sách máy nhánh, tìm đến số máy nhánh cần cài đặt và nhấn biểu tượng bút chì **✏️ (Sửa)** ở cột **CHUYỂN CUỘC GỌI THEO THỜI GIAN**.
 
-![](/media/ai-contact-center/user-guider-portal/img-00E3Zps5WWbbfuTsMj9B.png)
+    ![Bảng danh sách chuyển cuộc gọi trên Portal](/media/ai-contact-center/user-guider-portal/chuyen-cuoc-goi-thoi-gian_danh-sach.png)
+  </Step>
 
-## Chuyển hướng cuộc gọi theo trạng thái
+  <Step>
+    ### Bước 2: Thiết lập thông số chuyển tiếp
+    Trong modal **CẬP NHẬT CHUYỂN CUỘC GỌI THEO THỜI GIAN**:
+    1. Select **Thời gian để số máy nhánh đổ chuông** (khuyến nghị `15 giây`).
+    2. Nhập **Số được chuyển đến** (số máy nhánh đồng nghiệp hoặc số di động cá nhân).
+    3. Chọn **Thời gian để số được chuyển đến đổ chuông** (khuyến nghị `15 giây`).
+    4. Chọn kịch bản xử lý tại mục **Chuyển cuộc gọi khi không trả lời**.
+    5. Nhấn **CẬP NHẬT** để lưu cấu hình.
 
-Tính năng cho phép chuyển hướng cuộc gọi đến một đích đến khác theo trạng thái của số máy nhánh như không trả lời, bận hoặc mất kết nối.
+    ![Hộp thoại cập nhật chuyển cuộc gọi theo thời gian](/media/ai-contact-center/user-guider-portal/chuyen-cuoc-goi-thoi-gian_form-chi-tiet.png)
+  </Step>
 
-Chọn nút “Sửa” ở cuối dùng của số máy nhánh nào cần thiết lập.
+  <Step>
+    ### Bước 3: Kích hoạt trạng thái chuyển tiếp
+    Tại cột **BẬT TẮT** trên danh sách máy nhánh, tích chọn checkbox để kích hoạt tính năng chuyển tiếp cuộc gọi ngay lập tức (nhãn trạng thái chuyển sang màu xanh **Đang bật**).
+  </Step>
+</Steps>
 
-![](/media/ai-contact-center/user-guider-portal/img-BO85VQ8S9sxNuXfAucmK.png)
+---
 
-Ví dụ 2: kịch bản cấu hình theo trạng thái số máy nhánh 7877, khi có cuộc gọi đến:
+## 3. Trường hợp 2: Chuyển cuộc gọi theo trạng thái
 
-![](/media/ai-contact-center/user-guider-portal/img-FaRFNJF79aJ81KmuX0YA.png)
+Tính năng này xử lý tự động rẽ nhánh cuộc gọi dựa trên 3 trạng thái hoạt động thực tế của máy nhánh: Không trả lời, Máy bận, hoặc Mất kết nối.
 
-* **Khi không trả lời**: chuyển cuộc gọi đến nhóm số máy nhánh 7800
-* **Khi máy bận**: chuyển về thông báo bận
-* **Khi mất kết nối**: chuyển cuộc gọi đến nhóm số máy nhánh 7800
+### Bảng thông số cấu hình
 
-## Chuyển cuộc gọi đến hộp thư thoại
+| Tên trường (Trạng thái) | Loại trường | Bắt buộc | Diễn giải & Tùy chọn cấu hình |
+| :--- | :--- | :---: | :--- |
+| **Khi không trả lời** | Cascading Dropdown | Tùy chọn | Đích đến xử lý khi máy nhánh reo chuông hết giờ mà nhân viên không bắt máy (VD: Chuyển vào `Nhóm <CSKH>` hoặc `Hộp thư thoại`). |
+| **Khi máy bận** | Cascading Dropdown | Tùy chọn | Đích đến xử lý khi nhân viên đang trong cuộc đàm thoại khác (VD: Phát `Thông báo bận` hoặc chuyển sang máy đồng nghiệp). |
+| **Khi mất kết nối** | Cascading Dropdown | Tùy chọn | Đích đến xử lý khi máy nhánh ngắt kết nối mạng hoặc tắt ứng dụng (VD: Chuyển sang số di động cá nhân). |
 
-Tính năng cho phép thiết lập chuyển cuộc gọi qua email.
+### Hướng dẫn thiết lập từng bước
 
-Để thiết lập người dùng vào mục Chuyển cuộc gọi đến hộp thư thoại
+<Steps>
+  <Step>
+    ### Bước 1: Mở cấu hình Chuyển theo trạng thái
+    Tại bảng danh sách **Chuyển cuộc gọi**, nhấn biểu tượng bút chì **✏️ (Sửa)** ở cột **CHUYỂN CUỘC GỌI THEO TRẠNG THÁI** của máy nhánh cần cài đặt.
+  </Step>
 
-![](/media/ai-contact-center/user-guider-portal/img-oovLYvP11fYPLWN3wMey.png)
+  <Step>
+    ### Bước 2: Thiết lập đích đến cho từng trạng thái
+    Trong modal **CHUYỂN CUỘC GỌI THEO TRẠNG THÁI**:
+    1. **Khi không trả lời:** Chọn loại đối tượng `Nhóm số máy nhánh` > Đích đến `Support <7800>`.
+    2. **Khi máy bận:** Chọn loại đối tượng `Thông báo` > Đích đến `Thông báo máy bận`.
+    3. **Khi mất kết nối:** Chọn loại đối tượng `Nhóm số máy nhánh` > Đích đến `Support <7800>` hoặc số di động trực ban.
+    4. Nhấn **CẬP NHẬT** để áp dụng.
 
-Thiết lập với các thông số:
+    ![Modal cấu hình chuyển cuộc gọi theo trạng thái](/media/ai-contact-center/user-guider-portal/chuyen-cuoc-goi-trang-thai_form-chi-tiet.png)
+  </Step>
+</Steps>
 
-* **Kích hoạt thư thoại**: chọn “Bật”
-* **Tự động lưu thư thoại**: mặc định luôn “Tắt”
-* **Địa chỉ email**: Nhập địa chỉ email của người dùng số máy nội bộ để thư thoại được gửi về.<br />
+---
 
-  ![](/media/ai-contact-center/user-guider-portal/img-6loGPhNAUSIdNtEsaAYZ.png)
+## 4. Trường hợp 3: Chuyển cuộc gọi đến hộp thư thoại
+
+Tính năng này chuyển trực tiếp cuộc gọi vào hệ thống ghi âm thư thoại và tự động gửi file `.wav` về email của tổng đài viên.
+
+### Bảng thông số cấu hình
+
+| Tên trường | Loại trường | Bắt buộc | Diễn giải & Tùy chọn cấu hình |
+| :--- | :--- | :---: | :--- |
+| **Kích hoạt thư thoại** | Dropdown | **Có** | `Bật` / `Tắt` tính năng hộp thư thoại cho máy nhánh. |
+| **Tự động lưu thư thoại** | Dropdown | **Có** | `Bật` / `Tắt` tính năng lưu file ghi âm trực tiếp trên bộ nhớ lưu trữ tổng đài ODS. |
+| **Địa chỉ mail** | Text Input | **Có** | Nhập email cá nhân của nhân viên tiếp nhận file thư thoại đính kèm (VD: `nhanvien@ods.vn`). |
+
+### Hướng dẫn thiết lập từng bước
+
+<Steps>
+  <Step>
+    ### Bước 1: Mở cấu hình Hộp thư thoại
+    Tại bảng danh sách **Chuyển cuộc gọi**, nhấn biểu tượng bút chì **✏️ (Sửa)** ở cột **CHUYỂN CUỘC GỌI ĐẾN HỘP THƯ THOẠI** của máy nhánh tương ứng.
+  </Step>
+
+  <Step>
+    ### Bước 2: Kích hoạt & Nhập Email nhận
+    Trong modal **CẤU HÌNH HỘP THƯ THOẠI**:
+    1. Mục **Kích hoạt thư thoại:** Chọn `Bật`.
+    2. Mục **Tự động lưu thư thoại:** Chọn `Bật`.
+    3. Mục **Địa chỉ mail:** Nhập địa chỉ email chính xác của tổng đài viên.
+    4. Nhấn **CẬP NHẬT** để lưu thiết lập.
+
+    ![Cấu hình gửi thư thoại về email](/media/ai-contact-center/user-guider-portal/chuyen-cuoc-goi-thu-thoai_form-chi-tiet.png)
+  </Step>
+</Steps>
+
+---
+
+## 5. Lưu ý & Xử lý sự cố (Troubleshooting)
+
+### Lưu ý quan trọng khi vận hành
 
 <Callout type="warn">
-**Lưu ý**: Khi sử dụng tính năng “Cuộc gọi đến hộp thư” thì tính năng “Chuyển cuộc gọi theo thời gian” và “Chuyển cuộc gọi theo trạng thái” sẽ bị vô hiệu hóa.
+  **Thứ tự ưu tiên & Quy tắc vận hành:**
+  - **Thứ tự ưu tiên tính năng:** Khi tính năng **Chuyển cuộc gọi đến hộp thư thoại** được `Bật`, hệ thống sẽ ưu tiên ghi âm thư thoại và vô hiệu hóa các quy tắc chuyển tiếp theo thời gian và trạng thái của máy nhánh đó.
+  - **Tránh tạo vòng lặp chuyển tiếp (Loop Forwarding):** Tuyệt đối không cấu hình Máy nhánh A chuyển sang Máy nhánh B, đồng thời Máy nhánh B lại chuyển ngược về Máy nhánh A.
+  - **Cước viễn thông:** Khi cuộc gọi chuyển tiếp từ máy nhánh ra số di động ngoài, tổng đài sẽ phát sinh 1 cuộc gọi ra (Outbound Call) và tính cước theo gói cước hiện tại của doanh nghiệp.
 </Callout>
+
+### Sự cố thường gặp & Khắc phục nhanh
+
+- **Cuộc gọi chuyển tiếp ra số di động ngoài không thành công:**
+  - *Nguyên nhân:* Máy nhánh chưa được cấp quyền gọi ra trong [Định tuyến gọi ra](/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/dinh-tuyen-cuoc-goi-ma-pin) hoặc tài khoản tổng đài hết hạn mức cước.
+  - *Khắc phục:* Kiểm tra cấu hình Outbound Route của máy nhánh và hạn mức cước tại mục [Quản lý cước](/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/quan-ly-cuoc).
+- **Nhân viên offline/mất mạng nhưng cuộc gọi vẫn reo chuông chờ dài:**
+  - *Nguyên nhân:* Mục **Khi mất kết nối** chưa được cấu hình hoặc tính năng Bật/Tắt chuyển cuộc gọi chưa được chọn.
+  - *Khắc phục:* Vào mục *Chuyển cuộc gọi theo trạng thái*, thiết lập đích đến cho mục *Khi mất kết nối* và đảm bảo checkbox *Bật tắt* đã được tích chọn.
+- **Không nhận được email chứa file đính kèm thư thoại:**
+  - *Nguyên nhân:* Email nhập sai cú pháp hoặc cấu hình SMTP Mail Server tại phân hệ [Hộp thư thoại](/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/loi-chao-thong-bao-hop-thu-thoai) chưa được kích hoạt thành công.
+  - *Khắc phục:* Kiểm tra hòm thư rác (Spam) và chạy tính năng *Gửi thử* trong cài đặt Mail Server tổng đài.

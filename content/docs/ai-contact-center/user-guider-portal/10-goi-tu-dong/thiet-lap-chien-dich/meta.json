@@ -1,0 +1,11 @@
+{
+  "title": "Thiết lập chiến dịch",
+  "icon": "SlidersHorizontal",
+  "pages": [
+    "index",
+    "goi-tu-dong-autocall",
+    "goi-tu-dong-zalo-oa",
+    "chien-dich-znc",
+    "auto-dialer"
+  ]
+}

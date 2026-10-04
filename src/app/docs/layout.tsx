@@ -32,7 +32,7 @@ interface SidebarSection {
 
 const sidebarSections: Readonly<Record<string, SidebarSection>> = {
   'ai-contact-center/user-guider-portal': {
-    landingLabel: 'Tổng quan Portal',
+    landingLabel: 'GIỚI THIỆU',
     landingUrl: '/docs/ai-contact-center/user-guider-portal',
   },
   'ai-contact-center/api': {

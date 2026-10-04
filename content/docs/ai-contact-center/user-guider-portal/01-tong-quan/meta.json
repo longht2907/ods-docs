@@ -3,8 +3,7 @@
   "icon": "Compass",
   "defaultOpen": false,
   "pages": [
-    "index",
-    "bang-tinh-nang-tong-dai-ao",
-    "quickstart"
+    "quickstart",
+    "bang-tinh-nang-tong-dai-ao"
   ]
 }

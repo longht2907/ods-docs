@@ -2,7 +2,6 @@
   "title": "Cài đặt khách hàng",
   "icon": "Settings2",
   "pages": [
-    "index",
     "danh-sach-to-chuc",
     "nhan-khach-hang"
   ]

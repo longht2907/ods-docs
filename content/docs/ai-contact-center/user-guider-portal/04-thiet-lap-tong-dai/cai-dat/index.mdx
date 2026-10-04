@@ -1,8 +1,126 @@
 ---
 title: "Cài đặt tổng đài"
-description: "Thiết lập cài đặt tổng đài ảo là quá trình cấu hình hệ thống tổng đài nhằm hỗ trợ doanh nghiệp quản lý và tối ưu hoạt động chăm sóc khách hàng. Người dùng sẽ kh..."
+description: "Tổng quan các module cấu hình hệ thống tổng đài ảo AI Contact Center ODS trên giao diện Portal."
 ---
 
-**Thiết lập cài đặt tổng đài ảo** là quá trình cấu hình hệ thống tổng đài nhằm hỗ trợ doanh nghiệp quản lý và tối ưu hoạt động chăm sóc khách hàng. Người dùng sẽ khởi tạo máy nhánh nội bộ, thiết lập kịch bản IVR (hệ thống trả lời tự động), cấu hình ghi âm và phân phối cuộc gọi, đồng thời cài đặt ứng dụng nghe/gọi trên thiết bị di động hoặc máy tính. Hệ thống hỗ trợ tích hợp đa kênh (Zalo, Facebook, CRM…) giúp đồng bộ dữ liệu và nâng cao trải nghiệm khách hàng.
+Khu vực **Cài đặt tổng đài** là trung tâm thiết lập toàn bộ quy tắc vận hành tổng đài ảo của doanh nghiệp trên Cổng quản trị [app.ods.vn](https://app.ods.vn). Tại đây, quản trị viên có thể khởi tạo máy nhánh, nhóm tiếp nhận cuộc gọi, xây dựng kịch bản IVR tự động, định tuyến phân phối cuộc gọi và kích hoạt các tính năng AI phân tích chuyên sâu.
 
-![](/media/ai-contact-center/user-guider-portal/img-DEQKmGdKgwbBzAa5kLik.png)
+---
+
+## 1. Tổng quan & Điều kiện tiên quyết
+
+### Mục đích & Đối tượng áp dụng
+- **Mục đích:** Thiết lập toàn diện hạ tầng thoại, quy tắc phân bổ cuộc gọi và luồng xử lý tự động cho doanh nghiệp.
+- **Đối tượng áp dụng:** Quản trị viên hệ thống (**Administrator**), Trưởng nhóm vận hành tổng đài (**Team Lead / Supervisor**).
+
+### Điều kiện tiên quyết (Prerequisites)
+- Tài khoản quản trị viên đã đăng nhập thành công vào [app.ods.vn](https://app.ods.vn).
+- Doanh nghiệp đã được cấp ít nhất một đầu số Hotline (cố định hoặc di động SIP Trunk).
+- Chuẩn bị sẵn danh sách nhân sự (Họ tên, email, phòng ban) và file âm thanh lời chào (định dạng `.wav` hoặc `.mp3`).
+
+---
+
+## 2. Danh mục các Module Cấu hình Chính
+
+Dưới đây là các phân hệ cấu hình cốt lõi trong menu **Cài đặt tổng đài**:
+
+<Cards>
+  <Card title="Máy nhánh & Nhân viên" icon="PhoneCall" href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/tao-cau-hinh-may-nhanh">
+    Khởi tạo số máy nhánh nội bộ (SIP Extension), cấp tài khoản cho nhân viên và theo dõi trạng thái online/offline trực tiếp.
+  </Card>
+
+  <Card title="Nhóm nhân viên" icon="Users" href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/cau-hinh-nhom-nhan-vien">
+    Tạo nhóm tiếp nhận cuộc gọi theo phòng ban (Kinh doanh, CSKH, Kỹ thuật), thiết lập chế độ đổ chuông xoay vòng, đồng thời hoặc ngẫu nhiên.
+  </Card>
+
+  <Card title="Lời chào & Hộp thư thoại (IVR)" icon="Bot" href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/loi-chao-thong-bao-hop-thu-thoai">
+    Tải lên file âm thanh lời chào, thông báo ngoài giờ làm việc và cấu hình cây menu phím bấm tương tác tự động.
+  </Card>
+
+  <Card title="Định tuyến cuộc gọi & Mã PIN" icon="GitFork" href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/dinh-tuyen-cuoc-goi-ma-pin">
+    Thiết lập quy luật chuyển tiếp cuộc gọi vào/ra, phân quyền gọi quốc tế/di động bằng mã PIN bảo mật.
+  </Card>
+
+  <Card title="Điều hướng theo thời gian" icon="Clock" href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/dieu-huong-cuoc-goi-theo-thoi-gian">
+    Cấu hình quy luật thời gian làm việc, ngoài giờ, ca kíp và tự động điều hướng phân luồng cuộc gọi vào tổng đài.
+  </Card>
+
+  <Card title="Chuyển cuộc gọi" icon="PhoneForwarded" href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/chuyen-cuoc-goi">
+    Cấu hình tự động chuyển tiếp cuộc gọi khi máy bận, không trả lời, ngoài giờ làm việc sang số di động cá nhân hoặc Voicemail.
+  </Card>
+
+  <Card title="Cấu hình luật khách" icon="UserCheck" href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/cau-hinh-luat-khach">
+    Ưu tiên kết nối khách hàng VIP đến đúng nhân viên phụ trách hoặc chặn các số điện thoại spam/quấy rối.
+  </Card>
+
+  <Card title="Quản lý cước" icon="DollarSign" href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/quan-ly-cuoc">
+    Giới hạn hạn mức cước gọi ra theo từng máy nhánh, nhóm máy nhánh và quản lý thiết bị Gateway GSM.
+  </Card>
+
+  <Card title="Phân tích cuộc gọi bằng AI" icon="Activity" href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/phan-tich-cuoc-goi">
+    Bật tính năng AI nhận diện cảm xúc, chấm điểm chất lượng đàm thoại và chuyển đổi giọng nói thành văn bản (Speech-to-Text).
+  </Card>
+</Cards>
+
+---
+
+## 3. Quy trình Thiết lập Tổng đài Chuẩn hóa
+
+Để đưa hệ thống tổng đài vào hoạt động thông suốt, khuyến nghị thực hiện theo trình tự các bước:
+
+<Steps>
+  <Step>
+    ### Bước 1: Khởi tạo Máy nhánh & Phân quyền nhân viên
+
+    Truy cập mục **Nhân viên** để tạo danh sách tài khoản máy nhánh cho từng tổng đài viên, cấp thông tin SIP để đăng nhập ứng dụng **ODS Phone** hoặc IP Phone bàn.
+  </Step>
+
+  <Step>
+    ### Bước 2: Gom nhóm nhân viên & Thiết lập chế độ đổ chuông
+
+    Vào mục **Nhóm nhân viên** để nhóm các máy nhánh theo kỹ năng/phòng ban. Chọn quy tắc đổ chuông phù hợp (VD: đổ chuông đồng thời tất cả máy, hoặc đổ lần lượt cho người rảnh nhất).
+  </Step>
+
+  <Step>
+    ### Bước 3: Cài đặt Lời chào & Menu tự động (IVR)
+
+    Tải lên file ghi âm lời chào thương hiệu tại mục **Trả lời tự động**, gán các phím bấm (Phím 1, Phím 2...) tương ứng tới các Nhóm nhân viên đã tạo ở Bước 2.
+  </Step>
+
+  <Step>
+    ### Bước 4: Cấu hình Khung giờ làm việc & Định tuyến
+
+    Thiết lập khung giờ hành chính và quy tắc ngoài giờ làm việc tại mục **Thời gian gọi**. Cấu hình cuộc gọi ngoài giờ tự động phát thông báo hoặc chuyển vào hộp thư thoại (Voicemail).
+  </Step>
+
+  <Step>
+    ### Bước 5: Kiểm tra thực tế cuộc gọi
+
+    Thực hiện các cuộc gọi thử nghiệm (Test call) từ số ngoài vào Hotline để kiểm tra luồng IVR, chất lượng âm thanh và khả năng ghi âm cuộc gọi.
+  </Step>
+</Steps>
+
+---
+
+## 4. Giao diện Tổng quan Cài đặt Tổng đài
+
+![Giao diện Cài đặt tổng đài ODS Portal](/media/ai-contact-center/user-guider-portal/cai-dat-tong-dai-overview.png)
+
+---
+
+## 5. Lưu ý & Xử lý sự cố (Troubleshooting)
+
+### Lưu ý quan trọng
+
+<Callout type="warn">
+  **Khuyến cáo cấu hình:** Khi thiết lập chế độ đổ chuông nhóm, thời gian đổ chuông tối ưu nên từ **20 - 30 giây** trước khi chuyển tiếp sang bước tiếp theo, tránh để khách hàng chờ đợi quá lâu gây ngắt máy.
+</Callout>
+
+### Sự cố thường gặp & Khắc phục nhanh
+
+- **Cuộc gọi vào không đổ chuông máy nhánh:**
+  - *Kiểm tra:* Kiểm tra trạng thái máy nhánh trên danh sách xem có đang ở trạng thái Online (xanh) hay không.
+  - *Xử lý:* Xác minh ứng dụng ODS Phone / IP Phone đã đăng ký thành công SIP Server.
+- **Không nghe thấy lời chào IVR:**
+  - *Kiểm tra:* Định dạng file âm thanh tải lên (chuẩn khuyến nghị: WAV 8kHz/16-bit Mono hoặc MP3 chuẩn).
+  - *Xử lý:* Nghe thử lại file trong thư viện âm thanh để đảm bảo file không bị lỗi dữ liệu.

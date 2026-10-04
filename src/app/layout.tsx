@@ -19,7 +19,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
               'Search(search dialog)': 'Tìm kiếm',
               'Close Search(search dialog)(aria-label)': 'Đóng tìm kiếm',
               'No results found(search dialog)': 'Không tìm thấy kết quả',
-              'On this page(table of contents)': 'Trong trang này',
+              'On this page(table of contents)': 'On this page',
               'Copy Markdown(page actions)': 'Sao chép Markdown',
               'Open(page actions)': 'Mở',
               'Previous Page(pagination)': 'Trang trước',

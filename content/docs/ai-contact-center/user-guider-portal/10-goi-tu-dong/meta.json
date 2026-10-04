@@ -1,11 +1,10 @@
 {
-  "title": "Gọi tự động",
-  "description": "Hướng dẫn thiết lập và vận hành chiến dịch gọi tự động (Autocall) trên Portal.",
-  "icon": "PhoneOutgoing",
+  "title": "Chiến dịch cuộc gọi",
+  "icon": "PhoneCall",
   "pages": [
-    "index",
-    "tao-chien-dich",
-    "danh-ba-va-du-lieu",
-    "lich-va-bao-cao"
+    "tong-quan",
+    "them-am-thanh",
+    "danh-ba",
+    "thiet-lap-chien-dich"
   ]
 }

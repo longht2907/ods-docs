@@ -1,91 +1,112 @@
 ---
-title: "Hướng dãn tạo, cấu hình và kiểm tra trạng thái số máy nhánh"
-description: "Số máy nhánh là máy là một số điện thoại nội bộ được gán cho từng người dùng, phòng ban hoặc nhóm trong hệ thống tổng đài ảo. Nó cho phép các cuộc gọi được chuy..."
+title: "Tạo, cấu hình và kiểm tra trạng thái số máy nhánh"
+description: "Hướng dẫn chi tiết cách khởi tạo số máy nhánh (SIP Extension), cấu hình thông số nghe gọi và kiểm tra trạng thái hoạt động trên Portal ODS."
 ---
 
-Số máy nhánh là máy là một số điện thoại nội bộ được gán cho từng người dùng, phòng ban hoặc nhóm trong hệ thống tổng đài ảo. Nó cho phép các cuộc gọi được chuyển trực tiếp đến đúng người hoặc bộ phận
+**Số máy nhánh (Extension / Tài khoản nhân viên)** là định danh thoại nội bộ được cấp cho từng nhân viên, bộ phận hoặc thiết bị đầu cuối trong hệ thống tổng đài ảo. Mỗi máy nhánh sở hữu thông tin xác thực SIP riêng biệt để đăng ký trên ứng dụng **ODS Phone**, Softphone máy tính hoặc điện thoại bàn IP Phone.
 
-## Tạo số máy nhánh
+---
 
-### Số máy nhánh là gì?
+## 1. Tổng quan & Điều kiện tiên quyết
 
-Số máy nhánh là một chuỗi số gồm 1 đến 5 chữ số mà khách hàng có thể tạo tùy ý, dùng để cấp cho nhân viên. Nhân viên có thể đăng ký sử dụng trên các thiết bị như:
+### Mục đích & Đối tượng áp dụng
+- **Mục đích:** Cấp phát máy nhánh, quản lý quyền hạn đàm thoại và giám sát trạng thái kết nối của tổng đài viên.
+- **Đối tượng áp dụng:** Quản trị viên hệ thống (**Administrator**), Giám sát viên (**Supervisor**).
 
-* Điện thoại để bàn (IP Phone)
-* Softphone trên laptop/PC
-* Ứng dụng di động
+### Điều kiện tiên quyết (Prerequisites)
+- Đã đăng nhập vào Portal tại địa chỉ [https://app.ods.vn](https://app.ods.vn) bằng tài khoản có quyền quản trị tổng đài.
+- Gói cước tổng đài còn dung lượng máy nhánh trống để khởi tạo thêm (theo hạn mức gói Start, Grow, Expert hoặc Success).
+
+---
+
+## 2. Bảng thông số cấu hình chi tiết
+
+Dưới đây là bảng tra cứu chi tiết các trường thông tin khi tạo mới và cấu hình số máy nhánh trên giao diện:
+
+| Tên trường (Field) | Loại trường | Bắt buộc | Diễn giải & Quy tắc cấu hình |
+| :--- | :--- | :---: | :--- |
+| **Tên nhân viên** | Text Input | **Có** | Tên hiển thị của nhân viên hoặc phòng ban (VD: `101 - CSKH`, `NhanVien A`). |
+| **Số máy nhánh** | Number Input | **Có** | Dãy số định danh nội bộ từ 2 đến 5 chữ số (VD: `101`, `102`, `1000`). Không đặt trùng với các đầu số khẩn cấp quốc gia (`113`, `114`, `115`). |
+| **Mật khẩu SIP** | Password | **Có** | Mật khẩu xác thực tài khoản SIP. Tối thiểu 8 ký tự, khuyến khích sử dụng nút **Ngẫu nhiên** để tạo mật khẩu bảo mật cao. |
+| **Bỏ qua xác thực mã pin gọi ra** | Checkbox | Tùy chọn | Khi tích chọn, máy nhánh này được phép gọi ra ngoài trực tiếp mà không cần nhập mã PIN định tuyến bảo mật. |
+| **Số máy nhánh dùng ứng dụng ODS Phone** | Checkbox | Tùy chọn | Kích hoạt cơ chế gửi thông báo đẩy (Push Notification) tối ưu hóa nhận cuộc gọi trên ứng dụng di động ODS Phone (iOS/Android). |
+| **Thời gian đổ chuông** | Number (Giây) | Tùy chọn | Thời gian chuông reo tối đa trên máy nhánh (Mặc định: `30 giây`) trước khi chuyển tiếp hoặc ngắt máy. |
+| **Ghi âm cuộc gọi** | Select / Toggle | Tùy chọn | Tùy chọn chế độ ghi âm: `Luôn luôn`, `Theo yêu cầu` (bấm phím) hoặc `Không bao giờ`. |
+
+---
+
+## 3. Hướng dẫn thao tác từng bước
+
+<Steps>
+  <Step>
+    ### Bước 1: Truy cập danh sách nhân viên
+
+    Từ menu chính bên trái Portal, chọn **Tổng đài** > **Cài đặt tổng đài** > **Nhân viên**. Giao diện sẽ hiển thị toàn bộ danh sách các máy nhánh đã khởi tạo kèm trạng thái hoạt động thực tế.
+
+    ![Danh sách nhân viên và máy nhánh](/media/ai-contact-center/user-guider-portal/tao-may-nhanh_danh-sach.png)
+  </Step>
+
+  <Step>
+    ### Bước 2: Mở hộp thoại tạo máy nhánh mới
+
+    Nhấn nút **+ THÊM MỚI** (màu xanh lá) ở góc trên bên phải màn hình để hiển thị modal cấu hình **TẠO NHÂN VIÊN MỚI**.
+
+    ![Hộp thoại tạo nhân viên mới](/media/ai-contact-center/user-guider-portal/tao-may-nhanh_form-chi-tiet.png)
+  </Step>
+
+  <Step>
+    ### Bước 3: Nhập thông tin & Thiết lập tùy chọn
+
+    1. Điền **Tên nhân viên** và **Số máy nhánh** mong muốn.
+    2. Nhập **Mật khẩu** hoặc nhấn nút **Ngẫu nhiên** để hệ thống tự động sinh chuỗi mật khẩu mạnh.
+    3. Tích chọn các tính năng phụ trợ nếu cần:
+       - Tích chọn *Bỏ qua xác thực mã pin gọi ra* nếu không muốn áp dụng mã PIN cho nhân viên này.
+       - Tích chọn *Số máy nhánh dùng ứng dụng ODS Phone* nếu nhân viên sử dụng app di động.
+    4. Nhấn **+ THÊM MỚI** để lưu máy nhánh vào hệ thống.
+  </Step>
+
+  <Step>
+    ### Bước 4: Cấu hình nâng cao & Thao tác quản lý
+
+    Tại cột **THAO TÁC** trên danh sách, quản trị viên có thể sử dụng các chức năng quản lý chuyên sâu:
+    - ✏️ **Chỉnh sửa:** Cập nhật lại tên nhân viên và đổi mật khẩu SIP.
+    - ⏱️ **Cấu hình thời gian:** Thiết lập thời gian đổ chuông và thời gian chuyển tiếp cuộc gọi.
+    - 👥 **Gán nhóm:** Đưa máy nhánh vào nhóm tiếp nhận cuộc gọi tương ứng (Ring Group).
+    - 🎙️ **Ghi âm:** Bật hoặc tắt tính năng lưu trữ file ghi âm cho máy nhánh này.
+    - 📱 **Mã QR Softphone:** Mở mã QR để nhân viên quét và tự động cấu hình tài khoản trên app ODS Phone.
+    - 🗑️ **Xóa:** Xóa bỏ số máy nhánh khi nhân sự nghỉ việc hoặc không còn nhu cầu sử dụng.
+  </Step>
+</Steps>
+
+---
+
+## 4. Kiểm tra trạng thái máy nhánh (Online / Offline)
+
+Hệ thống cung cấp tín hiệu nhận diện trạng thái thời gian thực trực quan trên bảng danh sách:
+
+| Trạng thái | Màu sắc biểu thị | Ý nghĩa vận hành | Hướng dẫn kiểm tra |
+| :--- | :---: | :--- | :--- |
+| **Trực tuyến** | `Xanh lá` | Máy nhánh đã đăng ký SIP Server thành công, sẵn sàng nghe và gọi. | Tổng đài viên đang mở app hoặc IP Phone đang hoạt động bình thường. |
+| **Không trực tuyến** | `Đỏ / Hồng` | Máy nhánh chưa kết nối hoặc đã mất liên lạc với tổng đài. | Ứng dụng Softphone đang tắt, mất kết nối Internet hoặc thông tin cấu hình bị sai. |
+
+---
+
+## 5. Lưu ý & Xử lý sự cố (Troubleshooting)
+
+### Lưu ý quan trọng
 
 <Callout type="warn">
-### Lưu ý khi sử dụng số máy nhánh:
-
-* Số lượng số máy nhánh được tạo giới hạn theo gói dịch vụ tổng đài.
-* Không được trùng với các số SOS đặc biệt như 113, 114, ...
-* Một số máy nhánh có thể sử dụng tối đa trên 3 thiết bị.
-* Khi có cuộc gọi đến, có thể đổ chuông trên cả 3 thiết bị.
-* Khi gọi ra, chỉ được thực hiện trên 1 thiết bị tại một thời điểm.
-* Mật khẩu số máy nhánh cần được bảo mật.
+  **Quy định sử dụng máy nhánh:**
+  - Một số máy nhánh có thể đăng nhập đồng thời trên tối đa **3 thiết bị** (VD: 1 Softphone PC + 1 App di động + 1 IP Phone bàn).
+  - Khi có cuộc gọi đến, chuông sẽ reo đồng thời trên cả 3 thiết bị. Tuy nhiên, tại một thời điểm chỉ cho phép **1 thiết bị thực hiện gọi ra**.
+  - Không chia sẻ mật khẩu máy nhánh cho bên ngoài để tránh phát sinh cước quốc tế/di động ngoài ý muốn.
 </Callout>
 
-### Cách tạo số máy nhánh:
+### Sự cố thường gặp & Khắc phục
 
-1. Để thiết lập tạo máy nhánh (tài khoản nhân viên) trên hệ thống tổng đài, người dùng truy cập vào: **Tổng đài → Cài đặt tổng đài → Nhân viên**<br />
-
-   ![](/media/ai-contact-center/user-guider-portal/img-Hx1oADM6adP9N9tUbqUP.png)
-2. Điền các thông tin:
-   * **Số máy nhánh**: có thể đặt tùy ý (VD: 1234, 678, ...).
-   * **Tên nhân viên**: đặt tùy ý, không dấu.
-   * **Mật khẩu**: ít nhất 8 ký tự, gồm chữ hoa, số và ký tự đặc biệt.
-   * **Bỏ qua mã PIN gọi ra**: sử dụng khi thiết lập mã PIN trong mục "Định tuyến".
-   * **Sử dụng Matbao One Phone**: tối ưu push app khi dùng trên di động.\ <br />
-
-     ![](/media/ai-contact-center/user-guider-portal/img-QitWZe3FB428sbkKBzob.png)
-
-## Cấu hình số máy nhánh
-
-Người quản trị có thể thiết lập các thông số sau:
-
-### 1. Thời gian đổ chuông
-
-* **Thời gian đổ chuông**: thời gian tối đa trước khi cuộc gọi bị ngắt.
-* **Thời gian chuyển cuộc gọi**: thời gian đổ chuông khi chuyển tiếp.
-* **Báo cuộc gọi đến khi đang gọi**: bật/tắt chờ cuộc gọi.<br />
-
-  ![](/media/ai-contact-center/user-guider-portal/img-iXgu0aVvJ3LYirZ9uYYy.png)
-
-### 2. Ghi âm số máy nhánh
-
-* **Luôn luôn**: ghi âm mọi cuộc gọi.
-* **Theo yêu cầu**: chỉ ghi âm khi bấm phím chức năng.
-* **Không bao giờ**: không cho phép ghi âm.<br />
-
-  ![](/media/ai-contact-center/user-guider-portal/img-HTGKsOKCqd18VXjz1oFR.png)
-
-### 3. Cập nhật số máy nhánh
-
-* Chọn **Sửa** để thay đổi thông tin tên nhân viên, mật khẩu.
-
-### 4. Xóa số máy nhánh
-
-* Chọn **Xóa** để loại bỏ số máy nhánh khỏi hệ thống.<br />
-
-  ![](/media/ai-contact-center/user-guider-portal/img-Bg45CtaYjaRzO4tuzwBp.png)
-
-## Kiểm tra trạng thái của số máy nhánh
-
-Sau khi tạo số máy nhánh, có thể kiểm tra trạng thái đăng ký:
-
-* **Màu xanh**: Trực tuyến (đăng ký thành công).
-* **Màu đỏ**: Không trực tuyến (chưa đăng ký hoặc mất kết nối).
-* **Màu vàng**: Kết nối chậm.<br />
-
-  ![](/media/ai-contact-center/user-guider-portal/img-7nWutqbX2IHMtn8ge4P8.png)
-
-<Callout type="warn">
-### Lưu ý:
-
-* Khi dùng Matbao One Phone, Wi-Fi không ổn định có thể khiến trạng thái chuyển sang màu vàng.
-* Một số trường hợp đăng ký thất bại:
-  * Nhập sai mật khẩu.
-  * Sai thông tin IP tổng đài hoặc port kết nối.
-  * Nhập sai thông tin 3 lần sẽ bị chặn IP.
-</Callout>
+- **Máy nhánh báo "Không trực tuyến" dù đã đăng nhập ứng dụng:**
+  - *Nguyên nhân:* Nhập sai địa chỉ SIP Server, sai Port hoặc mật khẩu không chính xác.
+  - *Khắc phục:* Mở biểu tượng mã QR trên Portal để quét cấu hình tự động hoặc kiểm tra lại kết nối mạng Internet.
+- **Tài khoản bị khóa tạm thời do nhập sai mật khẩu:**
+  - *Nguyên nhân:* Nhập sai thông tin xác thực SIP quá 3 lần liên tiếp dẫn đến cơ chế tự động bảo vệ của hệ thống chặn IP.
+  - *Khắc phục:* Đợi sau 5 - 10 phút hoặc liên hệ bộ phận hỗ trợ kỹ thuật ODS **1900 6634** để mở khóa IP nhanh chóng.

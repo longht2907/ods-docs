@@ -1,66 +1,117 @@
 ---
-title: "Cấu hình webhook và popup trên tổng đài"
-description: "Tổng đài MatBao One hỗ trợ gửi dữ liệu chi tiết các sự kiện event khi phát sinh cuộc gọi ra bên ngoài."
+title: "Cấu hình Webhook và Popup trên tổng đài"
+description: "Thiết lập link Webhook nhận sự kiện cuộc gọi theo thời gian thực và kích hoạt thông báo Popup tích hợp CRM/ERP trên Portal ODS."
 ---
 
-## Thiết lập webhook trên tổng đài
+Tính năng **Cấu hình Webhook và Popup thông báo** trên tổng đài ODS cho phép doanh nghiệp tích hợp hệ thống tổng đài viễn thông với các phần mềm quản trị bên ngoài như CRM, ERP hoặc Helpdesk (HubSpot, Salesforce, Zoho, Lark, hoặc ứng dụng nội bộ). Mỗi khi phát sinh cuộc gọi đến hoặc gọi đi, tổng đài sẽ tự động phát tín hiệu Webhook chứa dữ liệu chi tiết cuộc gọi và kích hoạt Popup màn hình giúp nhân viên nhận diện khách hàng ngay khi chuông reo.
 
-Tổng đài MatBao One hỗ trợ gửi dữ liệu chi tiết các sự kiện (event) khi phát sinh cuộc gọi ra bên ngoài.
+---
 
-Người dùng có thể thiết lập webhook để nhận các sự kiện của cuộc gọi từ hệ thống tổng đài đẩy qua. Sau đó sử dụng thông tin tùy vào mục đích của mình.
+## 1. Cơ chế hoạt động & Điều kiện tiên quyết
 
-Để thiết lập cấu hình webhook trên tổng đài, người dùng cần thực hiện như sau:
+Hệ thống hỗ trợ 2 cơ chế kết nối linh hoạt phục vụ các mục đích nghiệp vụ khác nhau:
 
-Vào mục **Cấu hình API => Cấu hình Webhook** để tiến hành cập nhật link webhook của mình.
+- **Kênh Webhook (Server-to-Server):** Tự động đẩy payload JSON chứa đầy đủ thông tin cuộc gọi (số gọi, số nhận, thời gian bắt đầu, thời lượng đàm thoại, trạng thái thành công/nhỡ, link file ghi âm) về máy chủ của doanh nghiệp. Thích hợp để lưu vết lịch sử tương tác, trích xuất dữ liệu báo cáo và đồng bộ file ghi âm vào hồ sơ khách hàng.
+- **Kênh Popup thông báo (Client / Agent Notification):** Bắn tín hiệu thông báo theo từng sự kiện cuộc gọi (đang đổ chuông, bắt đầu nghe máy, kết thúc) gắn liền với số máy nhánh cụ thể. Khi nhân viên trực máy, phần mềm CRM sẽ tự động bật cửa sổ thông tin khách hàng (Contact Pop) tương ứng với số điện thoại đang liên hệ.
 
-Sau khi cập nhật webhook vào tổng đài, hệ thống tổng đài sẽ bắt đầu gửi sự kiện cuộc gọi ra webhook.
+### Điều kiện tiên quyết
+- Tài khoản quản trị có quyền truy cập vào phân hệ **Cài đặt tổng đài** trên Portal [https://app.ods.vn](https://app.ods.vn).
+- Doanh nghiệp đã chuẩn bị sẵn Endpoint URL nhận Webhook công khai (khuyến nghị chuẩn `https://`) và đảm bảo máy chủ phản hồi trạng thái HTTP `200 OK`.
+- Đã thiết lập danh sách [Máy nhánh nhân viên](/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/tao-cau-hinh-may-nhanh) hoạt động trên tổng đài.
 
-![](/media/ai-contact-center/user-guider-portal/img-aUHROdHsYlvmtunxALE3.png)
+---
+
+## 2. Bảng tham số & Các sự kiện hỗ trợ
+
+### Bảng tham số cấu hình
+
+| Tên trường | Vị trí tab | Bắt buộc | Diễn giải & Giá trị mẫu |
+| :--- | :---: | :---: | :--- |
+| **API URL (Webhook)** | Cấu hình Webhook | **Có** | Địa chỉ máy chủ nhận dữ liệu JSON sự kiện cuộc gọi (VD: `https://crm.yourcompany.com/webhook/call-events`). |
+| **THÔNG BÁO CUỘC GỌI QUA TIN NHẮN** | Cấu hình Webhook | Không | Toggle ON/OFF cho phép đẩy thông báo sự kiện qua luồng tin nhắn/SMS. |
+| **API KEY** | Cấu hình API | Tùy chọn | Mã khóa xác thực bí mật để máy chủ của bạn kiểm tra tính hợp lệ của request từ tổng đài. |
+| **API URL (Popup)** | Cấu hình API | **Có** | Endpoint chuyên nhận các sự kiện hiển thị thông báo popup cho phần mềm CRM/ERP. |
+| **Bật/tắt chức năng Popup** | Thông báo - PopUp | **Có** | Switch tổng kích hoạt hoặc tạm dừng toàn bộ cơ chế thông báo popup của tổng đài. |
+| **HIỂN THỊ THÔNG BÁO** | Thông báo - PopUp | **Có** | Checkbox phân quyền bật thông báo popup riêng cho từng số máy nhánh. |
+
+### Ma trận sự kiện thông báo Popup
+
+| Nhóm luồng | Tên sự kiện trên giao diện | Thời điểm kích hoạt & Ý nghĩa vận hành |
+| :--- | :--- | :--- |
+| **Cuộc gọi vào** | **Gửi thông báo khi đang đổ chuông cuộc gọi vào** | Kích hoạt ngay khi khách gọi đến và máy nhánh bắt đầu reo chuông $\rightarrow$ Bật popup tra cứu thông tin khách hàng trên CRM. |
+| | **Gửi thông báo khi đang bắt đầu nghe máy cuộc gọi vào** | Kích hoạt khi nhân viên bấm nhấc máy $\rightarrow$ Bắt đầu tính thời gian đàm thoại thực tế. |
+| | **Gửi thông báo khi kết thúc cuộc gọi vào** | Kích hoạt khi cuộc gọi gác máy $\rightarrow$ Đẩy thời lượng, kết quả cuộc gọi và link ghi âm về CRM. |
+| **Cuộc gọi ra** | **Gửi thông báo khi đang đổ chuông cuộc gọi ra** | Kích hoạt khi nhân viên bấm gọi và đầu số khách bắt đầu đổ chuông $\rightarrow$ Hiển thị trạng thái kết nối. |
+| | **Gửi thông báo khi bắt đầu nghe máy cuộc gọi ra** | Kích hoạt khi khách hàng nhấc máy trả lời $\rightarrow$ Ghi nhận cuộc gọi tư vấn kết nối thành công. |
+| | **Gửi thông báo khi kết thúc cuộc gọi ra** | Kích hoạt khi kết thúc cuộc gọi $\rightarrow$ Cập nhật báo cáo telesales và lưu file ghi âm vào phiếu chăm sóc. |
+
+---
+
+## 3. Hướng dẫn thao tác từng bước
+
+<Steps>
+  <Step>
+    ### Bước 1: Cấu hình link Webhook nhận dữ liệu cuộc gọi
+
+    1. Từ thanh menu bên trái Portal, chọn **Cài đặt tổng đài** > **Cấu hình API**.
+    2. Hệ thống mặc định mở tab **Cấu hình Webhook** (đường dẫn: `Tổng quan / Cài đặt tổng đài / Cấu hình API / Cấu hình Webhook`).
+    3. Tại ô **API URL:**, nhập chính xác đường link endpoint tiếp nhận webhook của doanh nghiệp (VD: `https://webhook.site/53cef3cb-e7f0-4abd-a558-d52cf634fc4c`).
+    4. (Tùy chọn) Bật công tắc **THÔNG BÁO CUỘC GỌI QUA TIN NHẮN** sang **ON** nếu có nhu cầu tích hợp luồng tin nhắn.
+    5. Nhấn nút **CẬP NHẬT** (màu xanh lá) để lưu cấu hình.
+
+    ![Giao diện Cấu hình Webhook trên Portal ODS](/media/ai-contact-center/user-guider-portal/webhook-va-popup_tab-webhook.png)
+  </Step>
+
+  <Step>
+    ### Bước 2: Thiết lập khóa API và lựa chọn sự kiện Popup
+
+    1. Chuyển sang tab **Cấu hình API** (URL: `https://app.ods.vn/switchboard-setting/api-config?tab=api`).
+    2. Tại mục **THIẾT LẬP KHOÁ API**:
+       - Nhập **API KEY:** Chuỗi khóa bí mật dùng để xác thực request (VD: `hsh29843nshh3321245653`).
+       - Nhập **API URL:** Đường link endpoint nhận dữ liệu sự kiện popup (VD: `https://webhook.site/613ef2ee-f428-47c4-89e3-96ce721c579c`).
+       - Nhấn **CẬP NHẬT** để lưu thông tin khóa và endpoint.
+    3. Tại mục **HIỆN THÔNG BÁO POPUP**:
+       - Bật các công tắc tương ứng với từng giai đoạn cuộc gọi bạn muốn hệ thống phát thông báo:
+         - *Cuộc gọi vào:* Đang đổ chuông, Bắt đầu nghe máy, Kết thúc.
+         - *Cuộc gọi ra:* Đang đổ chuông, Bắt đầu nghe máy, Kết thúc.
+       - Các trạng thái bật sẽ hiển thị màu xanh dương (**BẬT**), trạng thái tắt hiển thị màu đen (**TẮT**).
+
+    ![Giao diện Thiết lập khóa API và các sự kiện Popup](/media/ai-contact-center/user-guider-portal/webhook-va-popup_tab-api-config.png)
+  </Step>
+
+  <Step>
+    ### Bước 3: Phân quyền hiển thị Popup theo máy nhánh
+
+    1. Chuyển sang tab **Thông báo – PopUp** (URL: `https://app.ods.vn/switchboard-setting/api-config?tab=popup`).
+    2. Bật công tắc **Bật/tắt chức năng Popup:** sang trạng thái **BẬT** (màu xanh dương).
+    3. Bảng danh sách máy nhánh hiển thị danh sách toàn bộ nhân viên trên tổng đài:
+       - Cột **SỐ MÁY NHÁNH** và **TÊN HIỂN THỊ** giúp nhận diện nhân viên.
+       - Cột **HIỂN THỊ THÔNG BÁO**: Tích chọn ô vuông tương ứng với các máy nhánh cần nhận thông báo popup (VD: máy nhánh `100`, `101`).
+       - Nếu muốn bật thông báo cho tất cả nhân viên, tích chọn ô vuông trên thanh tiêu đề bảng.
+       - Những máy nhánh không được tích chọn sẽ không nhận sự kiện popup khi có cuộc gọi phát sinh.
+
+    ![Giao diện Phân quyền hiển thị Popup theo máy nhánh](/media/ai-contact-center/user-guider-portal/webhook-va-popup_tab-popup.png)
+  </Step>
+</Steps>
+
+---
+
+## 4. Lưu ý kỹ thuật quan trọng khi vận hành
 
 <Callout type="warn">
-**Lưu ý:** Sau 30 giây khi cập nhật webhook thì hệ thống sẽ bắt đầu gửi dữ liệu cuộc gọi.
+**Các điểm cốt lõi cần lưu ý khi tích hợp:**
 
-Tài liệu mô tả chi tiết các sự kiện bạn có thể xem ở trang này: Webhooks - API Docs cfotel (cloudfone.vn)
+1. **Thời gian đồng bộ hệ thống:** Sau khi nhấn **CẬP NHẬT** link Webhook hoặc API, hệ thống tổng đài cần khoảng **30 giây** để hoàn tất việc cập nhật cấu hình trên các cụm xử lý viễn thông trước khi bắt đầu gửi dữ liệu.
+2. **Yêu cầu phản hồi từ Endpoint:** Máy chủ tiếp nhận của doanh nghiệp phải phản hồi mã trạng thái HTTP `200 OK` trong vòng tối đa **2 giây** kể từ khi nhận được request. Nếu quá thời gian phản hồi hoặc máy chủ trả mã lỗi ($4xx$, $5xx$), tổng đài sẽ ghi nhận sự kiện gửi thất bại.
+3. **Tiêu chuẩn an toàn:** Luôn ưu tiên sử dụng giao thức bảo mật `https://` và tiến hành kiểm tra giá trị `API KEY` trong header hoặc payload của mỗi request gửi đến để đảm bảo dữ liệu cuộc gọi không bị giả mạo.
 </Callout>
 
-## Thông báo popup trên tổng đài
+---
 
-Thông báo popup trên tổng đài là tính năng cho phép hệ thống tổng đài gửi các thông báo hay các sự kiện trên tổng đài ra bên ngoài. Người dùng có thể sử dụng các tính năng trên để tích hợp với các đơn vị triển khai CRM/ERP bên ngoài.
+## 5. Xử lý sự cố thường gặp (Troubleshooting)
 
-Để thiết lập nhận thông báo popup trên tổng đài người dùng cần thực hiện theo 2 bước sau:
-
-**Bước 1: Cấu hình link webhook nhận thông báo**
-
-Người dùng cần nhập link webhook để nhận thông báo từ tổng đài gửi qua.
-
-Vào mục **Cấu hình API => Cấu hình API => Thiết lập khóa API** để nhập thông tin link webhook.
-
-Trong đó:
-
-* **API URL**: link url (webhook) nhận thông báo
-* **API KEY**: Key cho url (webhook) nếu có<br />
-
-  ![](/media/ai-contact-center/user-guider-portal/img-0pKSyfNEE4srRGWMOX6s.png)
-
-Sau khi thiết lập key và url nhận thông báo. Người dùng có thể thiết lập hiện thông báo popup theo nhu cầu.
-
-Trong đó:
-
-* Gửi thông báo khi đang đổ chuông cuộc gọi vào.
-* Gửi thông báo khi bắt đầu nghe máy cuộc gọi vào.
-* Gửi thông báo khi kết thúc cuộc gọi vào.
-* Gửi thông báo khi đang đổ chuông cuộc gọi ra.
-* Gửi thông báo khi bắt đầu nghe máy cuộc gọi ra.
-* Gửi thông báo khi kết thúc cuộc gọi ra.
-
-**Bước 2: Bật tính năng nhận thông báo**
-
-Tiếp theo người dùng cần bật tính năng thông báo popup trên tổng đài và lựa chọn số máy nhánh hiển thị thông báo.
-
-Trường hợp không muốn hiển thị thông báo cho số máy nhánh nào thì người dùng chỉ cần không click chọn cho số máy nhánh đó.
-
-Nút “Hiển thị thông báo” dùng để thiết lập chế độ hiển thị thông báo cho một hoặc nhiều số máy nhánh.
-
-Vào Mục **Cấu hình API => Thông báo popup** để tiến hành bật thông báo popup và hiển thị thông báo cho số máy nhánh.
-
-![](/media/ai-contact-center/user-guider-portal/img-b2Y5igoXaGZvNiaGnIgM.png)
+| Vấn đề phát sinh | Nguyên nhân khả dĩ | Hướng xử lý |
+| :--- | :--- | :--- |
+| **Đã lưu link Webhook nhưng máy chủ không nhận được dữ liệu cuộc gọi** | 1. Chưa đủ 30 giây sau khi nhấn Cập nhật.<br />2. Đường link Webhook chưa được mở truy cập công khai hoặc bị tường lửa (Firewall) của máy chủ chặn request.<br />3. Chứng chỉ SSL của đường link HTTPS không hợp lệ. | 1. Đợi tối thiểu 30 giây và thực hiện lại cuộc gọi thử nghiệm.<br />2. Dùng công cụ kiểm thử như `webhook.site` để xác minh tổng đài có gửi dữ liệu ra ngoài bình thường hay không.<br />3. Kiểm tra cấu hình tường lửa và chứng chỉ SSL trên máy chủ tiếp nhận. |
+| **Nhân viên không thấy Popup thông tin khách hàng khi máy nhánh reo chuông** | 1. Công tắc tổng **Bật/tắt chức năng Popup** đang ở trạng thái TẮT.<br />2. Số máy nhánh của nhân viên đó chưa được tích chọn tại cột **HIỂN THỊ THÔNG BÁO**.<br />3. Sự kiện **Gửi thông báo khi đang đổ chuông** chưa được bật ở tab Cấu hình API. | 1. Truy cập tab **Thông báo - PopUp**, bật công tắc tổng sang **BẬT**.<br />2. Tìm số máy nhánh của nhân viên và tích chọn ô vuông tương ứng.<br />3. Kiểm tra lại tab **Cấu hình API** và đảm bảo các sự kiện mong muốn đều đã ở trạng thái **BẬT**. |
+| **Sự kiện Webhook bị gửi lặp lại nhiều lần cho một cuộc gọi** | Máy chủ tiếp nhận xử lý tác vụ quá lâu dẫn đến vượt quá thời gian phản hồi (Timeout), khiến tổng đài thực hiện cơ chế gửi lại (Retry). | Thiết kế endpoint tiếp nhận theo cơ chế xử lý bất đồng bộ (Queue/Background Job): nhận payload, phản hồi HTTP `200 OK` ngay lập tức, sau đó mới xử lý lưu trữ hoặc đồng bộ dữ liệu vào CRM. |

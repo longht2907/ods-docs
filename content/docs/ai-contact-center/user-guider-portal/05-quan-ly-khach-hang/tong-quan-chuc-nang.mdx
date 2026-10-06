@@ -1,39 +1,120 @@
 ---
 title: "Tổng quan về chức năng quản lý khách hàng"
-description: "Hiểu được vai trò quan trọng của việc quản lý, sắp xếp dữ liệu khách hàng ODS đã thiết kế giao diện danh bạ khách hàng và các tính năng liên quan để khách hàng ..."
+description: "Hướng dẫn toàn diện về phân hệ Quản lý khách hàng (Mini CRM) trên ODS AI Contact Center: quản lý danh bạ, phân loại khách hàng hiện tại và tiềm năng, tích hợp cuộc gọi và định tuyến thông minh."
 ---
 
-Hiểu được vai trò quan trọng của việc quản lý, sắp xếp dữ liệu khách hàng ODS đã thiết kế giao diện danh bạ khách hàng và các tính năng liên quan để khách hàng có thể dễ dàng quản lý
 
-## 1. Giới thiệu về chức năng quản lý khách hàng
+Phân hệ **Quản lý khách hàng** (Mini CRM) trên ODS AI Contact Center là trung tâm lưu trữ, đồng bộ và khai thác dữ liệu danh bạ khách hàng tập trung. Thay vì phải sử dụng các phần mềm CRM ngoài cồng kềnh, phân hệ này được kết nối trực tiếp với lõi tổng đài Cloud PBX, giúp tự động nhận diện danh tính người gọi khi có cuộc gọi đến (Screen Pop-up), hiển thị lịch sử trao đổi, hỗ trợ bấm gọi nhanh (Click-to-Call) và phối hợp cùng tính năng [Cấu hình luật khách quen](/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/cau-hinh-luat-khach) để tự động chuyển máy cho nhân viên phụ trách.
 
-Chức năng quản lý khách hàng giúp doanh nghiệp theo dõi, lưu trữ và tối ưu hóa việc chăm sóc khách hàng. Hệ thống cho phép quản lý danh sách khách hàng, ghi nhớ các tương tác và giúp nhân viên CSKH xử lý hiệu quả hơn.
+---
 
-![](/media/ai-contact-center/user-guider-portal/img-ItJvBqZRoeTofyGjYGHf.png)
+## 1. Kiến trúc phân loại khách hàng trên Portal
 
-## 2. Phân loại khách hàng
+Hệ thống phân tách danh bạ thành hai nhóm nghiệp vụ riêng biệt để tối ưu quy trình chăm sóc và bán hàng:
 
-Khách hàng được chia thành hai nhóm chính:
+<CustomerFlowDiagram />
 
-* **Khách hàng tiềm năng**: Bao gồm những khách hàng ban đầu liên hệ vào hệ thống qua các kênh tương tác như Zalo OA, hotline, trang web, mạng xã hội...
-* **Khách hàng hiện tại**: Những khách hàng đã được nhân viên xử lý và chăm sóc, đang trong quá trình sử dụng sản phẩm/dịch vụ của doanh nghiệp.
+1. **Khách hàng tiềm năng (`/mini-crm/lead-list`):**
+   - Lưu trữ data khách hàng mới liên hệ qua các chiến dịch Marketing, quảng cáo, form website, hoặc đầu số hotline nhưng chưa phát sinh đơn hàng/hợp đồng.
+   - Giúp điện thoại viên (Telesales) theo dõi hành trình chuyển đổi từ khách lạ thành khách hàng chính thức.
+2. **Khách hàng hiện tại (`/mini-crm/customer-list`):**
+   - Lưu trữ danh sách cá nhân/doanh nghiệp đang sử dụng sản phẩm hoặc dịch vụ của doanh nghiệp.
+   - Hồ sơ tại đây được ưu tiên đồng bộ tự động với màn hình tiếp nhận cuộc gọi của tổng đài viên và định tuyến CSKH chuyên biệt.
 
-## 3. Chức năng quản lý khách hàng
+![Giao diện danh sách Khách hàng hiện tại trên ODS Portal](/media/ai-contact-center/user-guider-portal/quan-ly-khach-hang_khach-hang-hien-tai.png)
 
-* **Thêm mới khách hàng**: Nhân viên có thể nhập thông tin khách hàng từ các kênh hoặc thêm thủ công.
-* **Cập nhật thông tin khách hàng**: Chỉnh sửa, thêm mới thông tin liên hệ, nhu cầu của khách hàng.
-* **Ghi chú và lịch sử tương tác**: Ghi lại các cuộc gọi, email, trao đổi quan trọng.
-* **Bộ lọc khách hàng**: Giúp nhân viên dễ dàng tìm kiếm và phân loại khách hàng.
-* **Thêm nhãn (tag) cho khách hàng**: Nhằm phân nhóm và xác định tính chất của từng khách hàng.
-* **Quản lý danh sách tổ chức**: Nhóm khách hàng theo doanh nghiệp, đối tác.
+---
 
-## 4. Lợi ích của chức năng quản lý khách hàng
+## 2. Cấu trúc trường dữ liệu hồ sơ khách hàng
 
-* Tối ưu quy trình CSKH, giúp nhân viên tiết kiệm thời gian xử lý.
-* Nâng cao hiệu quả chăm sóc khách hàng, giữ chân và gia tăng tỷ lệ chốt đơn.
-* Cải thiện chất lượng dịch vụ, giúp doanh nghiệp đáp ứng nhu cầu khách hàng nhanh chóng.
-* Quản lý và phân loại khách hàng một cách hệ thống, hỗ trợ tốt hơn trong việc chăm sóc và kinh doanh.
+Khi quản trị viên hoặc nhân viên tạo mới/chỉnh sửa một hồ sơ khách hàng trên giao diện `+ THÊM MỚI KHÁCH HÀNG`, biểu mẫu được phân chia trực quan thành 2 nhóm thông tin:
 
-## 5. Kết luận
+![Màn hình biểu mẫu thêm mới thông tin khách hàng trên ODS Portal](/media/ai-contact-center/user-guider-portal/quan-ly-khach-hang_form-them-moi.png)
 
-Chức năng quản lý khách hàng giúp doanh nghiệp theo dõi và quản lý khách hàng hiệu quả hơn, cải thiện dịch vụ và tăng doanh thu. Doanh nghiệp nên tối ưu và khai thác chức năng này một cách hiệu quả để tối đa lợi ích.
+### Bảng chi tiết các trường thông tin
+
+| Trường dữ liệu | Tính bắt buộc | Kiểu dữ liệu / Thao tác | Mô tả & Ý nghĩa nghiệp vụ |
+| :--- | :---: | :--- | :--- |
+| **Tên khách hàng** | **Bắt buộc** | Text + Dropdown | Họ và tên khách hàng kèm danh xưng (Anh / Chị / Ông / Bà / Khác). Đây là tên sẽ hiển thị trên popup cuộc gọi. |
+| **Giới tính** | Tùy chọn | Radio button | Lựa chọn: *Nam* hoặc *Nữ*. Hỗ trợ tư vấn viên dùng ngữ điệu xưng hô phù hợp. |
+| **Ngày sinh** | Tùy chọn | Date picker | Định dạng `dd/mm/yyyy`, hỗ trợ lập chiến dịch gửi tin nhắn hoặc gọi điện chúc mừng sinh nhật. |
+| **Số điện thoại 1** | **Bắt buộc** | Number | Số điện thoại chính dùng để định tuyến, nhận diện cuộc gọi và Click-to-Call. |
+| **Thêm số điện thoại** | Tùy chọn | Nút bấm `+ Thêm` | Cho phép nhập thêm Số điện thoại 2, 3... nếu khách hàng dùng nhiều số di động/bàn. |
+| **Email 1** | Tùy chọn | Email | Hộp thư điện tử liên hệ. Hỗ trợ bấm `+ Thêm` để nhập thêm nhiều email phụ. |
+| **Phân loại khách hàng** | **Bắt buộc** | Radio button | Chọn chuyển khách vào nhóm **Khách hàng hiện tại** hoặc **Khách hàng tiềm năng**. |
+| **Nhãn khách hàng** | Tùy chọn | Multi-select Dropdown | Gắn thẻ (Tag/Label) phân loại như: *VIP*, *Ưu tiên*, *Đang theo dõi*, *Khách VIP ODS*... |
+| **Tổ chức** | Tùy chọn | Single Select Dropdown | Liên kết khách hàng vào một Doanh nghiệp/Đối tác B2B đã được khởi tạo trong hệ thống. |
+| **Địa chỉ** | Tùy chọn | Textarea | Địa chỉ văn phòng, nơi ở hoặc địa điểm giao dịch của khách hàng. |
+| **Thông tin** | Tùy chọn | Textarea | Các ghi chú đặc biệt về thói quen, lịch sử nhu cầu hoặc cảnh báo cần nhân viên lưu tâm. |
+
+<Callout type="info">
+**Khả năng mở rộng đa số điện thoại:** Hệ thống ODS cho phép một hồ sơ khách hàng sở hữu nhiều số điện thoại liên hệ. Bất kỳ số điện thoại nào trong danh sách trên gọi vào tổng đài, hệ thống đều tự động nhận diện chính xác về cùng một hồ sơ khách hàng duy nhất.
+</Callout>
+
+---
+
+## 3. Các tính năng quản trị danh bạ trên giao diện
+
+Tại thanh công cụ phía trên bảng danh sách khách hàng (`Khách hàng hiện tại` và `Khách hàng tiềm năng`), hệ thống cung cấp các nút chức năng tiêu chuẩn:
+
+| Chức năng | Vị trí nút | Mô tả hành động |
+| :--- | :--- | :--- |
+| **Tìm kiếm từ khóa** | Ô input bên trái | Tìm kiếm tức thì theo **Tên khách hàng**, **Số điện thoại** hoặc **Email**. |
+| **Xuất excel** | Nút màu xanh lá | Xuất toàn bộ danh sách khách hàng hiện có ra file định dạng Excel (`.xlsx`) để phục vụ sao lưu báo cáo. |
+| **Nhập dữ liệu từ excel** | Nút viền xanh lá | Tải file danh bạ hàng loạt lên hệ thống giúp nhập nhanh dữ liệu từ hệ thống cũ. |
+| **Download file excel mẫu**| Nút liên kết | Tải tệp tin Excel định dạng chuẩn của ODS để điền thông tin đúng cột trước khi import. |
+| **Xoá toàn bộ danh bạ** | Nút màu đỏ | Xóa nhanh toàn bộ danh sách khách hàng trong danh mục hiện tại (Yêu cầu mật khẩu/xác nhận quản trị). |
+| **+ THÊM MỚI KHÁCH HÀNG**| Nút màu xanh dương | Mở modal nhập thủ công hồ sơ một khách hàng mới. |
+
+![Danh sách Khách hàng tiềm năng trên hệ thống](/media/ai-contact-center/user-guider-portal/quan-ly-khach-hang_khach-hang-tiem-nang.png)
+
+---
+
+## 4. Hướng dẫn thao tác chuẩn trên Portal
+
+<Steps>
+### Bước 1: Truy cập phân hệ Khách hàng
+1. Đăng nhập vào **Portal ODS** bằng tài khoản có quyền quản trị hoặc nhân viên chăm sóc khách hàng.
+2. Tại thanh menu bên trái, nhấp chọn menu **Khách hàng**.
+3. Chọn mục **Khách hàng hiện tại** (để quản lý tệp khách thân thiết) hoặc **Khách hàng tiềm năng** (để quản lý tệp khách mới/leads).
+
+### Bước 2: Thêm mới hồ sơ khách hàng thủ công
+1. Nhấp nút **+ THÊM MỚI KHÁCH HÀNG HIỆN TẠI** (hoặc **+ THÊM MỚI KHÁCH HÀNG TIỀM NĂNG**).
+2. Nhập các trường thông tin bắt buộc: **Tên khách hàng**, danh xưng và **Số điện thoại 1**.
+3. Bổ sung các thông tin phụ: Nhãn phân loại (Label), Đơn vị tổ chức và địa chỉ liên lạc.
+4. Nhấn **+ THÊM MỚI** để lưu lại hồ sơ.
+
+### Bước 3: Tra cứu & Thao tác nhanh trên bảng danh sách
+1. Sử dụng thanh tìm kiếm: Gõ 3-4 ký tự số điện thoại hoặc tên khách hàng để hệ thống lọc ngay lập tức.
+2. Xem cột **THAO TÁC** tại từng dòng dữ liệu:
+   - **Xem chi tiết / Sửa**: Nhấp vào biểu tượng bút chỉnh sửa để cập nhật số điện thoại mới, thay đổi nhãn hoặc ghi chú bổ sung.
+   - **Click-to-Call**: Nhấp trực tiếp vào số điện thoại để kích hoạt gọi ra từ softphone/máy nhánh WebRTC mà không cần quay số bằng tay.
+   - **Xóa**: Nhấp biểu tượng thùng rác để xóa bỏ một hồ sơ không còn hoạt động.
+
+### Bước 4: Chuyển đổi trạng thái Tiềm năng thành Khách hàng hiện tại
+Khi khách hàng tiềm năng đã chốt đơn thành công:
+1. Mở chi tiết khách hàng tại màn hình `Khách hàng tiềm năng`.
+2. Tại trường **Phân loại khách hàng**, tích chọn chuyển từ *Khách hàng tiềm năng* sang *Khách hàng hiện tại*.
+3. Nhấn **Lưu thay đổi**. Hồ sơ sẽ tự động chuyển sang phân hệ Khách hàng hiện tại.
+</Steps>
+
+---
+
+## 5. Lưu ý vận hành quan trọng
+
+<Callout type="warn">
+- **Tránh trùng lặp số điện thoại:** Hệ thống khuyến nghị mỗi số điện thoại chỉ nên gán cho một khách hàng duy nhất. Nếu nhập trùng số điện thoại giữa 2 khách hàng khác nhau, khi cuộc gọi đến hệ thống sẽ ưu tiên hiển thị hồ sơ được cập nhật gần nhất.
+- **Thận trọng với nút "Xoá toàn bộ danh bạ":** Hành động này sẽ xóa vĩnh viễn toàn bộ dữ liệu danh bạ trong phân hệ được chọn và không thể khôi phục tự động. Bạn **luôn luôn phải bấm "Xuất excel"** để sao lưu dự phòng trước khi thực hiện thao tác này.
+- **Liên kết chặt chẽ với Luật khách quen:** Khi phân công nhân viên quản lý khách hàng, hãy đảm bảo đã cấu hình đúng chính sách định tuyến tại mục [Định tuyến > Luật khách quen](/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/cau-hinh-luat-khach) để cuộc gọi vào luôn gặp đúng người phụ trách.
+</Callout>
+
+---
+
+## 6. Xử lý các tình huống thường gặp (Troubleshooting)
+
+| Sự cố phát sinh | Nguyên nhân khả dĩ | Giải pháp xử lý |
+| :--- | :--- | :--- |
+| **Không hiển thị tên khách hàng khi có cuộc gọi đến** | Số điện thoại gọi đến chưa được lưu hoặc có khoảng trắng, sai định dạng mã quốc gia. | Kiểm tra lại số điện thoại trong danh bạ, lưu chuẩn số 10 chữ số (VD: `0901234567`) không chứa dấu cách, dấu gạch nối hoặc dấu chấm. |
+| **Import file Excel báo lỗi hoặc không nhận dữ liệu** | Cột trong file Excel bị đổi thứ tự hoặc sai cấu trúc so với file mẫu của hệ thống. | Nhấp vào **Download file excel mẫu**, sao chép nội dung khách hàng vào đúng các cột mẫu quy định và thực hiện import lại. |
+| **Không thể bấm gọi nhanh Click-to-Call từ danh bạ** | Máy nhánh của bạn chưa được đăng ký (Unregistered) hoặc tiện ích ODS Click-to-Call chưa được kích hoạt. | Đảm bảo WebRTC Extension/Softphone đang ở trạng thái Online (Xanh lá). Kiểm tra quyền gọi ra của máy nhánh. |
+| **Không nhìn thấy nút "Xoá toàn bộ danh bạ"** | Tài khoản của bạn là tài khoản nhân viên (Agent/User), không có quyền Quản trị tối cao (Admin). | Liên hệ quản trị viên hệ thống để được cấp quyền hoặc thực hiện xóa nếu có lý do nghiệp vụ chính đáng. |

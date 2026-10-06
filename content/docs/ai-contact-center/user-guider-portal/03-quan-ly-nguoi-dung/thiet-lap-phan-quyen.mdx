@@ -1,43 +1,121 @@
 ---
-title: "Thiết lập phân quyền người dùng"
-description: "Phân quyền chức năng giúp quản trị viên kiểm soát quyền truy cập của từng bộ phận hoặc cá nhân vào các tính năng cụ thể trong hệ thống. Điều này đảm bảo tính bả..."
+title: "Hướng dẫn thiết lập phân quyền người dùng"
+description: "Tạo nhóm quyền, cấu hình ma trận phân quyền chi tiết theo module chức năng và gán vai trò vận hành trên Portal ODS."
 ---
 
-## 1. Phân Quyền Chức Năng
+Tính năng **Phân quyền người dùng ** trên Portal ODS cho phép doanh nghiệp thiết lập các nhóm vai trò và phân chia quyền hạn truy cập chi tiết cho từng nhân viên hoặc phòng ban. Việc phân quyền chặt chẽ giúp bảo vệ an toàn dữ liệu khách hàng, ngăn ngừa sai sót cấu hình trên hệ thống tổng đài và tối ưu hóa giao diện làm việc đúng với nhiệm vụ của từng vị trí (Quản trị viên, Giám sát, Điện thoại viên, Kế toán).
 
-Phân quyền chức năng giúp quản trị viên kiểm soát quyền truy cập của từng bộ phận hoặc cá nhân vào các tính năng cụ thể trong hệ thống. Điều này đảm bảo tính bảo mật, hạn chế rủi ro và tối ưu hóa quy trình làm việc. Một số lợi ích chính của phân quyền:
+---
 
-* **Bảo mật hệ thống**: Hạn chế người dùng không có thẩm quyền truy cập vào các chức năng quan trọng.
-* **Tối ưu quản lý**: Giao đúng quyền hạn cho từng phòng ban, giúp hệ thống hoạt động hiệu quả.
-* **Tránh sai sót**: Giảm nguy cơ thao tác sai trên hệ thống do không đủ chuyên môn.
+## 1. Cơ chế hoạt động & Các nhóm vai trò chuẩn
 
-## 2. Hướng Dẫn Thiết Lập Phân Quyền
+Hệ thống phân quyền ODS tuân thủ 3 nguyên tắc bảo mật cốt lõi:
+- **Đặc quyền tối thiểu (Least Privilege):** Chỉ cấp đúng và đủ các quyền cần thiết để nhân viên hoàn thành công việc được giao, không cấp quyền vượt cấp.
+- **Tách biệt nhiệm vụ (Separation of Duties):** Tách bạch giữa nhóm cấu hình kỹ thuật viễn thông (Cài đặt tổng đài, API) và nhóm khai thác vận hành hàng ngày (CSKH, Telesales).
+- **Kiểm soát quyền nhạy cảm:** Các thao tác có rủi ro cao như *Xóa dữ liệu*, *Tải file ghi âm*, *Xuất danh bạ khách hàng* và *Cấu hình API / Phân quyền* cần được giới hạn nghiêm ngặt cho cấp quản lý.
 
-**Bước 1: Truy Cập Mục Quản Lý Phân Quyền**
+### Bảng đối chiếu các nhóm vai trò phổ biến
 
-* Đăng nhập vào hệ thống quản trị.
-* Trên thanh menu bên trái, chọn **"Người dùng" → "Phân quyền"**.
-* Giao diện danh sách các nhóm quyền sẽ hiển thị.
+| Nhóm vai trò | Phân hệ được phép truy cập | Phạm vi quyền hạn khuyến nghị |
+| :--- | :--- | :--- |
+| **Quản trị viên (Admin)** | Toàn bộ phân hệ (Tổng quan, Tổng đài, Khách hàng, Chiến dịch, Cài đặt, Người dùng). | Toàn quyền cấu hình hệ thống, tạo tài khoản, phân quyền và xuất toàn bộ dữ liệu. |
+| **Giám sát tổng đài (Supervisor)** | Tổng quan, Lịch sử cuộc gọi, Thống kê, Khách hàng. | Xem toàn bộ cuộc gọi, nghe ghi âm, chấm điểm phân tích AI, xuất báo cáo năng suất nhân viên. Không được đổi kịch bản tổng đài. |
+| **Điện thoại viên (Agent / CSKH)** | Tổng quan, Khách hàng (Mini CRM), Lịch sử cuộc gọi của máy nhánh được gán. | Xem và cập nhật hồ sơ khách hàng, xem nhật ký cuộc gọi cá nhân, nghe lại cuộc gọi của chính mình để ghi nhận thông tin. |
+| **Nhân viên Telesales** | Khách hàng, Chiến dịch gọi tự động, Lịch sử cuộc gọi đi. | Khai thác danh sách số gọi ra, cập nhật kết quả tư vấn trên phiếu chăm sóc. Không có quyền tải file ghi âm hàng loạt. |
+| **Bộ phận Kế toán - Cước** | Thống kê > Cước, Đầu số & Cước phí, Lịch sử cuộc gọi. | Theo dõi chi phí viễn thông, tải file Excel phục vụ đối soát cước tháng. Không có quyền can thiệp kịch bản định tuyến. |
 
-![](/media/ai-contact-center/user-guider-portal/img-AMcOTlypLtMaOsHTgZta.png)
+---
 
-**Bước 2: Tạo Nhóm Quyền Mới**
+## 2. Bảng ma trận phân quyền chi tiết theo phân hệ
 
-* Nhấn vào nút "Thêm mới quyền" (góc trên bên phải).<br />
+| Phân hệ chức năng | Các quyền hạn chi tiết (Actions) | Ý nghĩa & Tác động bảo mật |
+| :--- | :--- | :--- |
+| **Tổng quan (Dashboard)** | Xem | Cho phép theo dõi các biểu đồ thống kê tổng thể và tình trạng dịch vụ. |
+| **Tin nhắn** | Xem, Thêm, Gửi tin, Xuất file | Quản lý danh sách tin nhắn, gửi SMS Brandname/CSKH và xuất lịch sử gửi tin. |
+| **Khách hàng (Mini CRM)** | Xem, Thêm, Sửa, Xóa, Import, Export | Quản trị cơ sở dữ liệu danh bạ khách hàng, thông tin liên hệ và lịch sử tương tác. |
+| **Tổng đài - Lịch sử cuộc gọi** | Xem, Nghe ghi âm, Tải ghi âm, Phân tích AI, Xuất file | Truy cập nhật ký cuộc gọi; quyền nghe và tải file ghi âm là quyền nhạy cảm cần cân nhắc khi cấp. |
+| **Tổng đài - Thống kê** | Xem thống kê cuộc gọi, nhân viên, nhóm, cước phí | Theo dõi sản lượng viễn thông, hiệu suất làm việc và đối soát chi phí. |
+| **Chiến dịch** | Xem, Thêm, Sửa, Xóa, Khởi chạy/Tạm dừng, Xuất báo cáo | Tạo và vận hành các chiến dịch gọi tự động (Autocall) hàng loạt. |
+| **Cài đặt tổng đài** | Xem, Thêm, Sửa, Xóa cấu hình | Quản lý máy nhánh, IVR, định tuyến, thời gian gọi, phân tích cuộc gọi (chỉ cấp cho Admin). |
+| **Người dùng** | Xem, Thêm, Sửa, Xóa, Phân quyền | Cấp tài khoản và quản lý nhóm quyền hệ thống (chỉ cấp cho Admin cấp cao). |
 
-  ![](/media/ai-contact-center/user-guider-portal/img-Akr8qfvmyyAGLfaGyvnE.png)
-* Nhập thông tin nhóm quyền, bao gồm:
-  * **Tên nhóm quyền**: Đặt tên dễ hiểu theo chức năng (VD: "Quản trị viên", "Nhân viên CSKH").
-  * **Mô tả**: Ghi chú về mục đích của nhóm quyền này.
-* Nhấn **Lưu** để tạo nhóm quyền.
+---
 
-**Bước 3: Kiểm Tra và Điều Chỉnh (Nếu Cần)**
+## 3. Hướng dẫn thao tác từng bước
 
-* Sau khi thiết lập, kiểm tra lại bằng cách đăng nhập với tài khoản thuộc nhóm quyền vừa tạo.
-* Nếu cần thay đổi, quay lại "Phân quyền" để chỉnh sửa.
+<Steps>
+  <Step>
+    ### Bước 1: Mở danh sách quản lý phân quyền
 
-## 3. Một Số Lưu Ý Quan Trọng
+    1. Từ menu điều hướng bên trái Portal, truy cập **Người dùng** > **Phân quyền**.
+    2. Đường dẫn hiển thị: `Tổng quan / Phân quyền` (URL: `https://app.ods.vn/user/roles`).
+    3. Tại đây hiển thị danh sách các nhóm quyền đã được thiết lập trong hệ thống:
+       - Các cột thông tin: **STT**, **NHÓM QUYỀN** (kèm nút sao chép), **NGÀY TẠO**, **NGÀY CẬP NHẬT**, và **THAO TÁC** (Sửa / Xóa).
+       - Khung tìm kiếm từ khóa giúp tra cứu nhanh nhóm quyền theo tên.
+    4. Nhấn nút **+ THÊM MỚI QUYỀN** (màu xanh lá ở góc trên bên phải) để tạo nhóm quyền mới.
 
-* **Nguyên tắc phân quyền**: Chỉ cấp quyền cần thiết cho người dùng để tránh rủi ro bảo mật.
-* **Quyền quản trị viên**: Nên giới hạn số lượng quản trị viên có toàn quyền trên hệ thống.
-* **Cập nhật quyền thường xuyên**: Khi có thay đổi nhân sự hoặc quy trình làm việc, cần điều chỉnh lại quyền phù hợp.
+    ![Danh sách nhóm quyền người dùng trên Portal ODS](/media/ai-contact-center/user-guider-portal/thiet-lap-phan-quyen_danh-sach.png)
+  </Step>
+
+  <Step>
+    ### Bước 2: Thiết lập thông tin và cấu hình ma trận quyền hạn
+
+    Trong giao diện thiết lập quyền:
+
+    1. **Thông tin cơ bản:**
+       - **Tên nhóm quyền (\*):** Đặt tên rõ ràng theo chức danh hoặc nhiệm vụ (VD: `CSKH_Level_1`, `Supervisor_TongDai`, `KeToan_Cuoc`).
+       - **Mô tả:** Nhập ghi chú về mục đích hoặc phạm vi quyền hạn của nhóm.
+    2. **Cấu hình ma trận quyền hạn:**
+       - Hệ thống liệt kê toàn bộ các phân hệ chức năng (Tổng quan, Tin nhắn, Khách hàng, Tổng đài, Chiến dịch, Cài đặt tổng đài, Người dùng...).
+       - Tích chọn các ô chức năng tương ứng với quyền hạn cần cấp (*Xem, Thêm, Sửa, Xóa, Xuất file, Nghe ghi âm, Tải ghi âm*).
+       - Có thể tích chọn ô *Chọn tất cả* tại từng module nếu muốn cấp toàn quyền cho phân hệ đó.
+    3. Nhấn **Lưu** để hoàn tất việc tạo nhóm quyền.
+  </Step>
+
+  <Step>
+    ### Bước 3: Gán nhóm quyền cho tài khoản người dùng
+
+    Sau khi nhóm quyền được khởi tạo, quản trị viên tiến hành gán nhóm quyền cho nhân sự:
+
+    1. Từ menu bên trái, truy cập **Người dùng** > **Danh sách người dùng** (URL: `https://app.ods.vn/user/users`).
+    2. Tại dòng tài khoản nhân viên cần gán quyền, nhấn nút **Sửa** (icon bút chì) hoặc nhấn **Thêm mới người dùng** nếu tạo tài khoản mới.
+    3. Tại mục **Nhóm quyền (\*):** Nhấp chọn nhóm quyền vừa thiết lập từ danh sách thả xuống.
+    4. Nhấn **Lưu** để cập nhật thông tin tài khoản.
+
+    Chi tiết các bước tạo tài khoản xem tại [Hướng dẫn tạo tài khoản người dùng](./tao-tai-khoan-nguoi-dung).
+  </Step>
+
+  <Step>
+    ### Bước 4: Kiểm tra và xác nhận quyền hạn thực tế
+
+    Sau khi gán nhóm quyền:
+
+    1. Yêu cầu nhân viên đăng nhập vào Portal bằng tài khoản vừa được cấu hình.
+    2. Kiểm tra xác nhận:
+       - Thanh menu bên trái chỉ hiển thị đúng các mục được tích quyền *Xem*.
+       - Các nút chức năng nhạy cảm (*Thêm, Sửa, Xóa, Xuất file*) chỉ xuất hiện khi nhóm quyền có cấp phép.
+       - Khi nhân viên cố ý truy cập trực tiếp bằng URL của chức năng không được cấp quyền, hệ thống sẽ tự động chặn và thông báo từ chối truy cập.
+  </Step>
+</Steps>
+
+---
+
+## 4. Lưu ý quan trọng về an toàn thông tin
+
+<Callout type="warn">
+**Các quy tắc bảo mật bắt buộc:**
+
+1. **Không xóa nhóm quyền đang có tài khoản sử dụng:** Trước khi thực hiện xóa một nhóm quyền, quản trị viên phải chuyển toàn bộ các tài khoản đang gắn với nhóm quyền đó sang một nhóm quyền thay thế khác.
+2. **Kiểm soát quyền Tải file ghi âm & Xuất dữ liệu:** File ghi âm và danh bạ khách hàng chứa dữ liệu bảo mật kinh doanh. Doanh nghiệp chỉ nên cấp quyền *Tải ghi âm* và *Xuất file Excel* cho cấp quản lý để tránh rủi ro lộ lọt dữ liệu khách hàng ra bên ngoài.
+3. **Thu hồi quyền kịp thời:** Khi nhân sự nghỉ việc, chuyển phòng ban hoặc thay đổi phạm vi phụ trách, quản trị viên cần cập nhật lại nhóm quyền ngay lập tức để bảo đảm an toàn hệ thống.
+</Callout>
+
+---
+
+## 5. Xử lý sự cố thường gặp (Troubleshooting)
+
+| Vấn đề phát sinh | Nguyên nhân khả dĩ | Hướng xử lý |
+| :--- | :--- | :--- |
+| **Nhân viên sau khi được cấp quyền mới vẫn không thấy tính năng hiển thị** | Phiên đăng nhập (Session) cũ của người dùng chưa được làm mới để cập nhật token quyền hạn mới. | Yêu cầu nhân viên **Đăng xuất (Logout)** và đăng nhập lại vào Portal ODS, hoặc nhấn tổ hợp phím **Ctrl + F5** để làm mới hoàn toàn bộ nhớ đệm trình duyệt. |
+| **Nhân viên bấm vào phân hệ con bị báo lỗi "Bạn không có quyền truy cập"** | Nhóm quyền mới chỉ được tích chọn quyền thao tác con nhưng chưa được tích chọn quyền **Xem (View)** của phân hệ cha. | Truy cập lại **Người dùng** > **Phân quyền**, nhấn **Sửa** nhóm quyền đó và đảm bảo đã tích chọn quyền Xem cho phân hệ tương ứng. |
+| **Nhóm quyền mới tạo không xuất hiện trong dropdown khi tạo tài khoản người dùng** | Nhóm quyền chưa được lưu thành công hoặc người dùng đang ở chế độ xem của một tổng đài/chi nhánh khác. | Kiểm tra lại bảng danh sách tại trang **Phân quyền** để xác nhận nhóm quyền đã tồn tại, sau đó tải lại trang tạo tài khoản. |

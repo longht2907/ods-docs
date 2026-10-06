@@ -1,89 +1,133 @@
 ---
-title: "Thiết lập tính năng phân tích cuộc gọi"
-description: "Tính năng phân tích cuộc gọi đóng vai trò quan trọng trong việc nâng cao hiệu quả và chất lượng dịch vụ khách hàng. Nhờ khả năng theo dõi, phân tích chi tiết cá..."
+title: "Hướng dẫn cấu hình và sử dụng tính năng phân tích cuộc gọi AI"
+description: "Thiết lập tự động phân tích giọng nói, kịch bản đánh giá chất lượng (Prompt) và theo dõi báo cáo chấm điểm nhân viên bằng AI trên Portal ODS."
 ---
 
-## Giới thiệu tính năng phân tích cuộc gọi
+Tính năng **Phân tích cuộc gọi bằng AI (Voice AI Analytics)** trên tổng đài ODS sử dụng công nghệ nhận diện giọng nói (Speech-to-Text) kết hợp mô hình trí tuệ nhân tạo (AI/LLM) để tự động lắng nghe, bóc tách hội thoại, tóm tắt nội dung và chấm điểm chất lượng cuộc gọi. Giải pháp giúp doanh nghiệp giám sát 100% cuộc gọi mà không cần đội ngũ QA nghe thủ công từng file ghi âm, từ đó chuẩn hóa kỹ năng tư vấn, phát hiện sớm sự cố và nâng cao trải nghiệm khách hàng.
 
-### Mục đích
+---
 
-Tính năng phân tích cuộc gọi đóng vai trò quan trọng trong việc nâng cao hiệu quả và chất lượng dịch vụ khách hàng. Nhờ khả năng theo dõi, phân tích chi tiết các cuộc gọi, doanh nghiệp có thể:
+## 1. Cơ chế hoạt động & Lợi ích vận hành
 
-* Phát hiện những vấn đề trong giao tiếp giữa nhân viên và khách hàng.
-* Đưa ra những cải tiến kịp thời nhằm nâng cao sự hài lòng của khách hàng.
-* Tối ưu hóa quy trình làm việc và phát triển kỹ năng của nhân viên.
+### 4 Giá trị cốt lõi
+- **Giám sát toàn diện 100% cuộc gọi:** Thay thế hoàn toàn phương pháp lấy mẫu kiểm tra thủ công (chỉ 1–3%), loại bỏ rủi ro bỏ sót các cuộc gọi có mâu thuẫn hoặc khiếu nại nghiêm trọng.
+- **Tóm tắt hội thoại đa chiều:** Tách bạch rõ ràng nội dung trao đổi của **Nhân viên** và **Khách hàng** theo 4 phân mục: *Nội dung chính, Thông tin tiếp nhận, Giải pháp tư vấn, và Kết quả chốt cuộc gọi*.
+- **Chấm điểm năng lực khách quan:** Đánh giá tự động theo thang điểm 100 dựa trên 4 tiêu chí cốt lõi: *Thái độ, Tính chuyên nghiệp, Khả năng tương tác, và Năng lực giải quyết vấn đề*.
+- **Báo cáo xu hướng & Đào tạo có mục tiêu:** Hệ thống biểu đồ trực quan giúp cấp quản lý phát hiện ngay nhân viên cần bồi dưỡng kỹ năng hoặc các kịch bản tư vấn đang gặp rào cản.
 
-### Lợi ích
+### Điều kiện tiên quyết
+- Tài khoản quản trị có quyền truy cập vào phân hệ **Cài đặt tổng đài** trên Portal [https://app.ods.vn](https://app.ods.vn).
+- Doanh nghiệp đã kích hoạt gói cước phân tích AI và có số dư thời lượng khả dụng (theo dõi tại badge *Thời gian còn lại*).
+- Đã bật tính năng ghi âm cuộc gọi trên các máy nhánh tiếp nhận và gọi ra.
 
-Tính năng phân tích cuộc gọi mang lại nhiều giá trị thiết thực:
+---
 
-* **Đánh giá chất lượng cuộc gọi**: Cung cấp thông tin chi tiết về nội dung và hiệu quả của từng cuộc gọi.
-* **Chấm điểm hiệu suất nhân viên**: Hỗ trợ người quản lý đo lường mức độ hoàn thành công việc và thái độ phục vụ của nhân viên.
-* **Nâng cao trải nghiệm khách hàng**: Phát hiện và khắc phục nhanh chóng các điểm chưa tốt trong dịch vụ, từ đó xây dựng mối quan hệ tốt đẹp hơn với khách hàng.
+## 2. Bảng tham số thiết lập phân tích cuộc gọi
 
-### Đối tượng sử dụng
+| Tên trường / Tùy chọn | Vị trí khối | Loại điều khiển | Diễn giải & Giá trị khuyến nghị |
+| :--- | :--- | :---: | :--- |
+| **BẬT/TẮT CHỨC NĂNG PHÂN TÍCH** | Khối trạng thái | Toggle TẮT/BẬT | Công tắc chính kích hoạt toàn bộ phân hệ phân tích cuộc gọi bằng AI. |
+| **Thời gian còn lại** | Khối trạng thái | Badge hiển thị | Tổng số dư thời lượng phân tích AI khả dụng của doanh nghiệp (tính bằng giây). |
+| **Thời gian tối thiểu (Giây)** | Thiết lập thời gian | Text Input (Số) | Ngưỡng độ dài tối thiểu của cuộc gọi để đưa vào phân tích (khuyến nghị từ `15` đến `30` giây nhằm loại trừ cuộc gọi nhỡ, máy bận hoặc chưa phát sinh trao đổi). |
+| **Thời gian tối đa (Giây)** | Thiết lập thời gian | Text Input (Số) | Ngưỡng độ dài tối đa được phân tích cho một cuộc gọi (khuyến nghị từ `600` đến `900` giây nhằm tối ưu ngân sách thời lượng AI). |
+| **Bật/tắt phân tích tự động** | Cấu hình theo hướng gọi | Toggle TẮT/BẬT | Tự động kích hoạt AI phân tích ngay sau khi cuộc gọi kết thúc thành công. |
+| **Phân tích cuộc gọi ra** | Cấu hình theo hướng gọi | Toggle TẮT/BẬT | Áp dụng phân tích cho các cuộc gọi đi từ nhân viên đến khách hàng (Telesales, CSKH). |
+| **Phân tích cuộc gọi vào** | Cấu hình theo hướng gọi | Toggle TẮT/BẬT | Áp dụng phân tích cho các cuộc gọi khách hàng gọi vào đầu số hotline. |
+| **Phân tích cuộc gọi nội bộ** | Cấu hình theo hướng gọi | Toggle TẮT/BẬT | Áp dụng phân tích cho các cuộc gọi giữa các máy nhánh nội bộ công ty. |
 
-Tính năng này phù hợp cho các vai trò sau:
+---
 
-* **Người quản lý**: Đánh giá tổng quan về chất lượng dịch vụ và đội ngũ nhân viên.
-* **Trưởng nhóm**: Theo dõi hiệu suất nhóm, đưa ra hướng dẫn và cải thiện kịp thời.
-* **Nhân viên giám sát chất lượng**: Phân tích chi tiết từng cuộc gọi để đảm bảo dịch vụ luôn đạt tiêu chuẩn tốt nhất.
+## 3. Hướng dẫn thao tác từng bước
 
-Với tính năng phân tích cuộc gọi, doanh nghiệp không chỉ đảm bảo dịch vụ chuyên nghiệp mà còn tối ưu hóa trải nghiệm khách hàng, từ đó gia tăng hiệu quả kinh doanh một cách toàn diện.
+<Steps>
+  <Step>
+    ### Bước 1: Kích hoạt tính năng và cài đặt điều kiện lọc cuộc gọi
 
-## Mô tả giải pháp phân tích cuộc gọi và chấm điểm cuộc gọi
+    1. Từ menu bên trái Portal, truy cập **Cài đặt tổng đài** > **Cấu hình phân tích**.
+    2. Hệ thống mặc định mở tab **Cấu hình phân tích** (URL: `https://app.ods.vn/switchboard-setting/analysis-config`).
+    3. Chuyển công tắc **BẬT/TẮT CHỨC NĂNG PHÂN TÍCH:** sang trạng thái **BẬT**. Kiểm tra số dư tại khung *Thời gian còn lại: [Số_giây]*.
+    4. Tại khối **THIẾT LẬP THỜI GIAN PHÂN TÍCH**:
+       - Nhập **Thời gian tối thiểu (Giây):** (VD: `20`).
+       - Nhập **Thời gian tối đa (Giây):** (VD: `600`).
+       - Nhấn nút **CẬP NHẬT** (màu xanh lá) để lưu ngưỡng thời gian.
+    5. Tại khối **CẤU HÌNH THEO HƯỚNG GỌI**:
+       - Bật **Bật/tắt phân tích tự động**.
+       - Lựa chọn các hướng cuộc gọi cần đưa vào phân tích: *Phân tích cuộc gọi ra, Phân tích cuộc gọi vào, Phân tích cuộc gọi nội bộ*.
 
-### 2.1. Giải pháp phân tích cuộc gọi
+    ![Giao diện Cấu hình phân tích trên Portal ODS](/media/ai-contact-center/user-guider-portal/phan-tich-cuoc-goi_tab-cau-hinh.png)
+  </Step>
 
-Hệ thống sử dụng công nghệ phân tích giọng nói (Speech Analytics) kết hợp với các công cụ trí tuệ nhân tạo (AI) để phân tích nội dung cuộc gọi. Dữ liệu thu được bao gồm:
+  <Step>
+    ### Bước 2: Thiết lập Kịch bản phân tích (AI Prompt)
 
-* Thời lượng cuộc gọi.
-* Từ khóa chính được sử dụng trong cuộc trò chuyện.
-* Tông giọng, cảm xúc của cả nhân viên và khách hàng.
-* Mức độ hài lòng của khách hàng dựa trên phản hồi trực tiếp hoặc cảm nhận từ nội dung cuộc gọi.
+    Để AI đánh giá chính xác theo đặc thù ngành nghề của doanh nghiệp:
 
-### 2.2. Quy trình chấm điểm cuộc gọi
+    1. Chuyển sang tab **Kịch bản phân tích** (URL: `https://app.ods.vn/switchboard-setting/analysis-config?tab=promptAnalysis`).
+    2. Chọn kịch bản mong muốn tại ô **Kịch bản sử dụng:** hoặc nhấn nút **THÊM MỚI KỊCH BẢN PHÂN TÍCH** ở góc trên bên phải.
+    3. Định nghĩa tiêu chuẩn chấm điểm, từ khóa bắt buộc/nhạy cảm và cấu trúc câu hỏi phản hồi theo từng nghiệp vụ (Bán hàng, Hỗ trợ kỹ thuật, Thu hồi nợ hoặc Chăm sóc VIP).
+    4. Bảng danh sách kịch bản hiển thị: **STT**, **TIÊU ĐỀ KỊCH BẢN**, **NỘI DUNG KỊCH BẢN** và các nút **THAO TÁC** (sửa/xóa).
 
-* **Ghi âm cuộc gọi**: Mọi cuộc gọi giữa nhân viên và khách hàng được ghi âm lại để phục vụ quá trình phân tích.
-* **Phân tích nội dung**: Hệ thống tự động xử lý và trích xuất thông tin quan trọng từ file ghi âm.
-* **Chấm điểm**: Các cuộc gọi được chấm điểm dựa trên các tiêu chí:
-  * Mức độ giải đáp đầy đủ câu hỏi của khách hàng.
-  * Thái độ và tông giọng của nhân viên.
-  * Thời gian xử lý cuộc gọi.
-  * Khả năng giải quyết vấn đề và tương tác của nhân viên.
-* **Báo cáo kết quả**: Hệ thống đưa ra bản phân tích cuộc gọi của Nhân Viên và Khách Hàng. Từ đó đánh giá được năng chung năng lực của nhân viên thông qua từng cuộc gọi.
+    ![Giao diện Kịch bản phân tích AI](/media/ai-contact-center/user-guider-portal/phan-tich-cuoc-goi_tab-kich-ban.png)
+  </Step>
 
-## Hướng dẫn sử dụng tính năng phân tích cuộc gọi
+  <Step>
+    ### Bước 3: Tra cứu lịch sử phân tích và xem chi tiết cuộc gọi
 
-### Bước 1: Thiết lập cấu hình phân tích
+    Quản trị viên có thể theo dõi kết quả phân tích theo 2 cách:
 
-* Đăng nhập vào giao diện quản lý hệ thống: Mục Cài đặt tổng đài => Cấu hình phân tích\
-  ![](/media/ai-contact-center/user-guider-portal/img-b64rTAbQ2gyFksOJolAC.png)
+    - **Cách 1 - Xem tại tab Lịch sử phân tích:**
+      Chuyển sang tab **Lịch sử phân tích** (URL: `https://app.ods.vn/switchboard-setting/analysis-config?tab=historyAnalysis`). Tại đây theo dõi nhật ký các cuộc gọi đã được AI xử lý: **MÃ CUỘC GỌI**, **NỘI DUNG**, **THỜI GIAN BAN ĐẦU**, **THỜI GIAN PHÂN TÍCH**, **THỜI GIAN CÒN LẠI**, và **NGÀY PHÂN TÍCH**.
 
-### Bước 2: Lựa chọn cuộc gọi cần phân tích
+      ![Giao diện Lịch sử phân tích cuộc gọi](/media/ai-contact-center/user-guider-portal/phan-tich-cuoc-goi_tab-lich-su.png)
 
-* Trong giao diện Nhật ký cuộc gọi, danh sách các cuộc gọi sẽ được hiển thị dưới dạng bảng
-* Sử dụng bộ lọc để tìm kiếm cuộc gọi cần phân tích, bao gồm:
-  * Thời gian: Lọc theo ngày, tuần, hoặc tháng.
-  * Nhóm nhân viên: Chọn nhóm hoặc cá nhân cụ thể.
-  * Hướng cuộc gọi: hướng cuộc gọi vào/ra/gọi nội bộ
-* Chọn cuộc gọi cụ thể từ danh sách để xem phân tích.<br />
+    - **Cách 2 - Xem trực tiếp trong Nhật ký cuộc gọi:**
+      1. Vào menu **Tổng đài** > **Lịch sử cuộc gọi** > tab **Nhật ký cuộc gọi**.
+      2. Tại dòng cuộc gọi muốn xem, nhấn vào biểu tượng **Phân tích** (icon biểu đồ cột màu xanh lá) ở cột **THAO TÁC**.
+      3. Cửa sổ popup **PHÂN TÍCH CUỘC GỌI** hiển thị:
+         - **Header:** Thông tin khách hàng, Điểm số cuộc gọi tổng quát (thang 100), nút **Nghe ghi âm**, và nhận xét **Đánh giá chung**.
+         - **Tab Bảng phân tích cuộc gọi:** Bóc tách song song nội dung của *Nhân Viên* và *Khách hàng* theo 4 khía cạnh: *Nội dung cuộc gọi, Thông tin cuộc gọi, Giải pháp tư vấn, Kết quả cuộc gọi*.
+         - **Tab Đánh giá năng lực nhân viên:** Chấm điểm chi tiết các tiêu chuẩn nghiệp vụ.
 
-  ![](/media/ai-contact-center/user-guider-portal/img-AryASKNAq0OzEqdua54f.png)
+      ![Popup chi tiết phân tích cuộc gọi và đánh giá năng lực](/media/ai-contact-center/user-guider-portal/phan-tich-cuoc-goi_chi-tiet-cuoc-goi.png)
+  </Step>
 
-### Bước 3: Xem chi tiết và phân tích cuộc gọi
+  <Step>
+    ### Bước 4: Theo dõi báo cáo thống kê năng lực nhân viên
 
-* **Nghe lại ghi âm**: Nhấp vào biểu tượng phát để nghe lại cuộc gọi.
-* **Xem nội dung phân tích**:
-  * Nội dung cuộc gọi: Tóm tắt được nội dung chính cuộc gọi của nhân viên và khách hàng
-  * Thông tin cuộc gọi: Hiện thị được thông tin cuộc gọi
-  * Kết quả cuộc gọi: kết luận được nội dụng cuộc gọi
-* **Chấm điểm tự động**: Hệ thống sẽ đưa ra điểm số dựa trên các tiêu chí như tuân thủ quy trình, thái độ, và thời gian xử lý để đánh giá năng lực của nhân viên<br />
+    Để đánh giá tổng quan và so sánh chất lượng giữa các nhân viên trong đội ngũ:
 
-  ![](/media/ai-contact-center/user-guider-portal/img-De9oemCM2N7sfaszfTu1.png)
+    1. Từ menu bên trái, truy cập **Tổng đài** > **Thống kê** > **Nhân viên**.
+    2. Chuyển sang tab **Phân tích cuộc gọi**.
+    3. Lọc theo khoảng thời gian (*Hôm nay, 7 ngày qua, 30 ngày qua...*) và hướng cuộc gọi cần xem.
+    4. Hệ thống vẽ biểu đồ cột trực quan thể hiện 5 chỉ số cốt lõi:
+       - **Thái độ:** Mức độ hòa nhã, lịch sự và tôn trọng khách hàng.
+       - **Chuyên nghiệp:** Mức độ nắm vững nghiệp vụ và giải thích rõ ràng.
+       - **Tương tác:** Khả năng lắng nghe, phản hồi linh hoạt và giữ nhịp hội thoại.
+       - **Giải quyết vấn đề:** Mức độ thỏa đáng khi xử lý vướng mắc của khách hàng.
+       - **Điểm trung bình:** Điểm số tổng hợp phản ánh năng lực toàn diện của nhân viên.
 
-### Bước 4: Tạo báo cáo và thống kê
+    ![Biểu đồ thống kê phân tích cuộc gọi theo nhân viên](/media/ai-contact-center/user-guider-portal/phan-tich-cuoc-goi_bieu-do-thong-ke.png)
+  </Step>
+</Steps>
 
-Hệ thống có phép thống kê điểm số trung bình của từng nhân viên theo thời gian hoặc hướng cuộc gọi khác nhau. Từ đó có thể đánh giá được năng lực của nhân viên.
+---
 
-![](/media/ai-contact-center/user-guider-portal/img-QpFgj9tMIoCHusJ2hFgE.png)
+## 4. Lưu ý quan trọng khi vận hành
+
+<Callout type="warn">
+**Các điểm cốt lõi cần lưu ý về phân tích AI:**
+
+1. **Quản lý quỹ thời lượng AI:** Tính năng phân tích AI khấu trừ thời lượng theo số giây đàm thoại thực tế của cuộc gọi. Quản trị viên cần thường xuyên theo dõi số dư tại mục **Thời gian còn lại** và cấu hình khoảng thời gian tối đa hợp lý để tránh gián đoạn dịch vụ khi hết hạn mức.
+2. **Chất lượng file ghi âm:** Độ chính xác của việc bóc tách giọng nói (Speech-to-Text) và chấm điểm phụ thuộc lớn vào chất lượng âm thanh. Khuyến khích nhân viên sử dụng tai nghe có mic chống ồn chuyên dụng và đảm bảo đường truyền mạng không bị trễ/mất gói.
+3. **Độ trễ xử lý bất đồng bộ:** Sau khi cuộc gọi kết thúc, hệ thống AI cần từ vài giây đến 1–2 phút (tùy thuộc vào thời lượng cuộc gọi) để hoàn tất quy trình chuyển âm thanh thành văn bản và phân tích dữ liệu.
+</Callout>
+
+---
+
+## 5. Xử lý sự cố thường gặp (Troubleshooting)
+
+| Vấn đề phát sinh | Nguyên nhân khả dĩ | Hướng xử lý |
+| :--- | :--- | :--- |
+| **Cuộc gọi kết thúc nhưng không có biểu tượng phân tích trong Nhật ký cuộc gọi** | 1. Thời lượng cuộc gọi ngắn hơn mức **Thời gian tối thiểu** hoặc dài hơn mức **Thời gian tối đa** đã cài đặt.<br />2. Hướng cuộc gọi đó (Gọi vào/Gọi ra/Nội bộ) chưa được bật công tắc phân tích.<br />3. Quỹ **Thời gian còn lại** đã hết (0 giây). | 1. Kiểm tra lại tab **Cấu hình phân tích**, đối chiếu thời lượng cuộc gọi với cài đặt thời gian tối thiểu/tối đa.<br />2. Bật công tắc tương ứng trong khối **CẤU HÌNH THEO HƯỚNG GỌI**.<br />3. Liên hệ nhà cung cấp ODS để nạp thêm gói thời lượng phân tích AI. |
+| **Điểm số AI đánh giá chưa sát với quy chuẩn của doanh nghiệp** | Kịch bản phân tích (Prompt) đang để mặc định, chưa được tùy chỉnh theo bộ tiêu chuẩn chấm điểm và thuật ngữ ngành của doanh nghiệp. | Truy cập tab **Kịch bản phân tích**, nhấn **THÊM MỚI KỊCH BẢN PHÂN TÍCH** hoặc chỉnh sửa kịch bản đang dùng để bổ sung các tiêu chí đánh giá, từ khóa bắt buộc/cấm kỵ. |
+| **Nội dung hội thoại bị nhận diện sai hoặc tóm tắt thiếu ý** | Chất lượng âm thanh file ghi âm bị rè, tiếng ồn môi trường lớn hoặc nhân viên nói quá nhanh/nói chen ngang khách hàng. | Kiểm tra thiết bị tai nghe/micro của nhân viên, nhắc nhở nhân viên duy trì tốc độ nói vừa phải và lắng nghe khách hàng trọn vẹn trước khi phản hồi. |

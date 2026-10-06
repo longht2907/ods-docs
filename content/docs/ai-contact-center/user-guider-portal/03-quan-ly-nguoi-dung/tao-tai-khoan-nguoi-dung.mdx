@@ -1,60 +1,119 @@
 ---
-title: "Tạo tài khoản người dùng"
-description: "Tạo tài khoản Portal, gán tổng đài và nhóm quyền phù hợp để nhân sự bắt đầu sử dụng AI Contact Center an toàn."
+title: "Hướng dẫn tạo và quản lý tài khoản người dùng"
+description: "Tạo tài khoản Portal ODS, gán tổng đài, số máy nhánh, nhóm quyền và kích hoạt bảo mật xác thực hai lớp (2FA/OTP)."
 ---
 
-<Callout title="Kết quả sau khi hoàn thành" type="info">
-Bạn có một tài khoản Portal mới, được gắn với đúng tổng đài và nhóm quyền để sẵn sàng đăng nhập sử dụng.
+Tính năng **Quản lý người dùng** trên Portal ODS cho phép người quản trị cấp mới, phân bổ máy nhánh và phân quyền tài khoản cho từng nhân sự trong doanh nghiệp. Mỗi nhân viên được cấp một tài khoản đăng nhập độc lập tương ứng với vai trò công việc (Agent, Supervisor, Admin), hỗ trợ kích hoạt xác thực hai lớp (2FA qua OTP Email) nhằm đảm bảo an toàn dữ liệu và truy vết chính xác mọi thao tác trên hệ thống.
+
+---
+
+## 1. Cơ chế hoạt động & Điều kiện tiên quyết
+
+### Mục đích vận hành
+- **Cấp phát quyền truy cập độc lập:** Đảm bảo mỗi nhân sự chỉ thao tác trên đúng phân hệ chức năng thuộc thẩm quyền được giao.
+- **Liên kết tài nguyên viễn thông:** Ghép nối tài khoản người dùng với số máy nhánh (Extension) để nhân viên có thể tiếp nhận cuộc gọi vào và thực hiện cuộc gọi ra.
+
+### Điều kiện tiên quyết
+- Đăng nhập bằng tài khoản có quyền Quản trị viên (**Administrator**) trên Portal [https://app.ods.vn](https://app.ods.vn).
+- Đã chuẩn bị sẵn các [Nhóm quyền](./thiet-lap-phan-quyen) phù hợp với vai trò của nhân sự mới.
+- Đã khởi tạo các [Máy nhánh nhân viên](/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/tao-cau-hinh-may-nhanh) nếu nhân viên trực tiếp nghe/gọi điện thoại.
+
+---
+
+## 2. Bảng tham số thiết lập tài khoản người dùng
+
+Trong cửa sổ tạo mới người dùng, quản trị viên điền các thông tin theo bảng quy chuẩn dưới đây:
+
+| Tên trường | Bắt buộc | Loại trường | Diễn giải & Quy cách nhập |
+| :--- | :---: | :---: | :--- |
+| **Tên người dùng** | **Có** | Text Input | Họ và tên đầy đủ của nhân sự (VD: `Nguyễn Văn A`). |
+| **Tên tài khoản** | **Có** | Text Input | Tên đăng nhập vào Portal ODS, viết liền không dấu (VD: `anguyen`, `cskh_01`). |
+| **Mật khẩu** | **Có** | Password | Mật khẩu khởi tạo ban đầu (khuyến nghị tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường và chữ số). |
+| **Xác nhận mật khẩu** | **Có** | Password | Nhập lại chính xác mật khẩu khởi tạo ở trên để tránh gõ nhầm. |
+| **Máy nhánh hiển thị** | Không | Text Input | Danh sách máy nhánh hiển thị lịch sử cuộc gọi trên tài khoản. |
+| **Danh sách hiển thị GSM** | Không | Text Input | Danh sách đầu số GSM được phép hiển thị khi nhân viên thực hiện cuộc gọi ra. |
+| **Email gửi thông tin OTP** | Tùy chọn | Email Input | Địa chỉ email công việc nhận mã xác thực OTP khi người dùng đăng nhập. |
+| **Bật xác thực 2 lớp OTP** | Tùy chọn | Checkbox | Tích chọn để kích hoạt cơ chế bắt buộc nhập mã OTP khi đăng nhập. |
+| **Tổng đài** | **Có** | Dropdown | Chọn hệ thống tổng đài mà người dùng trực thuộc (VD: `103.129.90.242 \| CF-P0000193`). |
+| **Số máy nhánh** | Tùy chọn | Dropdown | Chọn extension cấp cho nhân viên để nghe/gọi trên giao diện web hoặc softphone. |
+| **Nhóm quyền** | **Có** | Dropdown | Chọn nhóm vai trò tương ứng với trách nhiệm công việc (VD: `CSKH`, `Supervisor`). |
+
+---
+
+## 3. Hướng dẫn thao tác từng bước
+
+<Steps>
+  <Step>
+    ### Bước 1: Mở danh sách quản lý người dùng
+
+    1. Từ menu điều hướng bên trái Portal, truy cập **Người dùng** > **Danh sách người dùng**.
+    2. Đường dẫn hiển thị: `Tổng quan / Danh sách người dùng` (URL: `https://app.ods.vn/user/list-user`).
+    3. Bảng danh sách hiển thị toàn bộ người dùng hiện có:
+       - Các cột thông tin: **STT**, **TÊN NGƯỜI DÙNG**, **TÊN ĐĂNG NHẬP**, **NHÓM QUYỀN**, **NGÀY TẠO**, và **THAO TÁC**.
+       - Khung tìm kiếm từ khóa và bộ lọc nhóm quyền giúp tra cứu nhanh tài khoản.
+    4. Nhấn nút **+ THÊM MỚI NGƯỜI DÙNG** (màu xanh lá ở góc trên bên phải).
+
+    ![Bảng danh sách người dùng trên Portal ODS](/media/ai-contact-center/user-guider-portal/quan-ly-nguoi-dung_danh-sach.png)
+  </Step>
+
+  <Step>
+    ### Bước 2: Nhập thông tin tài khoản và cấu hình bảo mật
+
+    Trong cửa sổ popup **THÊM MỚI NGƯỜI DÙNG**:
+
+    1. **Thông tin đăng nhập cơ bản:**
+       - Nhập **Tên người dùng** (họ tên nhân sự).
+       - Nhập **Tên tài khoản** (tên dùng để đăng nhập).
+       - Nhập **Mật khẩu** và **Xác nhận mật khẩu**.
+    2. **Cấu hình bảo mật nâng cao:**
+       - Nhập **Email gửi thông tin OTP** (email công việc của nhân viên).
+       - Tích chọn ô **Bật xác thực 2 lớp OTP** để bảo vệ tài khoản khi đăng nhập từ thiết bị lạ.
+    3. **Gán tài nguyên tổng đài & nhóm quyền:**
+       - Chọn **Tổng đài** trực thuộc của doanh nghiệp.
+       - Chọn **Số máy nhánh** cấp cho nhân viên (nếu có).
+       - Chọn **Nhóm quyền** đúng với vị trí công việc.
+    4. Nhấn nút **+ THÊM MỚI** (màu xanh lá) để hoàn tất.
+
+    ![Modal thêm mới người dùng](/media/ai-contact-center/user-guider-portal/quan-ly-nguoi-dung_form-them-moi.png)
+  </Step>
+
+  <Step>
+    ### Bước 3: Nhập danh sách người dùng hàng loạt từ Excel (Import)
+
+    Trường hợp doanh nghiệp cần khởi tạo số lượng lớn tài khoản nhân sự cùng lúc:
+
+    1. Tại giao diện Danh sách người dùng, nhấn nút **Download file excel mẫu** (nút màu cam vàng) để tải file mẫu chuẩn về máy tính.
+    2. Mở file mẫu và điền đầy đủ các thông tin: *Họ tên, Tên đăng nhập, Mật khẩu, Email nhận OTP, Số máy nhánh, và Nhóm quyền*.
+    3. Nhấn nút **Nhập dữ liệu từ excel** (nút màu tím), chọn file bảng tính vừa chuẩn bị để hệ thống tự động xử lý tạo tài khoản hàng loạt.
+  </Step>
+
+  <Step>
+    ### Bước 4: Kiểm tra và bàn giao tài khoản
+
+    1. Xác nhận tài khoản mới xuất hiện trong bảng danh sách tại `Người dùng` > `Danh sách người dùng`.
+    2. Bàn giao Tên đăng nhập và Mật khẩu khởi tạo cho nhân sự.
+    3. Hướng dẫn nhân sự truy cập cổng [https://app.ods.vn](https://app.ods.vn) để đăng nhập, nhập mã OTP gửi về email (nếu bật 2FA) và chủ động thay đổi mật khẩu cá nhân trong lần đăng nhập đầu tiên.
+  </Step>
+</Steps>
+
+---
+
+## 4. Lưu ý quan trọng khi vận hành
+
+<Callout type="warn">
+**Các quy tắc vận hành cần tuân thủ:**
+
+1. **Không dùng chung tài khoản:** Mỗi nhân sự bắt buộc phải sử dụng một tài khoản độc lập để đảm bảo tính minh bạch khi tra cứu lịch sử cuộc gọi và đo lường KPI cá nhân.
+2. **Tương thích giữa Máy nhánh và Nhóm quyền:** Một tài khoản có thể không gán máy nhánh (ví dụ tài khoản Kế toán chỉ xem cước), nhưng tài khoản của điện thoại viên (Agent) bắt buộc phải được gán đúng số máy nhánh để nhận diện được cuộc gọi trong hệ thống.
+3. **Chính sách mật khẩu & 2FA:** Tuyệt đối không đặt mật khẩu mặc định dễ đoán. Đối với các tài khoản thuộc nhóm Quản trị viên (**Admin**) hoặc Giám sát (**Supervisor**), khuyến nghị bắt buộc kích hoạt tính năng **Bật xác thực 2 lớp OTP** để phòng ngừa rủi ro an ninh mạng.
 </Callout>
 
-## Mục tiêu
+---
 
-Mỗi nhân sự cần một tài khoản riêng để truy cập đúng chức năng theo vai trò. Không dùng chung tài khoản vì sẽ khó kiểm soát quyền truy cập và truy vết thao tác khi có sự cố.
+## 5. Xử lý sự cố thường gặp (Troubleshooting)
 
-## Trước khi bắt đầu
-
-- Đăng nhập bằng tài khoản có quyền quản lý người dùng.
-- Xác định tổng đài, số máy nhánh và nhóm quyền của nhân sự mới.
-- Chuẩn bị địa chỉ email nếu doanh nghiệp sử dụng xác thực hai lớp (2FA).
-
-## Các bước thực hiện
-
-### Bước 1: Mở danh sách người dùng
-
-1. Đăng nhập vào giao diện quản trị tổng đài.
-2. Trên menu bên trái, chọn `Người dùng` → `Danh sách người dùng`.
-3. Chọn `Thêm mới người dùng` ở góc phải màn hình.
-
-### Bước 2: Nhập thông tin tài khoản
-
-Trong cửa sổ tạo mới, nhập các trường sau:
-
-| Trường | Cách nhập |
-| --- | --- |
-| `Tên người dùng` (bắt buộc) | Họ và tên đầy đủ của nhân sự. |
-| `Tên tài khoản` (bắt buộc) | Tên dùng để đăng nhập Portal. |
-| `Mật khẩu` và `Xác nhận mật khẩu` (bắt buộc) | Nhập cùng một mật khẩu cho tài khoản mới. |
-| `Danh sách hiển thị GSM` | Chọn số điện thoại hoặc danh sách hiển thị khi có yêu cầu. |
-| `Email gửi thông tin OTP` | Email nhận mã xác thực khi bật 2FA. |
-| `Bật xác thực 2 lớp OTP` | Bật để tăng lớp bảo vệ cho tài khoản. |
-| `Tổng đài` (bắt buộc) | Chọn tổng đài mà người dùng sẽ sử dụng. |
-| `Số máy nhánh` | Chọn extension đã cấp cho nhân sự, nếu có. |
-| `Nhóm quyền` (bắt buộc) | Chọn nhóm quyền đúng với vai trò công việc. |
-
-### Bước 3: Lưu tài khoản
-
-Kiểm tra lại thông tin, đặc biệt là `Tổng đài`, `Số máy nhánh` và `Nhóm quyền`, sau đó lưu tài khoản.
-
-## Kiểm tra kết quả
-
-Sau khi lưu, xác nhận ba điều kiện:
-
-- Tài khoản mới xuất hiện trong danh sách người dùng.
-- Người dùng đăng nhập được bằng thông tin đã cấp.
-- Người dùng chỉ nhìn thấy và thao tác được các chức năng thuộc nhóm quyền đã chọn.
-
-Nếu một trong các điều kiện chưa đạt, kiểm tra lại trạng thái tài khoản, tổng đài được gán và cấu hình nhóm quyền.
-
-## Bước tiếp theo
-
-Tiếp tục với [Thiết lập phân quyền người dùng](./thiet-lap-phan-quyen) để rà soát chi tiết quyền truy cập theo vai trò.
+| Vấn đề phát sinh | Nguyên nhân khả dĩ | Hướng xử lý |
+| :--- | :--- | :--- |
+| **Nhân viên đăng nhập báo sai tài khoản hoặc mật khẩu** | 1. Tên tài khoản nhập sai ký tự hoặc viết hoa không đúng.<br />2. Mật khẩu khởi tạo nhập nhầm ký tự đặc biệt. | Quản trị viên truy cập **Người dùng** > **Danh sách người dùng**, nhấn nút **Sửa** (icon bút chì) tại dòng tài khoản đó để nhập lại mật khẩu mới cho nhân sự. |
+| **Không nhận được mã xác thực OTP qua Email khi đăng nhập** | 1. Địa chỉ email nhập trong hồ sơ tài khoản bị sai chính tả.<br />2. Hộp thư doanh nghiệp lọc email chứa OTP vào thư mục Spam / Rác. | Kiểm tra thư mục Spam trong hộp thư; nếu địa chỉ email sai, quản trị viên mở hồ sơ tài khoản để chỉnh sửa lại đúng email nhận OTP. |
+| **Đăng nhập thành công nhưng không thực hiện được cuộc gọi** | Tài khoản chưa được gán **Số máy nhánh**, hoặc máy nhánh đó chưa được đăng ký (Register) thành công trên thiết bị IP Phone / Softphone của nhân viên. | 1. Kiểm tra lại hồ sơ tài khoản xem đã chọn số máy nhánh chưa.<br />2. Hướng dẫn nhân viên kiểm tra trạng thái kết nối mạng của phần mềm gọi điện (Softphone). |

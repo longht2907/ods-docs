@@ -1,4 +1,5 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
+import { Callout } from 'fumadocs-ui/components/callout';
 import { Card as FumadocsCard } from 'fumadocs-ui/components/card';
 import * as TabsComponents from 'fumadocs-ui/components/tabs';
 import * as StepsComponents from 'fumadocs-ui/components/steps';
@@ -23,6 +24,7 @@ import {
   ApiReferenceLayout,
   ApiReferenceMain,
 } from '@/components/docs/api-reference-layout';
+import { CustomerFlowDiagram } from '@/components/docs/customer-flow-diagram';
 import { DocsProductDirectory } from '@/components/docs/docs-product-directory';
 
 const cardIcons = {
@@ -56,11 +58,13 @@ export function getMDXComponents(components?: MDXComponents) {
     ...defaultMdxComponents,
     ...TabsComponents,
     ...StepsComponents,
+    Callout,
     Card,
     ApiReferenceLayout,
     ApiReferenceMain,
     ApiReferenceCode,
     DocsProductDirectory,
+    CustomerFlowDiagram,
     ...components,
   } satisfies MDXComponents;
 }

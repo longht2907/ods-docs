@@ -1,38 +1,118 @@
 ---
-title: "Thống kê - báo cáo cuộc gọi"
-description: "Giao diện portal quản trị hệ thống Matbao One cho phép người quản trị có thể dễ dàng xem, thống kê, truy xuất và báo cáo cuộc gọi trên hệ thống của mình."
+title: "Hướng dẫn thống kê và báo cáo cuộc gọi tổng đài"
+description: "Theo dõi số lượng cuộc gọi đến/đi/nhỡ, đo lường hiệu suất nhân viên và phân tích sản lượng theo nhóm trên Portal ODS."
 ---
 
-Giao diện portal quản trị hệ thống Matbao One cho phép người quản trị có thể dễ dàng xem, thống kê, truy xuất và báo cáo cuộc gọi trên hệ thống của mình.
+Phân hệ **Thống kê - Báo cáo cuộc gọi** trên Portal ODS cung cấp bức tranh toàn diện về lưu lượng viễn thông và hiệu suất vận hành của tổng đài doanh nghiệp. Thông qua hệ thống biểu đồ trực quan và bảng số liệu đa chiều, người quản trị có thể theo dõi tỷ lệ bắt máy, sản lượng cuộc gọi theo khung giờ, đánh giá năng suất làm việc của từng nhân viên/nhóm nghiệp vụ, và xuất báo cáo Excel phục vụ phân tích KPI định kỳ.
 
-Người dùng có thể thống kê được cuộc gọi cuộc gọi: đi/đến nhỡ. Hay số lượng cuộc gọi của từng nhân viên/nhóm nhân viên trên hệ thống và thống kê được cước cuộc gọi theo từng đầu số hay theo từng nhân viên với thời gian cụ thể
+---
 
-Để xem lại thống kê trên hệ thống, người dùng truy cập vào Mục **Tổng đài => Thống kê**
+## 1. Cơ chế hoạt động & Các chiều báo cáo
 
-![](/media/ai-contact-center/user-guider-portal/img-UnaqdRRFtFnMcqbnFani.png)
+Hệ thống phân chia báo cáo thống kê thành 4 góc nhìn chuyên biệt:
 
-## Cuộc gọi
+- **Báo cáo Cuộc gọi:** Thống kê tổng thể số lượng cuộc gọi đến, cuộc gọi đi và cuộc gọi nhỡ theo từng ngày hoặc khoảng thời gian.
+- **Báo cáo Theo nhân viên:** Đo lường số lượng cuộc gọi, tổng thời gian đàm thoại, thời lượng đàm thoại trung bình và điểm số đánh giá AI của từng nhân viên.
+- **Báo cáo Theo nhóm nhân viên:** Đánh giá năng lực tiếp nhận cuộc gọi của từng phòng ban hoặc hàng đợi chuyên trách (CSKH, Kinh doanh, Kỹ thuật).
+- **Báo cáo Cước phí:** Quản lý chi tiết chi phí cuộc gọi theo từng đầu số hotline hoặc theo từng nhân viên (nội mạng, liên tỉnh, di động).
 
-Cho phép người dùng thống kê được số lượng cuộc gọi: đi – đến – nhỡ trên hệ thống với các điều kiện thời gian khác nhau
+### Đối tượng áp dụng
+- **Quản trị viên hệ thống (Admin):** Giám sát toàn bộ năng lực tiếp nhận của hệ thống tổng đài; hoạch định tài nguyên đầu số và kênh thoại.
+- **Giám sát tổng đài (Supervisor):** Theo dõi chỉ số vận hành hàng ngày, phát hiện tình trạng quá tải hoặc tỷ lệ nhỡ cao để điều phối nhân sự trực máy.
+- **Trưởng bộ phận CSKH / Telesales:** Đánh giá năng suất, hiệu quả tư vấn và xếp hạng KPI của từng nhân viên trong đội ngũ.
 
-![](/media/ai-contact-center/user-guider-portal/img-uiD3iI0NWLOboCjz2Wlf.png)
+---
 
-## Theo nhân viên
+## 2. Bảng chỉ số đo lường hiệu suất (Call Center Metrics)
 
-Cho phép thống kê theo số lượng cuộc gọi, theo thời gian và đánh giá cuộc gọi của từng nhân viên trên hệ thống tổng đài
+| Chỉ số | Cách tính & Diễn giải | Tác động vận hành |
+| :--- | :--- | :--- |
+| **Cuộc gọi đến** | Tổng số cuộc gọi từ khách hàng gọi vào các đầu số hotline của doanh nghiệp. | Phản ánh nhu cầu liên hệ và lưu lượng cuộc gọi theo từng thời điểm. |
+| **Cuộc gọi đi** | Tổng số cuộc gọi do nhân viên chủ động thực hiện từ tổng đài ra bên ngoài. | Đánh giá mức độ chủ động tiếp cận của đội ngũ Bán hàng / CSKH. |
+| **Cuộc gọi nhỡ** | Số cuộc gọi vào nhưng khách hàng gác máy khi đang đổ chuông hoặc khi đang chờ trong hàng đợi. | Cảnh báo nguy cơ mất khách hàng, thiếu hụt nhân sự trực hoặc thời gian chờ quá lâu. |
+| **Trả lời** | Số cuộc gọi kết nối thành công và có phát sinh đàm thoại giữa nhân viên và khách hàng. | Căn cứ xác định tỷ lệ phục vụ thành công (Answer Rate). |
+| **Không bắt máy** | Cuộc gọi đổ chuông đến hết thời gian quy định nhưng nhân viên hoặc khách hàng không nhấc máy. | Đánh giá kỷ luật trực máy của nhân viên hoặc tỷ lệ tiếp cận khách hàng. |
+| **Máy bận** | Cuộc gọi không thể kết nối do đầu số hoặc máy nhánh đang bận cuộc gọi khác. | Nhận biết tình trạng nghẽn kênh hoặc cần mở rộng số lượng máy nhánh trực. |
+| **Không kết nối** | Cuộc gọi lỗi do sự cố mạng viễn thông, số thuê bao không tồn tại hoặc nghẽn mạch. | Đánh giá chất lượng dữ liệu số điện thoại và đường truyền nhà mạng. |
 
-Ngoài ra cho phép thống kế số lượng cuộc gọi của từng nhân viên theo các hướng cuộc gọi khác nhau
+---
 
-![](/media/ai-contact-center/user-guider-portal/img-FUGOZJ9FhCvnhWz6Nv8K.png)
+## 3. Hướng dẫn thao tác từng bước
 
-## Theo nhóm nhân viên
+<Steps>
+  <Step>
+    ### Bước 1: Tra cứu Thống kê cuộc gọi tổng thể (Đến - Đi - Nhỡ)
 
-Hệ thống cho phép thông kê số lượng cuộc gọi theo từng nhóm nhân viên khác nhau với các hướng cuộc gọi hay trạng thái cuộc gọi khác nhau trên hệ thống nhằm giúp người quản trị giám sát được cuộc gọi của nhóm nhân viên
+    1. Từ menu bên trái Portal, truy cập **Tổng đài** > **Thống kê** > **Cuộc gọi**.
+    2. Đường dẫn hiển thị: `Tổng quan / Thống kê / Cuộc gọi` (URL: `https://app.ods.vn/call`).
+    3. Chọn khoảng thời gian cần thống kê: *Hôm nay, 7 ngày qua, 30 ngày qua* hoặc tùy chọn khoảng ngày cụ thể.
+    4. Theo dõi dữ liệu:
+       - **Biểu đồ thống kê cuộc gọi:** Thể hiện trực quan theo từng ngày với 3 cột màu sắc: Cuộc gọi đến (xanh dương), Cuộc gọi đi (xanh lá), Cuộc gọi nhỡ (vàng cam).
+       - **Danh sách thống kê cuộc gọi:** Bảng dữ liệu chi tiết gồm các cột: **STT**, **THỜI GIAN**, **CUỘC GỌI ĐẾN**, **CUỘC GỌI ĐI**, và **CUỘC GỌI NHỠ**.
+    5. Nhấn nút **Xuất excel** ở góc phải bảng để tải file báo cáo tổng hợp.
 
-![](/media/ai-contact-center/user-guider-portal/img-E4rnVNUxnZ4JqKcru5tV.png)
+    ![Báo cáo thống kê cuộc gọi tổng quan](/media/ai-contact-center/user-guider-portal/thong-ke-cuoc-goi_tong-quan.png)
+  </Step>
 
-## Theo cước
+  <Step>
+    ### Bước 2: Báo cáo hiệu suất theo từng nhân viên
 
-Hệ thống cho phép thống kê cước phí cuộc gọi của từng đầu số hay từng nhân viên trên hệ thống nhằm quản lý và giám sát được chi phí cuộc gọi của đầu số và nhân viên
+    1. Từ menu bên trái Portal, chọn **Tổng đài** > **Thống kê** > **Nhân viên**.
+    2. Đường dẫn hiển thị: `Tổng quan / Thống kê / Nhân viên` (URL: `https://app.ods.vn/report/employee`).
+    3. Khám phá các góc nhìn qua các tab chức năng:
+       - **Tab Theo số lượng cuộc gọi:** So sánh tổng sản lượng của các nhân viên qua các cột: **NHÂN VIÊN**, **TỔNG CUỘC GỌI**, **TRẢ LỜI**, **KHÔNG BẮT MÁY**, **KHÔNG KẾT NỐI**, **MÁY BẬN**.
+       - **Tab Theo thời gian gọi:** Đánh giá tổng thời gian đàm thoại và thời lượng gọi trung bình của từng điện thoại viên.
+       - **Tab Phân tích cuộc gọi:** Xem điểm số đánh giá AI về thái độ, tính chuyên nghiệp, tương tác và giải quyết vấn đề.
+    4. Sử dụng bộ lọc khoảng thời gian và dropdown **Tất cả hướng gọi** (`Gọi vào`, `Gọi ra`) để lọc dữ liệu theo đúng nghiệp vụ.
+    5. Nhấn **Xuất excel** để tải báo cáo năng suất nhân viên.
 
-![](/media/ai-contact-center/user-guider-portal/img-GSS9xpFcgmqIpSuwZrNS.png)
+    ![Báo cáo thống kê hiệu suất theo nhân viên](/media/ai-contact-center/user-guider-portal/thong-ke-cuoc-goi_theo-nhan-vien.png)
+  </Step>
+
+  <Step>
+    ### Bước 3: Báo cáo năng lực xử lý theo nhóm nhân viên
+
+    1. Từ menu bên trái Portal, chọn **Tổng đài** > **Thống kê** > **Nhóm nhân viên**.
+    2. Đường dẫn hiển thị: `Tổng quan / Thống kê / Nhóm nhân viên` (URL: `https://app.ods.vn/report/group`).
+    3. Theo dõi dữ liệu phân bổ theo phòng ban/nhóm trực:
+       - **Tab Theo số lượng cuộc gọi:** So sánh tỷ lệ cuộc gọi tiếp nhận giữa các nhóm (CSKH, Bán hàng, Hỗ trợ kỹ thuật). Bảng hiển thị: **TÊN NHÓM NHÂN VIÊN**, **TỔNG CUỘC GỌI**, **TRẢ LỜI**, **KHÔNG BẮT MÁY**, **KHÔNG KẾT NỐI**, **MÁY BẬN**.
+       - **Tab Theo thời gian gọi:** Thống kê tổng thời gian thoại của từng nhóm để nhận diện nhóm có khối lượng xử lý lớn nhất.
+    4. Nhấn **Xuất excel** để lưu trữ báo cáo định kỳ cho cấp quản lý.
+
+    ![Báo cáo thống kê theo nhóm nhân viên](/media/ai-contact-center/user-guider-portal/thong-ke-cuoc-goi_theo-nhom.png)
+  </Step>
+
+  <Step>
+    ### Bước 4: Tùy biến cột hiển thị và kết xuất báo cáo Excel
+
+    Để bảng báo cáo tập trung đúng vào các chỉ số trọng tâm của doanh nghiệp:
+
+    1. Tại góc trên bên phải của bảng danh sách, nhấp vào menu **Tùy chọn cột hiển thị**:
+       - Đánh dấu chọn hoặc bỏ chọn các cột dữ liệu theo nhu cầu xem.
+    2. Nhấn nút **Xuất excel** (màu xanh tím):
+       - Hệ thống tự động tạo file bảng tính định dạng `.xlsx` với toàn bộ số liệu chi tiết.
+       - File Excel tải về đã được định dạng chuẩn, sẵn sàng để tổng hợp báo cáo tuần/tháng hoặc tích hợp vào hệ thống BI của doanh nghiệp.
+  </Step>
+</Steps>
+
+---
+
+## 4. Lưu ý quan trọng khi phân tích dữ liệu
+
+<Callout type="warn">
+**Các khuyến nghị vận hành cần lưu ý:**
+
+1. **Ngưỡng cảnh báo cuộc gọi nhỡ (Abandonment Rate):** Nếu tỷ lệ cuộc gọi nhỡ trên tổng cuộc gọi đến vượt quá **5% - 8%**, người quản trị cần rà soát lại kịch bản phân bổ cuộc gọi, thời gian đổ chuông tối đa và số lượng nhân sự trực trong các khung giờ cao điểm để tránh bỏ lỡ cơ hội kinh doanh.
+2. **Khung thời gian kết xuất báo cáo:** Dữ liệu thống kê được cập nhật theo thời gian thực (Real-time). Khi cần đối soát cước hoặc đánh giá năng suất tháng, nên chọn bộ lọc từ ngày 01 đến ngày cuối cùng của tháng để đồng bộ tuyệt đối với kỳ thanh toán viễn thông.
+3. **Phân biệt hướng gọi khi tính KPI:** Đối với nhân viên Telesales, chỉ số trọng tâm là số lượng cuộc gọi ra thành công và thời gian đàm thoại. Đối với nhân viên CSKH, chỉ số trọng tâm là tỷ lệ trả lời cuộc gọi vào và thời lượng xử lý trung bình mỗi cuộc gọi.
+</Callout>
+
+---
+
+## 5. Xử lý sự cố thường gặp (Troubleshooting)
+
+| Vấn đề phát sinh | Nguyên nhân khả dĩ | Hướng xử lý |
+| :--- | :--- | :--- |
+| **Biểu đồ thống kê không hiển thị cột dữ liệu** | 1. Doanh nghiệp chưa có cuộc gọi phát sinh trong khoảng thời gian đã chọn.<br />2. Bộ lọc thời gian chọn nhầm ngày trong tương lai hoặc ngoài chu kỳ hoạt động. | 1. Mở rộng khoảng thời gian sang *30 ngày qua* để kiểm tra lại dữ liệu lịch sử.<br />2. Thực hiện một cuộc gọi thử nghiệm để kiểm tra việc cập nhật số liệu lên biểu đồ. |
+| **Số liệu cuộc gọi trong Thống kê lệch so với Nhật ký cuộc gọi** | Báo cáo Thống kê ghi nhận theo số lượng cuộc gọi tổng thể (Call Session), trong khi Nhật ký cuộc gọi có thể hiển thị phân rã từng chặng chuyển tiếp (Call Legs) nếu chọn kiểu hiển thị *Chi tiết cuộc gọi*. | Chọn chế độ *Tổng quát cuộc gọi* trong Nhật ký cuộc gọi để đối chiếu số liệu đồng nhất với phân hệ Thống kê. |
+| **Không tải được file Excel hoặc quá trình xuất file bị treo** | Khoảng thời gian chọn quá dài (vượt quá 6 tháng hoặc hàng chục nghìn bản ghi), gây timeout trình duyệt khi tạo file bảng tính. | Chia nhỏ khoảng thời gian kết xuất báo cáo thành từng tháng để quá trình xuất file Excel diễn ra ổn định và nhanh chóng. |

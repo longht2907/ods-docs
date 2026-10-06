@@ -1,47 +1,94 @@
 ---
 title: "Nhãn khách hàng"
-description: "Nhãn khách hàng là một công cụ giúp phân loại khách hàng theo các nhóm khác nhau dựa trên đặc điểm, nhu cầu hoặc lịch sử giao dịch. Việc sử dụng nhãn giúp:"
+description: "Hướng dẫn tạo và quản lý hệ thống nhãn phân loại (Tags) có mã màu trực quan trên ODS Portal để gắn thẻ khách hàng và tối ưu chiến dịch chăm sóc."
 ---
 
-## 1. Giới thiệu về nhãn khách hàng
+Hệ thống **Nhãn khách hàng** (Tags) trên ODS Portal giúp doanh nghiệp gắn thẻ và phân nhóm khách hàng đa chiều dựa trên mức độ ưu tiên, đặc điểm giao dịch hoặc trạng thái chăm sóc. Nhãn đi kèm chấm màu nhận diện trực quan, hiển thị ngay trên bảng danh bạ và popup cuộc gọi đến.
 
-Nhãn khách hàng là một công cụ giúp phân loại khách hàng theo các nhóm khác nhau dựa trên đặc điểm, nhu cầu hoặc lịch sử giao dịch. Việc sử dụng nhãn giúp:
+---
 
-* Dễ dàng quản lý và tìm kiếm khách hàng.
-* Cá nhân hóa trải nghiệm khách hàng thông qua các chiến dịch chăm sóc phù hợp.
-* Tối ưu hóa quy trình làm việc của đội ngũ kinh doanh, hỗ trợ khách hàng.
+## 1. Giao diện quản lý nhãn khách hàng
 
-## 2. Hướng dẫn thêm nhãn khách hàng
+Để truy cập, từ menu bên trái bạn chọn **Khách hàng** ➔ **Cài đặt** ➔ **Nhãn khách hàng** (`/mini-crm/customer-classification`).
 
-**Bước 1: Truy cập vào danh mục "Nhãn khách hàng"**
+![Giao diện Danh sách nhãn khách hàng trên ODS Portal](/media/ai-contact-center/user-guider-portal/nhan-khach-hang_danh-sach-nhan.png)
 
-* Đăng nhập vào hệ thống MATBAO ONE.
-* Tại menu bên trái, chọn "Cài đặt" > "Nhãn khách hàng".
-* Màn hình sẽ hiển thị danh sách các nhãn khách hàng hiện có.
+Trang quản lý cung cấp các công cụ vận hành:
+- **Tìm kiếm:** Nhập từ khóa để lọc nhanh tên nhãn cần tra cứu.
+- **Bộ công cụ Excel:** Hỗ trợ **Xuất excel**, **Nhập dữ liệu từ excel** và **Download file excel mẫu** để quản lý danh sách nhãn số lượng lớn.
+- **Bảng dữ liệu:** Thống kê danh sách gồm các cột *STT*, *TÊN NHÃN*, *MÀU SẮC* (chấm màu kèm mã Hex), *NGÀY TẠO* và *THAO TÁC*.
 
-![](/media/ai-contact-center/user-guider-portal/img-xyjCJL0khMsG6ipJeKU0.png)
+---
 
-**Bước 2: Thêm nhãn khách hàng mới**
+## 2. Thêm mới nhãn khách hàng
 
-* Nhấp vào nút "THÊM MỚI NHÃN KHÁCH HÀNG" (nút màu xanh).
+Khi cần bổ sung một nhóm phân loại mới cho danh bạ:
 
-![](/media/ai-contact-center/user-guider-portal/img-DBT5e9MxXTWgKRklTabr.png)
+![Cửa sổ biểu mẫu Thêm nhãn khách hàng trên ODS Portal](/media/ai-contact-center/user-guider-portal/nhan-khach-hang_modal-them-moi.png)
 
-* Một cửa sổ nhập thông tin sẽ xuất hiện, bao gồm:
-  * Tên nhãn khách hàng: Nhập tên để dễ nhận diện (ví dụ: VIP, Tiềm năng, Bất động sản…).
-  * Màu sắc: Chọn màu để dễ phân biệt giữa các nhãn.\
-    ![](/media/ai-contact-center/user-guider-portal/img-mBlyWA8NXtfOtDa56bDr.png)
+<Steps>
+### Bước 1: Mở cửa sổ tạo nhãn
+Nhấp vào nút màu xanh lá **+ THÊM MỚI NHÃN KHÁCH HÀNG** ở góc trên bên phải màn hình.
 
-**Bước 3: Lưu nhãn khách hàng**
+### Bước 2: Nhập thông tin nhãn
+Cửa sổ **THÊM NHÃN** hiển thị hai trường bắt buộc:
 
-* Sau khi nhập đầy đủ thông tin, nhấn "Lưu" để hoàn tất.
-* Nhãn mới sẽ xuất hiện trong danh sách, có thể chỉnh sửa hoặc xóa nếu cần.
+| Trường thông tin | Tính bắt buộc | Hướng dẫn thiết lập |
+| :--- | :---: | :--- |
+| **Tên nhãn (*)** | **Bắt buộc** | Đặt tên ngắn gọn, dễ nhớ (VD: `VIP`, `Khách tiềm năng cao`, `Đang khiếu nại`). |
+| **Màu sắc (*)** | **Bắt buộc** | Nhấp vào ô nhập để mở bảng chọn màu (Color Picker). Bạn có thể chọn màu từ bảng mẫu hoặc dán trực tiếp mã màu Hex (VD: `#7ed321`). |
 
-![](/media/ai-contact-center/user-guider-portal/img-vZDouZ27fpH4Ios64ITW.png)
+### Bước 3: Lưu nhãn mới
+- Nhấn nút màu xanh lá **+ THÊM MỚI** để hoàn tất khởi tạo.
+- Nhấn **Hủy bỏ** hoặc biểu tượng `X` ở góc trên để hủy bỏ thao tác.
+</Steps>
 
-## 3. Chỉnh sửa hoặc xóa nhãn khách hàng
+---
 
-* Để chỉnh sửa, nhấp vào biểu tượng bút chì bên cạnh nhãn.
-* Để xóa, nhấp vào biểu tượng thùng rác (lưu ý: chỉ xóa nếu nhãn không còn cần thiết).
+## 3. Chỉnh sửa và xóa nhãn
 
-![](/media/ai-contact-center/user-guider-portal/img-o4E5JePW5r2VDLIzKYPM.png)
+Tại cột **THAO TÁC** của từng nhãn, bạn có thể thực hiện quản trị:
+
+<Steps>
+### Cập nhật nhãn
+1. Nhấp biểu tượng **Cây bút** (Sửa) tại dòng nhãn cần thay đổi.
+2. Cửa sổ **CẬP NHẬT NHÃN** hiển thị với tên và màu sắc hiện tại.
+3. Điều chỉnh thông tin và nhấn nút màu xanh dương **CẬP NHẬT**.
+
+### Xóa nhãn
+1. Nhấp biểu tượng **Thùng rác** (Xóa) tại dòng nhãn không còn sử dụng.
+2. Hộp thoại xác nhận xuất hiện (`Bạn muốn xóa dữ liệu đã chọn?`).
+3. Chọn **Chấp nhận** để xóa hẳn hoặc **Hủy** để giữ lại.
+</Steps>
+
+---
+
+## 4. Lưu ý vận hành quan trọng
+
+<Cards className="grid-cols-1 md:grid-cols-3 my-4">
+  <Card
+    icon="Layers"
+    title="Gán nhiều nhãn cho 1 khách"
+    description="Một hồ sơ khách hàng có thể gắn đồng thời nhiều nhãn khác nhau (VD: vừa là 'VIP', vừa thuộc nhóm 'Miền Nam')."
+  />
+  <Card
+    icon="Activity"
+    title="Hiển thị trên Popup cuộc gọi"
+    description="Màu sắc và tên nhãn hiển thị trực tiếp khi có chuông đổ, giúp điện thoại viên nhận diện ngay tính chất khách hàng."
+  />
+  <Card
+    icon="FileText"
+    title="Nhập hàng loạt qua Excel"
+    description="Sử dụng nút 'Download file excel mẫu' và 'Nhập dữ liệu từ excel' để tải lên đồng thời toàn bộ danh mục nhãn của doanh nghiệp."
+  />
+</Cards>
+
+---
+
+## 5. Xử lý các tình huống thường gặp
+
+| Tình huống | Nguyên nhân | Hướng dẫn xử lý |
+| :--- | :--- | :--- |
+| **Không thấy nhãn vừa tạo trong form thêm khách hàng** | Trang tạo khách hàng chưa được tải lại bộ nhớ đệm (cache). | Tải lại trang (`F5`) tại màn hình tạo mới khách hàng để dropdown cập nhật danh sách nhãn mới. |
+| **Xóa nhãn có làm mất khách hàng không?** | Xóa nhãn chỉ gỡ bỏ nhãn đó khỏi hệ thống và hồ sơ khách hàng liên quan. | Dữ liệu khách hàng, số điện thoại và lịch sử cuộc gọi vẫn được bảo toàn nguyên vẹn. |
+| **Nhập mã màu Hex nhưng không hiển thị đúng màu** | Mã màu bị thiếu ký tự thăng `#` ở đầu hoặc sai định dạng 6 ký tự. | Đảm bảo nhập đúng định dạng mã Hex hợp lệ (VD: `#d0021b` hoặc `#7ed321`) hoặc chọn trực tiếp từ bảng màu. |

@@ -1,158 +1,178 @@
 ---
 name: doc-actuator
-description: Technical Writer & UI Actuator chuyên nghiệp chuẩn hóa quy trình biên soạn tài liệu kỹ thuật MDX cho ODS AI Contact Center.
+description: Khảo sát UI thật và viết hoặc cải tiến tài liệu MDX cho ODS AI Contact Center. Dùng khi cần thao tác Portal, thu thập screenshot, mô tả field/workflow, làm bài hướng dẫn sinh động, hoặc kiểm chứng nội dung Fumadocs; không dùng để suy đoán tính năng chưa quan sát hay viết API khi chưa có đặc tả.
 ---
 
-# Doc-Actuator: Quy Trình Chuẩn Hóa Viết Tài Liệu Kỹ Thuật (Docs-as-Code)
+# Doc Actuator
 
-`doc-actuator` là bộ quy chuẩn vận hành dành cho Technical Writer và UI Actuator nhằm chuẩn hóa quy trình khảo sát thực tế trên giao diện, thu thập tài nguyên hình ảnh và viết tài liệu MDX chất lượng cao cho hệ thống **ODS AI Contact Center**.
+Biến hành vi thật trên ODS AI Contact Center thành tài liệu dễ làm theo, có bằng chứng và an toàn để công bố. Ưu tiên giúp người đọc hoàn thành công việc; component và hình thức chỉ phục vụ mục tiêu đó.
 
+## 1. Hợp đồng chất lượng
+
+Mỗi bài phải:
+
+1. **Đúng:** tên menu, field, trạng thái, validation và kết quả lấy từ UI hoặc nguồn được duyệt.
+2. **Làm được:** người đọc biết bắt đầu ở đâu, chọn gì, khi nào lưu và cách xác nhận thành công.
+3. **Dễ quét:** mở đầu ngắn, heading nói rõ tác vụ, ảnh nằm sát bước liên quan, bảng chỉ chứa dữ liệu cần tra cứu.
+4. **Có sức sống:** dùng tình huống vận hành, checkpoint và lựa chọn thực tế; không dùng giọng quảng cáo, emoji trang trí hoặc câu chữ khoa trương.
+
+Không đánh đổi độ chính xác để bài viết hấp dẫn hơn.
+
+## 2. Evidence first
+
+Trước khi viết, phân loại thông tin:
+
+- **Observed:** nhìn thấy trực tiếp trên UI, screenshot hoặc runtime.
+- **Approved:** có trong đặc tả, vendor docs hoặc tài liệu nghiệp vụ được Human duyệt.
+- **Inferred:** suy luận hợp lý nhưng chưa được xác nhận.
+- **Unknown:** chưa có bằng chứng.
+
+Chỉ trình bày **Observed** và **Approved** như sự thật. Với **Inferred**, ghi rõ đó là diễn giải hoặc khuyến nghị. Không xuất bản **Unknown**; để placeholder có kiểm soát hoặc hỏi Human.
+
+Phải có bằng chứng cho giới hạn số ký tự/thiết bị/lần thử; giá trị mặc định, timeout, thứ tự ưu tiên; định dạng file, codec, port; quyền, billing, cước; hành vi xóa, ghi đè, gửi email, khóa hoặc retry; endpoint, authentication, schema và webhook event.
+
+Khi UI mâu thuẫn với bài cũ, giữ bằng chứng và báo Human; không âm thầm chọn một phiên bản.
+
+## 3. Workflow khảo sát UI
+
+### Chuẩn bị
+
+- Dùng tài khoản demo hoặc dữ liệu được phép công bố.
+- Human tự nhập password, OTP và secret. Không ghi chúng vào chat, screenshot hay MDX.
+- Chốt **một bài target** và outcome trước khi thao tác.
+- Ưu tiên read-only. Trước khi submit, tạo, sửa, xóa, gọi điện, gửi chiến dịch hoặc phát sinh cước, phải có xác nhận cụ thể của Human.
+
+### Khảo sát
+
+1. Xác định đường dẫn menu và quyền cần có.
+2. Ghi trạng thái ban đầu: title, tab, bảng, filter và CTA.
+3. Mở form/modal/drawer; ghi đúng label, control type, required marker, default và helper text.
+4. Thử validation bằng dữ liệu demo khi được phép.
+5. Thực hiện tác vụ và ghi tín hiệu thành công: toast, trạng thái, row mới, URL hoặc thay đổi hiển thị.
+6. Ghi đường lui: Cancel, rollback, disable hoặc delete, nếu UI có.
+7. Chỉ ghi troubleshooting đã quan sát hoặc có nguồn.
+
+Dừng khi đủ bằng chứng cho outcome; không click lan sang module ngoài bài.
+
+## 4. Screenshot có chủ đích
+
+Ảnh phải trả lời một câu hỏi, không chỉ chứng minh màn hình tồn tại.
+
+- Lưu tại `public/media/ai-contact-center/user-guider-portal/`.
+- Đặt tên `{feature}_{state-or-action}.png` theo convention hiện có.
+- Chụp trạng thái có ý nghĩa: danh sách, form, validation, cấu hình hoàn chỉnh hoặc kết quả.
+- Crop vừa đủ để còn ngữ cảnh và vùng thao tác.
+- Loại bỏ dữ liệu khách hàng, số điện thoại, email, extension, token và identifier chưa được duyệt.
+- Không dùng hai ảnh gần như giống nhau.
+- Alt text mô tả trạng thái và mục đích, không viết “ảnh chụp màn hình”.
+
+Đặt ảnh ngay sau thao tác tạo ra trạng thái đó. Khi hữu ích, thêm checkpoint: “Kết quả mong đợi: trạng thái chuyển sang **Đang bật**.”
+
+## 5. Chọn cấu trúc theo loại bài
+
+Không ép mọi bài vào cùng một template.
+
+### Task guide
+
+Dùng cho một tác vụ cụ thể:
+
+- Mở đầu bằng outcome và khi nào nên dùng.
+- **Trước khi bắt đầu:** quyền và tài nguyên cần thiết.
+- **Cấu hình cần biết:** chỉ field xuất hiện trong workflow.
+- **Thực hiện:** `<Steps>/<Step>`.
+- **Kiểm tra kết quả:** dấu hiệu thành công và test an toàn.
+- **Xử lý sự cố:** symptom → nguyên nhân đã biết → cách kiểm tra → cách xử lý.
+
+### Concept hoặc overview
+
+- Module giải quyết bài toán gì.
+- Bản đồ khả năng bằng `<Cards>/<Card>`.
+- “Chọn hướng nào?” bằng decision table hoặc tình huống.
+- Trình tự triển khai khuyến nghị.
+- Link sang task guide; không lặp toàn bộ thao tác.
+
+### Multi-scenario guide
+
+- Mở bằng bảng: nhu cầu → tính năng → kết quả.
+- Mỗi scenario có prerequisites, field, steps và checkpoint riêng.
+- Dùng Mermaid khi luồng có điểm rẽ nhánh khó diễn đạt.
+- Nêu thứ tự ưu tiên và xung đột nếu đã được kiểm chứng.
+
+### Reference
+
+- Giữ prose ngắn.
+- Bảng nêu label đúng UI, control, required/default và tác động.
+- Link tới task guide thay vì nhúng quy trình dài.
+
+## 6. Nhịp viết sinh động nhưng thực dụng
+
+### Mở bài theo outcome
+
+Trong 2–3 câu, trả lời: người đọc làm được gì, khi nào cần dùng và kết quả vận hành là gì. Tránh “Tính năng X là một tính năng mạnh mẽ...”.
+
+### Viết theo hành động và phản hồi
+
+Mỗi step có nhịp:
+
+1. **Hành động:** click/chọn/nhập gì.
+2. **Lý do:** lựa chọn ảnh hưởng gì, nếu không hiển nhiên.
+3. **Kết quả mong đợi:** tín hiệu nào xác nhận đúng.
+
+Tiêu đề `###` trong `<Step>` dùng động từ như “Mở danh sách máy nhánh”, “Chọn đích ngoài giờ”. Không lặp “Bước 1”, vì component đã thể hiện thứ tự.
+
+### Giúp người đọc quyết định
+
+Dùng decision table cho lựa chọn dễ nhầm; một ví dụ cấu hình nhất quán xuyên bài; `info` cho context, `warn` cho rủi ro thật, `error` cho nguy cơ gián đoạn/mất dữ liệu; checkpoint sau thao tác quan trọng.
+
+Không dùng Callout để trang trí. Không nhồi mọi chi tiết vào bảng; field đơn giản có thể giải thích trong step.
+
+### Giọng văn
+
+- Tiếng Việt tự nhiên, trực tiếp; giữ SIP, Extension, IVR, Ring Group, Webhook.
+- Dùng “bạn” cho thao tác; dùng tên vai trò khi nói về quyền.
+- Câu ngắn, một câu một ý, động từ chủ động.
+- Không viết “luôn”, “tuyệt đối”, “ngay lập tức” nếu chưa chứng minh.
+- Không tự thêm số liệu khuyến nghị. Nếu là best practice, ghi rõ “Khuyến nghị vận hành”.
+
+## 7. MDX và Fumadocs
+
+Mọi file có frontmatter:
+
+```md
 ---
-
-## 1. Nguyên Tắc Cốt Lõi (Core Principles)
-
-1. **Thực chứng từ giao diện (UI Truth First):** Không đoán mò giao diện hay các trường cấu hình. Luôn khảo sát trực tiếp qua trình duyệt/portal trước khi viết.
-2. **Scope Control (Đúng phạm vi):** Mỗi lượt xử lý chỉ thao tác và chỉnh sửa **duy nhất 1 file target** được chỉ định. Không refactor lan sang các file khác.
-3. **Docs-as-Code & Type-Safe:** Mọi tài liệu MDX phải tuân thủ chuẩn Fumadocs, không gãy liên kết, không lỗi cú pháp React/MDX.
-4. **Zero-Broken Policy:** Mọi thay đổi bài viết phải vượt qua lệnh `npm run verify:code` trước khi kết thúc.
-
----
-
-## 2. Quy Chuẩn Tương Tác Browser (UI Actuation & Screenshot)
-
-Khi cần chụp ảnh hoặc khảo sát giao diện chức năng:
-
-1. **Điều hướng chính xác:** Sử dụng Browser Subagent điều hướng đến đúng module cần viết tài liệu (ví dụ: trên Portal `https://app.ods.vn` hoặc môi trường dev).
-2. **Khảo sát cấu trúc trang:** Quét và phân tích toàn bộ các thành phần UI:
-   - Các trường Form (Input, Select dropdown, Switch, Checkbox, Radio, Textarea).
-   - Modal popup, Drawer, Tabs điều hướng.
-   - Bảng dữ liệu (Data Table), các cột thông tin, nút hành động (Actions, Filter, Export).
-3. **Quy ước lưu trữ & Đặt tên ảnh:**
-   - **Thư mục lưu trữ:** `content/docs/assets/images/{module_slug}/` (hoặc `public/media/...` tương ứng theo cấu hình dự án).
-   - **Quy tắc đặt tên file:** `{file_slug}_{action}.png`
-     - Ví dụ: `cai-dat-may-nhanh_tao-moi.png`, `dinh-tuyen-cuoc-goi_cau-hinh-ivr.png`, `chien-dich-znc_thiet-lap-mau.png`.
-   - **Quy cách ảnh:** Chụp rõ ràng vùng thao tác chính, tránh chụp thừa khoảng trắng không cần thiết.
-
----
-
-## 3. Quy Chuẩn Định Dạng Nội Dung MDX (Content Architecture)
-
-Mọi file tài liệu `.mdx` phải tuân thủ nghiêm ngặt cấu trúc 4 phần chuẩn mực:
-
-### A. Frontmatter (Bắt buộc)
-Giữ nguyên hoặc khai báo đầy đủ frontmatter tiêu chuẩn:
-```markdown
----
-title: "Tiêu đề bài viết rõ ràng, đúng thuật ngữ"
-description: "Tóm tắt ngắn gọn mục đích và nội dung bài viết trong 1-2 câu."
+title: "Tiêu đề theo outcome hoặc tác vụ"
+description: "Người đọc sẽ làm được gì và phạm vi bài viết."
 ---
 ```
 
-### B. Bố Cục 4 Phần Chuẩn (Standard 4-Section Layout)
+Quy ước:
 
-```markdown
-Đoạn mở đầu giới thiệu ngắn gọn tính năng/module và giá trị mang lại cho doanh nghiệp.
+- `##` cho phần chính; `###` cho nhánh hoặc tiêu đề trong `<Step>`.
+- Layout render H1 từ frontmatter; không lặp `# Title` trong body.
+- `Steps` cho chuỗi tuần tự; `Cards` cho bản đồ khả năng; `Tabs` chỉ cho biến thể tương đương.
+- Mermaid chỉ dùng cho workflow/routing có điểm rẽ nhánh đáng kể.
+- Không dùng HTML tùy ý khi component hiện có đáp ứng được.
+- Link nội bộ phải tồn tại; public docs không link sang `/internal`.
+- Không đặt credential, API key, dữ liệu khách hàng hoặc số điện thoại thật vào ví dụ.
 
----
+## 8. Scope
 
-## 1. Tổng quan & Điều kiện tiên quyết
+Mặc định mỗi iteration hoàn thiện **một bài MDX target**. Được chạm thêm file hỗ trợ trực tiếp khi task spec cho phép: screenshot, `meta.json`, component MDX thật sự cần thiết, task spec và report.
 
-- **Mục đích sử dụng:** Diễn giải ngắn gọn mục tiêu của chức năng.
-- **Đối tượng áp dụng:** Administrator, Team Lead, hoặc Agent/Operator.
-- **Điều kiện tiên quyết (Prerequisites):**
-  - Đã có tài khoản phân quyền quản trị tương ứng.
-  - Các tài nguyên cần chuẩn bị trước (Đầu số Hotline, file âm thanh IVR, tài khoản Zalo OA, v.v.).
+Không refactor bài khác chỉ để đồng nhất văn phong. Ghi lỗi ngoài scope vào backlog.
 
----
+## 9. Definition of Done
 
-## 2. Bảng thông số cấu hình chi tiết
-
-Bảng tra cứu toàn bộ các trường dữ liệu và tùy chọn cấu hình trên giao diện:
-
-| Tên trường (Field) | Loại trường | Bắt buộc | Diễn giải & Giá trị mặc định |
-| :--- | :--- | :---: | :--- |
-| **Tên máy nhánh** | Text | Có | Định danh người dùng hoặc phòng ban (VD: `101 - CSKH`). |
-| **Mật khẩu SIP** | Password | Có | Mật khẩu xác thực cho Softphone/IP Phone. Tối thiểu 8 ký tự. |
-| **Nhóm gọi (Ring Group)** | Dropdown | Không | Chọn nhóm tiếp nhận cuộc gọi tương ứng. |
-| **Ghi âm cuộc gọi** | Toggle switch | Tùy chọn | Bật/tắt tự động ghi âm cuộc gọi vào/ra (Mặc định: `Bật`). |
-
----
-
-## 3. Hướng dẫn thao tác từng bước
-
-Sử dụng component `<Steps>` và `<Step>` kết hợp tiêu đề `###` (H3) để mục lục *On this page* hiển thị đường nhánh cây SVG chuẩn Fumadocs:
-
-<Steps>
-  <Step>
-    ### Truy cập chức năng
-
-    Từ thanh điều hướng bên trái của Portal, chọn **Cấu hình tổng đài** > **Máy nhánh nội bộ**.
-
-    ![Giao diện danh sách máy nhánh](/media/path/to/cai-dat-may-nhanh_danh-sach.png)
-  </Step>
-
-  <Step>
-    ### Khởi tạo cấu hình mới
-
-    Nhấn nút **+ Tạo mới** ở góc phải màn hình để mở hộp thoại thiết lập.
-
-    ![Hộp thoại tạo máy nhánh](/media/path/to/cai-dat-may-nhanh_tao-moi.png)
-  </Step>
-
-  <Step>
-    ### Điền thông số & Lưu cấu hình
-
-    1. Nhập đầy đủ các thông tin theo bảng thông số cấu hình ở Phần 2.
-    2. Kiểm tra lại thông số và nhấn **Lưu thay đổi** để hoàn tất.
-  </Step>
-</Steps>
-
----
-
-## 4. Lưu ý & Xử lý sự cố (Troubleshooting)
-
-### Lưu ý quan trọng
-
-<Callout type="warn">
-  **Cảnh báo bảo mật:** Không sử dụng mật khẩu mặc định hoặc mật khẩu đơn giản cho tài khoản SIP. Luôn đổi mật khẩu định kỳ để phòng chống cước phát sinh bất thường.
-</Callout>
-
-### Sự cố thường gặp & Khắc phục
-
-- **Lỗi không đăng ký được máy nhánh (SIP Register Failed):**
-  - *Nguyên nhân:* Sai địa chỉ SIP Server, sai Port hoặc thông tin SIP Password không khớp.
-  - *Khắc phục:* Kiểm tra lại địa chỉ IP/Domain của tổng đài và cập nhật lại mật khẩu trên ứng dụng Softphone.
-- **Không nghe thấy âm thanh 2 chiều (One-way Audio):**
-  - *Nguyên nhân:* Do chặn cổng NAT hoặc Firewall tại mạng nội bộ.
-  - *Khắc phục:* Bật tính năng STUN/ICE hoặc kiểm tra mở dải port RTP trên Router mạng.
-```
-
----
-
-## 4. Quy Chuẩn Kỹ Thuật Fumadocs & Phân Cấp Tiêu Đề
-
-1. **Phân cấp Heading (On this page TOC):**
-   - Dùng `##` (H2) cho 4 phần mục chính.
-   - Dùng `###` (H3) cho các bước trong `<Step>` hoặc các tiểu mục con để TOC Clerk uốn cong đường nét SVG.
-2. **Sử dụng MDX Components:**
-   - `<Steps>` và `<Step>`: Dành cho luồng thao tác tuần tự.
-   - `<Cards>` và `<Card title="..." icon="...">`: Dành cho danh sách tính năng, gói dịch vụ, phân loại.
-   - `<Callout type="info|warn|error">`: Dành cho ghi chú quan trọng hoặc cảnh báo sự cố.
-3. **Liên kết nội bộ (Internal Links):**
-   - Chỉ link đến các trang MDX thực sự tồn tại.
-   - Không link đến các thư mục không có trang `index.mdx`.
-   - Không link từ vùng Public (`/docs/`) sang vùng Internal (`/internal/`).
-
----
-
-## 5. Quy Trình Kiểm Thử Bắt Buộc (Validation Workflow)
-
-Trước khi xác nhận hoàn tất bài viết, bắt buộc thực hiện theo đúng chuỗi lệnh:
+- Đối chiếu claim định lượng hoặc hành vi nhạy cảm với evidence.
+- Kiểm tra frontmatter, heading, alt text, image path và internal link.
+- Xác nhận bài có outcome, prerequisites, workflow, checkpoint và recovery phù hợp với loại bài.
+- Chạy:
 
 ```bash
-# 1. Kiểm tra toàn bộ TypeScript, Broken Links, Env Guard và Security Guard
 npm run verify:code
+git diff --check
 ```
 
-- **Nếu lệnh trả về lỗi (FAIL):** Phải đọc rõ nguyên nhân (lỗi cú pháp MDX, sai đường dẫn ảnh, liên kết gãy hoặc sai Frontmatter) và sửa dứt điểm ngay tại file target.
-- **Chỉ công bố hoàn thành** khi `npm run verify:code` báo **PASS 100%**.
+Nếu task yêu cầu nghiệm thu đầy đủ, chạy `npm run verify:task`.
+
+Chỉ báo PASS khi lệnh đã chạy thật. Báo file đã sửa, evidence đã dùng, kết quả lệnh và nội dung còn Unknown/cần Human xác nhận.

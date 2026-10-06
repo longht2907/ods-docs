@@ -1,78 +1,136 @@
 ---
 title: "Nhập dữ liệu khách hàng vào hệ thống"
-description: "Hệ thống hỗ trợ hai cách để thêm mới khách hàng:"
+description: "Hướng dẫn chi tiết 2 phương thức nhập dữ liệu khách hàng trên ODS Portal: Thêm mới thủ công từng hồ sơ và nhập danh bạ hàng loạt từ file Excel chuẩn hóa."
 ---
 
-Hệ thống hỗ trợ hai cách để thêm mới khách hàng:
+Hệ thống **ODS AI Contact Center** cung cấp hai phương thức linh hoạt để khởi tạo dữ liệu danh bạ khách hàng vào phân hệ Mini CRM:
 
-* **Thêm thủ công** – Nhập thông tin từng khách hàng một cách thủ công.
-* **Nhập danh sách từ file Excel** – Tải lên danh sách khách hàng hàng loạt.
+1. **Thêm thủ công:** Phù hợp khi nhân viên tiếp nhận cuộc gọi lẻ tẻ trong ca trực và cần tạo nhanh hồ sơ cho một khách hàng mới.
+2. **Nhập danh bạ từ file Excel (Import):** Phù hợp khi doanh nghiệp cần chuyển đổi toàn bộ danh bạ từ phần mềm cũ, tệp khách hàng tiếp thị hoặc danh sách khách hàng doanh nghiệp lên hệ thống chỉ với một lần tải tệp.
+
+---
 
 ## 1. Thêm khách hàng thủ công
 
-**Bước 1: Mở giao diện thêm khách hàng**
+Phương thức thêm thủ công cho phép bạn khai báo đầy đủ các trường thông tin chi tiết, gán nhiều số điện thoại và nhãn phân loại ngay trên biểu mẫu tạo mới.
 
-Ở giao diện **Khách hàng Tiềm năng** hoặc **Khách hàng Hiện tại**, nhấn vào nút "Thêm mới khách hàng" (góc trên bên phải, màu xanh).
+![Giao diện biểu mẫu thêm mới thông tin khách hàng trên ODS Portal](/media/ai-contact-center/user-guider-portal/nhap-du-lieu-khach-hang_form-them-thu-cong.png)
 
-![](/media/ai-contact-center/user-guider-portal/img-IhtzQ3VWCnNIjJ3lE5JZ.png)
+<Steps>
+### Bước 1: Mở giao diện tạo mới
+1. Truy cập vào menu **Khách hàng** ở thanh điều hướng bên trái.
+2. Chọn phân mục muốn thêm: **Khách hàng hiện tại** (`/mini-crm/customer-list`) hoặc **Khách hàng tiềm năng** (`/mini-crm/lead-list`).
+3. Nhấp vào nút màu xanh lá **+ THÊM MỚI KHÁCH HÀNG HIỆN TẠI** (hoặc **+ THÊM MỚI KHÁCH HÀNG TIỀM NĂNG**) ở góc trên bên phải màn hình.
 
-**Bước 2: Nhập thông tin khách hàng**
+### Bước 2: Điền thông tin hồ sơ khách hàng
+Biểu mẫu được chia thành 2 cột trường dữ liệu:
 
-Một cửa sổ mới xuất hiện, nhập các thông tin:
+| Cột / Trường thông tin | Tính bắt buộc | Ý nghĩa và lưu ý nhập liệu |
+| :--- | :---: | :--- |
+| **Tên khách hàng** | **Bắt buộc** | Nhập họ và tên đầy đủ của khách hàng (kèm lựa chọn danh xưng: Anh, Chị, Ông, Bà, Khác). |
+| **Giới tính** | Tùy chọn | Chọn *Nam* hoặc *Nữ* trong danh sách thả xuống. |
+| **Ngày sinh** | Tùy chọn | Định dạng `DD/MM/YYYY`, hỗ trợ các chiến dịch tri ân sinh nhật. |
+| **Email 1** | Tùy chọn | Hộp thư điện tử liên hệ. Nhấp **Thêm email** nếu khách hàng sử dụng nhiều địa chỉ email. |
+| **Số điện thoại 1** | **Bắt buộc** | Số di động hoặc số bàn chính (10 chữ số). Nhấp **Thêm số điện thoại** nếu khách có thêm số phụ. |
+| **Phân loại khách hàng** | **Bắt buộc** | Chọn nhóm lưu trữ: *KH hiện tại* hoặc *KH tiềm năng*. |
+| **Nhãn khách hàng** | Tùy chọn | Chọn các thẻ phân loại nghiệp vụ (như *VIP*, *Ưu tiên*, *Đang liên hệ*...). |
+| **Tổ chức** | Tùy chọn | Chọn Doanh nghiệp hoặc Chi nhánh liên kết nếu là khách hàng B2B. |
+| **Địa chỉ** | Tùy chọn | Địa chỉ liên hệ hoặc văn phòng của khách hàng. |
+| **Thông tin** | Tùy chọn | Các ghi chú đặc biệt về sở thích, nhu cầu hoặc lưu ý đàm thoại. |
 
-* Tên khách hàng
-* Số điện thoại
-* Email (nếu có)
-* Ghi chú (thông tin bổ sung về khách hàng)
-* Gán nhãn khách hàng (ví dụ: Khách VIP, Đang quan tâm, Đã chốt đơn, v.v.)
-* Chọn danh sách tổ chức (nếu khách thuộc một tổ chức cụ thể)
+### Bước 3: Lưu hồ sơ
+- Sau khi kiểm tra tính chính xác của các trường bắt buộc (`Tên khách hàng`, `Số điện thoại 1`), nhấp nút **+ THÊM MỚI** màu xanh lá ở góc dưới bên phải.
+- Nếu muốn hủy bỏ thao tác, nhấp **Hủy bỏ** để quay lại danh sách.
+</Steps>
 
-![](/media/ai-contact-center/user-guider-portal/img-qnxtBFfLQn8PBBk3zm2a.png)
+---
 
-**Bước 3: Lưu thông tin**
+## 2. Nhập danh sách khách hàng từ file Excel (Import)
 
-Sau khi nhập đủ thông tin, nhấn nút "Lưu" để hoàn tất.
+Tính năng nhập từ Excel giúp đưa hàng trăm hoặc hàng nghìn liên hệ khách hàng lên hệ thống trong vài giây.
 
-Khách hàng sẽ xuất hiện trong danh sách tương ứng.
+![Thanh công cụ quản trị dữ liệu và nhập xuất Excel trên ODS Portal](/media/ai-contact-center/user-guider-portal/nhap-du-lieu-khach-hang_danh-sach-chuc-nang.png)
 
-## 2. Nhập danh sách khách hàng từ file Excel
+<Steps>
+### Bước 1: Tải file mẫu Excel chuẩn của hệ thống
+1. Tại màn hình danh sách khách hàng, tìm thanh công cụ phía trên bảng dữ liệu.
+2. Nhấp vào nút màu vàng cam **Download file excel mẫu**.
+3. Trình duyệt sẽ tự động tải tệp tin mẫu định dạng `.xlsx` về máy tính.
 
-**Bước 1: Tải file mẫu Excel**
-
-Nhấn vào nút "Download file excel mẫu" (màu vàng) để tải file mẫu về máy tính.
-
-![](/media/ai-contact-center/user-guider-portal/img-rrNMh7XPKgp97GpJip0h.png)
-
-**Bước 2: Nhập danh sách khách hàng vào file Excel**
-
-Mở file Excel vừa tải xuống.
-
-Điền đầy đủ thông tin khách hàng vào các cột tương ứng như: **Tên khách hàng, Số điện thoại, Email, Ghi chú, Nhãn khách hàng**.
-
-Lưu lại file sau khi nhập xong.
-
-**Bước 3: Tải lên danh sách khách hàng**
-
-Nhấn vào nút "Nhập dữ liệu từ Excel" (màu xanh).
-
-Chọn file Excel đã điền thông tin.
-
-Hệ thống sẽ tự động nhập danh sách khách hàng vào hệ thống.
-
-![](/media/ai-contact-center/user-guider-portal/img-3F7GjtchzUv87xgLrMYn.png)
-
-**Bước 4: Kiểm tra dữ liệu sau khi nhập**
-
-Sau khi tải lên thành công, danh sách khách hàng sẽ xuất hiện trong hệ thống.
-
-Nếu có sai sót, có thể chỉnh sửa thông tin bằng cách nhấn vào biểu tượng Chỉnh sửa (✏️).
-
-<Callout type="warn">
-**Lưu ý:**
-
-✔️ Nếu nhập thủ công, hãy đảm bảo không bỏ trống các thông tin quan trọng như **Số điện thoại**.
-
-✔️ Khi tải danh sách từ Excel, cần điền đúng định dạng của hệ thống để tránh lỗi nhập liệu.
-
-✔️ Hệ thống cho phép lọc, tìm kiếm khách hàng bằng từ khóa để dễ dàng quản lý.
+<Callout type="info">
+**Luôn sử dụng file mẫu chuẩn:** Định dạng cột và thứ tự dữ liệu trong file mẫu được thiết kế khớp tuyệt đối với cấu trúc cơ sở dữ liệu ODS. Tuyệt đối không xóa hoặc thay đổi tên các tiêu đề cột trong hàng đầu tiên của file mẫu.
 </Callout>
+
+### Bước 2: Chuẩn bị dữ liệu khách hàng trên file Excel
+Mở tệp tin mẫu vừa tải và nhập dữ liệu theo quy chuẩn:
+
+| Tên cột trong file | Tính bắt buộc | Định dạng chuẩn | Ví dụ dữ liệu |
+| :--- | :---: | :--- | :--- |
+| **Tên khách hàng** | **Bắt buộc** | Dạng chuỗi (Text), tối đa 255 ký tự | `Nguyễn Văn An` |
+| **Số điện thoại** | **Bắt buộc** | Dạng chuỗi (Text), 10 chữ số, bắt đầu bằng số 0 | `0901234567` |
+| **Email** | Tùy chọn | Email hợp lệ | `an.nguyen@example.com` |
+| **Giới tính** | Tùy chọn | `Nam` hoặc `Nữ` | `Nam` |
+| **Nhãn phân loại** | Tùy chọn | Tên nhãn đã khởi tạo sẵn trên Portal | `VIP` |
+| **Tổ chức** | Tùy chọn | Tên doanh nghiệp/tổ chức | `Công ty Cổ phần ABC` |
+| **Địa chỉ** | Tùy chọn | Văn bản tự do | `123 Cách Mạng Tháng 8, Q.10` |
+| **Ghi chú** | Tùy chọn | Văn bản tự do | `Khách hàng gọi vào từ chiến dịch tháng 10` |
+
+### Bước 3: Tải file dữ liệu lên hệ thống
+1. Sau khi điền xong và lưu file Excel trên máy tính, quay lại giao diện Portal ODS.
+2. Nhấp vào nút màu xanh tím **Nhập dữ liệu từ excel**.
+3. Cửa sổ chọn tệp tin của hệ điều hành xuất hiện. Chọn file Excel `.xlsx` hoặc `.xls` bạn vừa chuẩn bị.
+4. Hệ thống sẽ tiến hành đọc dữ liệu và nạp danh bạ tự động vào bảng danh sách khách hàng.
+
+### Bước 4: Kiểm tra và đối chiếu sau khi nhập
+1. Khi quá trình nhập hoàn tất, bảng dữ liệu sẽ tự động tải lại và hiển thị các bản ghi mới.
+2. Kiểm tra cột **STT**, **TÊN KHÁCH HÀNG**, **SỐ ĐIỆN THOẠI** và **NHÃN PHÂN LOẠI** để đảm bảo dữ liệu hiển thị chính xác.
+3. Sử dụng ô tìm kiếm từ khóa để tra cứu thử một vài số điện thoại vừa nhập.
+</Steps>
+
+---
+
+## 3. Quy chuẩn định dạng dữ liệu Excel
+
+Để tránh lỗi hệ thống không nhận diện được số điện thoại hoặc bị mất số `0` ở đầu khi tải lên, tệp dữ liệu Excel cần đáp ứng 3 nguyên tắc sau:
+
+<Cards className="grid-cols-1 md:grid-cols-3 mb-6">
+  <Card
+    icon="FileText"
+    title="Định dạng kiểu Text"
+    description="Luôn chuyển cột Số điện thoại sang định dạng Text trước khi nhập liệu để bảo toàn chữ số 0 đầu tiên."
+  />
+  <Card
+    icon="Activity"
+    title="Không dùng ký tự lạ"
+    description="Số điện thoại chỉ bao gồm các chữ số liền nhau, không chứa khoảng trắng, dấu chấm, gạch ngang hay dấu ngoặc."
+  />
+  <Card
+    icon="UserCheck"
+    title="Chống trùng lặp SĐT"
+    description="Mỗi số điện thoại chỉ nên gán cho một khách hàng duy nhất để đảm bảo cơ chế hiển thị cuộc gọi chuẩn xác."
+  />
+</Cards>
+
+### Bảng đối chiếu dữ liệu mẫu (Hợp lệ vs Cần tránh)
+
+| Tiêu chuẩn kiểm tra | Hướng dẫn xử lý | Định dạng HỢP LỆ (Nên dùng) | Định dạng LỖI (Cần tránh) |
+| :--- | :--- | :--- | :--- |
+| **Số di động** | Đủ 10 chữ số, giữ nguyên số 0 ở đầu | `0901234567` (hoặc `'0901234567`) | `901234567` *(Mất số 0 do định dạng Number)* |
+| **Số cố định (Bàn)** | Kèm mã vùng, viết liền không khoảng cách | `02877777788` | `(028) 7777-7788`, `028.7777.7788` |
+| **Khoảng cách trắng** | Không chứa ký tự space ở đầu, giữa hoặc cuối | `0988123456` | `0988 123 456` *(Chứa dấu cách giữa các số)* |
+| **Email liên hệ** | Đúng định dạng hộp thư điện tử tiêu chuẩn | `khachhang@congty.com` | `khachhang@`, `khachhang.com` |
+
+<Callout type="info" title="Mẹo nhập liệu nhanh trong Excel">
+Khi nhập số điện thoại bắt đầu bằng số `0`, bạn có thể gõ thêm **dấu nháy đơn (`'`)** ở đầu (ví dụ: `'0901234567`). Excel sẽ tự động nhận diện ô dữ liệu là chuỗi văn bản (Text) và giữ nguyên toàn bộ chữ số mà không cần phải định dạng lại toàn bộ cột.
+</Callout>
+
+---
+
+## 4. Xử lý các tình huống thường gặp (Troubleshooting)
+
+| Sự cố phát sinh | Nguyên nhân khả dĩ | Hướng dẫn khắc phục |
+| :--- | :--- | :--- |
+| **Bấm "Nhập dữ liệu từ excel" nhưng không thấy phản hồi** | Tệp tin tải lên có dung lượng quá lớn hoặc không đúng đuôi `.xlsx` / `.xls`. | Kiểm tra định dạng tệp tin. Nếu danh sách quá lớn (trên 10.000 dòng), hãy chia nhỏ file thành từng đợt để import mượt mà hơn. |
+| **Số điện thoại bị mất số 0 đầu tiên sau khi import** | Cột số điện thoại trong file Excel bị để ở định dạng Number. | Định dạng lại cột Số điện thoại sang kiểu **Text** trong Excel, lưu lại và thực hiện tải lên lại. |
+| **Nhập xong nhưng không thấy xuất hiện trong danh sách** | Khách hàng được nhập vào phân loại đối lập (ví dụ nhập vào nhóm Tiềm năng nhưng đang xem ở nhóm Hiện tại). | Kiểm tra lại phân loại khách hàng bằng cách chuyển qua lại giữa 2 menu: **Khách hàng hiện tại** và **Khách hàng tiềm năng**. |
+| **Cần sao lưu danh bạ trước khi nhập đợt mới** | Đề phòng dữ liệu bị ghi đè hoặc sai sót khi tải hàng loạt. | Nhấp nút **Xuất excel** màu xanh lá trên thanh công cụ để tải toàn bộ danh bạ hiện có về máy tính trước khi thực hiện import mới. |

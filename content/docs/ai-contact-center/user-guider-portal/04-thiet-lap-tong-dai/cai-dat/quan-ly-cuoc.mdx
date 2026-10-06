@@ -1,64 +1,135 @@
 ---
-title: "Hướng đãn cấu hình quản lý cước"
-description: "Cách thức tính cước hiện tại là block 6s đầu + 1s theo đơn giá của Matbao One. Nếu muốn biết chính xác đơn giá theo nhà mạng thì khách hàng có thể liên hệ nhà m..."
+title: "Hướng dẫn cấu hình quản lý cước"
+description: "Hướng dẫn thiết lập bảng giá cước, quy tắc nhận số (Rules) và tra cứu báo cáo thống kê cước cuộc gọi theo đầu số trên Portal ODS."
 ---
 
-## Hướng dẫn cấu hình quản lý cước
+Tính năng **Quản lý cước** trên tổng đài ODS cho phép doanh nghiệp chủ động thiết lập đơn giá cuộc gọi ra theo từng nhà mạng, từng đầu số hotline hoặc theo từng dải số đích (Nội mạng, Ngoại mạng, Di động, Cố định liên tỉnh). Hệ thống sẽ tự động tạm tính chi phí sau mỗi cuộc gọi hoàn thành, giúp người quản trị dễ dàng theo dõi ngân sách viễn thông theo thời gian thực và thuận tiện đối soát với hóa đơn cước từ nhà mạng viễn thông.
+
+---
+
+## 1. Cơ chế tính cước & Lưu ý vận hành
 
 <Callout type="warn">
-**Lưu ý**: Tính năng quản lý cước trên tổng đài MatBao One chỉ là mức tham khảo, cước phí đầu số sẽ được nhà mạng đối soát.
+**Lưu ý quan trọng về đối soát cước phí:**
+
+Số liệu cước phí trên Portal ODS là **mức cước tạm tính nội bộ** dựa trên bảng giá và quy tắc do doanh nghiệp thiết lập nhằm mục đích ước lượng chi phí vận hành. Cước phí thanh toán thực tế cuối kỳ sẽ được căn cứ chính thức theo biên bản đối soát và hóa đơn từ nhà mạng viễn thông cung cấp dịch vụ đầu số (Viettel, VNPT, MobiFone, FPT, CMC,...).
 </Callout>
 
-Cách thức tính cước hiện tại là block 6(s) đầu + 1(s) theo đơn giá của Matbao One. Nếu muốn biết chính xác đơn giá theo nhà mạng thì khách hàng có thể liên hệ nhà mạng cung cấp và tiến hành thao tác nhập dữ liệu giá cước.
+### Phương thức tính cước phổ biến
 
-Vào mục **Tổng đài => Lịch sử cuộc gọi => Đầu số và Cước Phí**
+Hệ thống hỗ trợ 2 cơ chế tính cước viễn thông tiêu chuẩn:
+1. **Tính theo giây (Block 6s + 1s):**
+   - Cuộc gọi có thời lượng 6 giây đầu tiên sẽ được tính trọn gói theo mức cước `Block 6s`.
+   - Từ giây thứ 7 trở đi, cước phí được tính lũy tiến theo từng giây lẻ dựa trên đơn giá `Cộng tiếp 1s`.
+2. **Tính theo phút (Block 1 phút):**
+   - Cuộc gọi có thời lượng dưới 60 giây được làm tròn thành 1 phút.
+   - Sang giây thứ 61, cuộc gọi được làm tròn thành 2 phút và tiếp tục nhân với đơn giá `Block 1 phút`.
 
-![](/media/ai-contact-center/user-guider-portal/img-VCnk0YEIKYKs7yfICX1O.png)
+---
 
-## Cấu hình đơn giá mặc định của MatBao One
+## 2. Quy chuẩn tạo quy tắc số nhận (Rules cú pháp)
 
-**Bước 1**. Nhập Đơn Giá
+Khi cấu hình đơn giá cho từng dải số, hệ thống sử dụng các ký tự đại diện để nhận dạng mạng di động hoặc mã vùng liên tỉnh:
 
-Chọn **“Thêm đầu số”**, chọn đầu số cần tính cước.<br />
+| Ký tự | Ý nghĩa | Ví dụ cú pháp | Diễn giải |
+| :---: | :--- | :--- | :--- |
+| **`X`** | Đại diện cho **1 chữ số bất kỳ** từ 0 đến 9. | `086X XXX XXX` | Nhận diện dải số 086 của Viettel gồm 10 chữ số. |
+| **`[-]`** | Biểu thị **khoảng số liên tục** (Đoạn). | `03[2-9]X XXX XXX` | Nhận diện các đầu số Viettel từ 032 đến 039. |
+| **`[,]`** | Biểu thị phép **liệt kê lựa chọn** (Hoặc). | `0[3,4,5]X XXX XXX` | Nhận diện các đầu số bắt đầu bằng 03, 04 hoặc 05. |
 
-![](/media/ai-contact-center/user-guider-portal/img-DzIjk7eEOt7win6voD1s.png)
+### Nguyên tắc độ ưu tiên (Priority)
 
-**Bước 2**. Nhấp chuột vào đầu số cần thiết lập (đầu số đó sẽ được tô đỏ đậm), sau đó chọn mặc định để tự động tạo đơn giá của MatBao One.<br />
+Hệ thống kiểm tra số nhận theo thứ tự **Độ ưu tiên từ nhỏ đến lớn** (1, 2, 3...):
+- Các quy tắc dải số hẹp, cước ưu đãi (VD: Nội mạng Viettel `09[6-8]X XXX XXX`) cần đặt **Độ ưu tiên cao (số 1, 2, 3)** để được khớp trước.
+- Các quy tắc bao quát rộng (VD: Toàn bộ di động ngoại mạng `0[345789]XX XXX` hoặc cố định `02 XXX XXX XXX`) cần đặt **Độ ưu tiên thấp hơn (số 4, 5...)** để làm phương án dự phòng khi không khớp dải số ưu tiên.
 
-![](/media/ai-contact-center/user-guider-portal/img-5rV3IsT3FnwfcV7JHaAb.png)
+---
 
-Cách tạo rules số nhận:
+## 3. Bảng tham số thiết lập đơn giá
 
-Kí tự: X = 0 đến 9
+| Tên trường | Loại trường | Bắt buộc | Diễn giải & Giá trị mẫu |
+| :--- | :---: | :---: | :--- |
+| **Đầu số gọi ra** | Dropdown | **Có** | Lựa chọn đầu số hotline cần áp dụng bảng giá (VD: `02873070809`). |
+| **Độ ưu tiên** | Number Input | **Có** | Số nguyên dương xác định thứ tự ưu tiên kiểm tra (VD: `1`, `2`). |
+| **Hình thức tính giá** | Radio | **Có** | Chọn `Theo giây` (Block 6s + 1s) hoặc `Theo phút` (Block 1 phút). |
+| **Mã vùng hoặc mã di động** | Text Input | **Có** | Cú pháp rule nhận diện đầu số (VD: `03[2-9]X XXX XXX`). Hệ thống tự động đếm tổng chữ số tương ứng. |
+| **Block 6s** | Number (VNĐ) | Tùy chọn | Đơn giá cho 6 giây đầu tiên khi chọn hình thức theo giây (VD: `44`). |
+| **Cộng tiếp 1s** | Number (VNĐ) | Tùy chọn | Đơn giá cho mỗi giây tiếp theo sau 6 giây đầu (VD: `8`). |
+| **Block 1 phút** | Number (VNĐ) | Tùy chọn | Đơn giá cho mỗi phút gọi (VD: `440`). |
+| **Diễn giải đơn giá** | Text Input | Không | Ghi chú gợi nhớ về loại cước (VD: `Cuộc gọi nội mạng Viettel`, `Cuộc gọi di động ngoại mạng`). |
 
-Dấu phẩy, biểu thị là và: “ , ”
+---
 
-Dấu gạch nối, biểu thị là đoạn: “ - “
+## 4. Hướng dẫn thao tác từng bước
 
-Ví dụ:
+<Steps>
+  <Step>
+    ### Bước 1: Truy cập mục Đầu số & Cước phí
 
-0\[3-5]XXXXXXXX
+    1. Từ thanh menu bên trái Portal, chọn **Tổng đài** > **Lịch sử cuộc gọi**.
+    2. Chuyển sang tab **Đầu số & Cước phí** (URL: `https://app.ods.vn/call-history?tab=pricing`).
+    3. Đường dẫn hiển thị: `Tổng quan / Tổng đài / Lịch sử cuộc gọi / Đầu số & Cước phí`.
+    4. Tại đây hiển thị danh sách các đầu số đã được cấu hình tính cước.
 
-0\[3,4,5]XXXXXXXX
+    ![Giao diện danh sách đầu số gọi ra](/media/ai-contact-center/user-guider-portal/quan-ly-cuoc_danh-sach-dau-so.png)
+  </Step>
 
-**Độ ưu tiên:** Hệ thống sẽ kiểm tra số nhận theo thứ tự độ ưu tiên để xác định số nhận thuộc rules số nhận nào để lấy đơn giá.
+  <Step>
+    ### Bước 2: Thêm đầu số vào danh sách tính cước
 
-Để cập nhật hoặc xoá đơn giá bấm chọn nút **“Sửa”**
+    1. Tại khu vực **DANH SÁCH ĐẦU SỐ GỌI RA**, nhấn nút **+ THÊM MỚI** (màu xanh lá).
+    2. Trong cửa sổ popup **+ THÊM ĐẦU SỐ**:
+       - **Đầu số gọi ra (\*):** Nhấp chọn đầu số hotline doanh nghiệp cần áp bảng giá cước từ danh sách thả xuống.
+       - **Mô tả:** Nhập tên gợi nhớ hoặc nhà cung cấp đầu số (VD: *Đơn giá Viettel SIP Trunking*).
+    3. Nhấn **+ THÊM MỚI** để lưu đầu số vào danh sách.
 
-## Cấu hình đơn giá tuỳ chọn
+    ![Modal thêm đầu số tính cước](/media/ai-contact-center/user-guider-portal/quan-ly-cuoc_form-them-dau-so.png)
+  </Step>
 
-Chọn nút “Thêm đơn giá” để thêm đơn giá mới. Trường hợp này khách hàng cần chuẩn bị sẵn một bảng giá để nhập vào bảng giá.
+  <Step>
+    ### Bước 3: Cấu hình bảng giá cước cho đầu số
 
-![](/media/ai-contact-center/user-guider-portal/img-4AFKIfPvHF6ZXA3BtApe.png)
+    Sau khi thêm đầu số, nhấp chuột trực tiếp vào dòng đầu số đó trong bảng để mở khu vực **BẢNG GIÁ CƯỚC PHÍ** ở bên dưới:
 
-Chọn **“Tính Theo Phút (Block 1 Phút)”**: dưới 1 phút sẽ tính tiền 1 phút và 61 giây sẽ tính 2 phút.
+    - **Tùy chọn 1 - Sử dụng bảng giá mẫu mặc định:**
+      Nhấn nút **Đặt lại** (hoặc **Mặc định**) trên thanh công cụ của bảng giá. Hệ thống sẽ tự động tạo sẵn các quy tắc cơ bản theo khung cước phổ thông của nhà mạng (nội mạng, ngoại mạng di động, cố định).
 
-Chọn **“Tính Theo Giây (Block 6 + 1)”**: Tính tiền theo 6 giây đầu + 1 giây tiếp theo + 1 phút.
+    - **Tùy chọn 2 - Thêm quy tắc đơn giá tùy biến:**
+      1. Nhấn nút **+ THÊM MỚI** tại khu vực `BẢNG GIÁ CƯỚC PHÍ`.
+      2. Trong modal **CẬP NHẬT ĐƠN GIÁ**:
+         - Chọn **Đầu số gọi ra** và nhập **Độ ưu tiên**.
+         - Chọn **Hình thức tính giá**: `Theo giây` hoặc `Theo phút`.
+         - Nhập **Mã vùng hoặc mã di động** theo cú pháp rule (VD: `09[6-8]X XXX XXX`).
+         - Nhập các mức đơn giá: `Block 6s`, `Cộng tiếp 1s`, `Block 1 phút`.
+         - Nhập **Diễn giải đơn giá** (VD: *Cuộc gọi nội mạng*).
+      3. Nhấn **CẬP NHẬT** (hoặc **THÊM MỚI**) để hoàn tất.
 
-## Xem cước gọi chi tiết
+    ![Modal cập nhật đơn giá theo rule](/media/ai-contact-center/user-guider-portal/quan-ly-cuoc_form-don-gia.png)
+  </Step>
 
-Để xem chi tiết đơn giá cuộc gọi, chọn **Tổng đài => Thống kê => Cước** và bấm tìm kiếm. Trong bảng hiển thị thời gian thực gọi (tính từ lúc cuộc gọi trả lời), chi phí cho từng cuộc gọi, tổng thời gian gọi, tổng chi phí gọi trong khoảng thời gian tìm kiếm,…
+  <Step>
+    ### Bước 4: Tra cứu và xuất báo cáo thống kê cước
 
-![](/media/ai-contact-center/user-guider-portal/img-HiwOTmrQtgMMHQF2y1Do.png)
+    Để theo dõi chi phí phát sinh và kiểm tra tính chính xác của bảng giá đã thiết lập:
 
-Để lưu trữ thông tin, xuất cước theo tháng hoặc theo ngày bạn có thể xuất file excel.
+    1. Từ menu bên trái Portal, truy cập **Tổng đài** > **Thống kê** > **Cước** (URL: `https://app.ods.vn/report/fee`).
+    2. Chọn xem dữ liệu **Theo đầu số** hoặc **Theo nhân viên**.
+    3. Thiết lập bộ lọc thời gian: *Hôm nay, 7 ngày qua, 30 ngày qua* hoặc tùy chọn khoảng ngày cụ thể.
+    4. Theo dõi chi tiết:
+       - **Biểu đồ thống kê cước chi phí:** Thể hiện cột chi phí theo từng đầu số/nhân viên.
+       - **Bảng thống kê cước chi phí:** Phân tách chi tiết thời gian gọi và chi phí theo 3 luồng: **NỘI MẠNG**, **LIÊN TỈNH**, và **DI ĐỘNG**.
+    5. Nhấn nút **Xuất excel** ở góc phải bảng để tải báo cáo về máy tính phục vụ đối soát chi phí hàng tháng.
+
+    ![Báo cáo thống kê cước chi phí theo đầu số](/media/ai-contact-center/user-guider-portal/quan-ly-cuoc_thong-ke-cuoc.png)
+  </Step>
+</Steps>
+
+---
+
+## 5. Xử lý sự cố thường gặp (Troubleshooting)
+
+| Vấn đề phát sinh | Nguyên nhân chính | Cách xử lý |
+| :--- | :--- | :--- |
+| **Cuộc gọi phát sinh nhưng chi phí hiển thị bằng 0đ** | 1. Đầu số gọi ra chưa được thêm vào mục **Đầu số & Cước phí**.<br />2. Đầu số đã thêm nhưng chưa có quy tắc nào trong **Bảng giá cước phí**.<br />3. Số máy người nhận không khớp với bất kỳ Rule số nhận nào đã khai báo. | 1. Kiểm tra lại tab **Đầu số & Cước phí**, đảm bảo đầu số đã được thêm.<br />2. Nhấn nút **Đặt lại** để nạp bảng giá chuẩn hoặc thêm các rule cơ bản.<br />3. Thêm một rule bao quát với độ ưu tiên thấp nhất (VD: `0[2345789]XX XXX`) để bắt mọi cuộc gọi thông thường. |
+| **Cuộc gọi nội mạng bị tính theo đơn giá ngoại mạng** | Độ ưu tiên của rule nội mạng đang đặt cao hơn (số lớn hơn) so với rule ngoại mạng bao quát. | Kiểm tra lại cột **ĐỘ ƯU TIÊN**: Cần đặt rule nội mạng có số thứ tự nhỏ hơn (VD: `1`, `2`) so với rule ngoại mạng (VD: `4`, `5`) để hệ thống kiểm tra trước. |
+| **Tổng cước Portal lệch so với hóa đơn nhà mạng viễn thông** | Đơn giá cài đặt trên Portal chưa cập nhật khi nhà mạng thay đổi gói cước, hoặc cách làm tròn block thời gian khác nhau giữa hai bên. | Kiểm tra lại phụ lục hợp đồng cước của nhà mạng, sau đó nhấn nút **Sửa** tại từng rule trên Portal để điều chỉnh lại đúng các mức đơn giá Block 6s, 1s và 1 phút. |

@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: done
 branch: task/TASK-013-portal-docs-actuation
-commit: ""
+commit: "99e5489"
 verified-by: npm run verify:task
 ---
 
@@ -29,6 +29,7 @@ Sau khi TASK-012 được merge qua Pull Request #12, working tree còn một nh
 - `content/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/**`
 - `public/media/ai-contact-center/user-guider-portal/**`
 - `public/media/session_init_success.png`
+- `src/components/docs/customer-flow-diagram.tsx`
 - `tasks/TASK-013-portal-docs-actuation.md`
 - `.harness/reports/TASK-013-report.md`
 

@@ -1,57 +1,134 @@
 ---
-title: "Lịch sử cuộc gọi"
-description: "Lịch sử gọi hiển thị các cuộc gọi vào, gọi ra hay gọi nhỡ. Ở đó bao gồm tất cả thông tin cần thiết của cuộc gọi như tổng thời gian cuộc gọi, thời gian thực gọi,..."
+title: "Hướng dẫn tra cứu nhật ký và lịch sử cuộc gọi"
+description: "Hướng dẫn lọc tìm kiếm đa điều kiện, nghe lại file ghi âm, phân tích chi tiết thông số và xuất báo cáo nhật ký cuộc gọi trên Portal ODS."
 ---
 
-## Lịch sử cuộc gọi
+Phân hệ **Lịch sử cuộc gọi** trên tổng đài ODS là trung tâm dữ liệu ghi nhận 100% các phiên tương tác phát sinh trên hệ thống (bao gồm cuộc gọi vào, gọi ra và gọi nội bộ). Phân hệ này cung cấp đầy đủ các thông tin vận hành như thời điểm gọi, hướng cuộc gọi, đầu số hotline, nhân viên phụ trách, số khách hàng, trạng thái kết nối, thời lượng đàm thoại thực tế, thời gian tính phí và liên kết nghe/tải file ghi âm chất lượng cao.
 
-Lịch sử gọi hiển thị các cuộc gọi vào, gọi ra hay gọi nhỡ. Ở đó bao gồm tất cả thông tin cần thiết của cuộc gọi như tổng thời gian cuộc gọi, thời gian thực gọi, số nhận, số gọi …
+---
 
-![](/media/ai-contact-center/user-guider-portal/img-dh75p4Bs4dyE9EgdJW8y.png)
+## 1. Cơ chế hoạt động & Đối tượng áp dụng
 
-Để xem lịch sử cuộc gọi trên hệ thống, Truy cập Mục **Tổng đài => Lịch sử cuộc gọi => Nhật Ký Cuộc Gọi**
+### Mục đích vận hành
+- **Giám sát thời gian thực:** Nắm bắt ngay tình trạng các cuộc gọi vào và gọi ra của doanh nghiệp trong ngày.
+- **Quản lý chất lượng dịch vụ (QA):** Nghe lại file ghi âm để đánh giá kỹ năng tư vấn, thái độ của điện thoại viên và mức độ hài lòng của khách hàng.
+- **Giải quyết khiếu nại:** Cung cấp bằng chứng xác thực về thời điểm, nội dung trao đổi khi phát sinh tranh chấp hoặc khiếu nại từ khách hàng.
+- **Đối soát chi phí:** Kiểm tra chính xác thời lượng tính phí viễn thông cho từng cuộc gọi để đối chiếu với hóa đơn cước nhà mạng.
 
-Để tìm kiếm nhật ký cuộc gọi trên tổng đài, người dùng có thể thiết lập điều kiện tìm kiếm trên công cụ tìm kiếm của nhật ký cuộc gọi với các thông tin như:
+### Đối tượng áp dụng
+- **Quản trị viên hệ thống (Admin):** Toàn quyền tra cứu lịch sử cuộc gọi của tất cả đầu số và nhân viên trong doanh nghiệp; xuất báo cáo tổng hợp.
+- **Giám sát tổng đài (Supervisor):** Theo dõi lịch sử cuộc gọi của các nhóm nhân viên phụ trách; nghe lại ghi âm và chấm điểm chất lượng.
+- **Điện thoại viên (Agent):** Tra cứu nhật ký cuộc gọi của chính máy nhánh mình để xem lại thông tin khách hàng vừa liên hệ.
 
-* **Khoảng thời gian**: Lựa chọn khoảng thời gian cần tìm kiếm
-* **Phân loại hướng cuộc gọi**: Lựa chọn hướng cuộc gọi:
-  * Gọi ra: Hướng cuộc gọi từ đổng đài ra bên ngoài
-  * Gọi vào: Hướng cuộc gọi từ bên ngoài vào tổng đài
-  * Gọi nội bộ: Các cuộc gọi nội bộ với nhau
-* **Thời gian đàm thoại**: Lọc cuộc gọi có tổng thời gian gọi trong một khoảng nhất định
-* **Kiểu hiển thị**:
-  * Kiểu hiển thị thời gian:
-  * Kiểu hiển thị lịch sử cuộc gọi:
-    * Tổng quát cuộc gọi
-    * Chi Tiết cuộc gọi<br />
+---
 
-      ![](/media/ai-contact-center/user-guider-portal/img-BEKS9pu2eWgB4ymDNukv.png)
+## 2. Bảng tham số bộ lọc & Ý nghĩa các chỉ số cuộc gọi
+
+### Bộ lọc tìm kiếm trên giao diện
+
+| Tên bộ lọc | Loại điều khiển | Diễn giải & Cách sử dụng |
+| :--- | :---: | :--- |
+| **Nhập từ khóa tại đây...** | Text Input | Tìm kiếm nhanh theo số điện thoại khách hàng, mã cuộc gọi hoặc số máy nhánh (hỗ trợ tìm cùng lúc nhiều số cách nhau bởi dấu `,`). |
+| **Khoảng thời gian** | Dropdown / Date Picker | Chọn nhanh các mốc thời gian (*Hôm nay, Hôm qua, 7 ngày qua, 30 ngày qua, Tháng này, Tháng trước*) hoặc chọn khoảng ngày bắt đầu – kết thúc tùy chỉnh. |
+| **Nhập đầu số** | Text Input / Dropdown | Lọc theo số hotline tổng đài tiếp nhận hoặc gọi ra của doanh nghiệp (VD: `02873070809`). |
+| **Tất cả hướng gọi** | Dropdown | Lọc theo hướng cuộc gọi: **Gọi ra** (Outbound), **Gọi vào** (Inbound), hoặc **Gọi nội bộ** (Internal). |
+| **Tất cả trạng thái** | Dropdown | Lọc theo trạng thái kết thúc cuộc gọi: **Trả lời**, **Không bắt máy**, **Máy bận**, hoặc **Không thể kết nối**. |
+| **Thoại từ giây – Đến giây** | Number Range | Lọc các cuộc gọi có thời lượng đàm thoại nằm trong một khoảng nhất định (VD: từ `60` đến `300` giây). |
+| **Kiểu hiển thị lịch sử** | Dropdown | Chọn giữa **Tổng quát cuộc gọi** (mặc định) hoặc **Chi tiết cuộc gọi** (hiển thị phân rã từng chặng chuyển tiếp). |
+
+### Diễn giải chi tiết các cột dữ liệu
+
+| Tên cột | Ý nghĩa & Diễn giải vận hành |
+| :--- | :--- |
+| **THỜI GIAN** | Thời điểm bắt đầu khởi tạo cuộc gọi, kèm icon màu sắc phân biệt hướng cuộc gọi (mũi tên xanh/tím). |
+| **ĐẦU SỐ** | Đầu số hotline của doanh nghiệp được sử dụng trong cuộc gọi. |
+| **NHÓM** | Tên nhóm máy nhánh tiếp nhận cuộc gọi (nếu cuộc gọi đi qua hàng đợi/nhóm nhân viên). |
+| **NHÂN VIÊN** | Tên và số máy nhánh của nhân viên phụ trách cuộc gọi (VD: `NhanVien A (101)`). |
+| **KHÁCH HÀNG** | Số điện thoại của khách hàng, kèm nút **`+`** để thêm nhanh vào danh bạ Mini CRM. |
+| **TRẠNG THÁI** | Trạng thái cuộc gọi: **Trả lời** (xanh lá), **Không bắt máy** (đỏ cam), **Máy bận**, hoặc **Ngắt kết nối**. |
+| **THỜI GIAN THOẠI** | Thời lượng đàm thoại thực tế tính từ lúc người nhận bắt máy đến khi gác máy. |
+| **THỜI GIAN GỌI** | Tổng thời gian phiên gọi tính từ lúc bắt đầu đổ chuông đến khi kết thúc (bao gồm cả thời gian chờ). |
+| **THỜI GIAN TÍNH PHÍ** | Thời gian thực tế tính cước của cuộc gọi dùng để đối soát với nhà mạng viễn thông. |
+| **THỜI GIAN BẮT MÁY** | Thời gian chờ từ lúc bắt đầu đổ chuông đến khi máy nhánh trả lời. |
+| **THỜI GIAN KỊCH BẢN** | Thời gian khách hàng tương tác với kịch bản lời chào/IVR trước khi được kết nối vào máy nhánh. |
+| **MÃ CUỘC GỌI** | Mã định danh duy nhất (Call ID) do hệ thống sinh ra cho từng cuộc gọi, dùng để tra cứu kỹ thuật và đối soát API. |
+| **THAO TÁC** | Các hành động nhanh: **Xem chi tiết** (icon mắt), **Nghe ghi âm** (icon loa), **Tải ghi âm** (icon download), **Phân tích AI** (icon biểu đồ). |
+
+---
+
+## 3. Hướng dẫn thao tác từng bước
+
+<Steps>
+  <Step>
+    ### Bước 1: Truy cập Nhật ký cuộc gọi và áp dụng bộ lọc
+
+    1. Từ menu bên trái Portal, truy cập **Tổng đài** > **Lịch sử cuộc gọi**.
+    2. Hệ thống mặc định mở tab **Nhật ký cuộc gọi** (đường dẫn: `Tổng quan / Tổng đài / Lịch sử cuộc gọi / Nhật ký cuộc gọi`).
+    3. Thiết lập các điều kiện tìm kiếm theo nhu cầu:
+       - Chọn khoảng thời gian cần tra cứu (VD: `7 ngày qua` hoặc `Tháng trước`).
+       - Chọn hướng gọi tại ô **Tất cả hướng gọi** (`Gọi vào`, `Gọi ra`, hoặc `Gọi nội bộ`).
+       - Chọn trạng thái tại ô **Tất cả trạng thái** (`Trả lời` hoặc `Không bắt máy`).
+       - Nhập số điện thoại khách hàng hoặc máy nhánh vào ô tìm kiếm từ khóa.
+    4. Nhấn nút **Tìm kiếm** (màu xanh dương) để lọc danh sách. Nhấn nút **Đặt lại** (icon vòng xoay) nếu muốn đưa bộ lọc về mặc định.
+
+    ![Bộ lọc và danh sách nhật ký cuộc gọi](/media/ai-contact-center/user-guider-portal/lich-su-cuoc-goi_bo-loc.png)
+  </Step>
+
+  <Step>
+    ### Bước 2: Tùy biến cột hiển thị và phân trang
+
+    Để giao diện hiển thị gọn gàng và tập trung vào các trường dữ liệu cần thiết:
+
+    1. Ở góc dưới bên trái của bảng danh sách, nhấp vào ô **Chọn cột hiển thị**.
+    2. Đánh dấu chọn các cột muốn xem hoặc bỏ chọn các cột không cần thiết (VD: có thể ẩn cột *Mã cuộc gọi* nếu chỉ xem vận hành hàng ngày).
+    3. Điều chỉnh số dòng hiển thị trên mỗi trang tại ô **Hiển thị [20] dòng** (hỗ trợ chọn 10, 20, 50 hoặc 100 dòng mỗi trang).
+
+    ![Bảng danh sách nhật ký cuộc gọi trên Portal ODS](/media/ai-contact-center/user-guider-portal/lich-su-cuoc-goi_danh-sach.png)
+  </Step>
+
+  <Step>
+    ### Bước 3: Xem chi tiết thông số và nghe lại file ghi âm
+
+    1. Tại cột **THAO TÁC** của cuộc gọi cần kiểm tra, nhấn vào biểu tượng **Chi tiết** (icon hình con mắt).
+    2. Cửa sổ popup **CHI TIẾT CUỘC GỌI [MÃ_CUỘC_GỌI]** xuất hiện:
+       - **Header:** Hiển thị rõ hướng cuộc gọi (`CUỘC GỌI VÀO` hoặc `CUỘC GỌI RA`) và trạng thái kết nối.
+       - **Thông tin đối tượng:** Số điện thoại khách hàng và thông tin nhân viên phụ trách (tên, số máy nhánh).
+       - **Bảng thông số:** Đầu số hotline, Nhóm, Thời gian khởi tạo, Thời gian gọi, Thời gian thoại, Thời gian tính phí, Thời gian chờ nghe máy và Tổng thời gian chờ.
+       - **Nghe ghi âm trực tiếp:** Nhấp vào biểu tượng loa hoặc nút Play trên thanh phát âm thanh để nghe lại toàn bộ cuộc hội thoại.
+       - **Tải file ghi âm:** Nhấn nút **Tải ghi âm** để lưu file âm thanh về máy tính.
+
+    ![Popup chi tiết cuộc gọi và trình phát file ghi âm](/media/ai-contact-center/user-guider-portal/lich-su-cuoc-goi_chi-tiet-cuoc-goi.png)
+  </Step>
+
+  <Step>
+    ### Bước 4: Xuất dữ liệu lịch sử cuộc gọi ra file Excel
+
+    Khi cần báo cáo định kỳ hoặc chuyển dữ liệu cho bộ phận kế toán/đối soát cước:
+
+    1. Áp dụng các bộ lọc cần thiết (khoảng ngày, hướng gọi, trạng thái).
+    2. Nhấn nút **Xuất excel** ở góc trên bên phải của bảng danh sách.
+    3. Hệ thống sẽ tự động tổng hợp các bản ghi thỏa mãn điều kiện và tải xuống file bảng tính `.xlsx` chứa đầy đủ mọi thông số chi tiết của từng cuộc gọi.
+  </Step>
+</Steps>
+
+---
+
+## 4. Lưu ý quan trọng khi vận hành
 
 <Callout type="warn">
-**Lưu ý**:Cho phép người dùng có thể tìm kiếm cùng lúc nhiều số gọi hoặc số nhận. Cú pháp thực hiện cách nhau bởi dấu “,”.
+**Các điểm cốt lõi cần ghi nhớ khi tra cứu:**
+
+1. **Tìm kiếm nhiều số cùng lúc:** Hệ thống hỗ trợ tra cứu đồng thời nhiều số điện thoại gọi đến hoặc số máy nhánh bằng cách nhập các số cách nhau bởi dấu phẩy `,` (VD: `0901234567, 0912345678, 101, 102`).
+2. **Điều kiện phát sinh file ghi âm:** File ghi âm chỉ được tạo ra khi máy nhánh/đầu số đã được cấu hình bật tính năng ghi âm và cuộc gọi có trạng thái **Trả lời**. Những cuộc gọi nhỡ, máy bận hoặc gọi lỗi viễn thông sẽ không có file ghi âm.
+3. **Chính sách lưu trữ file ghi âm:** Tùy theo gói dịch vụ doanh nghiệp đăng ký, file ghi âm được lưu trữ trên hệ thống trong khoảng thời gian nhất định (thường là 3 tháng, 6 tháng hoặc 12 tháng). Quản trị viên nên chủ động xuất file định kỳ nếu doanh nghiệp có quy định lưu trữ hồ sơ lâu dài.
 </Callout>
 
-Người dùng có thể lựa chọn thông tin hiển thị trên lịch sử cuộc gọi:
+---
 
-![](/media/ai-contact-center/user-guider-portal/img-Fhs8EXlpBp5H4Omjk4at.png)
+## 5. Xử lý sự cố thường gặp (Troubleshooting)
 
-* Thông tin chi tiết các cột trong bảng danh sách cuộc gọi:
-  * **Nhóm**: Nhóm nhận cuộc gọi trên tổng đài (nếu có)
-  * **Nhân viên**: là số máy nhánh của nhân viên
-  * **Trạng thái**: Trạng thái cuộc gọi
-    * Trả lời: cuộc gọi đã trả lời
-    * Không bắt máy: cuộc gọi không trả lời
-    * Máy bận: Người dùng bận
-    * Không thể kết nối: không thể kết nối được (>40 giây), đầu số lỗi (&lt;5 giây)
-  * **Thời gian gọi**: là tổng thời gian từ khi bắt đầu cuộc gọi tới khi kết thúc cuộc gọi (bao gồm thời gian chờ)
-  * **Thời gian đàm thoại**: là tổng thời gian từ khi cuộc gọi bắt đầu “Trả lời” (không bao gồm thời gian chờ)
-  * **Thời gian tính phí**: là thời gian thực tế tính cược của cuộc gọi (dùng đề đối soát cuộc gọi với các nhà mạng)
-  * **Thời gian chờ nghe máy**: Thời gian chờ đến khi máy nhánh trả lời đối với cuộc gọi vào
-  * **Tổng thời gian chờ**: Tổng thời gian chờ của một cuộc gọi vào hệ thống đến khi máy nhánh nghe máy hoặc thời gian chờ thực hiện cuộc gọi ra
-  * **Mã cuộc gọi**: mã của cuộc gọi<br />
-
-    ![](/media/ai-contact-center/user-guider-portal/img-RQdZ5jmcTLdbc0Zz2IeM.png)
-
-Người quản trị có thể nghe lại cuộc hội thoại của các máy nhánh, chọn biểu tượng hình loa để nghe ghi âm.
-
-![](/media/ai-contact-center/user-guider-portal/img-YQgA2JLOscb3J8JfwBgj.png)
+| Vấn đề phát sinh | Nguyên nhân khả dĩ | Hướng xử lý |
+| :--- | :--- | :--- |
+| **Tìm kiếm không hiển thị kết quả cuộc gọi** | 1. Khoảng thời gian chọn không bao gồm thời điểm phát sinh cuộc gọi.<br />2. Bộ lọc trạng thái hoặc hướng gọi bị chọn nhầm.<br />3. Có khoảng trắng thừa trong ô tìm kiếm từ khóa hoặc số điện thoại. | 1. Mở rộng khoảng thời gian lọc sang *30 ngày qua* hoặc chọn khoảng ngày cụ thể.<br />2. Nhấn nút **Đặt lại** (icon xoay tròn) để xóa toàn bộ điều kiện lọc và tìm kiếm lại.<br />3. Kiểm tra lại chính xác số điện thoại cần tìm. |
+| **Không thể phát file ghi âm trực tiếp trên trình duyệt** | 1. Cuộc gọi không có thời lượng đàm thoại (cuộc gọi nhỡ hoặc máy bận).<br />2. Trình duyệt web đang chặn tính năng tự động phát âm thanh (Autoplay Policy).<br />3. File ghi âm đang trong quá trình chuyển mã hoặc đồng bộ lên máy chủ lưu trữ. | 1. Kiểm tra cột **TRẠNG THÁI** và **THỜI GIAN THOẠI** (phải $> 0$).<br />2. Cấp quyền âm thanh cho trang web `app.ods.vn` trên trình duyệt (nhấp biểu tượng ổ khóa bên cạnh thanh URL).<br />3. Đợi 1–2 phút sau khi cuộc gọi kết thúc rồi tải lại trang. |
+| **Không tìm thấy nút Xuất Excel hoặc tải file bị chậm** | Số lượng bản ghi trong khoảng thời gian chọn quá lớn (hàng chục nghìn cuộc gọi), gây tải nặng cho quá trình kết xuất dữ liệu. | Chia nhỏ khoảng thời gian cần xuất báo cáo (theo từng tuần hoặc từng tháng) để quá trình xuất file Excel diễn ra nhanh chóng và không bị gián đoạn kết nối. |

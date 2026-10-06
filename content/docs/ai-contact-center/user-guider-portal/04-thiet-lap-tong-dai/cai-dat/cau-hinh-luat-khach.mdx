@@ -1,84 +1,134 @@
 ---
-title: "Hướng dẫn cấu hình luật khách"
-description: "Luật khách quen là tính năng cho phép tổng đài ghi nhớ cuộc gọi của nhân viên với khách hàng theo các chế độ ghi nhớ khác nhau. Chế độ ưu tiên trước/sau là khi ..."
+title: "Hướng dẫn cấu hình luật khách quen"
+description: "Thiết lập cơ chế tự động ghi nhớ cuộc gọi và định tuyến khách hàng cũ về đúng máy nhánh nhân viên phụ trách trên Portal ODS."
 ---
 
-## Cấu hình luật khách quen
+Tính năng **Luật khách quen** trên tổng đài ODS cho phép hệ thống tự động ghi nhớ mối liên kết giữa khách hàng và nhân viên phụ trách dựa trên lịch sử tương tác. Khi khách hàng gọi lại vào đầu số hotline của doanh nghiệp, cuộc gọi sẽ được tự động định tuyến thẳng đến đúng máy nhánh của nhân viên đó, bỏ qua kịch bản lời chào và phân luồng IVR thông thường.
 
-Luật khách quen là tính năng cho phép tổng đài ghi nhớ cuộc gọi của nhân viên với khách hàng theo các chế độ ghi nhớ khác nhau. Chế độ ưu tiên trước/sau là khi số máy nhánh (nhân viên) gọi ra cho khách hàng hoặc tiếp nhận cuộc gọi vào thì tổng đài tự động lưu lại nhật ký cuộc gọi đó, để lần sau khách hàng gọi lại thì gặp đúng nhân viên đó.
+---
+
+## 1. Cơ chế hoạt động & Điều kiện tiên quyết
+
+### Lợi ích vận hành
+- **Cá nhân hóa trải nghiệm:** Khách hàng không phải bấm phím chọn lại phòng ban hoặc nhắc lại câu chuyện cho một nhân viên mới.
+- **Tối ưu thời gian xử lý:** Nhân viên phụ trách đã nắm rõ hồ sơ và ngữ cảnh từ trước, rút ngắn thời gian tư vấn hoặc giải quyết khiếu nại.
+- **Linh hoạt theo quy trình:** Hỗ trợ cả mô hình chăm sóc cố định (người đầu tiên phụ trách) hoặc mô hình chuyển giao liên tục (người liên hệ gần nhất phụ trách).
+
+### Điều kiện tiên quyết
+- Tài khoản quản trị đã đăng nhập thành công vào Portal [https://app.ods.vn](https://app.ods.vn).
+- Doanh nghiệp đã được kích hoạt ít nhất một đầu số hotline (Inbound DID) và các [Máy nhánh nhân viên](/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/tao-cau-hinh-may-nhanh) đang hoạt động bình thường.
+
+---
+
+## 2. Bảng tham số & Chế độ ghi nhớ
+
+Hệ thống cung cấp 3 chế độ ghi nhớ linh hoạt trên từng đầu số:
+
+| Chế độ | Nguyên lý hoạt động | Tình huống áp dụng phù hợp |
+| :--- | :--- | :--- |
+| **Trước (First Contact)** | Khi nhiều máy nhánh khác nhau cùng liên hệ với một khách hàng, hệ thống **chỉ lưu duy nhất máy nhánh đầu tiên** thực hiện cuộc gọi. | Áp dụng cho mô hình Telesales chia lead cố định, chuyên viên kinh doanh phụ trách trọn đời tài khoản khách hàng. |
+| **Sau (Last Contact)** | Khi nhiều máy nhánh khác nhau cùng liên hệ với một khách hàng, hệ thống **tự động cập nhật máy nhánh cuối cùng** có tương tác. | Áp dụng cho bộ phận Hỗ trợ kỹ thuật (Helpdesk), Chăm sóc khách hàng sau bán hoặc xử lý sự vụ theo ca kíp. |
+| **Dừng (Disabled)** | Vô hiệu hóa quy tắc khách quen cho đầu số này. Cuộc gọi đến sẽ chạy theo kịch bản định tuyến thông thường (IVR, Nhóm máy nhánh). | Đầu số hotline dùng chung cho tuyển dụng, khảo sát chất lượng dịch vụ hoặc sự kiện ngắn hạn không cần lưu vết. |
+
+### Các tùy chọn bổ trợ
+
+| Tùy chọn | Loại điều khiển | Diễn giải & Tác động vận hành |
+| :--- | :---: | :--- |
+| **Tự động ghi nhớ cuộc gọi** | Toggle ON/OFF (Toàn cục) | Cho phép hệ thống tự động lưu lịch sử gọi giữa nhân viên và khách hàng vào cơ sở dữ liệu luật khách quen. Nếu tắt, hệ thống không tự động lưu dữ liệu mới từ các cuộc gọi phát sinh. |
+| **Lưu LKQ khi không bắt máy** | Toggle ON/OFF (Theo đầu số) | Khi nhân viên gọi ra cho khách hàng nhưng khách không nhấc máy (cuộc gọi nhỡ ra), hệ thống vẫn tự động lưu liên kết. Khi khách hàng nhìn thấy cuộc gọi nhỡ và gọi lại hotline, cuộc gọi sẽ tự động đổ chuông về đúng nhân viên vừa gọi. |
+
+---
+
+## 3. Hướng dẫn thao tác từng bước
+
+<Steps>
+  <Step>
+    ### Bước 1: Kích hoạt tính năng và chọn chế độ ghi nhớ cho đầu số
+
+    1. Từ thanh điều hướng bên trái Portal, chọn **Cài đặt tổng đài** > **Định tuyến**.
+    2. Chuyển sang tab **Luật khách quen** (đường dẫn: `Tổng quan / Cài đặt tổng đài / Danh sách định tuyến / Luật khách quen`).
+    3. Bật công tắc **Tự động ghi nhớ cuộc gọi** ở phía trên danh sách đầu số sang trạng thái **ON**.
+    4. Tại bảng danh sách, tìm đầu số hotline cần thiết lập:
+       - Cột **LƯU LKQ KHI KHÔNG BẮT MÁY**: Bật sang **ON** nếu muốn ghi nhận cả các cuộc gọi đi không thành công.
+       - Cột **CHẾ ĐỘ**: Chọn một trong 3 tùy chọn **Trước**, **Dừng** hoặc **Sau** tùy theo quy trình chăm sóc của doanh nghiệp.
+
+    ![Bảng danh sách đầu số cấu hình luật khách quen](/media/ai-contact-center/user-guider-portal/luat-khach-quen_danh-sach-dau-so.png)
+  </Step>
+
+  <Step>
+    ### Bước 2: Mở Danh sách cấu hình ưu tiên của đầu số
+
+    1. Tại dòng đầu số cần quản lý danh sách khách hàng, nhấn nút **Sửa** (biểu tượng cây bút) ở cột **THAO TÁC**.
+    2. Hệ thống chuyển sang màn hình **DANH SÁCH CẤU HÌNH ƯU TIÊN [TRƯỚC/SAU] CỦA ĐẦU SỐ: [Số_Hotline]**.
+    3. Tại đây hiển thị:
+       - Bảng danh sách các số điện thoại khách hàng đã được lưu tự động hoặc thêm thủ công.
+       - Các cột thông tin: **STT**, Checkbox chọn, **SỐ ĐIỆN THOẠI**, **SỐ MÁY NHÁNH**, **THỜI GIAN TẠO**, **HƯỚNG CUỘC GỌI**, và **THAO TÁC**.
+       - Các nút chức năng góc trên bên phải: **+ Thêm số điện thoại**, **Import số điện thoại**, **Xoá mục đã chọn**.
+
+    ![Danh sách cấu hình ưu tiên của đầu số](/media/ai-contact-center/user-guider-portal/luat-khach-quen_danh-sach-uu-tien.png)
+  </Step>
+
+  <Step>
+    ### Bước 3: Thêm thủ công số điện thoại vào danh sách ưu tiên
+
+    Ngoài việc để hệ thống tự động ghi nhận, người quản trị có thể chủ động phân bổ số điện thoại khách hàng cho một nhân viên cụ thể:
+
+    1. Nhấn nút **+ Thêm số điện thoại**.
+    2. Trong cửa sổ popup **+ THÊM MỚI SỐ ĐIỆN THOẠI**:
+       - **Đầu số:** Hiển thị đầu số hotline đang thao tác (hệ thống tự điền).
+       - **Số điện thoại:** Nhập chính xác số điện thoại của khách hàng (VD: `0901234567`).
+       - **Số máy nhánh:** Nhấp chọn máy nhánh của nhân viên phụ trách từ danh sách thả xuống.
+    3. Nhấn **+ THÊM MỚI** để lưu cấu hình.
+
+    ![Modal thêm mới số điện thoại ưu tiên](/media/ai-contact-center/user-guider-portal/luat-khach-quen_form-them-so.png)
+  </Step>
+
+  <Step>
+    ### Bước 4: Nhập hàng loạt số điện thoại từ file Excel
+
+    Khi cần cập nhật danh sách lớn khách hàng cho các nhân viên quản lý (VIP, Account Manager):
+
+    1. Nhấn nút **Import số điện thoại**.
+    2. Trong cửa sổ popup **Import danh sách số điện thoại**:
+       - Nhấp vào liên kết **Tải file mẫu** ở góc dưới bên trái để tải file Excel chuẩn về máy tính.
+       - Mở file mẫu và điền thông tin danh sách số điện thoại cùng số máy nhánh phụ trách tương ứng.
+       - Nhấn **Choose File** và chọn file Excel định dạng `.xlsx` vừa cập nhật.
+    3. Nhấn **+ Thêm mới** để tiến hành nhập dữ liệu vào hệ thống.
+
+    ![Modal import danh sách số điện thoại bằng file Excel](/media/ai-contact-center/user-guider-portal/luat-khach-quen_form-import.png)
+  </Step>
+
+  <Step>
+    ### Bước 5: Quản lý và xóa số điện thoại khỏi danh sách đã lưu
+
+    Khi nhân viên nghỉ việc hoặc cần phân phối lại khách hàng:
+
+    - **Xóa từng số điện thoại:** Nhấn biểu tượng thùng rác màu đỏ tại cột **THAO TÁC** của dòng số điện thoại muốn xóa, sau đó chọn **OK** tại hộp thoại xác nhận.
+    - **Xóa nhiều số cùng lúc:** Tích chọn ô vuông trước từng số điện thoại cần xóa (hoặc tích chọn ô vuông ở dòng tiêu đề để chọn tất cả), sau đó nhấn nút **Xoá mục đã chọn** và xác nhận.
+
+    Sau khi xóa, mối liên kết bị hủy và khách hàng khi gọi lại sẽ đổ chuông theo kịch bản tổng đài thông thường.
+  </Step>
+</Steps>
+
+---
+
+## 4. Lưu ý quan trọng khi vận hành
 
 <Callout type="warn">
-**Lưu ý:**
+**Quy tắc định tuyến cần nắm rõ:**
 
-* Nếu cuộc gọi nhỡ, cuộc gọi sẽ không được tự động lưu lại trên hệ thống và lần sau khách hàng gọi tới sẽ không gặp được nhân viên đó.
-* Số điện thoại được lưu trong danh sách ưu tiên, khi khách hàng gọi lại sẽ chạy theo quy luật khách quen và bỏ qua kịch bản tổng đài.
+1. **Bỏ qua kịch bản tổng đài:** Khi số điện thoại của khách hàng trùng khớp trong danh sách ưu tiên, hệ thống sẽ **bỏ qua hoàn toàn kịch bản lời chào, phím bấm IVR và quy luật thời gian làm việc** để kết nối trực tiếp đến máy nhánh phụ trách.
+2. **Cuộc gọi nhỡ gọi vào không tự động lưu:** Nếu khách hàng gọi vào nhưng chưa từng có nhân viên nào bắt máy (cuộc gọi nhỡ vào hàng đợi/IVR), hệ thống sẽ **không** tự động lưu liên kết vì chưa phát sinh nhân viên tiếp nhận.
+3. **Xử lý khi máy nhánh phụ trách bận hoặc offline:** Trường hợp máy nhánh của nhân viên đang bận cuộc gọi khác hoặc không đăng nhập hệ thống, cuộc gọi sẽ tuân theo cấu hình **Chuyển cuộc gọi khi bận / không trả lời** của chính máy nhánh đó (VD: Đổ chuông sang nhóm hỗ trợ hoặc chuyển vào Hộp thư thoại).
 </Callout>
 
-**Các bước cấu hình:**
+---
 
-1. Vào mục “Định tuyến” => “Luật khách quen”.<br />
+## 5. Xử lý sự cố thường gặp (Troubleshooting)
 
-   ![](/media/ai-contact-center/user-guider-portal/img-SGn0yrQ1EvmsCKN9q2aH.png)
-2. Chọn đầu số cần sử dụng tính năng luật khách quen, bật tự động ghi nhớ cuộc gọi.<br />
-
-   * **Tự động ghi nhớ cuộc gọi**: là nút cho phép tổng đài tự động ghi nhớ cuộc gọi giữa nhân viên và khách hàng, nếu tắt cuộc gọi sẽ không tự động lưu và khi khách hàng gọi lại sẽ không gặp được nhân viên trước đó.
-
-   ![](/media/ai-contact-center/user-guider-portal/img-zqDLHpXGUKVzOeGqKJrz.png)
-3. Chọn chế độ ghi nhớ cuộc gọi:<br />
-
-   * **Chế độ ưu tiên trước**: trường hợp các số máy nhánh khác nhau cùng gọi cho một khách hàng thì hệ thống tự động lưu duy nhất số máy nhánh (nhân viên) đầu tiên thực hiện cuộc gọi.
-   * **Chế độ ưu tiên sau**: trường hợp các số máy nhánh khác nhau cùng gọi cho một khách hàng thì hệ thống tự động lưu duy nhất số máy nhánh (nhân viên) cuối cùng thực hiện cuộc gọi.
-   * **Chế độ dừng**: Khi chọn chế độ này sẽ tắt tính năng luật khách quen.
-
-   ![](/media/ai-contact-center/user-guider-portal/img-fbDeW8Emk2ldncFpjlTP.png)
-4. (Tùy chọn): Bật lưu luật khách quen khi không bắt máy.<br />
-
-   * **Lưu luật khách quen khi không bắt máy**: lưu những cuộc gọi ra không thành công từ nhân viên tới khách hàng. Nếu tắt hệ thống sẽ lưu theo cấu hình ở bước 2.
-
-   ![](/media/ai-contact-center/user-guider-portal/img-jV8KPtPX2hgSHw3RyX1b.png)
-5. Chọn nút “Sửa” để kiểm tra nhật ký cuộc gọi đã lưu cho mỗi chế độ lưu.<br />
-
-   ![](/media/ai-contact-center/user-guider-portal/img-8IgGwFn7Xn8TaDixzC8Z.png)
-
-## Cấu hình danh sách ưu tiên
-
-### Thêm số điện thoại vào danh sách ưu tiên:
-
-Ngoài cách hệ thống tự động lưu ở phần trước, người quản trị cũng có thể lưu thủ công bằng cách thêm số điện thoại và chọn số máy nhánh muốn nhận.
-
-Để vào danh sách ưu tiên chọn **“Định tuyến” => “Luật khách quen” => nút “Sửa”** ở cuối dòng của đầu số cần cấu hình.
-
-Có 2 cách thêm số điện thoại vào danh sách ưu tiên:
-
-**Cách 1**: Thêm theo từng số điện thoại, chọn mục **“Thêm số điện thoại”**. Nhập thông tin cần thiết:
-
-* Số điện thoại: Số điện thoại khách hàng
-* Số máy nhánh: Chọn số máy nhánh của nhân viên<br />
-
-  ![](/media/ai-contact-center/user-guider-portal/img-UUQ2zdtaFmecg2lUGtUV.png)
-
-Để chọn lại nhân viên khác nghe cuộc gọi từ số điện thoại đã thiết lập, bạn chọn nút “Sửa”.
-
-**Cách 2**: Thêm nhiều số điện thoại từ file
-
-Chọn nút “Import số điện thoại” => “Choose File” để tải lên file số điện thoại có sẵn từ máy tính. File excel hỗ trợ định dạng .xlsx
-
-![](/media/ai-contact-center/user-guider-portal/img-fHOhhUhZ9dNaJNF3oFQ7.png)
-
-<Callout type="warn">
-**Lưu ý**: Để thuận tiện hơn, bạn chọn nút “Tải file mẫu” để tải xuống file mẫu, chỉnh sửa thông tin và tải lên lại, sau đó chọn thêm mới.
-</Callout>
-
-### Xóa số điện thoại ra khỏi danh sách đã lưu
-
-Xóa nhật ký cuộc gọi đã lưu tự động hoặc danh sách ưu tiên đã lưu bằng cách thêm thủ công. Khi xóa mọi dữ liệu sẽ mất hoàn toàn và không thể khôi phục lại và hệ thống sẽ ghi nhận lại nhật ký từ đầu.
-
-Để vào danh sách ưu tiên chọn “Định tuyến” => “Luật khách quen” => nút “Sửa” ở cuối dòng của đầu số cần cấu hình.
-
-![](/media/ai-contact-center/user-guider-portal/img-n0CMPfdfyRfxLYYq6OrO.png)
-
-Bạn nhấn chọn ô trống tại dòng số điện thoại muốn xóa để xóa từng số, hoặc nhấn chọn ô trống trên cùng để chọn tất cả.
-
-Chọn nút “Xóa mục đã chọn” để tiến hành xóa.
-
-Chọn OK ở popup để xác nhận xóa các mục đã chọn.
+| Vấn đề thường gặp | Nguyên nhân chính | Hướng xử lý |
+| :--- | :--- | :--- |
+| **Khách quen gọi vào vẫn nghe lời chào IVR chung** | 1. Tùy chọn **Tự động ghi nhớ cuộc gọi** đang tắt (OFF).<br />2. Cột **CHẾ ĐỘ** của đầu số đang đặt là **Dừng**.<br />3. Số điện thoại của khách hàng chưa được lưu hoặc đã bị xóa khỏi danh sách. | 1. Kiểm tra lại tab **Luật khách quen**, đảm bảo công tắc tổng đang bật **ON**.<br />2. Chuyển chế độ đầu số từ **Dừng** sang **Trước** hoặc **Sau**.<br />3. Nhấn nút **Sửa** của đầu số để tra cứu số điện thoại khách trong danh sách ưu tiên. |
+| **Khách gọi lại không gặp đúng nhân viên vừa trao đổi gần nhất** | Đầu số đang cấu hình chế độ **Trước (First Contact)** nên hệ thống giữ nguyên nhân viên đầu tiên tương tác. | Chuyển chế độ của đầu số sang **Sau (Last Contact)** để hệ thống luôn cập nhật nhân viên có tương tác mới nhất. |
+| **Nhân viên gọi ra cho khách nhưng khách gọi lại không gặp máy nhánh đó** | Tính năng **Lưu LKQ khi không bắt máy** đang tắt (OFF), trong khi cuộc gọi ra trước đó khách không nhấc máy. | Bật công tắc cột **LƯU LKQ KHI KHÔNG BẮT MÁY** sang **ON** tại dòng đầu số tương ứng. |
+| **Lỗi khi Import file số điện thoại từ Excel** | File tải lên không đúng định dạng `.xlsx` hoặc cấu trúc cột bị thay đổi so với quy định. | Nhấp vào **Tải file mẫu** trong modal import, copy dữ liệu vào đúng các cột mẫu và lưu dưới định dạng `.xlsx` trước khi tải lên lại. |

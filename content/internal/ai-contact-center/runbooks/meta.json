@@ -1,0 +1,14 @@
+{
+  "title": "Bảng tra triệu chứng",
+  "pages": [
+    "index",
+    "calls",
+    "extensions",
+    "recordings",
+    "autocall",
+    "carriers",
+    "portal",
+    "integrations"
+  ]
+}
+

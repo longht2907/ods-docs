@@ -1,0 +1,10 @@
+{
+  "title": "Cuộc gọi",
+  "pages": [
+    "outbound-failed",
+    "inbound-failed",
+    "dropped-calls",
+    "one-way-audio"
+  ]
+}
+

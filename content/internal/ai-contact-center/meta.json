@@ -3,5 +3,5 @@
   "description": "Support Wiki cho dịch vụ Tổng đài ODS.",
   "root": true,
   "defaultOpen": false,
-  "pages": ["index", "processes"]
+  "pages": ["index", "processes", "runbooks"]
 }

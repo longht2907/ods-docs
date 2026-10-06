@@ -21,7 +21,7 @@ Documentation Platform cho ODS trên Next.js + Fumadocs + MDX.
 5. Không đưa `/internal/**` vào sitemap, `llms.txt` hay search công khai.
 6. Không đổi `output: 'standalone'` thành `output: 'export'`. Auth cần server.
 7. `Caddyfile` phải giữ `Cache-Control: private, no-store` cho `/internal`.
-8. Không commit `.env`, credential, API key hay dữ liệu khách hàng.
+8. Không commit secret (mật khẩu, token, key) và dữ liệu cá nhân khách hàng ở bất kỳ đâu. IP hạ tầng và bảng đầu số chỉ được ghi trong `content/internal/**/knowledge-base/**` (ADR-006).
 
 Muốn thay đổi bất kỳ mục nào ở trên: dừng lại, hỏi Human.
 

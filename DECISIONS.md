@@ -87,3 +87,22 @@ Tài liệu này lưu trữ các quyết định kiến trúc quan trọng của
        - `package.json` bắt buộc nằm tại root theo chuẩn Node.js/npm.
   4. **Vị trí của `src/proxy.ts`**:
      - `src/proxy.ts` bắt buộc ở lại trong `src/` vì nó thực thi bảo vệ ranh giới lúc runtime (Edge proxy). Nếu xoá file này, vùng `/internal` sẽ bị mở toang — đây là hành vi trực tiếp của sản phẩm, không phải code kiểm soát kiểm thử.
+
+---
+
+## ADR-006: Nội dung internal trong repository public
+
+- **Ngày quyết định**: 2026-10-06
+- **Trạng thái**: Đã áp dụng (Chấp thuận)
+- **Bối cảnh**:
+  - Repository của Documentation Platform là public. Cơ chế đăng nhập tại `/internal` chỉ bảo vệ website khi chạy, không thể che nội dung đã commit khỏi người đọc Git hoặc lịch sử repository.
+  - Support Wiki cần lưu thông tin vận hành phục vụ tra cứu nội bộ, trong đó có thể bao gồm IP hạ tầng và bảng đầu số thật.
+- **Quyết định**:
+  1. **Phạm vi được phép**: IP hạ tầng và bảng đầu số thật chỉ được ghi trong `content/internal/**/knowledge-base/**`.
+  2. **Cấm tuyệt đối**: Không commit mật khẩu, token, API key, private key, credential, dữ liệu cá nhân khách hàng hoặc thông tin liên hệ cá nhân của nhân viên ở bất kỳ đâu trong repository.
+  3. **Ranh giới runtime vẫn giữ nguyên**: Nội dung internal tiếp tục được tách loader, bảo vệ bởi Proxy, không xuất hiện trong public search, sitemap hoặc `llms.txt`, và giữ `noindex`/`no-store` theo ADR-001.
+  4. **Trách nhiệm review**: Auth không thay thế content review. Người viết và reviewer phải đánh giá nội dung trước khi commit vì mọi revision trong Git đều có thể được đọc công khai.
+  5. **Phương án tương lai**: Khi Support Wiki cần lưu dữ liệu vượt quá phạm vi cho phép, phải tách nội dung đó sang private repository hoặc hệ thống quản lý tri thức riêng trước khi xuất bản.
+- **Hệ quả**:
+  - Không được dùng `/internal` làm nơi lưu secret hoặc dữ liệu cá nhân chỉ vì route yêu cầu đăng nhập.
+  - Giới hạn TASK-014 chỉ tạo template là phạm vi triển khai của task, không phải chính sách cấm bổ sung IP hạ tầng hoặc bảng đầu số thật trong các task sau.

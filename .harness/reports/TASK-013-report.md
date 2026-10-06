@@ -4,7 +4,7 @@
 
 - Branch: `task/TASK-013-portal-docs-actuation`
 - Task status: `done`
-- Commit: `5b9c3a2`
+- Commit: `99e5489`
 - Pull Request: hoàn tất đồng bộ và merge vào `main`
 
 ## Phạm vi đã thực hiện hoàn tất

@@ -1,7 +1,7 @@
 ---
 status: done
 branch: task/TASK-013-portal-docs-actuation
-commit: "5b9c3a2"
+commit: "99e5489"
 verified-by: npm run verify:task
 ---
 

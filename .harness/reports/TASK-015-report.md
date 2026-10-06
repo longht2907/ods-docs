@@ -84,52 +84,52 @@ Tổng số file MDX quét được: **55 file** (gồm `content/docs/ai-contact
 
 ## 2. Đề xuất Hàng đợi viết bài (Writing Queue)
 
-Thứ tự ưu tiên được sắp xếp theo nguyên tắc: hoàn thiện các phân hệ thiết bị ngoại vi cốt lõi và vận hành cuộc gọi trước, sau đó mở rộng sang các kênh tự động hóa và tích hợp đa kênh.
+Thứ tự ưu tiên được sắp xếp theo đúng thứ tự điều hướng hiển thị trên thanh menu (Sidebar) của Portal ODS AI Contact Center:
 
-### Thứ tự thực hiện:
+### Thứ tự thực hiện chính thức:
 
 ```
-1. 09-thiet-lap-may-nhanh
-   └──> 2. 06-quan-ly-cuoc-goi
-        └──> 3. 10-goi-tu-dong
-             └──> 4. 07-quan-ly-hoi-thoai
-                  └──> 5. 08-tich-hop-da-kenh
+1. 07-quan-ly-hoi-thoai (Quản lý hội thoại)
+   └──> 2. 06-quan-ly-cuoc-goi (Giám sát cuộc gọi)
+        └──> 3. 10-goi-tu-dong (Chiến dịch cuộc gọi / Gọi tự động)
+             └──> 4. 08-tich-hop-da-kenh (Tích hợp đa kênh)
+                  └──> 5. 09-thiet-lap-may-nhanh (Thiết lập máy nhánh)
                        └──> 6. cloudfile (Hỏi Human trước)
-                            └──> 7. Rà soát lại (03, 04, 05)
+                            └──> 7. Rà soát lại (TASK-013: 03, 04, 05)
 ```
 
 ### Chi tiết từng chặng:
 
-#### Chặng 1: `09-thiet-lap-may-nhanh` (Ưu tiên cao nhất)
-- **Mục tiêu**: Người dùng cấu hình thành công máy nhánh trên mọi nền tảng thiết bị để đàm thoại được.
+#### Chặng 1: `07-quan-ly-hoi-thoai` (Quản lý hội thoại)
+- **Mục tiêu**: Chuẩn hóa luồng làm việc Omnichannel Contact Center (Nhắn tin, gọi lại, hợp nhất hồ sơ).
+- **Phạm vi xử lý**:
+  - `quan-ly-tin-nhan-cuoc-goi.mdx` (Tiếp nhận tin nhắn đa kênh, gọi lại nhanh cho khách).
+  - `hop-nhat-thong-tin-khach-hang.mdx` (Quy trình gộp contact trùng lặp từ nhiều kênh).
+
+#### Chặng 2: `06-quan-ly-cuoc-goi` (Giám sát cuộc gọi)
+- **Mục tiêu**: Hướng dẫn Supervisor/Manager giám sát cuộc gọi trực tiếp thời gian thực.
+- **Phạm vi xử lý**:
+  - `huong-dan-giam-sat-cuoc-goi.mdx` (Chuyển đổi 294 dòng nháp sang Multi-scenario guide; tách rõ 4 hành động: Nghe lén, Rước cuộc gọi, Đàm thoại ba bên, Ngắt cuộc gọi; thay 10 ảnh hash cũ bằng media nét có ngữ cảnh).
+
+#### Chặng 3: `10-goi-tu-dong` (Chiến dịch cuộc gọi / Gọi tự động)
+- **Mục tiêu**: Xây dựng toàn bộ phân hệ AutoCall / AutoDialer / ZNC / Zalo OA từ trạng thái placeholder.
+- **Phạm vi xử lý**:
+  - Viết mới tuần tự 12 file placeholder: từ Danh bạ (`them-nhom-danh-ba`, `them-danh-ba`) → Thư viện âm thanh (`them-am-thanh`) → Thiết lập chiến dịch (`auto-dialer`, `chien-dich-znc`, `goi-tu-dong-autocall`, `goi-tu-dong-zalo-oa`) → Lịch chạy và báo cáo.
+
+#### Chặng 4: `08-tich-hop-da-kenh` (Tích hợp đa kênh)
+- **Mục tiêu**: Hướng dẫn kết nối các kênh mạng xã hội (Facebook Page, Zalo Official Account) vào tổng đài.
+- **Phạm vi xử lý**:
+  - `index.mdx` (Bản đồ tổng quan các kênh tích hợp).
+  - `tich-hop-facebook-messenger.mdx` (Quy trình ủy quyền Fanpage, cấu hình Webhook).
+  - `tich-hop-zalo-oa.mdx` (Quy trình ủy quyền Zalo OA, xác thực doanh nghiệp ZCA).
+
+#### Chặng 5: `09-thiet-lap-may-nhanh` (Thiết lập máy nhánh)
+- **Mục tiêu**: Hướng dẫn cấu hình thiết bị đầu cuối đàm thoại (IP Phone phần cứng, Softphone PC, App Mobile).
 - **Phạm vi xử lý**:
   - `ip-phone/cau-hinh-yealink-t19x-t30x.mdx` (Chuyển sang `<Steps>`, thay 7 ảnh hash cũ, bổ sung checklist SIP registered).
   - `softphone/cai-dat-zoiper-may-tinh.mdx` (Rút gọn 18 ảnh wizard, tập trung vào cấu hình tài khoản SIP ODS).
-  - `mobile-app/cai-dat-ods-phone-android.mdx` & `mobile-app/cai-dat-ods-phone-ios.mdx` (Quy trình quét mã QR máy nhánh, cấp quyền chạy ngầm).
+  - `mobile-app/cai-dat-ods-phone-android.mdx` & `mobile-app/cai-dat-ods-phone-ios.mdx` (Quy trình quét mã QR máy nhánh, cấp quyền chạy ngầm background).
   - Hoàn thiện các trang `index.mdx` định hướng lựa chọn thiết bị.
-
-#### Chặng 2: `06-quan-ly-cuoc-goi`
-- **Mục tiêu**: Hướng dẫn Supervisor giám sát cuộc gọi trực tiếp.
-- **Phạm vi xử lý**:
-  - `huong-dan-giam-sat-cuoc-goi.mdx` (Chuyển đổi 294 dòng nháp sang Multi-scenario guide, tách rõ 4 hành động: Nghe lén, Rước cuộc gọi, Đàm thoại ba bên, Ngắt cuộc gọi; thay 10 ảnh hash cũ).
-
-#### Chặng 3: `10-goi-tu-dong`
-- **Mục tiêu**: Xây dựng toàn bộ phân hệ AutoCall / AutoDialer từ trạng thái placeholder.
-- **Phạm vi xử lý**:
-  - Viết mới tuần tự 12 file: từ Danh bạ (`them-nhom-danh-ba`, `them-danh-ba`) → Thư viện âm thanh (`them-am-thanh`) → Thiết lập chiến dịch (`auto-dialer`, `chien-dich-znc`, `goi-tu-dong-autocall`, `goi-tu-dong-zalo-oa`) → Lịch chạy và báo cáo.
-
-#### Chặng 4: `07-quan-ly-hoi-thoai`
-- **Mục tiêu**: Chuẩn hóa luồng làm việc Omnichannel Contact Center.
-- **Phạm vi xử lý**:
-  - `quan-ly-tin-nhan-cuoc-goi.mdx` (Tiếp nhận tin nhắn đa kênh, gọi lại nhanh).
-  - `hop-nhat-thong-tin-khach-hang.mdx` (Hợp nhất dữ liệu khách hàng giữa các kênh tương tác).
-
-#### Chặng 5: `08-tich-hop-da-kenh`
-- **Mục tiêu**: Kết nối Fanpage Facebook và Zalo OA vào tổng đài.
-- **Phạm vi xử lý**:
-  - `index.mdx` (Bản đồ các kênh tích hợp).
-  - `tich-hop-facebook-messenger.mdx` (Quy trình cấp quyền Fanpage, webhook).
-  - `tich-hop-zalo-oa.mdx` (Ủy quyền Zalo OA, xác thực ứng dụng).
 
 #### Chặng 6: `cloudfile` *(Cần hỏi Human trước)*
 - **Lưu ý đặc biệt**: CloudFile là một dòng sản phẩm độc lập ngoài AI Contact Center. Hiện chỉ có 1 file placeholder.

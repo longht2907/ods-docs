@@ -1,0 +1,6 @@
+{
+  "title": "Bắt đầu",
+  "description": "Điểm bắt đầu dành cho nhân viên Support ODS.",
+  "root": true,
+  "pages": ["index", "onboarding", "policies", "security", "contributing"]
+}

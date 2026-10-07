@@ -1,293 +1,143 @@
 ---
 title: "Hướng dẫn giám sát cuộc gọi"
-description: "Dành cho: Admin/Supervisor · Trưởng nhóm · QA Lead"
+description: "Hướng dẫn theo dõi, hỗ trợ riêng (whisper) và can thiệp cuộc gọi (barge-in) thời gian thực trên tổng đài ODS."
 ---
 
-## Tính năng Giám sát Cuộc gọi trên hệ thống tổng đài ODS
+Tính năng **Giám sát cuộc gọi** cho phép cấp quản lý (Admin, Supervisor, QA Lead) theo dõi chất lượng đàm thoại và trực tiếp trợ giúp nhân viên theo thời gian thực mà không làm gián đoạn trải nghiệm của khách hàng.
 
-*Dành cho: **Admin/Supervisor** · Trưởng nhóm · QA Lead*
-
-***
-
-| **Tài liệu này hướng dẫn**                                         |
-| ------------------------------------------------------------------ |
-| ▸ **Cách truy cập màn hình Giám sát Cuộc gọi**                     |
-| ▸ **Sử dụng 3 chế độ: Theo dõi, Hỗ trợ riêng, Can thiệp cuộc gọi** |
-| ▸ **Kết thúc phiên giám sát an toàn**                              |
-| ▸ **Câu hỏi thường gặp & lưu ý quan trọng**                        |
-
-***
-
-## 1. Tổng quan Tính năng
-
-Tính năng Giám sát Cuộc gọi cho phép admin/supervisor theo dõi và hỗ trợ Agent đang trong cuộc gọi với Khách hàng — theo thời gian thực và hoàn toàn không làm gián đoạn trải nghiệm của Khách hàng.
-
-| **Chế độ**         | **Ai nghe thấy Supervisor?** | **Khi nào dùng?**                               |
-| ------------------ | ---------------------------- | ----------------------------------------------- |
-| Theo dõi           | **Không ai**                 | QA đánh giá, theo dõi Agent mới, audit cuộc gọi |
-| Hỗ trợ riêng       | **Chỉ Agent nghe**           | Coach Agent đang xử lý tình huống khó           |
-| Can thiệp cuộc gọi | **Agent và KH đều nghe**     | Xử lý khẩn cấp, KH yêu cầu gặp quản lý          |
-
-![](/media/ai-contact-center/user-guider-portal/img-TgfFxzWjaSPyI204hYYi.png)
-
-<Callout type="info">
-▸ **Tính năng này chỉ dành cho tài khoản có quyền admin hoặc Supervisor — Agent thông thường không thấy các nút này**\
-▸ **Chỉ có thể giám sát Agent đang trong cuộc gọi — nút sẽ bị mờ (disabled) nếu Agent đang rảnh hoặc offline**
+<Callout type="info" title="Trước khi bắt đầu">
+- Tài khoản người dùng được gán nhóm quyền **Admin** hoặc **Supervisor** có quyền trên module **Giám sát cuộc gọi**.
+- Tài khoản đã được liên kết với một máy nhánh tổng đài và hiển thị badge **Sẵn sàng giám sát** màu xanh ở góc trên bên phải màn hình.
+- Thiết bị đã kết nối tai nghe/microphone và cấp quyền truy cập micro cho trình duyệt.
 </Callout>
 
-***
-
-## 2. Truy cập Màn hình Giám sát
-
-### 2.1 Hướng dẫn đăng nhập và thiết lập với tài khoản admin
-
-
-
-
-## ODS
-
-→ Mở trình duyệt (khuyến nghị Chrome hoặc Edge)\
-→ Truy cập địa chỉ tổng đài ODS của công ty: [https://app.ods.vn/](https://app.ods.vn/)\
-→ Đăng nhập bằng tài khoản admin được cấp khi sử dụng dịch vụ ODS\ ![](/media/ai-contact-center/user-guider-portal/img-2GU1Z2nUO4AsAqmap4H7.png)
-
-
-
-
-## Menu Giám sát cuộc gọi
-
-→ Từ menu chính, chọn **Tổng quan → Giám sát cuộc gọi**\
-![](/media/ai-contact-center/user-guider-portal/img-CSuMF063QhpTWv5A7eWL.png)\
-→ Hoặc truy cập trực tiếp qua URL: [https://app.ods.vn/call-monitoring](https://app.ods.vn/call-monitoring)\
-→ Màn hình sẽ tải dữ liệu Agent và cập nhật real-time tự động
-
-
-
-
-## Kiểm tra kết nối
-
-🔧 **Thiết lập ban đầu:** Để sử dụng tính năng giám sát cuộc gọi, người dùng cần gắn tài khoản với một máy nhánh tổng đài.\
-→ Có thể chọn máy nhánh cá nhân đã có sẵn trên hệ thống\
-→ Nếu chưa có máy nhánh, tạo mới tại: **Tổng đài → Cài đặt tổng đài → Nhân viên**\
-→ Có thể thay đổi máy nhánh giám sát khi cần\
-→ Khi thiết lập thành công, góc trên phải màn hình hiển thị badge **"Sẵn sàng giám sát"** màu xanh\
-→ Nếu badge màu vàng hoặc đỏ: kiểm tra lại microphone và cho phép trình duyệt truy cập mic\
-![](/media/ai-contact-center/user-guider-portal/img-PAdU6wtiLiQx0BlucYHV.png)
-
-Sau khi vào màn hình, bạn sẽ thấy 4 thẻ thống kê ở trên cùng: số Agent online, offline, số cuộc gọi đang diễn ra và số phiên giám sát đang hoạt động. Bên dưới là vùng Priority Zone hiển thị các cuộc gọi đang cần chú ý.\
-![](/media/ai-contact-center/user-guider-portal/img-rm7RKTMiJ52QvLqicsqO.png)
-
-
-
-### 2.2 Thiết lập phân quyền sử dụng tính năng giám sát cuộc gọi
-
-Người dùng Admin có thể tạo nhóm quyền và phân quyền các thao tác trong tính năng giám sát cuộc gọi cho tài khoản Supervisor.
-
-#### Bước 1: Tạo nhóm quyền
-
-Vào menu: **Người dùng → Phân quyền**
-
-Tạo nhóm quyền mới cho người dùng Supervisor.\ ![](/media/ai-contact-center/user-guider-portal/img-pr5YXoEMbQCijNI6S5GX.png)
-
-Tại phần phân quyền, chọn module **Giám sát cuộc gọi**, sau đó cấp các quyền thao tác cần sử dụng, bao gồm:
-
-* Theo dõi
-* Hỗ trợ riêng
-* Can thiệp cuộc gọi
-* Gác máy
-* Gác máy hàng loạt\
-  ![](/media/ai-contact-center/user-guider-portal/img-fyH7wpKadi1JluzKDhzK.png)
-
-#### Bước 2: Tạo tài khoản Supervisor
-
-Vào menu: **Người dùng → Danh sách người dùng**
-
-Chọn **Thêm mới người dùng** và nhập các thông tin cần thiết cho tài khoản Supervisor.\
-![](/media/ai-contact-center/user-guider-portal/img-eDVkDBRPQuscwqwoaqJ7.png)
-
-> **Lưu ý:** cần gắn số máy nhánh và nhóm quyền đã thiết lập ở bước trước để người dùng có thể sử dụng tính năng giám sát cuộc gọi.
-
-#### Bước 3: Gửi thông tin đăng nhập
-
-Sau khi tạo tài khoản thành công, Admin gửi thông tin đăng nhập cho Supervisor.
-
-Supervisor sử dụng tài khoản được cấp để đăng nhập vào giao diện hệ thống và bắt đầu sử dụng tính năng giám sát cuộc gọi.
-
-***
-
-## 3. Hướng dẫn Sử dụng Chi tiết
-
-### 3.1 Theo dõi — Theo dõi cuộc gọi (không để lộ)
-
-*Phù hợp: Đánh giá chất lượng cuộc gọi, theo dõi Agent mới, audit ngẫu nhiên*
-
-
-
-
-## Xác định Agent cần giám sát
-
-→ Tìm Agent trong danh sách — chỉ những Agent có trạng thái **"Đang gọi"** mới cho phép thao tác\
-→ Quan sát cột **"Thời lượng"** để ưu tiên cuộc gọi đang kéo dài\
-→ Số điện thoại KH hiển thị ngay dưới tên Agent khi họ đang trong cuộc gọi
-
-
-
-
-## Nhấn nút
-
-→ Tìm hàng của Agent cần giám sát trong danh sách\
-→ Nhấn nút 🎧 **Theo dõi** (màu xanh) ở cột Thao tác\
-![](/media/ai-contact-center/user-guider-portal/img-qiINaTNhnkJt8xFZaovp.png)\
-→ Popup xác nhận hiện ra — hiển thị tên Agent, EXT, chế độ Theo dõi\
-![](/media/ai-contact-center/user-guider-portal/img-gbSysiQKlH1JvI1DNTKo.png)
-
-
-
-
-## Xác nhận và bắt đầu
-
-→ Đọc thông tin xác nhận, nhấn **"Bắt đầu Theo dõi"**\
-→ Hệ thống tự động kết nối\
-→ Banner màu xanh hiện ở đầu trang: **"Đang giám sát: \[Tên Agent] · Chế độ: Theo dõi"**\
-→ Bạn có thể nghe toàn bộ cuộc gọi — Agent và KH không biết
-
-
-
-| **Khi đang theo dõi — bạn có thể làm gì?**                                              |
-| --------------------------------------------------------------------------------------- |
-| ▸ **Nghe toàn bộ cuộc gọi trong thời gian thực qua tai nghe**                           |
-| ▸ **Xem timer đang đếm trên banner — biết bạn đã nghe bao lâu**                         |
-| ▸ **Chuyển sang Hỗ trợ riêng hoặc Can thiệp cuộc gọi bất cứ lúc nào nếu cần can thiệp** |
-| ▸ **Kết thúc phiên bằng nút "Kết thúc giám sát" trên banner**                           |
-
-***
-
-### 3.2 Hỗ trợ riêng — Coaching riêng với Agent
-
-*Phù hợp: Hỗ trợ Agent đang lúng túng, nhắc thông tin, hướng dẫn cách xử lý*
-
-
-
-
-## Xác định tình huống cần coaching
-
-→ Agent đang trong cuộc gọi với dấu hiệu khó khăn: thời gian dài, hoặc bạn đang nghe qua theo dõi\
-→ Nhấn nút **Hỗ trợ riêng** ở cột Thao tác của Agent đó
-
-
-
-
-## Xác nhận
-
-→ Popup hiển thị: **"KH sẽ KHÔNG nghe thấy bạn — chỉ Agent nghe"**
-
-
-
-
-## Nói chuyện với Agent
-
-→ Sẵn sàng giám sát — bạn có thể nói chuyện ngay qua micro\
-→ Agent nghe thấy bạn nhưng KH hoàn toàn không nghe
-
-
-
-| **Lưu ý khi dùng Hỗ trợ riêng**                                                               |
-| --------------------------------------------------------------------------------------------- |
-| ▸ **KH hoàn toàn không nghe thấy Supervisor — an toàn để coaching thẳng thắn**                |
-| ▸ **Agent không nên trả lời trực tiếp với Supervisor trong khi đang nói với KH — gây khó xử** |
-| ▸ **Nếu cần Agent phản hồi, dùng hệ thống chat nội bộ song song**                             |
-| ▸ **Tránh nói quá dài — chỉ nhắc key point để Agent xử lý được ngay**                         |
-
-***
-
-### 3.3 Can thiệp cuộc gọi — Tham gia 3-way (Cả Agent và KH nghe thấy)
-
-*Phù hợp: KH yêu cầu gặp quản lý, tình huống khẩn cấp, cuộc gọi leo thang*
-
-
-
-
-## Đánh giá tình huống cần can thiệp
-
-→ Cuộc gọi kéo dài bất thường (hiển thị màu đỏ > 10 phút) và Agent không tự xử lý được\
-→ KH đang bức xúc và yêu cầu nói chuyện với cấp cao hơn\
-→ Nhấn nút **Can thiệp cuộc gọi** ở cột Thao tác
-
-
-
-
-## Đọc kỹ xác nhận
-
-→ Popup hiển thị cảnh báo: **"Cả Agent VÀ KH đều nghe thấy bạn ngay khi kết nối"**\
-→ Xác nhận bạn đã chuẩn bị sẵn lời mở đầu trước khi nhấn **"Can thiệp vào cuộc gọi"**
-
-
-
-
-## Tham gia và xử lý
-
-→ Cả ba bên đều nghe và nói chuyện được — dẫn dắt cuộc trò chuyện từ đây\
-→ Sau khi giải quyết xong, kết thúc phiên — cuộc gọi Agent-KH tiếp tục bình thường
-
-
-
-| **Checklist trước khi Can thiệp cuộc gọi**                                             |
-| -------------------------------------------------------------------------------------- |
-| ▸ **Bạn đã chuẩn bị lời chào mở đầu chuyên nghiệp chưa?**                              |
-| ▸ **Bạn đã nắm được vấn đề KH đang gặp phải chưa? (nghe qua Listen trước nếu có thể)** |
-| ▸ **Micro của bạn hoạt động tốt không? Không gian xung quanh có yên tĩnh không?**      |
-| ▸ **Bạn có đủ thẩm quyền để giải quyết vấn đề KH đang nêu không?**                     |
-
-***
-
-### Các nút bị mờ (disabled) — tại sao?
-
-<Callout type="warn">
-▸ **Agent đang ở trạng thái Online (rảnh) — không có cuộc gọi nào để giám sát**\
-▸ **Agent đang Offline — không thể kết nối**\
-▸ **Agent đang trong Wrap-up (xử lý sau cuộc gọi) — cuộc gọi đã kết thúc**\
-▸ **Bạn đang trong phiên giám sát khác — hệ thống chỉ cho phép 1 phiên cùng lúc**
-</Callout>
-
-***
-
-## 4. Câu hỏi Thường gặp
-
-<details>
-
-<summary>❓ <strong>Khi tôi bật Theo dõi, Agent và KH có biết không?</strong></summary>
-
-Không. Chế độ Theo dõi hoàn toàn ẩn danh — cả Agent lẫn KH đều không nhận được bất kỳ thông báo hay âm thanh nào. Đây là thiết kế cố ý để đảm bảo hành vi tự nhiên của Agent khi giám sát.
-
-</details>
-
-<details>
-
-<summary>❓ <strong>Khi tôi kết thúc phiên giám sát, cuộc gọi Agent–KH có bị ngắt không?</strong></summary>
-
-Không. Đây là điểm quan trọng nhất: Hệ thống chỉ ngắt kết nối channel của Supervisor. Agent và KH vẫn đang trong cuộc gọi bình thường và không bị ảnh hưởng gì.
-
-</details>
-
-<details>
-
-<summary>❓ <strong>Tôi có thể giám sát nhiều Agent cùng lúc không?</strong></summary>
-
-Mỗi phiên đăng nhập Supervisor chỉ cho phép 1 phiên giám sát đang hoạt động cùng lúc. Để giám sát Agent khác, cần kết thúc phiên hiện tại trước. Tuy nhiên, bạn có thể quan sát toàn bộ danh sách Agent và Priority Zone trong khi đang giám sát.
-
-</details>
-
-<details>
-
-<summary>❓ <strong>Sự khác biệt giữa Hỗ trợ riêng và Can thiệp trực tiếp là gì?</strong></summary>
-
-**Whisper:** Supervisor nói — chỉ Agent nghe, KH không nghe. **Barge:** Supervisor tham gia — cả Agent và KH đều nghe thấy Supervisor và ba bên có thể nói chuyện cùng nhau. Whisper dùng để coaching riêng; Barge dùng khi cần tham gia công khai vào cuộc gọi.
-
-</details>
-
-<details>
-
-<summary>❓ <strong>Tôi có thể dùng tính năng này trên điện thoại di động không?</strong></summary>
-
-Tính năng hoạt động tốt nhất trên máy tính để bàn hoặc laptop với màn hình rộng. Trên thiết bị di động, giao diện có thể bị thu nhỏ và có thể gặp giới hạn trên một số trình duyệt mobile.
-
-</details>
+## Tổng quan không gian giám sát
+
+Màn hình điều phối tập trung cung cấp số liệu tổng quan và trạng thái đàm thoại của toàn bộ máy nhánh trong doanh nghiệp:
+
+| Khu vực | Chức năng chính | Trạng thái hiển thị |
+| :--- | :--- | :--- |
+| **Thẻ thống kê** | Cập nhật số lượng nhân viên Trực tuyến, Ngoại tuyến, Cuộc gọi đang diễn ra và Phiên giám sát đang hoạt động | Tự động làm mới theo thời gian thực |
+| **Thanh công cụ lọc** | Tìm kiếm theo tên/máy nhánh và lọc nhanh theo trạng thái (`Tất cả`, `Trực tuyến`, `Đang gọi`, `Đang giám sát`, `Đang đổ chuông`, `Ngoại tuyến`) | Chọn xem dạng lưới (Grid) hoặc dạng bảng (List) |
+| **Khu vực máy nhánh** | Hiển thị thẻ thông tin nhân viên, thời lượng cuộc gọi và các nút thao tác giám sát | Nút chức năng chỉ kích hoạt khi máy nhánh ở trạng thái **Đang gọi** |
+
+![Giao diện tổng quan giám sát cuộc gọi dạng lưới](/media/ai-contact-center/user-guider-portal/giam-sat-cuoc-goi_tong-quan-luoi.png)
+
+Hệ thống hỗ trợ 2 chế độ hiển thị:
+- **Dạng lưới (Grid View):** Trực quan hóa từng máy nhánh theo dạng thẻ màu, giúp bao quát nhanh tình trạng online/offline và cuộc gọi trong nhóm.
+- **Dạng bảng (Table View):** Hiển thị danh sách chi tiết kèm bảng điều phối **Cuộc gọi đang diễn ra** ở cột bên phải để thao tác nghe nhanh.
+
+## Theo dõi và điều phối cuộc gọi
+
+Quy trình chọn cuộc gọi và kích hoạt chế độ giám sát phù hợp:
+
+<Steps>
+  <Step title="Xác định cuộc gọi cần giám sát">
+    Từ thanh điều hướng bên trái của Portal, chọn **Tổng quan** → **Giám sát cuộc gọi** (hoặc truy cập đường dẫn `/call-monitoring`).
+
+    Tại thanh lọc trạng thái, chọn thẻ **Đang gọi** để lọc ra các nhân viên đang trong phiên đàm thoại.
+
+    *Kết quả: Danh sách chỉ hiển thị các máy nhánh đang có kết nối thoại đang hoạt động với khách hàng.*
+  </Step>
+
+  <Step title="Kích hoạt chế độ giám sát phù hợp">
+    Tại hàng hoặc thẻ máy nhánh của nhân viên cần giám sát, nhấp chọn 1 trong 3 chế độ tương tác:
+
+    <Tabs items={['Theo dõi (Listen)', 'Hỗ trợ riêng (Whisper)', 'Can thiệp cuộc gọi (Barge-in)']}>
+      <Tab value="Theo dõi (Listen)">
+        - **Cơ chế âm thanh:** Nghe 1 chiều — cả nhân viên và khách hàng đều không nghe thấy người giám sát.
+        - **Mục đích sử dụng:** Đánh giá chất lượng phục vụ định kỳ (QA), chấm điểm kỹ năng nhân viên mới hoặc kiểm tra ngẫu nhiên.
+        - **Thao tác:** Nhấp biểu tượng tai nghe **Theo dõi** (màu xanh lá) tại cuộc gọi cần nghe.
+      </Tab>
+      <Tab value="Hỗ trợ riêng (Whisper)">
+        - **Cơ chế âm thanh:** Đàm thoại 2 chiều với nhân viên — khách hàng hoàn toàn không nghe thấy người giám sát.
+        - **Mục đích sử dụng:** Huấn luyện trực tiếp, nhắc quy trình, hỗ trợ thông tin giá bán hoặc chính sách khi nhân viên lúng túng.
+        - **Thao tác:** Nhấp biểu tượng micro **Hỗ trợ riêng** (màu vàng cam) tại cuộc gọi cần nhắc bài.
+      </Tab>
+      <Tab value="Can thiệp cuộc gọi (Barge-in)">
+        - **Cơ chế âm thanh:** Hội đàm 3 bên (3-Way Conference) — cả nhân viên, khách hàng và quản lý đều nghe và nói chuyện trực tiếp với nhau.
+        - **Mục đích sử dụng:** Xử lý tình huống khẩn cấp, giải quyết khiếu nại gay gắt hoặc khi khách hàng yêu cầu gặp cấp quản lý.
+        - **Thao tác:** Nhấp biểu tượng điện thoại **Can thiệp cuộc gọi** (màu đỏ nhạt) để tham gia trực tiếp vào cuộc đàm thoại.
+      </Tab>
+    </Tabs>
+
+    ![Thao tác giám sát cuộc gọi trên danh sách dạng bảng](/media/ai-contact-center/user-guider-portal/giam-sat-cuoc-goi_danh-sach-bang.png)
+
+    *Kết quả: Trình duyệt kết nối âm thanh với máy nhánh, thẻ chỉ số Phiên giám sát đang hoạt động tăng lên 1 và hiển thị đồng hồ thời lượng giám sát.*
+  </Step>
+
+  <Step title="Kết thúc phiên giám sát an toàn">
+    Sau khi hoàn thành phiên lắng nghe hoặc hỗ trợ, nhấp nút kết thúc phiên giám sát trên thanh điều khiển.
+
+    <Callout type="warn" title="Lưu ý khi ngắt cuộc gọi">
+      - Nhấp **Kết thúc giám sát**: Chỉ ngắt kênh âm thanh của quản lý; cuộc gọi giữa nhân viên và khách hàng vẫn tiếp tục bình thường.
+      - Nhấp **Gác máy** (nút màu đỏ đặc): Hệ thống sẽ lập tức ngắt toàn bộ kết nối cuộc gọi giữa nhân viên và khách hàng. Chỉ sử dụng nút này trong tình huống vi phạm quy chế hoặc cuộc gọi spam kéo dài.
+    </Callout>
+
+    *Kết quả: Kênh âm thanh giám sát đóng lại, máy nhánh quản lý trở về trạng thái sẵn sàng cho phiên tiếp theo.*
+  </Step>
+</Steps>
+
+## Phân quyền chức năng giám sát
+
+Quản trị viên có thể cấu hình chi tiết các quyền thao tác trong module Giám sát cuộc gọi tại mục **Người dùng** → **Phân quyền**:
+
+| Quyền hạn | Mô tả chức năng | Đối tượng áp dụng |
+| :--- | :--- | :--- |
+| **Theo dõi** | Lắng nghe thụ động âm thanh cuộc gọi mà không can thiệp | Nhân viên QA, Trưởng nhóm thử việc |
+| **Hỗ trợ riêng** | Nói chuyện riêng với nhân viên trong phiên gọi | Supervisor, Team Leader, Trưởng ca |
+| **Can thiệp cuộc gọi** | Tham gia hội đàm 3 bên cùng khách hàng và nhân viên | Quản lý bộ phận, Trưởng phòng CSKH |
+| **Gác máy** | Cưỡng chế kết thúc cuộc gọi đang diễn ra của máy nhánh | Trưởng nhóm, Quản trị viên hệ thống |
+| **Gác máy hàng loạt** | Ngắt đồng thời nhiều cuộc gọi được tích chọn từ danh sách | Quản trị viên hệ thống (Admin) |
+
+## Kiểm tra kết quả
+
+Xác nhận phiên giám sát hoạt động chính xác qua các tiêu chí:
+
+- Nghe rõ luồng âm thanh đàm thoại của nhân viên và khách hàng qua tai nghe kết nối.
+- Thẻ chỉ số **Phiên giám sát đang hoạt động** ở đầu màn hình chuyển sang số lượng phiên tương ứng.
+- Khi kết thúc phiên giám sát, máy nhánh nhân viên vẫn duy trì cuộc gọi bình thường và không phát sinh thông báo ngắt đột ngột.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Các nút giám sát bị mờ (disabled) không thể nhấp">
+    - **Nguyên nhân:** Máy nhánh đang ở trạng thái rảnh (`Trực tuyến`), `Ngoại tuyến` hoặc đang xử lý sau cuộc gọi (`Wrap-up`); hoặc bạn chưa được phân quyền thao tác tương ứng.
+    - **Cách xử lý:** Các nút giám sát chỉ kích hoạt khi máy nhánh ở trạng thái **Đang gọi**. Kiểm tra lại bộ lọc trạng thái và phân quyền tài khoản của bạn.
+  </Accordion>
+  <Accordion title="Badge trạng thái hiển thị màu đỏ hoặc vàng (Chưa sẵn sàng)">
+    - **Nguyên nhân:** Tài khoản chưa được liên kết với số máy nhánh hoặc trình duyệt chưa được cấp quyền truy cập microphone.
+    - **Cách xử lý:** Nhấp biểu tượng ổ khóa cạnh thanh địa chỉ trình duyệt để cấp quyền micro. Đảm bảo tài khoản đã gắn số máy nhánh tại **Tổng đài** → **Cài đặt tổng đài** → **Nhân viên**.
+  </Accordion>
+  <Accordion title="Không nghe thấy âm thanh từ cuộc gọi">
+    - **Nguyên nhân:** Thiết bị đầu ra âm thanh (loa/tai nghe) bị ngắt kết nối hoặc âm lượng máy tính đang tắt.
+    - **Cách xử lý:** Kiểm tra giắc cắm hoặc kết nối Bluetooth của tai nghe, thử nghiệm lại microphone trên trình duyệt và tải lại trang.
+  </Accordion>
+  <Accordion title="Không thể giám sát đồng thời nhiều cuộc gọi">
+    - **Nguyên nhân:** Mỗi máy nhánh quản lý chỉ được kết nối vào 1 kênh thoại giám sát tại một thời điểm theo thiết kế bảo mật SIP/WebRTC.
+    - **Cách xử lý:** Kết thúc phiên giám sát hiện tại trước khi chuyển sang giám sát cuộc gọi của nhân viên khác.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="MessageSquare"
+    title="Quản lý hội thoại tin nhắn và cuộc gọi"
+    description="Hướng dẫn tiếp nhận, phản hồi tin nhắn đa kênh và Click-to-Call trên giao diện làm việc."
+    href="/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/quan-ly-tin-nhan-cuoc-goi"
+  />
+  <Card
+    icon="Phone"
+    title="Thiết lập tổng đài"
+    description="Cấu hình số máy nhánh, hàng đợi và chính sách phân phối cuộc gọi đến nhân viên."
+    href="/docs/ai-contact-center/user-guider-portal/02-tong-quan-va-dich-vu/thiet-lap-tong-dai"
+  />
+  <Card
+    icon="Headphones"
+    title="Phím tắt tổng đài"
+    description="Danh sách phím tắt hỗ trợ thao tác bắt máy, chuyển tiếp và kết thúc cuộc gọi nhanh chóng."
+    href="/docs/ai-contact-center/user-guider-portal/02-tong-quan-va-dich-vu/phim-tat-tong-dai"
+  />
+</Cards>

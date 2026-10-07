@@ -5,15 +5,23 @@ description: Hướng dẫn chọn template, đặt slug và kiểm soát dữ l
 
 ## Chọn đúng template
 
-- Dùng template **Quy trình** cho luồng tiếp nhận, xử lý, chuyển cấp và đóng case.
-- Dùng template **Runbook** cho một triệu chứng hoặc sự cố cụ thể.
-- Dùng template **Tra cứu kỹ thuật** cho bảng dữ liệu, mã lỗi, thuật ngữ và thông tin hạ tầng.
+- Dùng template **Quy trình vận hành** cho luồng tiếp nhận, xử lý, chuyển cấp và đóng case.
+- Dùng template **Xử lý sự cố** cho một triệu chứng hoặc sự cố cụ thể.
+- Dùng template **Kiến thức kỹ thuật** cho bảng dữ liệu, mã lỗi, thuật ngữ và thông tin hạ tầng.
 
 ## Đặt slug
 
 - Dùng tiếng Anh, chữ thường và dấu gạch ngang, ví dụ `one-way-audio`.
 - Title và nội dung hiển thị viết bằng tiếng Việt; giữ thuật ngữ kỹ thuật khi phù hợp.
 - Không tạo link tới folder không có `index.mdx`; link trực tiếp tới trang đích.
+
+## Đăng thông báo
+
+1. Tạo file `content/internal/(home)/announcements/YYYY-MM-DD-ten-ngan.mdx` với slug tiếng Anh, chữ thường và dấu gạch ngang.
+2. Frontmatter chỉ gồm `title` và `description`; trong body ghi ngày đăng, phạm vi áp dụng và hành động cần thực hiện.
+3. Thêm slug vào `content/internal/(home)/announcements/meta.json` ngay sau `index`, mới nhất trước.
+4. Cập nhật mục **Thông báo mới** trên `/internal` để hiển thị tối đa ba thông báo gần nhất và bỏ link cũ nhất khi cần.
+5. Chạy kiểm tra link và toàn bộ chuỗi nghiệm thu trước khi gửi review.
 
 ## Dữ liệu nhạy cảm
 

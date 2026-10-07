@@ -1,4 +1,4 @@
 {
-  "title": "Quy trình xử lý",
+  "title": "Quy trình vận hành",
   "pages": ["index", "intake", "incident-flow", "escalation", "case-closure", "service-requests"]
 }

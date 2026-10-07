@@ -1,61 +1,194 @@
 ---
-title: "Cấu hình IP Phone Yealink T19X-T30X"
-description: "1. Bước 1: Lấy địa chỉ IPv4 để nhập vào URL trên trình duyệtbroken://pages/MklEvUtW8Js8Dgpr9VGY 2. Bước 2: Đăng nhập tài khoản cấu hìnhbroken://pages/MklEvUtW8J..."
+title: "Cấu hình IP Phone Yealink T19X - T30X"
+description: "Hướng dẫn cài đặt số máy nhánh SIP tổng đài ODS trên điện thoại bàn Yealink T19X và T30X qua giao diện Web GUI."
 ---
 
-## Mục lục
+Điện thoại bàn IP Phone Yealink (các dòng phổ biến T19P, T19E2, T30, T30P) kết nối trực tiếp với tổng đài ảo ODS qua giao thức mạng SIP. Hướng dẫn này giúp bạn khai báo thông số tài khoản máy nhánh để thực hiện và nhận cuộc gọi trên thiết bị Yealink.
 
-1. Bước 1: Lấy địa chỉ IPv4 để nhập vào URL trên trình duyệt
-2. Bước 2: Đăng nhập tài khoản cấu hình
-3. Bước 3: Nhập thông tin số máy nhánh
-4. Bước 4: Kiểm tra trạng thái số máy nhánh
+<Callout type="info" title="Trước khi bắt đầu">
+- Cần có thông tin **Số máy nhánh**, **Mật khẩu SIP** và **Địa chỉ Server SIP** do quản trị viên cấp từ Portal ODS.
+- Điện thoại Yealink đã được cắm nguồn (hoặc nguồn PoE) và kết nối dây mạng LAN từ cổng **Internet** của điện thoại vào Switch/Router.
+- Máy tính dùng để cấu hình phải kết nối chung mạng LAN nội bộ với điện thoại Yealink.
+</Callout>
 
-## Bước 1: Lấy địa chỉ IPv4 để nhập vào URL trên trình duyệt
+## 1. Cơ chế hoạt động & Điều kiện kết nối
 
-Trên điện thoại Yealink, nhấn nút “✔” (OK) ở giữa 4 nút mũi tên.
+Điện thoại IP Yealink hoạt động độc lập bằng cách gửi yêu cầu đăng ký (SIP Register) trực tiếp đến máy chủ tổng đài ODS qua cổng mạng. Để thiết bị đăng ký thành công, hạ tầng mạng cần đáp ứng các điều kiện sau:
 
-![](/media/ai-contact-center/user-guider-portal/img-IDSixvjIqJ3KQiL1BQ4j.png)
+| Thành phần | Yêu cầu kỹ thuật | Lưu ý quan trọng |
+| :--- | :--- | :--- |
+| **Cổng mạng kết nối** | Cổng Internet / LAN trên điện thoại | Không cắm nhầm vào cổng ký hiệu PC |
+| **Giao thức & Port** | UDP / TCP - Port `51000` | Tường lửa mạng doanh nghiệp không được chặn cổng 51000 |
+| **Cơ chế cấp IP** | DHCP (tự động nhận IP từ Router) | Điện thoại và máy tính cấu hình phải cùng lớp mạng (Subnet) |
+| **Tính năng mạng** | Tắt tính năng SIP ALG trên Router | SIP ALG bật có thể gây lỗi cuộc gọi không có âm thanh một chiều |
 
-Trên màn hình hiển thị dòng `ipv4`, nhập địa chỉ `ipv4` đó vào thanh địa chỉ (URL) của trình duyệt web (Chrome, Coccoc,…).
+## 2. Lấy thông tin tài khoản SIP trên Portal ODS
 
-![](/media/ai-contact-center/user-guider-portal/img-7EvIcF9ozxPLTOlOhVgh.png)
+Quản trị viên lấy thông tin xác thực của máy nhánh trên trang quản trị tổng đài ODS theo các bước sau:
 
-## Bước 2: Đăng nhập tài khoản cấu hình
+1. Đăng nhập vào trang quản trị ODS: `https://app.ods.vn/`.
+2. Truy cập menu **Tổng đài** → **Cài đặt tổng đài** → **Nhân viên**.
+3. Tại danh sách nhân viên, chọn biểu tượng **Chỉnh sửa** (cây bút) hoặc nhấn **Thêm mới** để xem chi tiết tài khoản SIP.
 
-Tài khoản đăng nhập mặc định là:
+![Form thông tin chi tiết số máy nhánh trên Portal ODS](/media/ai-contact-center/user-guider-portal/tao-may-nhanh_form-chi-tiet.png)
 
-* Username: `admin`
-* Password: `admin`
+Bảng đối chiếu thông tin từ Portal ODS sang giao diện Yealink:
 
-![](/media/ai-contact-center/user-guider-portal/img-viY9jRywaTmWdN2YG1EE.png)
+| Thông số trên ODS Portal | Trường tương ứng trên Yealink | Ví dụ thực tế |
+| :--- | :--- | :--- |
+| **Số máy nhánh** | **Register Name** / **User Name** / **Label** | `100` |
+| **Mật khẩu** | **Password** | `MatKhau@123` |
+| **Tên nhân viên** | **Display Name** | `NhanVienA` hoặc `100` |
+| **Tên miền / IP Tổng đài** | **SIP Server 1 -> Server Host** | `sip.ods.vn` (hoặc IP do ODS cung cấp) |
+| **Port SIP** | **SIP Server 1 -> Port** | `51000` |
 
-Giao diện sau khi đăng nhập thành công:
+## 3. Các bước cấu hình trên điện thoại Yealink
 
-![](/media/ai-contact-center/user-guider-portal/img-XbcstWiZqPwC6uhgPKe5.png)
+Thực hiện lần lượt các bước sau trên thiết bị và trình duyệt máy tính:
 
-## Bước 3: Nhập thông tin số máy nhánh
+<Steps>
+<Step>
+### Bước 1: Xác định địa chỉ IP của điện thoại Yealink
 
-Các thông tin đăng kí số máy nhánh được lấy ở trang quản trị tổng đài `https://app.matbao.one/` mục **Tổng đài** => **Cài đặt tổng đài** => **Nhân viên**.
+Trên bàn phím cứng của điện thoại Yealink, nhấn phím **OK** (biểu tượng dấu tích `✔` nằm ở vị trí trung tâm cụm phím điều hướng 4 chiều).
 
-![](/media/ai-contact-center/user-guider-portal/img-npIPkTpdn4fyzrVxK9qc.png)
+![Vị trí phím bấm OK trên điện thoại Yealink để kiểm tra IP](/media/ai-contact-center/user-guider-portal/yealink_nut-bam-lay-ip.png)
 
-Nhập thông tin theo hướng dẫn như hình bên dưới (thường trong mục **Account** => **Register**):
+Màn hình LCD của điện thoại hiển thị trạng thái mạng. Ghi lại dải số tại dòng **IPv4** (ví dụ: `10.0.0.101`).
 
-![](/media/ai-contact-center/user-guider-portal/img-ZydWS4OdmjGOxGWNL5fT.png)
+![Địa chỉ IPv4 hiển thị trên màn hình LCD Yealink](/media/ai-contact-center/user-guider-portal/yealink_man-hinh-hien-thi-ip.png)
 
-*(Lưu ý: Cần nhập các thông tin như Label, Display Name, Register Name, User Name, Password, Server Host - các thông tin này lấy từ trang quản trị tổng đài Mắt Bão)*
+*Kết quả: Bạn đã xác định được địa chỉ IP nội mạng của thiết bị điện thoại.*
+</Step>
 
-***
+<Step>
+### Bước 2: Đăng nhập giao diện Web GUI của Yealink
 
-## Bước 4: Kiểm tra trạng thái số máy nhánh
+Mở trình duyệt web (Google Chrome, Microsoft Edge, Cốc Cốc) trên máy tính cùng mạng nội bộ. Nhập địa chỉ IPv4 vừa lấy được vào thanh địa chỉ URL:
 
-Sau khi nhập thông tin và lưu lại (Nhấn **Confirm**), kiểm tra trạng thái đăng ký.\
-Nếu mục **Register Status** hiển thị **Registered** là đã đăng kí thành công.
+```http
+http://10.0.0.101
+```
 
-![](/media/ai-contact-center/user-guider-portal/img-TctpsK3FUmEBr9xn2rpZ.png)
+Giao diện đăng nhập quản trị Yealink xuất hiện. Nhập thông tin đăng nhập mặc định của nhà sản xuất:
 
-***
+- **Username**: `admin`
+- **Password**: `admin`
 
-## Lưu ý
+![Màn hình đăng nhập Web GUI Yealink](/media/ai-contact-center/user-guider-portal/yealink_dang-nhap-web-gui.png)
 
-Nếu quý khách hàng quên thông tin tài khoản đăng nhập trang quản trị tổng đài Mắt Bão (`https://app.ods.vn/`), vui lòng gửi email yêu cầu reset mật khẩu về hộp thư: `support@ods.vn`.
+Sau khi đăng nhập thành công, hệ thống chuyển đến tab **Status** hiển thị các thông tin cơ bản của thiết bị như tên dòng máy (Product Name), địa chỉ MAC và phiên bản Firmware.
+
+![Giao diện trang Status sau khi đăng nhập Yealink Web GUI](/media/ai-contact-center/user-guider-portal/yealink_giao-dien-status.png)
+
+*Kết quả: Đăng nhập thành công vào trang cấu hình phần cứng của thiết bị.*
+</Step>
+
+<Step>
+### Bước 3: Khai báo thông tin tài khoản SIP
+
+Trên thanh điều hướng chính, chuyển sang tab **Account** → chọn menu con **Register** ở cột bên trái:
+
+1. Tại mục **Account**, giữ mặc định là **Account 1** (hoặc chọn tài khoản trống cần cấu hình).
+2. Điền đầy đủ các trường thông tin theo bảng quy chuẩn dưới đây:
+
+| Mục cấu hình | Giá trị thiết lập | Mô tả chức năng |
+| :--- | :--- | :--- |
+| **Line Active** | `Enabled` | Bật trạng thái hoạt động của line tài khoản |
+| **Label** | Số máy nhánh (VD: `100`) | Tên hiển thị trên màn hình LCD điện thoại |
+| **Display Name** | Tên nhân viên / Số máy nhánh | Tên hiển thị khi gọi nội bộ cho đồng nghiệp |
+| **Register Name** | Số máy nhánh (VD: `100`) | Tên tài khoản định danh gửi đến tổng đài ODS |
+| **User Name** | Số máy nhánh (VD: `100`) | Tên xác thực SIP User Name |
+| **Password** | Mật khẩu SIP từ Portal ODS | Mật khẩu xác thực của số máy nhánh |
+| **Server Host** | Tên miền hoặc IP tổng đài ODS | Địa chỉ máy chủ SIP ODS tiếp nhận kết nối |
+| **Port** | `51000` | Cổng dịch vụ SIP chuẩn của ODS (không dùng 5060) |
+| **Transport** | `UDP` | Giao thức truyền tải SIP mặc định |
+
+![Khai báo thông số tài khoản SIP trên giao diện Account Register của Yealink](/media/ai-contact-center/user-guider-portal/yealink_cau-hinh-tai-khoan-sip.png)
+
+*Kết quả: Các trường thông tin kết nối máy chủ ODS được thiết lập đầy đủ.*
+</Step>
+
+<Step>
+### Bước 4: Lưu cấu hình và kích hoạt
+
+Cuộn xuống cuối trang và nhấn nút **Confirm** để lưu toàn bộ thiết lập. Thiết bị sẽ tự động gửi gói tin xác thực đăng ký đến máy chủ tổng đài ODS trong vòng 5–10 giây.
+</Step>
+</Steps>
+
+## 4. Kiểm tra kết quả
+
+Sau khi nhấn **Confirm**, xác nhận trạng thái hoạt động của thiết bị qua các bước sau:
+
+- **Kiểm tra trên giao diện Web GUI**: Tại dòng **Register Status** trên màn hình **Account** → **Register**, trạng thái chuyển sang chữ màu xanh lá **Registered**.
+  ![Trạng thái Register Status hiển thị Registered thành công](/media/ai-contact-center/user-guider-portal/yealink_trang-thai-registered.png)
+- **Kiểm tra trên màn hình LCD điện thoại**: Màn hình hiển thị số máy nhánh kèm biểu tượng ống nghe sẵn sàng (không có dấu gạch chéo đỏ hoặc thông báo No Service).
+- **Thực hiện cuộc gọi thử nghiệm**:
+  - Nhấc tay nghe và bấm thử một số máy nhánh nội bộ khác để kiểm tra chiều gọi đi và âm đàm thoại hai chiều.
+  - Dùng số điện thoại di động gọi vào số hotline của doanh nghiệp và bấm phím chuyển tới máy nhánh vừa cấu hình để xác nhận chiều nhận cuộc gọi.
+
+## 5. Xử lý sự cố thường gặp (Troubleshooting)
+
+<Accordions>
+<Accordion title="Không truy cập được vào địa chỉ IP của điện thoại trên trình duyệt">
+**Nguyên nhân:**
+- Máy tính và điện thoại Yealink không cùng dải mạng nội bộ (khác lớp mạng Subnet / VLAN).
+- Dây mạng cắm nhầm vào cổng PC trên điện thoại thay vì cổng Internet/LAN.
+
+**Cách xử lý:**
+1. Kiểm tra lại giắc cắm mạng phía sau điện thoại, đảm bảo dây mạng nối từ Switch/Router cắm đúng vào cổng có biểu tượng **Internet** hoặc **LAN**.
+2. Kiểm tra địa chỉ IP của máy tính (sử dụng lệnh `ipconfig` trên Windows) và so sánh với IP điện thoại để đảm bảo cùng dải mạng (ví dụ cả hai cùng là `192.168.1.x`).
+3. Mở cửa sổ Command Prompt trên máy tính và chạy lệnh `ping <IP_dien_thoai>` để kiểm tra thông tuyến kết nối vật lý.
+</Accordion>
+
+<Accordion title="Trạng thái Register Status báo 'Register Failed' hoặc 'Registering...' liên tục">
+**Nguyên nhân:**
+- Nhập sai mật khẩu SIP hoặc sai số máy nhánh (User Name / Register Name).
+- Nhập sai địa chỉ Server Host hoặc chưa đổi cổng **Port** thành `51000`.
+- Tường lửa (Firewall) hoặc Modem văn phòng chặn luồng kết nối UDP cổng 51000 ra Internet.
+
+**Cách xử lý:**
+1. Kiểm tra kỹ mật khẩu SIP trên Portal ODS (lưu ý ký tự viết hoa, viết thường, ký tự đặc biệt).
+2. Xác nhận trường **Port** đã được đặt chính xác là `51000`.
+3. Kiểm tra kết nối mạng Internet của văn phòng. Nếu dùng Firewall doanh nghiệp (Fortinet, Mikrotik, pfSense), tạo rule cho phép kết nối Outbound UDP port 51000 đến IP/Domain của tổng đài ODS.
+</Accordion>
+
+<Accordion title="Cuộc gọi kết nối được nhưng không nghe thấy âm thanh (One-way Audio)">
+**Nguyên nhân:**
+- Modem hoặc Router mạng nội bộ bật tính năng **SIP ALG** (SIP Application Layer Gateway). Tính năng này tự động sửa đổi gói tin SIP SDP dẫn đến gói tin âm thanh RTP không tìm được đường về điện thoại.
+
+**Cách xử lý:**
+1. Truy cập vào trang quản trị của Modem mạng chính (hoặc Router WiFi).
+2. Tìm đến mục **NAT** / **SIP ALG** / **VoIP ALG** và chọn chuyển sang chế độ **Disable** (Tắt).
+3. Khởi động lại Router và điện thoại Yealink, sau đó thực hiện lại cuộc gọi thử.
+</Accordion>
+</Accordions>
+
+## 6. Bài viết liên quan
+
+<Cards>
+  <Card
+    title="Tổng quan thiết lập máy nhánh"
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh"
+    icon="Layers"
+    description="So sánh và lựa chọn thiết bị đầu cuối phù hợp giữa IP Phone, Softphone và Mobile App."
+  />
+  <Card
+    title="Cài đặt nhân viên & cấp máy nhánh"
+    href="/docs/ai-contact-center/user-guider-portal/02-cai-dat-tong-dai/thiet-lap-nhan-vien"
+    icon="Users"
+    description="Hướng dẫn tạo số máy nhánh và quản lý quyền hạn gọi thoại trên Portal ODS."
+  />
+  <Card
+    title="Cấu hình Softphone Zoiper"
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/softphone"
+    icon="Headphones"
+    description="Giải pháp gọi thoại trực tiếp trên máy tính Windows và macOS với phần mềm Zoiper."
+  />
+  <Card
+    title="Cấu hình ứng dụng ODS Phone"
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/mobile-app"
+    icon="Phone"
+    description="Cài đặt ứng dụng tổng đài trên smartphone iOS và Android cho nhân viên di động."
+  />
+</Cards>

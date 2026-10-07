@@ -1,0 +1,14 @@
+{
+  "title": "Xử lý sự cố",
+  "pages": [
+    "index",
+    "calls",
+    "extensions",
+    "recordings",
+    "autocall",
+    "carriers",
+    "portal",
+    "integrations"
+  ]
+}
+

@@ -43,7 +43,8 @@ function registerValidRoutes(baseDir, baseRoute) {
     if (parts[parts.length - 1] === 'index') {
       parts.pop();
     }
-    const route = parts.length ? `${baseRoute}/${parts.join('/')}` : baseRoute;
+    const routeParts = parts.filter((part) => !/^\([^/]+\)$/.test(part));
+    const route = routeParts.length ? `${baseRoute}/${routeParts.join('/')}` : baseRoute;
     validRoutes.add(route);
   }
 }
@@ -53,29 +54,35 @@ registerValidRoutes('content/internal', '/internal');
 
 // Quét link trong từng file
 const allFiles = [...walkMdx('content/docs'), ...walkMdx('content/internal')];
-const LINK_RE = /\[([^\]]+)\]\(([^)]+)\)/g;
+const LINK_PATTERNS = [
+  /\[([^\]]+)\]\(([^)]+)\)/g,
+  /\bhref\s*=\s*["']([^"']+)["']/g,
+];
 
 for (const file of allFiles) {
   const content = fs.readFileSync(path.join(root, file), 'utf8');
-  let match;
-  while ((match = LINK_RE.exec(content)) !== null) {
-    const rawTarget = match[2].trim();
-    // Bỏ qua external link, mailto, anchor nội bộ (#), hoặc link sang llms
-    if (
-      rawTarget.startsWith('http://') ||
-      rawTarget.startsWith('https://') ||
-      rawTarget.startsWith('mailto:') ||
-      rawTarget.startsWith('#') ||
-      rawTarget.startsWith('/llms')
-    ) {
-      continue;
-    }
+  for (const pattern of LINK_PATTERNS) {
+    let match;
+    while ((match = pattern.exec(content)) !== null) {
+      const rawTarget = match[2]?.trim() ?? match[1].trim();
+      // Bỏ qua external link, mailto, anchor nội bộ (#), hoặc link sang llms
+      if (
+        rawTarget.startsWith('http://') ||
+        rawTarget.startsWith('https://') ||
+        rawTarget.startsWith('mailto:') ||
+        rawTarget.startsWith('#') ||
+        rawTarget.startsWith('/llms')
+      ) {
+        continue;
+      }
 
-    // Bỏ query params và hash
-    const cleanPath = rawTarget.split('?')[0].split('#')[0].replace(/\/$/, '');
+      // Bỏ query params, hash và trailing slash
+      const cleanPath = rawTarget.split('?')[0].split('#')[0].replace(/\/$/, '');
 
-    if (cleanPath.startsWith('/docs') || cleanPath.startsWith('/internal')) {
-      if (!validRoutes.has(cleanPath)) {
+      if (
+        (cleanPath.startsWith('/docs') || cleanPath.startsWith('/internal')) &&
+        !validRoutes.has(cleanPath)
+      ) {
         errors.push(`${file}: Liên kết gãy tới "${rawTarget}"`);
       }
     }

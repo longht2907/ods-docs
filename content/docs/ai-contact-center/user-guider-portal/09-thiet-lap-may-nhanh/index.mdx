@@ -1,8 +1,162 @@
 ---
-title: "Thiết lập máy nhánh"
-description: "Hướng dẫn cài đặt và cấu hình máy nhánh trên IP Phone Yealink, Softphone Zoiper và App ODS Phone."
+title: "Tổng quan thiết lập máy nhánh"
+description: "Hướng dẫn sử dụng máy nhánh tổng đài ảo ODS trên Web App Portal, điện thoại bàn IP Phone, Softphone máy tính và Mobile App."
 ---
 
-# Thiết lập máy nhánh
+**Số máy nhánh (Extension / Tài khoản SIP)** là định danh thoại nội bộ của từng nhân viên hoặc bộ phận trong hệ thống tổng đài ảo ODS AI Contact Center. Mỗi máy nhánh cho phép nhân viên tiếp nhận cuộc gọi vào từ khách hàng, gọi ra ngoài qua đầu số doanh nghiệp và liên lạc nội bộ hoàn toàn miễn phí cước viễn thông.
 
-Hướng dẫn cài đặt và cấu hình máy nhánh trên IP Phone Yealink, Softphone Zoiper và App ODS Phone.
+Tổng đài ảo ODS hỗ trợ cơ chế đàm thoại đa nền tảng linh hoạt, cho phép người dùng nghe/gọi trực tiếp trên **Web App giao diện quản trị Portal** hoặc cài đặt trên các thiết bị đầu cuối chuyên dụng tùy theo nhu cầu vận hành thực tế.
+
+---
+
+## 1. Cơ chế hoạt động & Các hình thức sử dụng máy nhánh
+
+### Khái niệm số máy nhánh (SIP Extension)
+Mỗi máy nhánh sở hữu một bộ thông số xác thực SIP độc lập (Số máy nhánh, Mật khẩu SIP, Địa chỉ máy chủ tổng đài và Cổng kết nối). Khi một thiết bị đăng ký (Register) thành công với tổng đài, máy nhánh chuyển sang trạng thái sẵn sàng đàm thoại.
+
+### Lợi ích triển khai đa nền tảng
+- **Linh hoạt theo vai trò công việc:** Điện thoại viên tại văn phòng có thể dùng Web App hoặc tai nghe Call Center; nhân viên kinh doanh / kỹ thuật di chuyển ngoài hiện trường sử dụng Mobile App.
+- **Tiết kiệm chi phí đầu tư thiết bị:** Doanh nghiệp có thể tận dụng ngay máy tính có sẵn và trình duyệt Web để nghe/gọi mà không bắt buộc phải mua sắm điện thoại bàn phần cứng đắt đỏ.
+- **Đồng bộ dữ liệu thời gian thực:** Toàn bộ cuộc gọi phát sinh từ bất kỳ thiết bị nào đều được hệ thống ODS ghi nhận lịch sử, ghi âm cuộc gọi và cập nhật tức thì vào hồ sơ khách hàng trên CRM.
+
+---
+
+## 2. Bảng so sánh các nền tảng sử dụng máy nhánh
+
+Hệ thống AI Contact Center ODS hỗ trợ 4 phương thức sử dụng máy nhánh chính:
+
+| Nền tảng sử dụng | Thiết bị yêu cầu | Cài đặt phần mềm | Tính cơ động | Trường hợp áp dụng tối ưu |
+| :--- | :--- | :---: | :---: | :--- |
+| **Web App Portal (Webphone)** | Máy tính + Trình duyệt Web + Tai nghe/Micro | **Không** (Chạy trên web) | Trung bình (Làm việc tại trình duyệt) | Điện thoại viên trực tổng đài, nhân sự CSKH thao tác đồng thời trên Portal ODS. |
+| **Điện thoại bàn IP Phone** | Thiết bị phần cứng IP Phone (Yealink, Grandstream...) | **Không** (Cấu hình trên máy) | Cố định (Đặt tại bàn làm việc) | Lễ tân, bàn tiếp tân, phòng họp hoặc nhân viên làm việc cố định tại văn phòng. |
+| **Softphone trên máy tính** | PC / Laptop (Windows, macOS) + Tai nghe Call Center | **Có** (Cài Zoiper, MicroSIP...) | Linh hoạt (Cần máy tính) | Nhân sự làm việc từ xa (Work from Home), điện thoại viên cần giao diện phím số riêng biệt. |
+| **Mobile App (ODS Phone)** | Điện thoại thông minh (iOS, Android) | **Có** (Cài app ODS Phone) | Rất cao (Mọi lúc, mọi nơi) | Nhân viên kinh doanh (Sales), kỹ sư hiện trường, quản lý thường xuyên ra ngoài văn phòng. |
+
+---
+
+## 3. Sử dụng máy nhánh trên Web App Portal tổng đài
+
+Web App Portal ODS tích hợp sẵn trình đàm thoại trực tiếp trên nền tảng WebRTC (**Webphone**), giúp nhân viên nghe và gọi ngay trong trình duyệt mà không cần cài đặt thêm bất kỳ phần mềm hay tiện ích mở rộng nào.
+
+### Cơ chế hoạt động của Webphone tích hợp
+1. **Liên kết tài khoản người dùng:** Quản trị viên chỉ cần gán số máy nhánh cho tài khoản người dùng tại mục **Người dùng** → **Danh sách người dùng**.
+2. **Kích hoạt tự động khi đăng nhập:** Khi nhân viên đăng nhập vào Portal ODS tại [https://app.ods.vn](https://app.ods.vn), hệ thống tự động khởi tạo kết nối Webphone ngầm và đăng ký máy nhánh lên tổng đài.
+3. **Cấp quyền Micro trình duyệt:** Trong lần đầu sử dụng, trình duyệt (Chrome, Cốc Cốc, Edge) sẽ hiển thị thông báo yêu cầu cấp quyền truy cập Microphone; nhân viên chọn **Cho phép (Allow)** để đàm thoại.
+
+### Các thao tác nghe và gọi chính trên Web App
+- **Bàn phím số ảo (Keypad):** Nhấp vào biểu tượng điện thoại tròn màu tím ở góc dưới bên phải màn hình để mở bàn phím số, nhập số điện thoại và nhấp **Gọi**.
+- **Gọi nhanh một chạm (Click-to-Call):** Nhấp trực tiếp vào số điện thoại của khách hàng tại bất kỳ đâu trên Portal (màn hình Danh sách khách hàng, Chi tiết khách hàng, Lịch sử cuộc gọi, hoặc mục Tin nhắn đa kênh).
+- **Tiếp nhận cuộc gọi đến:** Khi có khách hàng gọi vào, khung thông báo cuộc gọi đến xuất hiện tức thì kèm tên khách hàng (nếu đã lưu trong CRM), số điện thoại và 2 nút thao tác: **Trả lời** (xanh) hoặc **Từ chối** (đỏ).
+- **Thanh điều khiển cuộc gọi:** Trong khi đàm thoại, thanh điều khiển hiển thị đầy đủ các tính năng:
+  - **Tắt tiếng (Mute):** Tạm ngắt micro của nhân viên.
+  - **Giữ cuộc gọi (Hold):** Giữ máy khách hàng kèm nhạc chờ.
+  - **Chuyển tiếp (Transfer):** Chuyển cuộc gọi cho máy nhánh nội bộ khác.
+  - **Bàn phím DTMF:** Bấm phím số khi tương tác với tổng đài tự động.
+
+### Ưu điểm vượt trội khi sử dụng Web App Portal
+- Không phát sinh chi phí mua sắm thiết bị phần cứng IP Phone.
+- Tự động hiển thị màn hình thông tin khách hàng (Pop-up CRM) ngay khi nhấc máy.
+- Chuyển đổi liền mạch giữa gọi thoại và nhắn tin Zalo / Facebook Messenger trên cùng một màn hình làm việc duy nhất.
+
+---
+
+## 4. Sử dụng máy nhánh trên các thiết bị chuyên dụng
+
+Bên cạnh Web App Portal, doanh nghiệp có thể cấu hình máy nhánh trên các thiết bị chuyên dụng để phục vụ các tình huống vận hành đặc thù:
+
+### Điện thoại bàn IP Phone phần cứng
+- Sử dụng các dòng điện thoại IP chuyên nghiệp như Yealink T19X, T30X, T31P, T46U...
+- Thiết bị cắm trực tiếp dây mạng LAN hoặc kết nối Wi-Fi, độc lập hoàn toàn với máy tính cá nhân.
+- Khởi động nhanh, chất lượng âm thanh HD Voice ổn định và độ bền phần cứng cao.
+
+### Phần mềm Softphone trên máy tính PC/Laptop
+- Sử dụng các ứng dụng Softphone tiêu chuẩn quốc tế như **Zoiper**, **MicroSIP**, **Linphone** trên hệ điều hành Windows hoặc macOS.
+- Hỗ trợ phím tắt quay số nhanh, tích hợp bộ xử lý khử tiếng ồn với tai nghe chuyên dụng qua cổng USB.
+- Hoạt động ổn định ngay cả khi nhân viên không mở trình duyệt web Portal.
+
+### Ứng dụng di động ODS Phone trên Smartphone
+- Ứng dụng di động do ODS phát triển chuyên biệt cho tổng đài ảo, có mặt trên cả App Store (iOS) và Google Play (Android).
+- Tích hợp công nghệ **Push Notification** tiên tiến: Nhận cuộc gọi đến tức thì ngay cả khi điện thoại khóa màn hình hoặc tắt ứng dụng, giúp tiết kiệm pin tối đa.
+- Đồng bộ danh bạ điện thoại và hiển thị số điện thoại Hotline doanh nghiệp khi gọi ra cho khách hàng.
+
+---
+
+## 5. Thông số tài khoản SIP cần thiết khi cấu hình thiết bị
+
+Khi cấu hình máy nhánh trên các thiết bị bên ngoài (IP Phone, Zoiper, App ODS Phone), quản trị viên cần chuẩn bị các thông số xác thực SIP:
+
+| Thông số SIP | Diễn giải | Vị trí tra cứu trên Portal ODS | Ví dụ giá trị |
+| :--- | :--- | :--- | :--- |
+| **SIP Server / Domain** | Địa chỉ IP hoặc tên miền máy chủ tổng đài của doanh nghiệp | **Tổng đài** → **Cài đặt tổng đài** → **Thông tin chung** | `103.129.90.242` hoặc `pbx.ods.vn` |
+| **SIP User / Extension** | Số máy nhánh nội bộ được cấp cho nhân viên | **Tổng đài** → **Cài đặt tổng đài** → **Nhân viên** (cột Số máy nhánh) | `101`, `102`, `108` |
+| **SIP Password** | Mật khẩu xác thực tài khoản SIP | Mục **Mật khẩu SIP** trong cửa sổ sửa thông tin nhân viên | `S@cretP@ss123` |
+| **SIP Port** | Cổng giao thức SIP của tổng đài | Mặc định của giao thức SIP | `5060` (UDP/TCP) |
+| **Transport** | Giao thức truyền tải gói tin thoại | Khuyến nghị tổng đài ODS | `UDP` hoặc `TCP` |
+
+<Callout type="warn" title="Lưu ý quan trọng về bảo mật SIP">
+Tuyệt đối không chia sẻ mật khẩu SIP của máy nhánh cho người ngoài hoặc cấu hình trên các thiết bị không thuộc quyền quản lý của doanh nghiệp để phòng ngừa rủi ro bị lợi dụng gọi ra phát sinh cước viễn thông trái phép.
+</Callout>
+
+---
+
+## 6. Hướng dẫn cài đặt theo từng loại thiết bị
+
+Chọn loại thiết bị bạn muốn thiết lập để xem hướng dẫn thao tác chi tiết từng bước:
+
+<Cards>
+  <Card
+    icon="Phone"
+    title="Cấu hình IP Phone Yealink"
+    description="Hướng dẫn lấy địa chỉ IP, truy cập trang quản trị web điện thoại Yealink T19X/T30X và khai báo số máy nhánh."
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/ip-phone/cau-hinh-yealink-t19x-t30x"
+  />
+  <Card
+    icon="Headphones"
+    title="Cài đặt Softphone Zoiper trên máy tính"
+    description="Tải, cài đặt phần mềm Zoiper trên Windows/macOS và điền thông số SIP tổng đài ODS."
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/softphone/cai-dat-zoiper-may-tinh"
+  />
+  <Card
+    icon="PhoneCall"
+    title="Cài đặt App ODS Phone trên iOS"
+    description="Tải ứng dụng ODS Phone từ App Store, cấu hình nhận cuộc gọi Push Notification trên iPhone."
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/mobile-app/cai-dat-ods-phone-ios"
+  />
+  <Card
+    icon="PhoneCall"
+    title="Cài đặt App ODS Phone trên Android"
+    description="Tải ứng dụng ODS Phone từ CH Play, thiết lập quyền chạy nền và nhận cuộc gọi trên Android."
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/mobile-app/cai-dat-ods-phone-android"
+  />
+</Cards>
+
+---
+
+## 7. Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="Settings"
+    title="Tạo và cấu hình số máy nhánh trên Portal"
+    description="Quy trình khởi tạo số máy nhánh mới, đổi mật khẩu SIP và thiết lập thời gian đổ chuông trên ODS."
+    href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/tao-cau-hinh-may-nhanh"
+  />
+  <Card
+    icon="Users"
+    title="Tạo tài khoản và phân quyền người dùng"
+    description="Cách liên kết số máy nhánh với tài khoản người dùng và gán quyền thao tác trên Portal ODS."
+    href="/docs/ai-contact-center/user-guider-portal/03-quan-ly-nguoi-dung/tao-tai-khoan-nguoi-dung"
+  />
+  <Card
+    icon="PhoneForwarded"
+    title="Định tuyến cuộc gọi và mã PIN"
+    description="Thiết lập chính sách phân phối cuộc gọi vào và phân quyền gọi ra ngoài theo mã PIN bảo mật."
+    href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/dinh-tuyen-cuoc-goi-ma-pin"
+  />
+  <Card
+    icon="MessageSquare"
+    title="Quản lý tin nhắn và cuộc gọi"
+    description="Hướng dẫn điện thoại viên xử lý tương tác đa kênh và đàm thoại khách hàng trên giao diện Portal."
+    href="/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/quan-ly-tin-nhan-cuoc-goi"
+  />
+</Cards>

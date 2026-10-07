@@ -1,90 +1,131 @@
 ---
-title: "HƯỚNG DẪN TÍCH HỢP FACEBOOK MESSENGER"
-description: "Hướng dẫn chi tiết về hướng dẫn tích hợp facebook messenger trên hệ thống ODS AI Contact Center."
+title: "Hướng dẫn tích hợp Facebook Messenger"
+description: "Hướng dẫn kết nối Fanpage Facebook với tổng đài ODS để tiếp nhận và phản hồi tin nhắn Messenger tập trung."
 ---
 
-### 1. Giới thiệu & Yêu cầu tích hợp
+Tính năng **Tích hợp Facebook Messenger** giúp doanh nghiệp tiếp nhận, phản hồi tin nhắn khách hàng từ Fanpage và đồng bộ dữ liệu hội thoại trực tiếp trên hệ thống AI Contact Center ODS.
 
-**🔹 Mô tả tính năng**
+<Callout type="info" title="Trước khi bắt đầu">
+- Tài khoản người dùng có quyền quản trị trong hệ thống ODS.
+- Bạn sở hữu tài khoản Facebook cá nhân có quyền **Quản trị viên (Admin)** trên Fanpage cần kết nối.
+- Cấu hình tích hợp được thực hiện tại mục **Thiết lập nâng cao** → **Tích hợp Facebook** trên ODS Portal.
+</Callout>
 
-Tính năng **Tích hợp Facebook Messenger vào AI Contact Center ODS** cho phép doanh nghiệp:
+## Tổng quan màn hình Quản lý Fanpage Facebook
 
-* Kết nối trực tiếp Fanpage Facebook thông qua **Messenger Platform (Graph API & Webhooks)**.
-* Tiếp nhận và phản hồi tin nhắn của khách hàng **ngay trong giao diện ODS**, không cần chuyển đổi ứng dụng.
-* Quản lý hội thoại đa kênh tập trung (Messenger, Call, Email, Zalo) trên **một nền tảng duy nhất**.
-* Tự động lưu trữ và đồng bộ lịch sử chat vào **CRM**, giúp xây dựng hồ sơ khách hàng để cá nhân hóa chăm sóc.
-* Giám sát, phân công và báo cáo hiệu quả hoạt động của đội ngũ CSKH trên một Dashboard duy nhất.
+Màn hình **Quản lý Fanpage Facebook** hiển thị danh sách các Fanpage đã được cấp phép liên kết với tổng đài ODS, trạng thái đồng bộ CRM và các công cụ thao tác nhanh.
 
-Nhờ đó, ODS giúp doanh nghiệp **không bỏ sót khách hàng**, **nâng cao tốc độ phản hồi**, và **tối ưu hóa vận hành CSKH** trong chiến lược Omnichannel.
+![Màn hình danh sách Fanpage Facebook đã kết nối trên ODS Portal](/media/ai-contact-center/user-guider-portal/tich-hop-facebook_danh-sach-fanpage.png)
 
-**🔹 Yêu cầu tích hợp ở phía người dùng**
+| Vùng giao diện / Cột | Loại thành phần | Chức năng |
+| :--- | :--- | :--- |
+| **+ THÊM MỚI FANPAGE** | Nút hành động | Mở luồng ủy quyền đăng nhập Facebook để kết nối Fanpage mới |
+| **Nhập từ khóa tại đây...** | Ô tìm kiếm | Tìm nhanh Fanpage theo tên trong danh sách |
+| **STT** | Cột thông tin | Số thứ tự các Fanpage đã kết nối |
+| **TÊN FANPAGE** | Cột thông tin | Tên Fanpage Facebook được cấp phép |
+| **CHỌN FACEBOOK TOKEN CHO HỆ THỐNG CRM** | Trạng thái | Biểu tượng tích xanh xác nhận Token Facebook đã kích hoạt đồng bộ vào CRM ODS |
+| **NGÀY TẠO** | Cột thông tin | Thời điểm hoàn tất liên kết Fanpage vào hệ thống |
+| **THAO TÁC** | Nút tác vụ | Nút xóa (thùng rác) để hủy liên kết Fanpage khỏi tổng đài |
 
-Để sử dụng tính năng này, doanh nghiệp cần đáp ứng các điều kiện sau:
+## Kết nối Fanpage Facebook vào tổng đài ODS
 
-1. **Fanpage Facebook hợp lệ**
-   * Doanh nghiệp phải sở hữu Fanpage chính thức.
-   * Tài khoản Facebook dùng để tích hợp cần có quyền **Quản trị viên (Admin)**.
-2. **Ứng dụng ODS được chứng thực**
-   * Việc kết nối được thực hiện thông qua **App ODS đã đăng ký trên Facebook Developer**.
-   * Người dùng chỉ cần đăng nhập Facebook và cấp quyền cho App ODS (không cần tự tạo ứng dụng riêng).
-3. **Cấp quyền cho App ODS**\
-   Khi tích hợp, cần cấp các quyền sau:
-   * pages\_messaging: Nhắn tin và trả lời khách hàng.
-   * pages\_manage\_metadata: Quản lý webhook & cấu hình Fanpage.
-   * pages\_read\_engagement: Đọc nội dung và tương tác tin nhắn.
-4. **Hạ tầng ODS**
-   * Người dùng cần có tài khoản quản trị trong hệ thống ODS.
+Quá trình kết nối sử dụng ứng dụng ủy quyền `ODS_APP_PRODUCTION` được Facebook chứng thực, không yêu cầu doanh nghiệp tự tạo ứng dụng riêng trên Facebook Developer.
 
-**2. Các bước tích hợp**
+<Steps>
+  <Step title="Truy cập mục Tích hợp Facebook">
+    Từ thanh điều hướng bên trái của Portal, chọn **Thiết lập nâng cao** → **Tích hợp Facebook** (hoặc truy cập đường dẫn `/advance-setting/facebook`).
 
-**Bước 1: Truy cập cấu hình tích hợp trong ODS**
+    *Kết quả: Màn hình hiển thị danh sách Fanpage hiện có kèm nút thao tác thêm mới.*
+  </Step>
 
-* Đăng nhập **ODS Admin Portal**: [https://app.ods.vn/](https://app.ods.vn/)
+  <Step title="Mở luồng ủy quyền Facebook">
+    Nhấp nút **+ THÊM MỚI FANPAGE** màu xanh lá ở góc trên bên phải màn hình.
 
-![](/media/ai-contact-center/user-guider-portal/img-WfRl5dJ0OZx65HQ2I4oa.png)
+    *Kết quả: Cửa sổ popup xác thực của Facebook hiển thị yêu cầu đăng nhập tài khoản Quản trị viên.*
+  </Step>
 
-* Chọn menu **Thiết lập nâng cao → Tích hợp Facebook**.
+  <Step title="Chọn Fanpage cần kết nối">
+    Trong cửa sổ popup của Facebook, chọn tùy chọn **Chọn áp dụng cho riêng Trang hiện tại**, sau đó đánh dấu tích vào Fanpage bạn muốn kết nối vào tổng đài ODS rồi nhấp **Tiếp tục**.
 
-![](/media/ai-contact-center/user-guider-portal/img-QawboWnzvusa8KUi5jaD.png)
+    ![Cửa sổ popup Facebook cho phép chọn Fanpage cấp quyền cho ODS_APP_PRODUCTION](/media/ai-contact-center/user-guider-portal/tich-hop-facebook_popup-chon-fanpage.png)
 
-**Bước 2: Đăng nhập và chọn Fanpage**
+    *Kết quả: Facebook chuyển sang màn hình xác nhận các quyền truy cập của ứng dụng.*
+  </Step>
 
-* Nhấn **Thêm mới Fanpage** → hệ thống mở giao diện xác thực Facebook.
+  <Step title="Xác nhận cấp quyền cho ứng dụng ODS">
+    Kiểm tra danh sách các quyền truy cập cần thiết và nhấp nút **Lưu** để hoàn tất ủy quyền:
+    - Quản lý và truy cập cuộc trò chuyện trên Trang trong Messenger.
+    - Quản lý tài khoản, cài đặt và webhook cho Trang.
+    - Hiển thị danh sách Trang bạn quản lý.
 
-![](/media/ai-contact-center/user-guider-portal/img-i8YSrCk7hb1Msimz6mXk.png)
+    ![Cửa sổ xác nhận cấp quyền cho ứng dụng ODS_APP_PRODUCTION](/media/ai-contact-center/user-guider-portal/tich-hop-facebook_popup-cap-quyen.png)
 
-* Đăng nhập bằng tài khoản quản trị Fanpage.
-* Chọn Fanpage cần tích hợp và cấp các quyền cần thiết cho App ODS:
-  * Quản lý và trả lời tin nhắn trên Messenger.
-  * Quản lý webhook và cấu hình Page.
-  * Hiển thị danh sách Page đã quản lý.
+    *Kết quả: Facebook đóng cửa sổ popup và hiển thị thông báo liên kết thành công trên ODS Portal.*
+  </Step>
 
-![](/media/ai-contact-center/user-guider-portal/img-hkrPTr8NlZTYhJGTSYCN.png)
+  <Step title="Kích hoạt token cho hệ thống CRM">
+    Tại danh sách Fanpage vừa kết nối, hệ thống tự động kiểm tra và đánh dấu tích xanh tại cột **CHỌN FACEBOOK TOKEN CHO HỆ THỐNG CRM**.
 
-**Bước 3: Xác nhận kết nối**
+    *Kết quả: Fanpage chính thức sẵn sàng tiếp nhận và gửi tin nhắn qua ODS.*
+  </Step>
+</Steps>
 
-* Sau khi cấp quyền, Fanpage sẽ hiển thị trạng thái **Đã kết nối** trong ODS.
-* Hệ thống tự động đăng ký Webhook và quản lý Page Access Token an toàn.
+## Tiếp nhận và xử lý tin nhắn Messenger trên ODS
 
-![](/media/ai-contact-center/user-guider-portal/img-X44nTMOCvLjOgMGEiZ19.png)
+Sau khi tích hợp thành công, điện thoại viên không cần mở Meta Business Suite mà xử lý hội thoại trực tiếp trong không gian làm việc tập trung:
 
-**Bước 4: Kiểm thử và hoàn tất**
+![Giao diện tiếp nhận và trả lời tin nhắn Facebook Messenger trên ODS](/media/ai-contact-center/user-guider-portal/tich-hop-facebook_quan-ly-tin-nhan.png)
 
-* Gửi tin nhắn thử từ Fanpage → kiểm tra hiển thị trong giao diện ODS.
-* Agent phản hồi trực tiếp trên ODS → khách hàng nhận tin nhắn trên Messenger.
+<Steps>
+  <Step title="Tiếp nhận hội thoại mới">
+    Mở menu **Tin nhắn** trên thanh điều hướng bên trái. Khi khách hàng nhắn tin đến Fanpage, hội thoại mới xuất hiện ngay lập tức trong danh sách với nhãn biểu tượng Facebook và thông báo thời gian thực.
+  </Step>
 
-**3. Hướng dẫn chat và quản lý contact trên giao diện Contact Center ODS**
+  <Step title="Tương tác và phản hồi khách hàng">
+    Nhấp vào hội thoại để xem toàn bộ lịch sử tin nhắn. Nhập nội dung phản hồi tại khung nhập liệu bên dưới và nhấp **Gửi** (hoặc nhấn phím Enter). Tin nhắn được chuyển ngay lập tức đến ứng dụng Messenger của khách hàng.
+  </Step>
 
-Sau khi tích hợp, toàn bộ tin nhắn từ khách hàng sẽ hiển thị trong giao diện ODS. Quy trình quản lý cơ bản:
+  <Step title="Quản lý thông tin và phân loại khách hàng">
+    Cột thông tin khách hàng bên phải hiển thị định danh Facebook, phân loại khách hàng và lịch sử liên hệ. Điện thoại viên có thể gán nhãn, thêm ghi chú hoặc chuyển tiếp hội thoại cho nhân sự phụ trách.
+  </Step>
+</Steps>
 
-1. **Nhận hội thoại**
-   * Khi có tin nhắn mới từ Messenger, Agent nhận thông báo real-time trong giao diện ODS.
-   * Tin nhắn hiển thị kèm thông tin khách hàng (nếu đã tồn tại trong CRM).
-2. **Xử lý hội thoại**
-   * Agent mở cửa sổ chat, xem lịch sử trao đổi với khách hàng.
-   * Trả lời trực tiếp trên giao diện ODS → tin nhắn được gửi ngược về Messenger qua API.
-   * Nếu cần, Agent có thể gắn nhãn (tag), thêm ghi chú hoặc chuyển hội thoại cho Agent khác.
-3. **Quản lý contact**
-   * Thông tin khách hàng (tên, ID Messenger, lịch sử chat, hành vi) được lưu trong **CRM tích hợp**.
+## Kiểm tra kết quả
 
-![](/media/ai-contact-center/user-guider-portal/img-esZbvdDeXaPFwgjKLLEG.png)
+Doanh nghiệp xác nhận tích hợp Facebook Messenger hoạt động chính xác qua các tiêu chí sau:
+
+- Tên Fanpage xuất hiện đầy đủ trong bảng **Quản lý Fanpage Facebook**.
+- Cột **CHỌN FACEBOOK TOKEN CHO HỆ THỐNG CRM** hiển thị biểu tượng tích xanh.
+- Dùng tài khoản Facebook cá nhân gửi một tin nhắn bất kỳ đến Fanpage; mục **Tin nhắn** trên ODS ghi nhận hội thoại mới trong vòng 3 giây.
+- Điện thoại viên gửi phản hồi từ ODS và tin nhắn hiển thị chính xác trên ứng dụng Messenger của người gửi.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Không tìm thấy Fanpage trong cửa sổ chọn Trang của Facebook">
+    **Nguyên nhân:** Tài khoản Facebook cá nhân đang đăng nhập không có quyền Quản trị viên (Admin) trên Fanpage đó, hoặc bạn chưa chuyển sang Profile Trang trên Facebook.
+
+    **Cách xử lý:** Đăng nhập vào Facebook cá nhân, kiểm tra lại vai trò trên Trang tại mục **Cài đặt Trang** → **Trải nghiệm Trang mới** → **Quyền truy cập Trang**. Đảm bảo tài khoản có toàn quyền quản lý trước khi thực hiện liên kết lại trên ODS.
+  </Accordion>
+
+  <Accordion title="Fanpage báo mất kết nối hoặc tin nhắn không đồng bộ về ODS">
+    **Nguyên nhân:** Token truy cập Fanpage bị vô hiệu hóa khi người quản trị đổi mật khẩu Facebook, xóa phiên đăng nhập bảo mật hoặc gỡ quyền ứng dụng `ODS_APP_PRODUCTION` trên Facebook.
+
+    **Cách xử lý:** Tại bảng Quản lý Fanpage trên ODS Portal, nhấp nút thùng rác tại cột **THAO TÁC** để xóa liên kết cũ. Sau đó nhấp **+ THÊM MỚI FANPAGE** và cấp lại quyền cho Trang.
+  </Accordion>
+
+  <Accordion title="Khách nhắn tin đến Fanpage nhưng ODS không nhận được">
+    **Nguyên nhân:** Webhook của Fanpage bị gián đoạn hoặc Fanpage đang được kết nối song song với ứng dụng bên thứ ba khác chiếm quyền điều khiển tin nhắn chính (Handover Protocol).
+
+    **Cách xử lý:** Truy cập Meta Business Suite → **Hộp thư** → **Cài đặt hộp thư** để kiểm tra phân quyền ứng dụng nhận tin. Đảm bảo ứng dụng ODS được cấp quyền trả lời và webhook hoạt động bình thường.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Tổng quan tích hợp đa kênh" href="/docs/ai-contact-center/user-guider-portal/08-tich-hop-da-kenh" description="Tìm hiểu kiến trúc kết nối các kênh liên lạc vào tổng đài ODS." />
+  <Card title="Tích hợp Zalo OA" href="/docs/ai-contact-center/user-guider-portal/08-tich-hop-da-kenh/tich-hop-zalo-oa" description="Hướng dẫn kết nối Zalo Official Account với tổng đài ODS." />
+  <Card title="Quản lý tin nhắn và cuộc gọi" href="/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/quan-ly-tin-nhan-cuoc-goi" description="Quy trình tiếp nhận và xử lý tương tác đa kênh của điện thoại viên." />
+  <Card title="Hợp nhất thông tin khách hàng" href="/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/hop-nhat-thong-tin-khach-hang" description="Cách liên kết hồ sơ khách hàng giữa Facebook, Zalo và số điện thoại." />
+</Cards>

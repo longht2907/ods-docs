@@ -11,8 +11,10 @@
 ## Phạm vi đã thực hiện
 
 - Quy hoạch `content/internal/**` thành hai root `Bắt đầu` và `Tổng đài`.
-- Tạo 39 trang MDX và 17 file `meta.json`.
+- Tạo 42 trang MDX và 18 file `meta.json`.
 - Mảng Tổng đài có tám quy trình, 16 runbook và sáu trang knowledge base, ngoài các landing page.
+- Hoàn thiện `Cổng thông tin Support` với Thông báo, Công cụ làm việc và Checklist ca trực.
+- Chuẩn hóa ba nhãn điều hướng Tổng đài thành `Quy trình vận hành`, `Xử lý sự cố` và `Kiến thức kỹ thuật` mà không đổi URL.
 - Xóa bốn placeholder cũ; `/internal/runbook` và `/internal/quy-trinh` không có redirect.
 - Thêm ADR-006 và cập nhật policy dữ liệu internal trong `AGENTS.md`.
 - Link checker nhận route group và literal JSX `href` cho `/docs` hoặc `/internal`.
@@ -27,6 +29,9 @@
 | C | `a6c85df` | `docs(internal): add support process templates` |
 | D | `af72d36` | `docs(internal): add incident runbook templates` |
 | E | `a4c543d` | `docs(internal): add technical knowledge templates` |
+| F | `0310782` | `docs(internal): record task 014 verification` |
+| G — Plan | `85def40` | `docs(task-014): extend support hub plan` |
+| G — Content | `4d74345` | `docs(internal): refine support wiki navigation` |
 
 ## Kết quả kiểm tra theo phase
 
@@ -39,6 +44,7 @@ Mỗi phase đã chạy thật `npm run verify:task`, `git diff --check` và ki�
 | C | 208/208 | 12/12 | PASS |
 | D | 225/225 | 12/12 | PASS |
 | E | 232/232 | 12/12 | PASS |
+| G | 235/235 | 12/12 | PASS |
 
 Các lần chạy đều PASS type generation, TypeScript, env guard, link checker, guard, scope checker, production build và route tests. Build còn warning `metadataBase` dùng `http://localhost:3000`; đây là warning có sẵn, không làm fail build.
 
@@ -46,10 +52,11 @@ Các lần chạy đều PASS type generation, TypeScript, env guard, link check
 
 Kiểm tra bằng HTTP client trên dev server port 3000:
 
-- 39/39 route MDX internal trả `200`; không có route thất bại.
+- 42/42 route MDX internal trả `200`; không có route thất bại.
 - `/internal/runbook` trả `404`.
 - `/internal/quy-trinh` trả `404`.
 - `/api/search/internal?query=Không gọi ra được` trả route `/internal/ai-contact-center/runbooks/calls/outbound-failed`.
+- Internal search trả đúng `/internal/announcements`, `/internal/tools` và `/internal/shift-checklist` theo title tương ứng.
 - Cùng query trên `/api/search` không chứa `/internal`.
 - `/llms.txt` không chứa `/internal`.
 - `/sitemap.xml` tiếp tục trả `404`; repo chưa triển khai sitemap.
@@ -64,6 +71,9 @@ Validation server được chạy trên port 3101 trong shell xác nhận `ODS_I
 | Route | Status | Cache-Control | X-Robots-Tag |
 |---|---:|---|---|
 | `/internal` | 401 | `private, no-store, must-revalidate` | `noindex, nofollow` |
+| `/internal/announcements` | 401 | `private, no-store, must-revalidate` | `noindex, nofollow` |
+| `/internal/tools` | 401 | `private, no-store, must-revalidate` | `noindex, nofollow` |
+| `/internal/shift-checklist` | 401 | `private, no-store, must-revalidate` | `noindex, nofollow` |
 | `/internal/ai-contact-center` | 401 | `private, no-store, must-revalidate` | `noindex, nofollow` |
 | `/internal/ai-contact-center/runbooks/calls/outbound-failed` | 401 | `private, no-store, must-revalidate` | `noindex, nofollow` |
 | `/internal/runbook` | 401 | `private, no-store, must-revalidate` | `noindex, nofollow` |
@@ -95,13 +105,13 @@ Chrome DevTools Protocol được dùng để đặt device metrics thật và �
 
 ## Console và giới hạn còn lại
 
-- Không ghi nhận JavaScript exception hoặc application console error trên sáu lượt kiểm tra.
-- Chrome yêu cầu `http://localhost:3000/favicon.ico` ở lần tải đầu và nhận `404`, tạo một resource error. Repo không có favicon và `public/**` nằm ngoài scope TASK-014, nên không sửa trong task này.
+- Không ghi nhận JavaScript exception, `console.error` hoặc browser log error trên sáu lượt kiểm tra Phase G.
+- Lần nghiệm thu Phase F từng ghi nhận `favicon.ico` trả `404`. Repo vẫn không có favicon và `public/**` nằm ngoài scope TASK-014; lỗi này không xuất hiện lại trong lượt CDP Phase G.
 - Nội dung nghiệp vụ hiện là template; SLA, mức độ sự cố, nguồn chuẩn, người cập nhật, IP và bảng đầu số thật chưa được điền.
 - Task giữ `in-progress`; CI trên Pull Request và Human finalization chưa diễn ra.
 
 ## Final verification
 
-- `npm run verify:task`: PASS — 232/232 static pages, 12/12 route tests; report và screenshot đã có trong worktree khi chạy.
+- `npm run verify:task`: PASS — 235/235 static pages, 12/12 route tests; report và screenshot đã có trong worktree khi chạy.
 - `git diff --check`: PASS sau khi cập nhật evidence cuối.
-- `git status --short`: chỉ còn report và sáu screenshot trước commit Phase F.
+- `git status --short`: chỉ còn report và sáu screenshot trước commit evidence Phase G.

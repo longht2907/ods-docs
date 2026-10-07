@@ -1,105 +1,141 @@
 ---
 title: "Hợp nhất thông tin khách hàng"
-description: "Hướng dẫn gộp các phiên hội thoại và hồ sơ trùng lặp từ nhiều kênh liên lạc vào một hồ sơ khách hàng 360 độ duy nhất."
+description: "Hướng dẫn gộp các phiên hội thoại và hồ sơ trùng lặp từ nhiều kênh liên lạc vào một hồ sơ khách hàng 360 độ duy nhất trên ODS."
 ---
 
-Trong vận hành Contact Center, một khách hàng có thể liên hệ với doanh nghiệp qua nhiều kênh khác nhau (gọi điện vào hotline, nhắn tin qua Zalo OA, chat trên Fanpage Facebook). Tính năng **Hợp nhất thông tin khách hàng** cho phép nhân viên gộp các hồ sơ phân tán này thành một hồ sơ duy nhất, đồng bộ toàn bộ lịch sử tương tác mà không làm mất dữ liệu quan trọng.
+Tính năng **Hợp nhất thông tin khách hàng** gộp các phiên hội thoại phân tán từ Zalo, Messenger hoặc cuộc gọi thoại vào một hồ sơ duy nhất, đồng bộ lịch sử tương tác xuyên suốt mà không làm mất thông tin liên lạc.
 
-## Trước khi bắt đầu
-
-Trước khi thực hiện hợp nhất, đảm bảo các điều kiện sau:
-
-- Tài khoản của bạn được cấp quyền thao tác trên phân hệ **Tin nhắn** và cập nhật hồ sơ khách hàng.
-- Đã xác minh các phiên hội thoại hoặc số điện thoại thực sự thuộc về cùng một cá nhân (thông qua đối chiếu họ tên, số điện thoại, nội dung trao đổi).
-- Cân nhắc kỹ các trường thông tin cần giữ lại trước khi nhấn xác nhận vì thao tác hợp nhất sẽ cập nhật trực tiếp vào cơ sở dữ liệu khách hàng.
+<Callout type="info" title="Trước khi bắt đầu">
+- Tài khoản người dùng được phân quyền thao tác trên phân hệ **Tin nhắn** và cập nhật hồ sơ khách hàng.
+- Cần tối thiểu **2 phiên hội thoại** đã được xác minh thuộc cùng một cá nhân (qua đối chiếu họ tên, số điện thoại hoặc ngữ cảnh trao đổi).
+- Thao tác hợp nhất sẽ ghi đè và đồng bộ trực tiếp vào cơ sở dữ liệu khách hàng.
+</Callout>
 
 ## Cơ chế lựa chọn dữ liệu khi hợp nhất
 
-Khi hợp nhất hai hồ sơ, hệ thống áp dụng cơ chế phân định rõ ràng giữa trường dữ liệu đơn và trường dữ liệu đa giá trị:
+Hệ thống phân định quy tắc xử lý giữa trường thông tin đơn nhất và trường thông tin đa giá trị:
 
-| Nhóm trường | Các trường áp dụng | Cơ chế xử lý |
-| --- | --- | --- |
-| **Giá trị đơn (Chỉ giữ 1)** | Hình đại diện, Tên người dùng, Giới tính, Ngày sinh, Zalo ID, Phân loại khách hàng | Sử dụng nút chọn Radio: Bạn chỉ được chọn giữ lại giá trị từ một trong hai hồ sơ làm thông tin chính thức. |
-| **Giá trị đa phần tử (Cho phép giữ cả hai)** | Số điện thoại, Email, Nhãn khách hàng (Tags), Địa chỉ liên hệ | Sử dụng hộp kiểm Checkbox: Bạn có thể chọn giữ lại cả hai số điện thoại hoặc cả hai nhãn để không làm gián đoạn kênh liên lạc nào. |
+| Phân loại | Các trường áp dụng | Cơ chế xử lý |
+| :--- | :--- | :--- |
+| **Giá trị đơn (Chỉ giữ 1)** | Hình đại diện, Tên người dùng, Giới tính, Ngày sinh, Phân loại khách hàng | Sử dụng nút chọn Radio: Chỉ chọn giữ lại 1 giá trị duy nhất từ một trong các hồ sơ nguồn làm thông tin đại diện. |
+| **Giá trị đa phần tử (Cho phép giữ cả hai)** | Số điện thoại, Email, Nhãn khách hàng (Tags), Địa chỉ liên hệ | Sử dụng hộp kiểm Checkbox: Có thể đánh dấu giữ lại nhiều số điện thoại hoặc nhiều nhãn để duy trì khả năng nhận diện đa kênh. |
 
-## Các bước thực hiện
+## Chọn các phiên hội thoại cần hợp nhất
+
+Quy trình chọn các phiên tương tác trùng lặp từ danh sách trao đổi:
 
 <Steps>
-  <Step>
-    ### Chọn các phiên hội thoại cần hợp nhất
+  <Step title="Truy cập danh sách hội thoại">
+    Từ thanh điều hướng bên trái của Portal, chọn **Tin nhắn**.
 
-    Từ thanh điều hướng bên trái, truy cập vào mục **Tin nhắn**.
+    Tại cột danh sách hội thoại, rà soát các phiên cần gộp (ví dụ: một phiên nhắn tin Zalo và một phiên cuộc gọi hotline đến cùng khách hàng).
+  </Step>
 
-    1. Tại cột danh sách hội thoại bên trái, rà soát các phiên trao đổi nghi ngờ trùng lặp (ví dụ: một phiên nhắn tin qua Zalo và một phiên cuộc gọi thoại đến số hotline).
-    2. Nhấp chuột vào hộp kiểm (checkbox) nằm phía trước từng phiên hội thoại cần gộp.
+  <Step title="Tích chọn các phiên cần gộp">
+    Nhấp chuột vào ô vuông kiểm (checkbox) nằm phía trước từng phiên trao đổi cần hợp nhất.
 
     ![Tích chọn các phiên hội thoại trùng lặp trong danh sách](/media/ai-contact-center/user-guider-portal/hop-nhat-khach-hang_danh-sach-chon-hoi-thoai.png)
 
-    **Kết quả mong đợi:** Một thanh công cụ xuất hiện trên đầu danh sách hiển thị số lượng phiên đã chọn (ví dụ: `ĐÃ CHỌN 2`), nút **Hủy** và nút **Hợp nhất** màu xanh tím.
-  </Step>
-
-  <Step>
-    ### Mở cửa sổ cấu hình hợp nhất thông tin
-
-    Nhấn vào nút **Hợp nhất** trên thanh công cụ vừa xuất hiện.
-
-    Hệ thống sẽ mở modal **HỢP NHẤT THÔNG TIN CHÍNH** gồm 2 cột so sánh trực quan:
-    - Cột bên trái: Danh sách các trường dữ liệu lấy từ cả hai hồ sơ nguồn để bạn lựa chọn.
-    - Cột bên phải: Khu vực xem trước **THÔNG TIN KHÁCH HÀNG SAU KHI HỢP NHẤT**.
-
-    **Kết quả mong đợi:** Cửa sổ modal hiển thị đầy đủ thông tin chi tiết của các hồ sơ đang được đối chiếu.
-  </Step>
-
-  <Step>
-    ### Chọn thông tin nguồn cho hồ sơ chính thức
-
-    Tại cột bên trái của modal, duyệt qua từng mục thông tin:
-
-    1. **Tên người dùng & Hình đại diện:** Chọn hồ sơ có tên hiển thị đầy đủ và rõ ràng nhất (ví dụ: chọn tên chính thức thay vì tên hiển thị tạm thời `Khách mới`).
-    2. **Giới tính & Ngày sinh:** Tích chọn giá trị đã được xác thực chính xác.
-    3. **Số điện thoại:** Đánh dấu chọn cả hai số điện thoại nếu muốn duy trì khả năng nhận diện cuộc gọi từ cả hai số thuê bao này trong tương lai.
-    4. **Phân loại khách hàng:** Chọn trạng thái chính xác (`KH hiện tại` nếu khách đã phát sinh dịch vụ).
-    5. **Nhãn khách hàng & Địa chỉ:** Chọn các nhãn phân khúc nghiệp vụ và địa chỉ chính xác cần lưu trữ.
-
-    ![Lựa chọn các trường dữ liệu và đối chiếu bản xem trước sau khi hợp nhất](/media/ai-contact-center/user-guider-portal/hop-nhat-khach-hang_modal-chon-thong-tin.png)
-
-    **Kết quả mong đợi:** Cột bên phải tự động cập nhật bản xem trước tương ứng theo từng thao tác tích chọn của bạn.
-  </Step>
-
-  <Step>
-    ### Kiểm tra bản xem trước và xác nhận hợp nhất
-
-    Tại cột **THÔNG TIN KHÁCH HÀNG SAU KHI HỢP NHẤT** ở bên phải:
-
-    1. Đọc lại toàn bộ bản tóm tắt hồ sơ sau khi gộp để đảm bảo không bỏ sót số điện thoại hay thông tin quan trọng.
-    2. Nhấn nút **Hợp nhất** ở góc dưới bên phải modal để tiến hành lưu thay đổi vào hệ thống (hoặc nhấn **Hủy bỏ** nếu muốn dừng thao tác mà không lưu).
-
-    <Callout title="Cảnh báo an toàn dữ liệu" type="warn">
-      Sau khi nhấn **Hợp nhất**, hai hồ sơ sẽ được sáp nhập vĩnh viễn và không thể tự phân tách trực tiếp trên giao diện người dùng. Hãy kiểm tra kỹ bản xem trước trước khi bấm nút.
-    </Callout>
-
-    **Kết quả mong đợi:** Modal đóng lại, hệ thống hiển thị thông báo hợp nhất thành công và danh sách hội thoại được làm mới.
+    *Kết quả: Thanh tiêu đề cột hiển thị số lượng phiên đã chọn (ví dụ: **ĐÃ CHỌN 2**) cùng hai nút chức năng **Hủy** và **Hợp nhất**.*
   </Step>
 </Steps>
 
+## Thiết lập thông tin và xác nhận hợp nhất
+
+Sau khi chọn đủ các phiên hội thoại nguồn, tiến hành cấu hình dữ liệu cho hồ sơ hợp nhất:
+
+<Steps>
+  <Step title="Mở modal cấu hình hợp nhất">
+    Nhấn nút **Hợp nhất** màu xanh tím trên thanh công cụ vừa xuất hiện ở đầu danh sách.
+
+    Cửa sổ modal **HỢP NHẤT THÔNG TIN CHÍNH** mở ra với 2 cột làm việc:
+    - Cột bên trái: Danh sách các trường thông tin lấy từ các hồ sơ nguồn để lựa chọn.
+    - Cột bên phải: Khu vực xem trước **THÔNG TIN KHÁCH HÀNG SAU KHI HỢP NHẤT**.
+  </Step>
+
+  <Step title="Chọn dữ liệu nguồn cho hồ sơ chính thức">
+    Tại cột bên trái của modal, đối chiếu và đánh dấu vào các giá trị chính xác cần giữ lại:
+
+    - **Hình đại diện & Tên người dùng:** Chọn hồ sơ có tên đầy đủ và avatar rõ ràng nhất.
+    - **Số điện thoại & Email:** Đánh dấu chọn các số điện thoại đang hoạt động để hệ thống nhận diện cuộc gọi đến trong tương lai.
+    - **Phân loại khách hàng & Nhãn:** Chọn trạng thái quan hệ khách hàng và các thẻ phân loại nghiệp vụ phù hợp.
+
+    ![Lựa chọn các trường dữ liệu và đối chiếu bản xem trước sau khi hợp nhất](/media/ai-contact-center/user-guider-portal/hop-nhat-khach-hang_modal-chon-thong-tin.png)
+
+    *Kết quả: Cột xem trước bên phải tự động cập nhật ngay lập tức theo từng lựa chọn.*
+  </Step>
+
+  <Step title="Kiểm tra bản xem trước và xác nhận">
+    Rà soát toàn bộ thông tin tại cột **THÔNG TIN KHÁCH HÀNG SAU KHI HỢP NHẤT** bên phải để đảm bảo không thiếu số điện thoại hay ghi chú quan trọng.
+
+    Nhấn nút **Hợp nhất** ở góc dưới bên phải modal để hoàn tất (hoặc nhấn **Hủy bỏ** nếu muốn dừng thao tác mà không lưu).
+
+    <Callout type="warn" title="Lưu ý an toàn dữ liệu">
+      Sau khi nhấn **Hợp nhất**, các hồ sơ nguồn sẽ được sáp nhập vĩnh viễn và không thể tự phân tách trực tiếp trên giao diện người dùng. Hãy kiểm tra kỹ bản xem trước trước khi xác nhận.
+    </Callout>
+
+    *Kết quả: Cửa sổ modal đóng lại, hệ thống hiển thị thông báo thành công và làm mới danh sách hội thoại.*
+  </Step>
+</Steps>
+
+Các trường thông tin thiết lập trong modal hợp nhất:
+
+| Trường | Bắt buộc | Kiểu chọn | Mô tả | Ví dụ |
+| :--- | :--- | :--- | :--- | :--- |
+| **Hình đại diện** | Không | Radio (Chọn 1) | Ảnh đại diện chính thức hiển thị trên hồ sơ | Avatar tài khoản Zalo |
+| **Tên người dùng** | Có | Radio (Chọn 1) | Tên định danh chính thức của khách hàng | `Long`, `Nguyễn Văn A` |
+| **Giới tính** | Không | Radio (Chọn 1) | Danh xưng phục vụ giao tiếp | `Ông`, `Bà` |
+| **Ngày sinh** | Không | Radio (Chọn 1) | Ngày tháng năm sinh của khách hàng | `29/07/1996` |
+| **Số điện thoại** | Có | Checkbox (Chọn nhiều) | Danh sách số thuê bao liên hệ được giữ lại | `0928816xxx`, `0352862xxx` |
+| **Email** | Không | Checkbox (Chọn nhiều) | Hòm thư điện tử liên hệ | `khachhang@example.com` |
+| **Phân loại khách hàng** | Có | Radio (Chọn 1) | Nhóm quan hệ khách hàng | `KH hiện tại`, `KH tiềm năng` |
+| **Nhãn khách hàng** | Không | Checkbox (Chọn nhiều) | Thẻ phân loại nghiệp vụ hoặc sở thích | `BatDongSan`, `VIP` |
+| **Địa chỉ** | Không | Checkbox (Chọn nhiều) | Địa chỉ nơi ở hoặc văn phòng liên hệ | `96 Man Thiện, TP. Thủ Đức` |
+
 ## Kiểm tra kết quả
 
-Sau khi hợp nhất thành công, tiến hành kiểm tra lại hồ sơ khách hàng:
+Sau khi hoàn tất hợp nhất, kiểm tra lại dữ liệu theo các dấu hiệu sau:
 
-- Trong danh sách hội thoại, các phiên tương tác trước đây của hai hồ sơ giờ đây hiển thị chung dưới tên khách hàng chính thức.
-- Mở hồ sơ khách hàng ở cột bên phải, kiểm tra mục **Số điện thoại** hiển thị đầy đủ các số đã được gộp.
-- Mở tab lịch sử trao đổi để xác nhận toàn bộ tin nhắn từ các kênh và nhật ký các cuộc gọi cũ đều xuất hiện liền mạch theo thứ tự thời gian.
+- Các phiên trao đổi trước đây từ nhiều kênh hiển thị thống nhất dưới tên khách hàng chính thức trên danh sách hội thoại.
+- Mở hồ sơ khách hàng ở cột bên phải, mục **Số điện thoại** hiển thị đầy đủ các số thuê bao đã tích chọn kèm tính năng Click-to-Call.
+- Toàn bộ lịch sử tin nhắn đa kênh và nhật ký cuộc gọi được gộp liền mạch theo đúng trình tự thời gian.
 
-## Xử lý sự cố thường gặp
+## Xử lý sự cố
 
-| Hiện tượng | Nguyên nhân có thể | Cách kiểm tra & xử lý |
-| --- | --- | --- |
-| Không thấy nút "Hợp nhất" xuất hiện trên đầu danh sách | Chưa chọn đủ tối thiểu 2 phiên hội thoại | Kiểm tra lại các ô checkbox phía trước phiên hội thoại; nút chỉ kích hoạt khi có từ 2 phiên trở lên được đánh dấu chọn. |
-| Sau khi gộp bị thiếu mất số điện thoại phụ | Quên không đánh dấu checkbox cho số điện thoại thứ hai trong modal | Mở chi tiết hồ sơ khách hàng ở cột bên phải, nhấn **Thêm số mới +** để nhập bổ sung thủ công số điện thoại bị thiếu. |
-| Hợp nhất nhầm hai khách hàng khác nhau | Thao tác chọn nhầm phiên hội thoại trong danh sách | Giao diện hiện tại không hỗ trợ nút tách hồ sơ tự phục vụ; vui lòng liên hệ Quản trị viên hệ thống để được hỗ trợ trích xuất và khôi phục dữ liệu tương tác. |
+<Accordions>
+  <Accordion title="Không thấy nút Hợp nhất xuất hiện trên đầu danh sách">
+    - **Nguyên nhân:** Chưa đánh dấu đủ tối thiểu 2 phiên hội thoại hoặc ô checkbox bị hủy chọn khi tìm kiếm.
+    - **Cách xử lý:** Kiểm tra lại các ô checkbox phía trước từng phiên trao đổi; nút chỉ kích hoạt khi có từ 2 phiên trở lên được đánh dấu chọn.
+  </Accordion>
+  <Accordion title="Thiếu số điện thoại hoặc email phụ sau khi hoàn tất hợp nhất">
+    - **Nguyên nhân:** Quên không đánh dấu checkbox cho số điện thoại hoặc email thứ hai trong modal cấu hình.
+    - **Cách xử lý:** Mở hồ sơ khách hàng tại cột thông tin bên phải, nhấn **Thêm số mới +** tại mục Số điện thoại để nhập bổ sung thủ công.
+  </Accordion>
+  <Accordion title="Hợp nhất nhầm hai khách hàng khác nhau">
+    - **Nguyên nhân:** Chọn nhầm các phiên trao đổi không cùng một khách hàng trong danh sách hội thoại.
+    - **Cách xử lý:** Giao diện người dùng không hỗ trợ tính năng tự tách hồ sơ sau khi sáp nhập. Hãy liên hệ Quản trị viên hệ thống để được hỗ trợ trích xuất nhật ký và khôi phục dữ liệu tương tác.
+  </Accordion>
+</Accordions>
 
 ## Bài viết liên quan
 
-- [Quản lý hội thoại tin nhắn và cuộc gọi](/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/quan-ly-tin-nhan-cuoc-goi)
-- [Xem và chỉnh sửa thông tin khách hàng](/docs/ai-contact-center/user-guider-portal/05-quan-ly-khach-hang/xem-va-chinh-sua-thong-tin)
-- [Nhập dữ liệu khách hàng vào hệ thống](/docs/ai-contact-center/user-guider-portal/05-quan-ly-khach-hang/nhap-du-lieu-khach-hang)
+<Cards>
+  <Card
+    icon="MessageSquare"
+    title="Quản lý hội thoại tin nhắn và cuộc gọi"
+    description="Hướng dẫn tiếp nhận, phản hồi tin nhắn và tra cứu hồ sơ khách hàng trên giao diện tương tác."
+    href="/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/quan-ly-tin-nhan-cuoc-goi"
+  />
+  <Card
+    icon="Users"
+    title="Xem và chỉnh sửa thông tin khách hàng"
+    description="Tra cứu chi tiết hồ sơ 360 độ, cập nhật thuộc tính cá nhân và lịch sử liên hệ."
+    href="/docs/ai-contact-center/user-guider-portal/05-quan-ly-khach-hang/xem-va-chinh-sua-thong-tin"
+  />
+  <Card
+    icon="Tags"
+    title="Nhãn khách hàng"
+    description="Tạo và quản lý hệ thống nhãn màu giúp phân loại khách hàng nhanh chóng trong phiên chat."
+    href="/docs/ai-contact-center/user-guider-portal/05-quan-ly-khach-hang/nhan-khach-hang"
+  />
+</Cards>

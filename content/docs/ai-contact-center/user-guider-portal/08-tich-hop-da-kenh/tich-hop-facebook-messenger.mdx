@@ -5,55 +5,73 @@ description: "Hướng dẫn kết nối Fanpage Facebook với tổng đài ODS
 
 Tính năng **Tích hợp Facebook Messenger** giúp doanh nghiệp tiếp nhận, phản hồi tin nhắn khách hàng từ Fanpage và đồng bộ dữ liệu hội thoại trực tiếp trên hệ thống AI Contact Center ODS.
 
-<Callout type="info" title="Trước khi bắt đầu">
-- Tài khoản người dùng có quyền quản trị trong hệ thống ODS.
-- Bạn sở hữu tài khoản Facebook cá nhân có quyền **Quản trị viên (Admin)** trên Fanpage cần kết nối.
-- Cấu hình tích hợp được thực hiện tại mục **Thiết lập nâng cao** → **Tích hợp Facebook** trên ODS Portal.
-</Callout>
+---
 
-## Tổng quan màn hình Quản lý Fanpage Facebook
+## 1. Cơ chế hoạt động & Điều kiện tiên quyết
 
-Màn hình **Quản lý Fanpage Facebook** hiển thị danh sách các Fanpage đã được cấp phép liên kết với tổng đài ODS, trạng thái đồng bộ CRM và các công cụ thao tác nhanh.
+### Mục đích sử dụng
+- **Tiếp nhận đa kênh tập trung:** Hợp nhất tin nhắn từ các Fanpage Facebook về cùng một không gian làm việc với kênh Thoại và Zalo OA.
+- **Phản hồi tức thời:** Điện thoại viên trả lời tin nhắn trực tiếp trên Portal ODS; nội dung được chuyển ngay về Messenger của khách hàng qua Graph API & Webhooks.
+- **Đồng bộ hồ sơ CRM:** Tự động nhận diện và lưu vết lịch sử chat vào hồ sơ khách hàng tương ứng.
+
+### Điều kiện tiên quyết
+- Đăng nhập bằng tài khoản có quyền Quản trị viên (**Administrator**) trong hệ thống ODS.
+- Sở hữu tài khoản Facebook cá nhân có quyền **Quản trị viên (Admin)** trên Fanpage cần kết nối.
+- Đường dẫn cấu hình trên Portal: **Thiết lập nâng cao** → **Tích hợp Facebook** (URL: `https://app.ods.vn/advance-setting/facebook`).
+
+---
+
+## 2. Bảng tham số và giao diện Quản lý Fanpage
+
+Màn hình **Quản lý Fanpage Facebook** hiển thị danh sách các Trang đã cấp phép liên kết với tổng đài ODS, trạng thái đồng bộ CRM và công cụ thao tác:
 
 ![Màn hình danh sách Fanpage Facebook đã kết nối trên ODS Portal](/media/ai-contact-center/user-guider-portal/tich-hop-facebook_danh-sach-fanpage.png)
 
-| Vùng giao diện / Cột | Loại thành phần | Chức năng |
-| :--- | :--- | :--- |
-| **+ THÊM MỚI FANPAGE** | Nút hành động | Mở luồng ủy quyền đăng nhập Facebook để kết nối Fanpage mới |
-| **Nhập từ khóa tại đây...** | Ô tìm kiếm | Tìm nhanh Fanpage theo tên trong danh sách |
-| **STT** | Cột thông tin | Số thứ tự các Fanpage đã kết nối |
-| **TÊN FANPAGE** | Cột thông tin | Tên Fanpage Facebook được cấp phép |
-| **CHỌN FACEBOOK TOKEN CHO HỆ THỐNG CRM** | Trạng thái | Biểu tượng tích xanh xác nhận Token Facebook đã kích hoạt đồng bộ vào CRM ODS |
-| **NGÀY TẠO** | Cột thông tin | Thời điểm hoàn tất liên kết Fanpage vào hệ thống |
-| **THAO TÁC** | Nút tác vụ | Nút xóa (thùng rác) để hủy liên kết Fanpage khỏi tổng đài |
+| Vùng giao diện / Cột | Loại thành phần | Diễn giải & Chức năng |
+| :--- | :---: | :--- |
+| **+ THÊM MỚI FANPAGE** | Nút hành động | Mở luồng ủy quyền đăng nhập Facebook để kết nối Fanpage mới (nút màu xanh lá). |
+| **Nhập từ khóa tại đây...** | Ô tìm kiếm | Tìm kiếm nhanh Fanpage theo tên trong danh sách. |
+| **STT** | Cột thông tin | Số thứ tự các Fanpage đã kết nối vào tổng đài. |
+| **TÊN FANPAGE** | Cột thông tin | Tên Fanpage Facebook được cấp phép kết nối. |
+| **CHỌN FACEBOOK TOKEN CHO HỆ THỐNG CRM** | Trạng thái | Biểu tượng tích xanh xác nhận Token Facebook đã kích hoạt đồng bộ vào CRM ODS. |
+| **NGÀY TẠO** | Cột thông tin | Thời điểm hoàn tất liên kết Fanpage vào hệ thống. |
+| **THAO TÁC** | Nút tác vụ | Nút xóa (thùng rác màu đỏ nhạt) để hủy kết nối Fanpage khỏi tổng đài. |
 
-## Kết nối Fanpage Facebook vào tổng đài ODS
+---
 
-Quá trình kết nối sử dụng ứng dụng ủy quyền `ODS_APP_PRODUCTION` được Facebook chứng thực, không yêu cầu doanh nghiệp tự tạo ứng dụng riêng trên Facebook Developer.
+## 3. Hướng dẫn kết nối Fanpage Facebook
+
+Quá trình liên kết sử dụng ứng dụng ủy quyền `ODS_APP_PRODUCTION` được Facebook chứng thực, không yêu cầu doanh nghiệp tự tạo ứng dụng riêng trên Facebook Developer.
 
 <Steps>
-  <Step title="Truy cập mục Tích hợp Facebook">
-    Từ thanh điều hướng bên trái của Portal, chọn **Thiết lập nâng cao** → **Tích hợp Facebook** (hoặc truy cập đường dẫn `/advance-setting/facebook`).
+  <Step>
+    ### Bước 1: Mở giao diện Tích hợp Facebook
 
-    *Kết quả: Màn hình hiển thị danh sách Fanpage hiện có kèm nút thao tác thêm mới.*
+    1. Từ thanh điều hướng bên trái của Portal, chọn **Thiết lập nâng cao** → **Tích hợp Facebook**.
+    2. Giao diện hiển thị danh sách các Fanpage hiện có cùng nút tác vụ quản lý.
   </Step>
 
-  <Step title="Mở luồng ủy quyền Facebook">
-    Nhấp nút **+ THÊM MỚI FANPAGE** màu xanh lá ở góc trên bên phải màn hình.
+  <Step>
+    ### Bước 2: Mở luồng ủy quyền Facebook
 
-    *Kết quả: Cửa sổ popup xác thực của Facebook hiển thị yêu cầu đăng nhập tài khoản Quản trị viên.*
+    1. Nhấp nút **+ THÊM MỚI FANPAGE** (màu xanh lá ở góc trên bên phải màn hình).
+    2. Hệ thống hiển thị cửa sổ popup xác thực tài khoản Facebook của Quản trị viên Trang.
   </Step>
 
-  <Step title="Chọn Fanpage cần kết nối">
-    Trong cửa sổ popup của Facebook, chọn tùy chọn **Chọn áp dụng cho riêng Trang hiện tại**, sau đó đánh dấu tích vào Fanpage bạn muốn kết nối vào tổng đài ODS rồi nhấp **Tiếp tục**.
+  <Step>
+    ### Bước 3: Chọn Fanpage cần liên kết
+
+    1. Trong popup Facebook, chọn tùy chọn **Chọn áp dụng cho riêng Trang hiện tại**.
+    2. Đánh dấu tích vào Fanpage bạn muốn kết nối vào tổng đài ODS.
+    3. Nhấp nút **Tiếp tục**.
 
     ![Cửa sổ popup Facebook cho phép chọn Fanpage cấp quyền cho ODS_APP_PRODUCTION](/media/ai-contact-center/user-guider-portal/tich-hop-facebook_popup-chon-fanpage.png)
-
-    *Kết quả: Facebook chuyển sang màn hình xác nhận các quyền truy cập của ứng dụng.*
   </Step>
 
-  <Step title="Xác nhận cấp quyền cho ứng dụng ODS">
-    Kiểm tra danh sách các quyền truy cập cần thiết và nhấp nút **Lưu** để hoàn tất ủy quyền:
+  <Step>
+    ### Bước 4: Xác nhận cấp quyền cho ứng dụng ODS
+
+    Kiểm tra danh sách các quyền truy cập của ứng dụng `ODS_APP_PRODUCTION` và nhấp nút **Lưu**:
     - Quản lý và truy cập cuộc trò chuyện trên Trang trong Messenger.
     - Quản lý tài khoản, cài đặt và webhook cho Trang.
     - Hiển thị danh sách Trang bạn quản lý.
@@ -63,43 +81,61 @@ Quá trình kết nối sử dụng ứng dụng ủy quyền `ODS_APP_PRODUCTIO
     *Kết quả: Facebook đóng cửa sổ popup và hiển thị thông báo liên kết thành công trên ODS Portal.*
   </Step>
 
-  <Step title="Kích hoạt token cho hệ thống CRM">
-    Tại danh sách Fanpage vừa kết nối, hệ thống tự động kiểm tra và đánh dấu tích xanh tại cột **CHỌN FACEBOOK TOKEN CHO HỆ THỐNG CRM**.
+  <Step>
+    ### Bước 5: Kích hoạt token cho hệ thống CRM
 
-    *Kết quả: Fanpage chính thức sẵn sàng tiếp nhận và gửi tin nhắn qua ODS.*
+    1. Quan sát dòng Fanpage vừa thêm trong bảng danh sách.
+    2. Hệ thống tự động xác thực và hiển thị tích xanh tại cột **CHỌN FACEBOOK TOKEN CHO HỆ THỐNG CRM**.
+    3. Fanpage chính thức sẵn sàng tiếp nhận và gửi tin nhắn qua ODS.
   </Step>
 </Steps>
 
-## Tiếp nhận và xử lý tin nhắn Messenger trên ODS
+---
 
-Sau khi tích hợp thành công, điện thoại viên không cần mở Meta Business Suite mà xử lý hội thoại trực tiếp trong không gian làm việc tập trung:
+## 4. Hướng dẫn tiếp nhận & xử lý tin nhắn Messenger
+
+Sau khi kết nối, điện thoại viên không cần mở Meta Business Suite mà xử lý hội thoại trực tiếp trong không gian làm việc tập trung:
 
 ![Giao diện tiếp nhận và trả lời tin nhắn Facebook Messenger trên ODS](/media/ai-contact-center/user-guider-portal/tich-hop-facebook_quan-ly-tin-nhan.png)
 
 <Steps>
-  <Step title="Tiếp nhận hội thoại mới">
-    Mở menu **Tin nhắn** trên thanh điều hướng bên trái. Khi khách hàng nhắn tin đến Fanpage, hội thoại mới xuất hiện ngay lập tức trong danh sách với nhãn biểu tượng Facebook và thông báo thời gian thực.
+  <Step>
+    ### Bước 1: Tiếp nhận tin nhắn mới từ Fanpage
+
+    1. Mở menu **Tin nhắn** trên thanh điều hướng bên trái Portal.
+    2. Khi khách hàng nhắn tin đến Fanpage, hội thoại mới xuất hiện ngay lập tức trong danh sách kèm biểu tượng Facebook và thông báo thời gian thực.
   </Step>
 
-  <Step title="Tương tác và phản hồi khách hàng">
-    Nhấp vào hội thoại để xem toàn bộ lịch sử tin nhắn. Nhập nội dung phản hồi tại khung nhập liệu bên dưới và nhấp **Gửi** (hoặc nhấn phím Enter). Tin nhắn được chuyển ngay lập tức đến ứng dụng Messenger của khách hàng.
+  <Step>
+    ### Bước 2: Tương tác và phản hồi khách hàng
+
+    1. Nhấp vào hội thoại để xem toàn bộ lịch sử trao đổi.
+    2. Nhập nội dung phản hồi tại khung chat bên dưới và nhấp nút **Gửi** (hoặc nhấn phím Enter).
+    3. Tin nhắn được gửi tức thời đến ứng dụng Messenger của khách hàng.
   </Step>
 
-  <Step title="Quản lý thông tin và phân loại khách hàng">
-    Cột thông tin khách hàng bên phải hiển thị định danh Facebook, phân loại khách hàng và lịch sử liên hệ. Điện thoại viên có thể gán nhãn, thêm ghi chú hoặc chuyển tiếp hội thoại cho nhân sự phụ trách.
+  <Step>
+    ### Bước 3: Phân loại và cập nhật hồ sơ khách hàng
+
+    1. Cột thông tin bên phải hiển thị định danh Facebook, phân loại khách hàng và lịch sử tương tác.
+    2. Điện thoại viên có thể gán nhãn, thêm ghi chú hoặc chuyển tiếp hội thoại cho nhân sự phụ trách.
   </Step>
 </Steps>
 
-## Kiểm tra kết quả
+---
 
-Doanh nghiệp xác nhận tích hợp Facebook Messenger hoạt động chính xác qua các tiêu chí sau:
+## 5. Kiểm tra kết quả
+
+Doanh nghiệp xác nhận tích hợp Facebook Messenger hoạt động chính xác qua các tiêu chí:
 
 - Tên Fanpage xuất hiện đầy đủ trong bảng **Quản lý Fanpage Facebook**.
 - Cột **CHỌN FACEBOOK TOKEN CHO HỆ THỐNG CRM** hiển thị biểu tượng tích xanh.
-- Dùng tài khoản Facebook cá nhân gửi một tin nhắn bất kỳ đến Fanpage; mục **Tin nhắn** trên ODS ghi nhận hội thoại mới trong vòng 3 giây.
+- Dùng tài khoản Facebook cá nhân gửi tin nhắn thử nghiệm đến Fanpage; mục **Tin nhắn** trên ODS ghi nhận hội thoại mới trong vòng 3 giây.
 - Điện thoại viên gửi phản hồi từ ODS và tin nhắn hiển thị chính xác trên ứng dụng Messenger của người gửi.
 
-## Xử lý sự cố
+---
+
+## 6. Xử lý sự cố thường gặp (Troubleshooting)
 
 <Accordions>
   <Accordion title="Không tìm thấy Fanpage trong cửa sổ chọn Trang của Facebook">
@@ -121,7 +157,9 @@ Doanh nghiệp xác nhận tích hợp Facebook Messenger hoạt động chính 
   </Accordion>
 </Accordions>
 
-## Bài viết liên quan
+---
+
+## 7. Bài viết liên quan
 
 <Cards>
   <Card title="Tổng quan tích hợp đa kênh" href="/docs/ai-contact-center/user-guider-portal/08-tich-hop-da-kenh" description="Tìm hiểu kiến trúc kết nối các kênh liên lạc vào tổng đài ODS." />

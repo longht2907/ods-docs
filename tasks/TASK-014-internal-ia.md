@@ -17,7 +17,7 @@ Loader internal thực tế nằm trong `src/lib/source.ts`, route render nằm 
 
 - Tạo hai root navigation: `Bắt đầu` và `Tổng đài`.
 - Chuẩn hóa mảng Tổng đài theo ba nhóm `processes`, `runbooks` và `knowledge-base`.
-- Hoàn thiện `Bắt đầu` thành `Cổng thông tin Support` với thông báo, công cụ làm việc và checklist ca trực.
+- Hoàn thiện `Bắt đầu` thành `Cổng thông tin Support` với thông báo tự động và công cụ làm việc.
 - Dùng nhãn điều hướng rõ mục đích: `Quy trình vận hành`, `Xử lý sự cố` và `Kiến thức kỹ thuật` mà không đổi URL hiện có.
 - Tạo landing có navigation hoàn chỉnh và các trang con ở dạng template, chưa điền dữ liệu vận hành thật.
 - Cho phép nội dung knowledge base chứa IP hạ tầng và bảng đầu số thật theo ADR-006, nhưng tuyệt đối cấm secret và dữ liệu cá nhân.
@@ -33,6 +33,9 @@ Loader internal thực tế nằm trong `src/lib/source.ts`, route render nằm 
 - `harness/linters/broken-links.mjs`
 - `tasks/TASK-014-internal-ia.md`
 - `.harness/reports/**`
+- `src/app/internal/[[...slug]]/page.tsx`
+- `src/app/internal/_components/**`
+- `src/app/internal/_lib/**`
 
 ## Ngoài phạm vi
 
@@ -66,10 +69,8 @@ Baseline trước task: `npm run guard`, `npm run check:links` và `git diff --c
 | `content/internal/quy-trinh/index.mdx` | `content/internal/(home)/policies/index.mdx` | Move và đổi slug/title | `/internal/policies` |
 | `content/internal/runbook/index.mdx` | `content/internal/ai-contact-center/runbooks/index.mdx` | Thay bằng landing mới, xóa folder cũ | `/internal/ai-contact-center/runbooks` |
 | Không có | `content/internal/(home)/security/index.mdx` | Create | `/internal/security` |
-| Không có | `content/internal/(home)/contributing.mdx` | Create | `/internal/contributing` |
 | Không có | `content/internal/(home)/announcements/**` | Create | `/internal/announcements/**` |
 | Không có | `content/internal/(home)/tools.mdx` | Create | `/internal/tools` |
-| Không có | `content/internal/(home)/shift-checklist.mdx` | Create | `/internal/shift-checklist` |
 | Không có | `content/internal/ai-contact-center/**` | Create | `/internal/ai-contact-center/**` |
 
 ## Kế hoạch theo phase
@@ -130,6 +131,20 @@ Baseline trước task: `npm run guard`, `npm run check:links` và `git diff --c
 - Commit nội dung: `docs(internal): refine support wiki navigation`.
 - Commit evidence: `docs(internal): refresh task 014 verification`.
 
+### Phase H — Tự động hóa thông báo local/GitHub
+
+- Xóa `Checklist ca trực`, `Đóng góp tài liệu` và mọi link tương ứng; sidebar `Bắt đầu` còn Home, Thông báo, Onboarding, Công cụ, Quy định và Bảo mật.
+- Home đổi `Làm việc hằng ngày` thành `Tra cứu nhanh`, chỉ link tới Công cụ làm việc và Wiki Tổng đài.
+- Admin chỉ tạo một MDX tại `content/internal/(home)/announcements/YYYY-MM-DD-ten-thong-bao.mdx`; ngày hiển thị lấy từ slug và slug sai định dạng phải làm build fail rõ ràng.
+- Thêm helper và Server Component dưới `src/app/internal/**` để tự sinh tối đa ba thông báo mới nhất trên Home và toàn bộ archive theo thứ tự mới nhất trước.
+- `announcements/meta.json` dùng `pages: ["index", "z...a"]`; không cần sửa Home, archive hoặc metadata folder khi thêm bài.
+- Không hỗ trợ pinned post, expiry, scheduling; không sửa deploy VPS, Docker hoặc GitHub Actions deploy.
+- Dùng fixture tạm để xác minh Home, archive, detail và sidebar; xóa fixture trước final commit để trả lại empty state.
+- Chụp desktop/mobile cho Home, Thông báo, Tổng đài và Xử lý sự cố; cập nhật report với 40 route MDX.
+- Commit plan: `docs(task-014): revise announcement publishing plan`.
+- Commit nội dung: `feat(internal): automate announcement publishing`.
+- Commit evidence: `docs(internal): refresh task 014 verification`.
+
 ## Ràng buộc nội dung
 
 - Slug tiếng Anh, title và nội dung tiếng Việt; thuật ngữ kỹ thuật giữ nguyên khi phù hợp.
@@ -151,10 +166,12 @@ Baseline trước task: `npm run guard`, `npm run check:links` và `git diff --c
 - [ ] Metadata internal giữ `noindex, nofollow`; production không có cờ dev trả 401 cho internal routes/search.
 - [ ] Desktop 1440×900 và mobile 390×844 không overflow, không có console error; screenshot được ghi vào report.
 - [ ] Dev server port 3000 tiếp tục chạy trong toàn bộ task.
-- [ ] Sidebar `Bắt đầu` lần lượt có Home, Thông báo, Onboarding, Công cụ, Checklist, Quy định, Bảo mật và Đóng góp tài liệu.
-- [ ] `/internal/announcements`, `/internal/tools` và `/internal/shift-checklist` trả 200 trong dev, xuất hiện trong internal search và không xuất hiện trong public search hoặc `llms.txt`.
+- [ ] Sidebar `Bắt đầu` lần lượt có Home, Thông báo, Onboarding, Công cụ, Quy định và Bảo mật.
+- [ ] `/internal/announcements` và `/internal/tools` trả 200 trong dev; `/internal/shift-checklist` và `/internal/contributing` trả 404.
+- [ ] Fixture thông báo tạm tự xuất hiện trên Home, archive, detail và sidebar; fixture được xóa trước final commit và empty state hiển thị đúng.
+- [ ] Internal search không còn hai route đã xóa; public search và `llms.txt` không chứa `/internal`.
 - [ ] Ba nhóm Tổng đài hiển thị `Quy trình vận hành`, `Xử lý sự cố`, `Kiến thức kỹ thuật` nhưng URL `processes`, `runbooks`, `knowledge-base` không đổi.
-- [ ] Toàn bộ 42 route MDX internal trả 200 khi dev access được mở.
+- [ ] Toàn bộ 40 route MDX internal còn lại trả 200 khi dev access được mở.
 
 ## Điều kiện dừng
 

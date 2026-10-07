@@ -1,71 +1,133 @@
 ---
-title: "Hướng Dẫn Tích Hợp Zalo OA"
-description: "Tích hợp Zalo Official Account Zalo OA vào hệ thống giúp doanh nghiệp tận dụng kênh Zalo để:"
+title: "Hướng dẫn tích hợp Zalo OA"
+description: "Hướng dẫn kết nối Zalo Official Account với tổng đài ODS, điều kiện gói Zalo và quản lý tin nhắn khách hàng."
 ---
 
-## 1. Mục Đích Tích Hợp Zalo OA
+Tính năng **Tích hợp Zalo Official Account (Zalo OA)** giúp doanh nghiệp tiếp nhận, phản hồi tin nhắn và gọi thoại chăm sóc khách hàng trực tiếp trên hệ thống ODS AI Contact Center thông qua giao diện làm việc tập trung.
 
-Tích hợp Zalo Official Account (Zalo OA) vào hệ thống giúp doanh nghiệp tận dụng kênh Zalo để:
+<Callout type="info" title="Trước khi bắt đầu">
+- Tài khoản người dùng có quyền quản trị trong hệ thống ODS.
+- Doanh nghiệp sở hữu tài khoản **Zalo Official Account đã xác thực** và tài khoản đăng nhập có quyền Quản trị viên (Admin) của trang OA đó.
+- Cấu hình tích hợp được thực hiện tại mục **Thiết lập nâng cao** → **Thiết lập Zalo Token** trên ODS Portal.
+</Callout>
 
-* Tự động hóa việc gửi tin nhắn chăm sóc khách hàng.
-* Quản lý khách hàng hiệu quả hơn thông qua API của Zalo.
-* Gửi thông báo quan trọng như đơn hàng, khuyến mãi, hỗ trợ khách hàng.
-* Tạo chatbot để hỗ trợ khách hàng 24/7 mà không cần nhân viên trực tiếp xử lý.
+## Điều kiện gói Zalo OA theo nhu cầu tích hợp
 
-## 2. Hướng Dẫn Tích Hợp Zalo OA
+Tùy theo nhu cầu vận hành thực tế của doanh nghiệp, tài khoản Zalo OA cần đáp ứng điều kiện gói dịch vụ tương ứng:
 
-Có hai cách để tích hợp Zalo OA vào hệ thống :
+| Nhu cầu tích hợp | Điều kiện xác thực | Gói dịch vụ Zalo OA tối thiểu | Phạm vi tính năng trên ODS |
+| :--- | :--- | :--- | :--- |
+| **Chỉ sử dụng gọi thoại** | OA đã xác thực | **Gói Tiêu chuẩn** trở lên | Nhận cuộc gọi đến và gọi ra cho khách hàng qua định danh Zalo OA trên tổng đài |
+| **Gọi thoại và đồng bộ tin nhắn qua API** | OA đã xác thực | **Gói Tăng trưởng** trở lên | Tiếp nhận, phản hồi tin nhắn chat hai chiều và đồng bộ lịch sử hội thoại về ODS |
 
-**Cách 1: Tích Hợp Thông Qua App Ủy Quyền Của ODS**
+<Callout type="warn" title="Lưu ý khi tư vấn và triển khai">
+Trước khi tư vấn, báo giá hoặc triển khai giải pháp Contact Center ODS có kết nối Zalo OA, cần xác nhận rõ nhu cầu thực tế của khách hàng:
+- Khách hàng chỉ cần gọi thoại qua Zalo OA.
+- Khách hàng cần gọi thoại và quản lý tin nhắn Zalo OA trực tiếp trên Contact Center ODS.
+- Khách hàng cần đồng bộ tin nhắn hai chiều qua API giữa Zalo OA và hệ thống ODS.
 
-ODS cung cấp sẵn một ứng dụng giúp bạn dễ dàng kết nối Zalo OA với hệ thống của mình mà không cần lập trình phức tạp.
+Việc xác định đúng nhu cầu từ đầu giúp đề xuất đúng gói Zalo OA, tránh các trường hợp:
+- Không đủ điều kiện sử dụng tính năng tích hợp.
+- Phát sinh chi phí ngoài dự kiến.
+- Phải nâng cấp gói Zalo OA trong quá trình triển khai hoặc vận hành.
+</Callout>
 
-Các bước thực hiện:
+Chi tiết về quyền lợi và biểu phí mới nhất của các gói Zalo OA được công bố chính thức tại [Bảng giá Zalo OA](https://zalo.solutions/oa/pricing).
 
-1. Truy cập trang quản lý Zalo Token
-   * Đăng nhập vào tài khoản quản trị tổng đài.
-   * Vào phần "Thiết lập nâng cao" ⇒ Thiết lập Zalo token<br />
+## Kết nối Zalo OA vào tổng đài ODS
 
-     ![](/media/ai-contact-center/user-guider-portal/img-AKUymV2gGB2DeSaP5Rfn.png)
-2. Thêm mới tài khoản Zalo OA
-   * Nhấn vào nút "Thêm Mới Zalo".<br />
+ODS cung cấp ứng dụng ủy quyền được Zalo chứng thực, cho phép kết nối Zalo OA nhanh chóng mà không cần lập trình phức tạp:
 
-     ![](/media/ai-contact-center/user-guider-portal/img-YouwrYhPKLsMAmzyvJKY.png)
-   * Hệ thống sẽ hiển thị hộp thoại xác nhận liên kết với Zalo OA.
-3. Ủy quyền ứng dụng
-   * Nhấn "Liên Kết Ứng Dụng".<br />
+<Steps>
+  <Step title="Truy cập trang Quản lý Zalo Token">
+    Từ thanh điều hướng bên trái của Portal, chọn **Thiết lập nâng cao** → **Thiết lập Zalo Token** (hoặc truy cập đường dẫn `/advance-setting/zalo-token`).
+  </Step>
 
-     ![](/media/ai-contact-center/user-guider-portal/img-yRTQ1Mu8v8IckXU4ruu2.png)
-   * Đăng nhập vào tài khoản Zalo OA của bạn.
-   * Cho phép ứng dụng Mắt Bão One sử dụng API của Zalo OA.<br />
+  <Step title="Thêm mới liên kết Zalo">
+    Tại góc trên bên phải màn hình, nhấp nút **+ THÊM MỚI ZALO** màu xanh lá. Hệ thống sẽ mở cửa sổ xác thực tài khoản của Zalo.
+  </Step>
 
-     ![](/media/ai-contact-center/user-guider-portal/img-zWHKVxrLC6RAew7aAbH1.png)
-4. Kiểm tra và sử dụng
-   * Sau khi liên kết thành công, bạn có thể bắt đầu gửi tin nhắn và quản lý khách hàng thông qua Mắt Bão One.
+  <Step title="Đăng nhập và cấp quyền ủy quyền">
+    Đăng nhập bằng tài khoản Quản trị viên của trang Zalo OA cần kết nối.
 
-![](/media/ai-contact-center/user-guider-portal/img-6qFRdWzA3DvUxam8f3bI.png)
+    Chọn trang Official Account tương ứng và nhấn **Cho phép** cấp các quyền truy cập cần thiết cho ứng dụng ODS:
+    - Quản lý và gửi tin nhắn tư vấn khách hàng.
+    - Quản lý webhook nhận thông báo tin nhắn mới.
+    - Thực hiện và tiếp nhận cuộc gọi thoại qua Zalo OA.
+  </Step>
 
-**Cách 2: Tích Hợp Sử Dụng App Riêng Của Người Dùng**
+  <Step title="Kích hoạt token cho hệ thống Contact Center">
+    Sau khi ủy quyền thành công, dòng thông tin Zalo OA sẽ xuất hiện trong danh sách.
 
-Nếu bạn muốn tự xây dựng hệ thống tích hợp Zalo OA mà không thông qua bên thứ ba, bạn có thể sử dụng API chính thức của Zalo OA.
+    Nhấp chọn biểu tượng tích xanh tại cột **CHỌN ZALO TOKEN CHO HỆ THỐNG CRM** để kích hoạt luồng tiếp nhận tin nhắn và cuộc gọi cho doanh nghiệp.
 
-Các bước thực hiện:
+    ![Màn hình quản lý Zalo Token trên ODS Portal](/media/ai-contact-center/user-guider-portal/tich-hop-zalo-oa_danh-sach-token.png)
 
-1. Đăng ký ứng dụng trên Zalo Developer
-   * Truy cập Zalo for Developers.
-   * Đăng ký tài khoản và tạo ứng dụng mới.
-2. Lấy Zalo OA Access Token
-   * Vào mục "Quản lý ứng dụng".
-   * Lấy thông tin `app_id`, `app_secret` và `access_token` để tích hợp.
-3. Tích hợp API vào hệ thống
-   * Sử dụng API của Zalo để gửi tin nhắn, lấy danh sách người quan tâm, gửi thông báo...
-   * Tham khảo tài liệu API của Zalo: [https://developers.zalo.me/docs/](https://developers.zalo.me/docs/)
-4. Xác thực Webhook (nếu có)
-   * Đăng ký Webhook để nhận thông báo từ Zalo OA khi có tin nhắn hoặc sự kiện mới.
+    *Kết quả: Tài khoản Zalo OA chuyển sang trạng thái sẵn sàng tiếp nhận tương tác.*
+  </Step>
+</Steps>
 
-## 3. Các Lưu Ý Khi Tích Hợp Zalo OA
+Các trường thông tin hiển thị trên bảng Quản lý Zalo Token:
 
-* **Chọn cách tích hợp phù hợp:** Nếu bạn không có đội ngũ lập trình, nên sử dụng giải pháp có sẵn như Mắt Bão One.
-* **Đảm bảo quyền truy cập API:** Nếu sử dụng app riêng, cần đảm bảo quyền truy cập API Zalo OA đã được cấp đúng.
-* **Kiểm tra hạn của Access Token:** Token Zalo có thời gian hết hạn, cần cập nhật định kỳ để tránh gián đoạn.
-* **Tuân thủ chính sách Zalo:** Không gửi tin nhắn spam, quảng cáo không đúng quy định để tránh bị khóa OA.
+| Cột thông tin | Ý nghĩa | Thao tác hỗ trợ |
+| :--- | :--- | :--- |
+| **STT** | Số thứ tự bản ghi liên kết | Hiển thị tự động |
+| **TÊN GỢI NHỚ** | Tên doanh nghiệp hoặc tên trang Zalo OA đã đăng ký | Nhận diện tài khoản kết nối |
+| **CHỌN ZALO TOKEN CHO HỆ THỐNG CRM** | Trạng thái kích hoạt token làm nguồn nhận diện dữ liệu chính | Nhấp chọn để kích hoạt kênh tương tác |
+| **NGÀY TẠO** | Thời điểm cấp phép ủy quyền token thành công | Tra cứu lịch sử kết nối |
+| **THAO TÁC** | Nút chức năng xóa liên kết (biểu tượng thùng rác màu đỏ) | Ngắt kết nối và gỡ bỏ token khi cần thay đổi |
+
+## Kiểm tra kết quả
+
+Sau khi kết nối thành công, tiến hành kiểm tra hoạt động theo các bước sau:
+
+- Dòng token mới xuất hiện trong bảng danh sách tại `/advance-setting/zalo-token` với trạng thái tích xanh kích hoạt.
+- Dùng tài khoản cá nhân gửi một tin nhắn thử nghiệm đến trang Zalo OA của doanh nghiệp.
+- Mở phân hệ **Tin nhắn** (`/chat`) trên ODS Portal, xác nhận phiên chat mới xuất hiện tức thì với biểu tượng logo Zalo màu xanh.
+- Nhân viên gửi tin nhắn phản hồi thành công từ màn hình ODS và khách hàng nhận được nội dung trên ứng dụng Zalo cá nhân.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Token Zalo hết hạn hoặc thông báo lỗi kết nối">
+    - **Nguyên nhân:** Mã truy cập (Access Token) của Zalo có thời hạn nhất định hoặc mật khẩu quản trị viên Zalo OA vừa bị thay đổi.
+    - **Cách xử lý:** Nhấp biểu tượng thùng rác màu đỏ tại cột **THAO TÁC** để xóa token cũ, sau đó nhấp **+ THÊM MỚI ZALO** để thực hiện ủy quyền liên kết lại.
+  </Accordion>
+  <Accordion title="Không thể gửi hoặc nhận tin nhắn hai chiều qua API">
+    - **Nguyên nhân:** Tài khoản Zalo OA chưa đăng ký **Gói Tăng trưởng** trở lên hoặc tài khoản OA chưa hoàn tất xác thực doanh nghiệp.
+    - **Cách xử lý:** Kiểm tra trạng thái gói cước trên trang quản lý Zalo OA của doanh nghiệp. Nâng cấp lên từ Gói Tăng trưởng để mở khóa toàn bộ quyền tương tác tin nhắn qua API.
+  </Accordion>
+  <Accordion title="Khách hàng nhắn tin trên Zalo nhưng không đổ về mục Tin nhắn trên ODS">
+    - **Nguyên nhân:** Chưa bật tích xanh tại cột **CHỌN ZALO TOKEN CHO HỆ THỐNG CRM**, hoặc tài khoản nhân viên chưa được phân quyền truy cập phân hệ Tin nhắn.
+    - **Cách xử lý:** Đảm bảo cột chọn token đã hiển thị tích xanh. Kiểm tra lại phân quyền tài khoản người dùng tại **Người dùng** → **Phân quyền**.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="MessageSquare"
+    title="Thiết lập tích hợp đa kênh"
+    description="Tổng quan kiến trúc kết nối và lợi ích khi vận hành đa kênh Zalo, Facebook trên ODS."
+    href="/docs/ai-contact-center/user-guider-portal/08-tich-hop-da-kenh"
+  />
+  <Card
+    icon="MessageSquare"
+    title="Hướng dẫn tích hợp Facebook Messenger"
+    description="Kết nối Fanpage Facebook với ODS qua Graph API và thiết lập phân luồng tin nhắn tự động."
+    href="/docs/ai-contact-center/user-guider-portal/08-tich-hop-da-kenh/tich-hop-facebook-messenger"
+  />
+  <Card
+    icon="MessageSquare"
+    title="Quản lý hội thoại tin nhắn và cuộc gọi"
+    description="Hướng dẫn tiếp nhận, phản hồi tin nhắn và tra cứu hồ sơ khách hàng trên giao diện tương tác."
+    href="/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/quan-ly-tin-nhan-cuoc-goi"
+  />
+  <Card
+    icon="Users"
+    title="Hợp nhất thông tin khách hàng"
+    description="Gộp các phiên hội thoại và hồ sơ trùng lặp từ nhiều kênh liên lạc vào một hồ sơ 360 độ duy nhất."
+    href="/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/hop-nhat-thong-tin-khach-hang"
+  />
+</Cards>

@@ -17,6 +17,8 @@ Loader internal thực tế nằm trong `src/lib/source.ts`, route render nằm 
 
 - Tạo hai root navigation: `Bắt đầu` và `Tổng đài`.
 - Chuẩn hóa mảng Tổng đài theo ba nhóm `processes`, `runbooks` và `knowledge-base`.
+- Hoàn thiện `Bắt đầu` thành `Cổng thông tin Support` với thông báo, công cụ làm việc và checklist ca trực.
+- Dùng nhãn điều hướng rõ mục đích: `Quy trình vận hành`, `Xử lý sự cố` và `Kiến thức kỹ thuật` mà không đổi URL hiện có.
 - Tạo landing có navigation hoàn chỉnh và các trang con ở dạng template, chưa điền dữ liệu vận hành thật.
 - Cho phép nội dung knowledge base chứa IP hạ tầng và bảng đầu số thật theo ADR-006, nhưng tuyệt đối cấm secret và dữ liệu cá nhân.
 - Giữ nguyên auth/proxy, TOC, internal search boundary, noindex/no-store và public search isolation.
@@ -65,6 +67,9 @@ Baseline trước task: `npm run guard`, `npm run check:links` và `git diff --c
 | `content/internal/runbook/index.mdx` | `content/internal/ai-contact-center/runbooks/index.mdx` | Thay bằng landing mới, xóa folder cũ | `/internal/ai-contact-center/runbooks` |
 | Không có | `content/internal/(home)/security/index.mdx` | Create | `/internal/security` |
 | Không có | `content/internal/(home)/contributing.mdx` | Create | `/internal/contributing` |
+| Không có | `content/internal/(home)/announcements/**` | Create | `/internal/announcements/**` |
+| Không có | `content/internal/(home)/tools.mdx` | Create | `/internal/tools` |
+| Không có | `content/internal/(home)/shift-checklist.mdx` | Create | `/internal/shift-checklist` |
 | Không có | `content/internal/ai-contact-center/**` | Create | `/internal/ai-contact-center/**` |
 
 ## Kế hoạch theo phase
@@ -113,11 +118,24 @@ Baseline trước task: `npm run guard`, `npm run check:links` và `git diff --c
 - Tạo `.harness/reports/TASK-014-report.md` và sáu screenshot desktop/mobile cho `/internal`, `/internal/ai-contact-center`, `/internal/ai-contact-center/runbooks` dưới `.harness/reports/assets/TASK-014/`.
 - Commit: `docs(internal): record task 014 verification`.
 
+### Phase G — Hoàn thiện Support Hub và Information Architecture
+
+- Đổi landing `/internal` thành `Cổng thông tin Support`; bổ sung các vùng `Thông báo mới`, `Làm việc hằng ngày`, `Hướng dẫn & quy định` và `Mảng dịch vụ`.
+- Thêm `/internal/announcements` ở trạng thái chưa có thông báo thật. Mỗi thông báo tương lai là một MDX riêng với slug `YYYY-MM-DD-ten-ngan`; danh sách và tối đa ba tin mới trên Home được cập nhật thủ công.
+- Thêm hai template `Công cụ làm việc` và `Checklist ca trực`, có Callout `Đang soạn` và không chứa credential hoặc liên hệ cá nhân.
+- Đổi nhãn hiển thị của ba nhóm Tổng đài thành `Quy trình vận hành`, `Xử lý sự cố` và `Kiến thức kỹ thuật`; giữ nguyên slug và URL.
+- Không thêm quy trình triển khai hoặc hủy dịch vụ trong TASK-014.
+- Cập nhật hướng dẫn đóng góp, report và chụp lại sáu screenshot desktop/mobile.
+- Commit plan: `docs(task-014): extend support hub plan`.
+- Commit nội dung: `docs(internal): refine support wiki navigation`.
+- Commit evidence: `docs(internal): refresh task 014 verification`.
+
 ## Ràng buộc nội dung
 
 - Slug tiếng Anh, title và nội dung tiếng Việt; thuật ngữ kỹ thuật giữ nguyên khi phù hợp.
 - Mọi MDX có `title` và `description`.
 - Mọi trang placeholder/template có `<Callout title="Đang soạn" type="warn">`.
+- Thông báo thật không dùng Callout placeholder; frontmatter chỉ có `title` và `description`, còn ngày đăng, phạm vi áp dụng và hành động cần thực hiện nằm trong body.
 - Không link tới folder thiếu `index.mdx`.
 - Trang quy trình link tới `/internal/ai-contact-center/runbooks`; runbook link trực tiếp tới trang KB liên quan.
 - Nội dung internal chỉ render qua Server Component; không import vào file `'use client'`.
@@ -133,6 +151,10 @@ Baseline trước task: `npm run guard`, `npm run check:links` và `git diff --c
 - [ ] Metadata internal giữ `noindex, nofollow`; production không có cờ dev trả 401 cho internal routes/search.
 - [ ] Desktop 1440×900 và mobile 390×844 không overflow, không có console error; screenshot được ghi vào report.
 - [ ] Dev server port 3000 tiếp tục chạy trong toàn bộ task.
+- [ ] Sidebar `Bắt đầu` lần lượt có Home, Thông báo, Onboarding, Công cụ, Checklist, Quy định, Bảo mật và Đóng góp tài liệu.
+- [ ] `/internal/announcements`, `/internal/tools` và `/internal/shift-checklist` trả 200 trong dev, xuất hiện trong internal search và không xuất hiện trong public search hoặc `llms.txt`.
+- [ ] Ba nhóm Tổng đài hiển thị `Quy trình vận hành`, `Xử lý sự cố`, `Kiến thức kỹ thuật` nhưng URL `processes`, `runbooks`, `knowledge-base` không đổi.
+- [ ] Toàn bộ 42 route MDX internal trả 200 khi dev access được mở.
 
 ## Điều kiện dừng
 

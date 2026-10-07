@@ -1,41 +1,85 @@
 ---
 title: Cuộc gọi bị rớt
-description: Khung xử lý sự cố cuộc gọi bị ngắt ngoài dự kiến.
+description: Dàn ý chẩn đoán và xử lý case cuộc gọi bị ngắt ngoài dự kiến.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Dàn ý — chờ bổ sung" type="warn">
+  Mục ghi *(đề xuất)* là gợi ý cần xác nhận. Mục **Cần bổ sung** là thông tin riêng của ODS. Câu hỏi xem tại file câu hỏi TASK-018.
 </Callout>
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Cuộc gọi thiết lập thành công nhưng tự ngắt sau một khoảng thời gian hoặc tại mốc thời gian lặp lại. *(đề xuất)*
+- Lỗi có thể chỉ xảy ra ở một chiều gọi, một thiết bị, một mạng truy cập, một trunk hoặc một nhà mạng. *(đề xuất)*
+- Người dùng có thể thấy thông báo mất kết nối hoặc chỉ nghe im lặng trước khi cuộc gọi kết thúc. *(đề xuất)*
+
+**Cần bổ sung:** Ngưỡng và dấu hiệu ODS dùng để phân biệt rớt cuộc gọi với người dùng chủ động kết thúc.
+
+> **[Q-dropped-calls-1]** ODS xác nhận một cuộc gọi “bị rớt” dựa trên CDR, SIP cause hay dấu hiệu nào khác?
 
 ## Cần hỏi KH
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+- Số gọi, số bị gọi, thời điểm kèm múi giờ và thời lượng trước khi bị ngắt. *(đề xuất)*
+- Chiều gọi, máy nhánh, thiết bị/softphone, loại mạng và vị trí kết nối. *(đề xuất)*
+- Lỗi có lặp lại ở cùng một mốc thời gian, cùng số đích hoặc khi đổi thiết bị/mạng không. *(đề xuất)*
+- Trước sự cố có thay đổi firewall, router, ISP, thiết bị hoặc cấu hình Tổng đài không. *(đề xuất)*
+
+**Cần bổ sung:** Trường ticket và bài test đối chứng ODS yêu cầu khách hàng thực hiện.
+
+> **[Q-dropped-calls-2]** Khách hàng cần thực hiện những cuộc gọi thử nào để khoanh vùng case rớt cuộc gọi?
 
 ## Kiểm tra
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+1. Kiểm tra mạng và thiết bị ở hai đầu; so sánh với một thiết bị hoặc kết nối khác nếu có thể. *(đề xuất)*
+2. Xác nhận máy nhánh đăng ký ổn định và không bị thay đổi contact bất thường trong thời gian gọi. *(đề xuất)*
+3. Đối chiếu CDR, Call-ID và SIP BYE/CANCEL để xác định phía nào kết thúc cuộc gọi và mã nguyên nhân. *(đề xuất)*
+4. Kiểm tra session timer, NAT/firewall timeout, trunk và dấu hiệu mất gói hoặc mất luồng RTP. *(đề xuất)*
+5. Có thể tham khảo `pjsip show endpoints`, `pjsip show contacts`, CDR, log, `sngrep` hoặc RTP debug. *(đề xuất — cần xác nhận công cụ thực tế ODS)*
+
+**Cần bổ sung:** Công cụ ODS dùng để xem SIP ladder, RTP quality và giới hạn quyền capture theo vai trò.
+
+> **[Q-dropped-calls-3]** ODS có số liệu hoặc log nào để xác định bên gửi BYE và chất lượng RTP trước lúc cuộc gọi rớt?
 
 ## Xử lý
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+- Nếu lỗi chỉ ở một mạng/thiết bị: xử lý kết nối, NAT hoặc firmware theo hướng dẫn đã duyệt và gọi thử lại. *(đề xuất)*
+- Nếu session timer hoặc timeout không tương thích: chuyển nhóm có quyền để đối chiếu và thay đổi có kiểm soát. *(đề xuất)*
+- Nếu trunk/nhà mạng gửi tín hiệu kết thúc: lưu Call-ID, mã nguyên nhân và chuyển bằng chứng cho nhóm phụ trách. *(đề xuất)*
+- Nếu có mất gói/jitter cao: khoanh vùng đường truyền và phối hợp bên quản lý mạng thay vì thay đổi dialplan. *(đề xuất)*
+
+**Cần bổ sung:** Ngưỡng chất lượng mạng, thao tác L1 được phép và quy trình rollback của ODS.
+
+> **[Q-dropped-calls-4]** Ngưỡng packet loss, jitter hoặc latency nào được ODS dùng để kết luận cần chuyển đội mạng?
 
 ## Chuyển cấp
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Chuyển cấp khi nhiều tenant/nhà mạng cùng bị ảnh hưởng, cuộc gọi rớt theo mẫu thời gian lặp lại, hoặc cần SIP/RTP capture ngoài quyền L1. *(đề xuất)*
+- Đính kèm thời điểm/múi giờ, số gọi/bị gọi đã xử lý an toàn, Call-ID, thời lượng, thiết bị/mạng, SIP cause và các bước đã thử. *(đề xuất)*
+- Chỉ gửi log/pcap qua kênh được duyệt và loại bỏ credential hoặc dữ liệu không liên quan. *(đề xuất)*
+
+**Cần bổ sung:** Nhóm nhận chuyển cấp, kênh chung, SLA và chính sách lưu/chia sẻ pcap.
+
+> **[Q-dropped-calls-5]** Case rớt cuộc gọi được chuyển cho L2, NOC, ISP hay nhà mạng theo ma trận nào?
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận cuộc gọi bị ngắt ngoài dự kiến. Anh/chị vui lòng cung cấp hai số, thời điểm, thời lượng và thiết bị/mạng đang dùng để đội ngũ khoanh vùng. *(đề xuất)*
+
+> **Đã xử lý:** ODS đã hoàn tất bước xử lý và kiểm tra tín hiệu cuộc gọi. Anh/chị vui lòng thực hiện một cuộc gọi thử đủ thời lượng thường phát sinh lỗi và phản hồi kết quả. *(đề xuất)*
+
+**Cần bổ sung:** Mẫu phản hồi và tiêu chí xác nhận ổn định của ODS.
+
+> **[Q-dropped-calls-6]** Sau xử lý, ODS yêu cầu test trong bao lâu hoặc bao nhiêu cuộc gọi trước khi xác nhận ổn định?
 
 ## Nguyên nhân đã gặp
 
-Chưa có dữ liệu đã xác minh.
+| Ngày | Nguyên nhân | Cách xử lý | Ticket |
+|---|---|---|---|
+| | | | |
+
+**Cần bổ sung:** Chỉ Human điền case thật đã được phép lưu và loại bỏ dữ liệu nhận diện khách hàng.
+
+> **[Q-dropped-calls-7]** Có ticket đã đóng nào phù hợp để tổng hợp nguyên nhân rớt cuộc gọi mà không chứa dữ liệu bị cấm?
 
 ## Tra cứu liên quan
 
@@ -44,7 +88,12 @@ Chưa có dữ liệu đã xác minh.
 - [Nhà mạng & trunk SIP](/internal/ai-contact-center/knowledge-base/carriers)
 - [Mã lỗi SIP](/internal/ai-contact-center/knowledge-base/sip-codes)
 
+**Cần bổ sung:** Xác nhận có cần thêm trang tra cứu chất lượng mạng/RTP.
+
+> **[Q-dropped-calls-8]** Runbook rớt cuộc gọi cần liên kết thêm tài liệu mạng hoặc RTP nào?
+
 ## Cập nhật lần cuối
 
-Chưa cập nhật.
+**Cần bổ sung:** Ngày duyệt gần nhất và vai trò chịu trách nhiệm cập nhật runbook.
 
+> **[Q-common-10]** Vai trò nào phê duyệt và duy trì nội dung Support Wiki?

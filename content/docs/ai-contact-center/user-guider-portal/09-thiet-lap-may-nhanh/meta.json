@@ -3,6 +3,7 @@
   "icon": "PhoneCall",
   "pages": [
     "index",
+    "web-app",
     "ip-phone",
     "softphone",
     "mobile-app"

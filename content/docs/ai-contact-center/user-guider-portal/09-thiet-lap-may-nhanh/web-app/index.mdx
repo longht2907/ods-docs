@@ -1,0 +1,172 @@
+---
+title: "Hướng dẫn sử dụng máy nhánh trên Web App Portal"
+description: "Hướng dẫn sử dụng Webphone tích hợp trên trình duyệt Web App Portal ODS để đàm thoại, gọi nhanh một chạm và xử lý cuộc gọi."
+---
+
+**Web App Portal ODS** tích hợp sẵn trình đàm thoại trực tiếp trên nền tảng WebRTC (**Webphone**), cho phép điện thoại viên nghe, gọi và quản lý cuộc gọi khách hàng ngay trong giao diện web quản trị tại [https://app.ods.vn](https://app.ods.vn) mà không cần cài đặt thêm bất kỳ phần mềm hay thiết bị phần cứng nào.
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Tài khoản người dùng đã được liên kết với một **Số máy nhánh (Extension)** còn hoạt động trên hệ thống ODS.
+- Sử dụng trình duyệt web được hỗ trợ: Google Chrome, Cốc Cốc, Microsoft Edge, hoặc Mozilla Firefox phiên bản mới nhất.
+- Máy tính có kết nối tai nghe (Headset) kèm Microphone và đường truyền Internet ổn định.
+</Callout>
+
+---
+
+## 1. Cơ chế hoạt động & Điều kiện kích hoạt
+
+### Công nghệ WebRTC tích hợp
+Webphone trên Portal ODS sử dụng giao thức truyền thông thời gian thực **WebRTC (Web Real-Time Communication)** được bảo mật mã hóa đầu cuối (SRTP/TLS). Cơ chế này kết nối trực tiếp trình duyệt của bạn với máy chủ tổng đài ODS mà không cần thông qua ứng dụng trung gian, đảm bảo độ trễ thấp và chất lượng âm thanh đàm thoại HD.
+
+### Tự động nhận diện số máy nhánh
+Khi nhân viên đăng nhập thành công vào Portal ODS, hệ thống sẽ tự động kiểm tra số máy nhánh được gán cho tài khoản đó tại mục **Người dùng** → **Danh sách người dùng**. Nếu tài khoản đã được gán máy nhánh, dịch vụ Webphone sẽ tự động chạy ngầm và hiển thị nút gọi đàm thoại ở góc dưới bên phải màn hình.
+
+---
+
+## 2. Hướng dẫn kích hoạt & cấp quyền Micro trên trình duyệt
+
+Để thực hiện và tiếp nhận cuộc gọi, trình duyệt web bắt buộc phải được cấp quyền sử dụng thiết bị thu âm (Microphone):
+
+<Steps>
+  <Step>
+    ### Bước 1: Đăng nhập vào ODS Portal
+
+    1. Mở trình duyệt web và truy cập địa chỉ [https://app.ods.vn](https://app.ods.vn).
+    2. Nhập **Tên tài khoản** và **Mật khẩu** của nhân viên, sau đó nhấn **Đăng nhập**.
+  </Step>
+
+  <Step>
+    ### Bước 2: Cấp quyền truy cập Microphone cho trình duyệt
+
+    1. Ngay khi đăng nhập thành công hoặc trong lần đầu tiên mở bàn phím gọi, trình duyệt sẽ hiển thị cửa sổ popup bảo mật yêu cầu quyền truy cập Micro.
+    2. Nhấp chọn nút **Cho phép (Allow)**.
+
+    <Callout type="warn" title="Lưu ý quan trọng">
+    Nếu bạn vô tình nhấn "Chặn (Block)", trình duyệt sẽ không thể thu âm thanh. Bạn cần nhấp vào biểu tượng ổ khóa hoặc camera ở đầu thanh địa chỉ URL để đổi lại quyền thành "Cho phép" và tải lại trang (F5).
+    </Callout>
+  </Step>
+
+  <Step>
+    ### Bước 3: Xác nhận trạng thái sẵn sàng của Webphone
+
+    Quan sát góc dưới bên phải màn hình Portal: Nút tròn màu tím với biểu tượng chiếc điện thoại xuất hiện, báo hiệu máy nhánh đã đăng ký thành công lên tổng đài và sẵn sàng hoạt động.
+  </Step>
+</Steps>
+
+---
+
+## 3. Các phương thức thực hiện cuộc gọi trên Web App
+
+Điện thoại viên có thể khởi tạo cuộc gọi linh hoạt bằng hai hình thức:
+
+### Sử dụng bàn phím số ảo (Keypad)
+1. Nhấp vào **nút điện thoại tròn màu tím** ở góc dưới bên phải màn hình để mở giao diện bàn phím quay số.
+2. Nhập số điện thoại cần gọi (bằng cách nhấp vào các phím số ảo trên màn hình hoặc gõ trực tiếp từ bàn phím máy tính).
+3. Nhấp nút **Gọi** (biểu tượng điện thoại màu xanh lá) để bắt đầu cuộc gọi.
+
+### Gọi nhanh một chạm (Click-to-Call)
+Tính năng Click-to-Call cho phép nhân viên gọi ra tức thì mà không cần ghi nhớ hoặc nhập lại số điện thoại:
+- Tại màn hình **Khách hàng**: Nhấp trực tiếp vào số điện thoại của khách hàng trong danh sách hoặc trong trang hồ sơ chi tiết.
+- Tại màn hình **Lịch sử cuộc gọi**: Nhấp vào số điện thoại để gọi lại nhanh cho khách hàng.
+- Tại màn hình **Tin nhắn (Chat)**: Nhấp biểu tượng gọi thoại ở đầu khung trò chuyện Facebook hoặc Zalo OA để gọi điện ngay cho khách hàng đang chat.
+
+---
+
+## 4. Tiếp nhận và điều khiển cuộc gọi trên Portal
+
+### Tiếp nhận cuộc gọi đến
+Khi có khách hàng gọi vào số máy nhánh của bạn:
+1. Một khung thông báo cuộc gọi đến xuất hiện tức thì ở góc màn hình kèm âm thanh chuông reo.
+2. Màn hình hiển thị số điện thoại người gọi và thông tin tên khách hàng (nếu số đã được lưu trong danh bạ CRM).
+3. Nhấp nút **Trả lời** (màu xanh lá) để bắt máy hoặc nút **Từ chối** (màu đỏ) để ngắt cuộc gọi.
+
+### Bảng chức năng điều khiển trong lúc đàm thoại
+
+Trong quá trình đàm thoại, thanh công cụ cuộc gọi trên Portal cung cấp các phím điều khiển nghiệp vụ:
+
+| Phím chức năng | Biểu tượng | Mô tả & Cách sử dụng |
+| :--- | :---: | :--- |
+| **Tắt tiếng (Mute)** | Micro gạch chéo | Tạm thời ngắt micro của điện thoại viên (khách hàng không nghe thấy tiếng). Nhấp lại để bật lại micro. |
+| **Giữ máy (Hold)** | Tạm dừng (Pause) | Giữ máy cuộc gọi kèm nhạc chờ của doanh nghiệp để nhân viên tra cứu tài liệu. Nhấp lại để tiếp tục đàm thoại. |
+| **Chuyển tiếp (Transfer)** | Mũi tên chuyển hướng | Chuyển cuộc gọi đang nghe sang một máy nhánh nội bộ khác hoặc số điện thoại bên ngoài. |
+| **Bàn phím DTMF** | Lưới phím số | Mở bàn phím số để bấm các phím tương tác khi gọi đến các tổng đài tự động yêu cầu bấm phím theo menu. |
+| **Kết thúc cuộc gọi** | Điện thoại đỏ | Ngắt kết nối và đóng phiên đàm thoại. |
+
+---
+
+## 5. Ưu điểm nổi bật khi sử dụng Web App Portal
+
+- **Không tốn chi phí phần cứng:** Tiết kiệm 100% ngân sách mua sắm điện thoại bàn IP Phone và dây mạng cho từng vị trí làm việc.
+- **Tự động mở hồ sơ khách hàng (Pop-up CRM):** Ngay khi nhấc máy, giao diện tự động nhận diện và mở lịch sử giao dịch, ghi chú và thông tin khách hàng tương ứng.
+- **Hợp nhất đa kênh:** Cho phép nhân viên vừa đàm thoại vừa xử lý tin nhắn Zalo, Facebook Messenger và tạo ghi chú công việc trên cùng một màn hình làm việc tập trung.
+
+---
+
+## 6. Kiểm tra kết quả
+
+Doanh nghiệp xác nhận Webphone trên Web App Portal hoạt động chính xác qua các tiêu chí:
+
+- Biểu tượng điện thoại tròn màu tím xuất hiện ở góc dưới bên phải màn hình sau khi đăng nhập.
+- Thử nghiệm gọi đến số máy nhánh từ một điện thoại khác: Khung thông báo cuộc gọi đến hiển thị đúng và chuông reo rõ ràng trên máy tính.
+- Thực hiện cuộc gọi ra cho khách hàng hoặc số nội bộ: Kết nối nhanh chóng, âm thanh hai chiều rõ ràng và không bị rè hay ngắt quãng.
+- Cuộc gọi sau khi kết thúc được ghi nhận đầy đủ thời lượng và file ghi âm trong mục **Tổng đài** → **Lịch sử cuộc gọi**.
+
+---
+
+## 7. Xử lý sự cố thường gặp (Troubleshooting)
+
+<Accordions>
+  <Accordion title="Trình duyệt không cho phép gọi hoặc báo lỗi không tìm thấy Microphone">
+    **Nguyên nhân:** Quyền truy cập Micro trên trình duyệt đã bị từ chối hoặc máy tính chưa cắm tai nghe/micro.
+
+    **Cách xử lý:**
+    1. Kiểm tra lại jack cắm hoặc kết nối Bluetooth của tai nghe với máy tính.
+    2. Nhấp vào biểu tượng ổ khóa bảo mật ở góc trái thanh địa chỉ URL của trình duyệt (bên cạnh `https://app.ods.vn`), tìm mục **Microphone (Micro)** và chọn **Cho phép (Allow)**.
+    3. Nhấn **F5** để tải lại trang Portal.
+  </Accordion>
+
+  <Accordion title="Đăng nhập thành công nhưng không thấy nút điện thoại gọi đàm thoại">
+    **Nguyên nhân:** Tài khoản người dùng đang đăng nhập chưa được gán **Số máy nhánh (Extension)** trong hệ thống ODS.
+
+    **Cách xử lý:** Nhờ Quản trị viên truy cập mục **Người dùng** → **Danh sách người dùng**, tìm tài khoản của bạn, nhấn **Sửa** (icon bút chì) và chọn số máy nhánh tương ứng tại mục **Số máy nhánh**, sau đó nhấn **Cập nhật**. Đăng xuất và đăng nhập lại Portal để kích hoạt.
+  </Accordion>
+
+  <Accordion title="Cuộc gọi kết nối được nhưng không nghe thấy âm thanh hoặc một bên bị mất tiếng">
+    **Nguyên nhân:** Thiết bị đầu ra (Loa/Tai nghe) hoặc đầu vào (Micro) bị chọn sai trong cài đặt âm thanh của hệ điều hành, hoặc mạng nội bộ chặn cổng âm thanh UDP/RTP.
+
+    **Cách xử lý:**
+    1. Kiểm tra cài đặt Sound Settings trên Windows/macOS, đảm bảo Output và Input đã chọn đúng tai nghe chuyên dụng đang đeo.
+    2. Thử chuyển sang mạng Internet khác (hoặc phát 4G từ điện thoại) để kiểm tra xem hệ thống tường lửa (Firewall) mạng công ty có chặn dải cổng thoại hay không.
+  </Accordion>
+</Accordions>
+
+---
+
+## 8. Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="PhoneCall"
+    title="Tổng quan thiết lập máy nhánh"
+    description="So sánh và lựa chọn phương thức sử dụng máy nhánh phù hợp giữa Web App, IP Phone, Softphone và Mobile App."
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh"
+  />
+  <Card
+    icon="Settings"
+    title="Tạo và cấu hình số máy nhánh trên Portal"
+    description="Hướng dẫn quản trị viên khởi tạo máy nhánh, gán số extension và cấp mật khẩu SIP trên ODS."
+    href="/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/tao-cau-hinh-may-nhanh"
+  />
+  <Card
+    icon="Users"
+    title="Tạo tài khoản và phân quyền người dùng"
+    description="Cách liên kết số máy nhánh với tài khoản người dùng và thiết lập quyền hạn truy cập Portal."
+    href="/docs/ai-contact-center/user-guider-portal/03-quan-ly-nguoi-dung/tao-tai-khoan-nguoi-dung"
+  />
+  <Card
+    icon="MessageSquare"
+    title="Quản lý tin nhắn và cuộc gọi"
+    description="Quy trình phối hợp đàm thoại và phản hồi tin nhắn đa kênh trên không gian làm việc Portal ODS."
+    href="/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/quan-ly-tin-nhan-cuoc-goi"
+  />
+</Cards>

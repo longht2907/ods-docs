@@ -1,6 +1,47 @@
 ---
-title: "IP Phone"
-description: "Hướng dẫn cấu hình máy nhánh trên IP Phone Yealink T19X và T30X."
+title: "Thiết lập máy nhánh trên IP Phone"
+description: "Tổng quan và hướng dẫn cấu hình số máy nhánh tổng đài ODS trên các dòng điện thoại bàn phần cứng IP Phone Yealink."
 ---
 
-- [Cấu hình IP Phone Yealink T19X–T30X](/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/ip-phone/cau-hinh-yealink-t19x-t30x)
+**Điện thoại bàn IP Phone** là thiết bị phần cứng viễn thông chuyên dụng kết nối trực tiếp vào hệ thống mạng nội bộ (LAN/Wi-Fi) của doanh nghiệp, giúp điện thoại viên thực hiện và tiếp nhận cuộc gọi thoại chất lượng cao độc lập hoàn toàn với máy tính cá nhân.
+
+---
+
+## 1. Ưu điểm của điện thoại bàn IP Phone
+
+- **Độ ổn định tối đa:** Hoạt động liên tục 24/7 mà không phụ thuộc vào trạng thái khởi động hay hiệu năng của máy tính.
+- **Chất lượng âm thanh chuẩn HD Voice:** Tích hợp bộ giải mã âm thanh phần cứng (Opus, G.722, G.711) và công nghệ khử tiếng ồn chuyên nghiệp trên ống nghe (Handset) và loa ngoài (Speakerphone).
+- **Phím chức năng vật lý tiện lợi:** Các phím cứng chuyển cuộc gọi (Transfer), giữ máy (Hold), tắt tiếng (Mute) và phím quay số nhanh (Speed Dial) giúp thao tác nghiệp vụ nhanh chóng.
+- **Phù hợp đa dạng vị trí:** Lý tưởng cho bàn lễ tân, nhân viên văn phòng cố định, phòng họp và các bộ phận tiếp nhận thông tin khẩn cấp.
+
+---
+
+## 2. Quy trình thiết lập tổng quát
+
+Quá trình cấu hình một thiết bị IP Phone mới với tổng đài ảo ODS bao gồm 4 bước cơ bản:
+
+1. **Kết nối phần cứng:** Cắm dây mạng LAN vào cổng Internet/PC trên điện thoại và cấp nguồn (qua adapter nguồn hoặc cổng cấp nguồn PoE).
+2. **Xác định địa chỉ IP thiết bị:** Nhấn nút trạng thái (**OK**) trên điện thoại để xem địa chỉ IPv4 được cấp phát trong mạng nội bộ.
+3. **Đăng nhập giao diện Web GUI:** Nhập địa chỉ IP vào trình duyệt web trên máy tính để truy cập trang quản trị cấu hình của điện thoại.
+4. **Khai báo thông số SIP ODS:** Điền thông tin Số máy nhánh, Mật khẩu SIP, Địa chỉ máy chủ tổng đài và Cổng kết nối `51000`, sau đó lưu cấu hình để thiết bị đăng ký (Register) lên tổng đài.
+
+---
+
+## 3. Danh sách hướng dẫn chi tiết
+
+Chọn dòng thiết bị IP Phone tương ứng để xem hướng dẫn cấu hình từng bước:
+
+<Cards>
+  <Card
+    icon="Phone"
+    title="Cấu hình IP Phone Yealink T19X - T30X"
+    description="Hướng dẫn chi tiết từng bước lấy IP, đăng nhập Web GUI và khai báo tài khoản SIP trên dòng điện thoại Yealink T19X và T30X."
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/ip-phone/cau-hinh-yealink-t19x-t30x"
+  />
+  <Card
+    icon="PhoneCall"
+    title="Tổng quan thiết lập máy nhánh"
+    description="Quay lại trang tổng quan để tìm hiểu các phương thức sử dụng máy nhánh khác (Web App, Softphone, Mobile App)."
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh"
+  />
+</Cards>

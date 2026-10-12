@@ -1,59 +1,175 @@
 ---
-title: "Gọi tự động (AutoCall)"
-description: "Hướng dẫn chi tiết 5 bước thiết lập chiến dịch Auto Call: chọn nguồn khách hàng, xem trước, cài đặt chung, âm thanh và phím bấm."
+title: "Gọi tự động (Auto Call)"
+description: "Hướng dẫn thiết lập chiến dịch Auto Call 5 bước: chọn nguồn khách hàng, xem trước, cấu hình khung giờ, phát âm thanh và điều hướng phím bấm."
 ---
 
-## Mục tiêu
+Giải pháp chiến dịch cuộc gọi tự động trên ODS AI Contact Center giúp doanh nghiệp chủ động kết nối và truyền tải thông điệp đến hàng loạt khách hàng nhanh chóng, hỗ trợ cá nhân hóa nội dung theo từng liên hệ.
 
-Bài viết này hướng dẫn bạn thực hiện đầy đủ 5 bước thiết lập một chiến dịch gọi tự động (Auto Call) để phát thông điệp âm thanh hàng loạt đến danh sách khách hàng.
+<Callout type="info" title="Trước khi bắt đầu">
+- **Vị trí màn hình**: **Chiến dịch** → **Danh sách chiến dịch** → nhấn **THÊM MỚI CHIẾN DỊCH**.
+- **Quyền hạn yêu cầu**: Tài khoản Quản trị viên (Admin) hoặc tài khoản được phân quyền Quản lý chiến dịch.
+- **Điều kiện cần**: Đã có sẵn danh bạ khách hàng, ít nhất 01 tệp âm thanh hoặc kịch bản TTS trong thư viện, và đầu số SIP Trunk đã kết nối hoạt động.
+</Callout>
 
-## Điều kiện cần
+## Tổng quan dịch vụ chiến dịch
 
-Trước khi cấu hình, hãy chuẩn bị:
+Hệ thống hỗ trợ 4 hình thức chiến dịch tương tác tự động phục vụ đa dạng nhu cầu tiếp cận khách hàng:
 
-- Nguồn dữ liệu khách hàng từ Danh bạ tổng đài hoặc Danh bạ chiến dịch.
-- Tệp ghi âm lời thoại hoặc kịch bản Text to Speech.
-- Đầu số gọi ra (Hotline/Brandname) đã được kích hoạt trên hệ thống.
+![Giao diện chọn loại dịch vụ chiến dịch](/media/ai-contact-center/user-guider-portal/autocall_tong-quan_chon-dich-vu.png)
 
-## Các bước thực hiện
+| Dịch vụ | Hình thức kết nối | Mục đích sử dụng |
+| :--- | :--- | :--- |
+| **Auto Call** | Gọi tự động phát âm thanh qua đầu số SIP Trunk đến thuê bao di động | Phát thông báo, nhắc lịch thanh toán, khảo sát tự động. Hỗ trợ cá nhân hóa lời thoại (đọc tên, danh xưng riêng biệt). |
+| **Auto Dialer** | Tự động quay số theo danh sách phân phối | Tự động gọi ra và chuyển ngay cuộc gọi đến tổng đài viên khi khách hàng bắt máy. |
+| **Zalo Call** | Gọi tự động đến người dùng Zalo qua tài khoản Zalo OA | Tương tự Auto Call nhưng thực hiện cuộc gọi qua Zalo OA, tối ưu chi phí viễn thông. |
+| **Zalo Message** | Tự động gửi tin nhắn qua Zalo ZNS / Zalo OA | Chăm sóc khách hàng, gửi thông báo biến động, mã xác thực hoặc tin chăm sóc định kỳ qua Zalo. |
+
+## Quy trình 5 bước thiết lập chiến dịch Auto Call
+
+Chọn thẻ **Auto Call** tại màn hình chọn dịch vụ, sau đó nhấn **TIẾP TỤC** để mở trình hướng dẫn thiết lập 5 bước.
 
 <Steps>
-### Bước 1: Nguồn khách hàng
+<Step>
+### Chọn nguồn dữ liệu khách hàng
 
-Chọn nguồn dữ liệu người nhận từ **Danh bạ tổng đài**, **Danh bạ chiến dịch** (hệ thống cho phép chọn song song cả hai nguồn danh bạ này) hoặc nhóm danh bạ, sau đó nhấn **Tiếp tục**.
+Tại bước **Nguồn khách hàng**, chọn danh bạ chứa các số điện thoại cần tiếp cận:
 
-Ảnh: Bước 1 - Chọn nguồn dữ liệu khách hàng cho chiến dịch Auto Call
+- Chọn một hoặc chọn song song cả hai nguồn: **Danh bạ tổng đài** và **Danh bạ chiến dịch**.
+- Hoặc chọn nguồn theo **Nhóm danh bạ** đã phân loại sẵn.
+- Nhấn nút **THÊM MỚI** màu xanh nếu cần nạp thêm danh bạ mới trực tiếp vào hệ thống.
+- Nhấn **Lưu thông tin bước 1** hoặc nhấn **TIẾP TỤC** để chuyển sang bước kế tiếp.
 
-### Bước 2: Xem trước
+![Chọn nguồn danh bạ khách hàng](/media/ai-contact-center/user-guider-portal/autocall_buoc1_nguon-khach-hang.png)
 
-Rà soát danh sách số điện thoại nhận cuộc gọi trên bảng xem trước, tại bước này bạn có thể bổ sung thêm khách hàng bằng cách bấm **Thêm mới** thủ công hoặc **Nhập excel** trực tiếp trước khi tiếp tục.
+*Kết quả: Nguồn danh bạ được ghi nhận, mục số 1 chuyển sang trạng thái tích xanh.*
+</Step>
 
-Ảnh: Bước 2 - Xem trước danh sách khách hàng kèm nút Thêm mới và Nhập excel
+<Step>
+### Xem trước và rà soát danh sách liên hệ
 
-### Bước 3: Thiết lập chung
+Tại bước **Xem trước**, hệ thống hiển thị bảng danh sách các số điện thoại được nạp vào chiến dịch:
 
-Khai báo Tên chiến dịch, lựa chọn Đầu số gọi ra và cấu hình Khung giờ gọi (khuyến nghị thiết lập trong khoảng thời gian từ **08:00 – 17:00** để tránh làm phiền khách hàng và phòng ngừa việc nhà mạng chặn cuộc gọi spam).
+- Rà soát số lượng và chi tiết các thuê bao sẽ nhận cuộc gọi.
+- Nhấn **Thêm mới** để bổ sung liên hệ thủ công, hoặc nhấn **Nhập excel** để tải lên danh sách bổ sung trực tiếp tại màn hình này.
+- Nhấn **TIẾP TỤC** để sang cấu hình thông số.
 
-Ảnh: Bước 3 - Thiết lập thông tin chung, đầu số gọi ra và khung giờ gọi
+![Xem trước danh sách liên hệ nhận cuộc gọi](/media/ai-contact-center/user-guider-portal/autocall_buoc2_xem-truoc.png)
 
-### Bước 4: Âm thanh
+*Kết quả: Danh sách người nhận được xác thực đầy đủ trước khi cấu hình thời gian chạy.*
+</Step>
 
-Lựa chọn tệp âm thanh có sẵn hoặc tạo nội dung Text to Speech để phát cho khách hàng khi bắt máy (hệ thống hỗ trợ tạo mới và tải lên tệp âm thanh trực tiếp ngay trong bước này).
+<Step>
+### Cấu hình thông tin chung và khung giờ gọi
 
-Ảnh: Bước 4 - Cấu hình nội dung phát âm thanh và kiểm tra kịch bản lời thoại
+Tại bước **Thiết lập chung**, khai báo các tham số vận hành cho chiến dịch:
 
-### Bước 5: Phím bấm
+![Thiết lập thông tin chung và khung giờ chạy](/media/ai-contact-center/user-guider-portal/autocall_buoc3_thiet-lap-chung.png)
 
-Cấu hình các hành động phản hồi theo phím bấm (IVR) của khách hàng trong cuộc gọi và nhấn **Hoàn thành** để lưu chiến dịch.
+| Trường | Bắt buộc | Mô tả | Giá trị ví dụ |
+| :--- | :---: | :--- | :--- |
+| **Tên chiến dịch** | Có | Tên định danh gợi nhớ cho chiến dịch | `Chiến dịch CSKH Tháng 10` |
+| **Tổng đài gọi ra** | Có | Đầu số SIP Trunk/Hotline thực hiện cuộc gọi | `CF-BS0000021` |
+| **Thời gian chạy** | Có | Ngày và giờ bắt đầu kích hoạt chiến dịch | `15/10/2026 08:30` |
+| **Khoảng thời gian chạy** | Không | Khung giờ gọi hợp lệ trong ngày. Khuyến nghị **08:00 – 17:00** tránh nhà mạng đưa vào danh sách spam | `Từ 8 Giờ Đến 17 Giờ` |
+| **Webhook Endpoint** | Không | URL API bên thứ ba nhận dữ liệu kết quả cuộc gọi | `https://api.example.com/webhook` |
+| **Webhook Token Key** | Không | Token bảo mật xác thực khi gọi webhook | `sec_token_xyz123` |
+| **Prefix trước số điện thoại** | Không | Mã tiền tố tự động thêm trước số thuê bao | `0` |
+| **Gọi qua Sim GateWay** | Không | Tùy chọn định tuyến cuộc gọi qua thiết bị SIM Gateway | Bỏ chọn (mặc định) |
 
-Ảnh: Bước 5 - Cấu hình điều hướng theo phím bấm của khách hàng
+Nhấn **TIẾP TỤC** để lưu thông tin dưới dạng bản nháp và chuyển sang cấu hình âm thanh.
+
+*Kết quả: Thông số thời gian và đầu số gọi ra được lưu thành công.*
+</Step>
+
+<Step>
+### Thiết lập âm thanh phát cuộc gọi
+
+Tại bước **Âm thanh**, chỉ định nội dung thoại mà khách hàng sẽ nghe khi nhấc máy:
+
+![Cấu hình âm thanh lời chào và âm báo sai phím](/media/ai-contact-center/user-guider-portal/autocall_buoc4_am-thanh.png)
+
+| Trường | Bắt buộc | Mô tả |
+| :--- | :---: | :--- |
+| **Âm thanh lời chào** | Có | Tệp âm thanh hoặc kịch bản TTS phát ngay khi khách hàng bắt máy. |
+| **Âm báo sai phím** | Không | Tệp âm thanh phát khi khách hàng nhấn phím không nằm trong kịch bản IVR. |
+
+<Callout type="info" title="Cá nhân hóa cuộc gọi theo liên hệ">
+Hệ thống hỗ trợ đọc tên riêng, danh xưng và thông tin đặc thù cho từng khách hàng thông qua tính năng Text to Speech (TTS) bằng cách lồng ghép các biến dữ liệu từ file danh bạ đã nạp ở Bước 1.
+</Callout>
+
+Nhấn vào biểu tượng chiếc loa bên cạnh mỗi tệp âm thanh trong danh sách thả xuống để nghe thử nội dung trước khi áp dụng. Sau đó nhấn **TIẾP TỤC**.
+
+*Kết quả: Kịch bản âm thanh và giọng đọc được gán vào chiến dịch.*
+</Step>
+
+<Step>
+### Cấu hình phản hồi phím bấm (IVR)
+
+Tại bước **Phím bấm**, thiết lập các nhánh rẽ tương tác khi khách hàng nhấn phím số trên bàn phím điện thoại:
+
+![Cấu hình điều hướng phím bấm](/media/ai-contact-center/user-guider-portal/autocall_buoc5_phim-bam.png)
+
+1. Nhập phím số cần gán vào ô **Phím bấm** (từ `0` đến `9`).
+2. Chọn hành động tương ứng tại mục **Hành động cho phím**:
+   - **Thông báo**: Phát tiếp một tệp âm thanh thông báo chi tiết tương ứng.
+   - **Tổng đài viên**: Chuyển cuộc gọi đến một máy nhánh điện thoại viên cụ thể.
+   - **Nhóm tổng đài viên**: Đổ chuông nhóm hàng đợi nhân viên hỗ trợ.
+   - **Nghe lại hướng dẫn**: Phát lại tệp âm thanh lời chào từ đầu.
+   - **API**: Kích hoạt gọi webhook API để hệ thống nội bộ xử lý logic riêng.
+3. Chọn tệp âm thanh phản hồi tại mục **Âm thanh** (nếu chọn hành động có phát âm thanh).
+4. Nhấn biểu tượng dấu **+** màu xanh ở góc phải nếu cần bổ sung thêm các phím bấm khác.
+5. Nhấn **LƯU** để lưu chiến dịch dưới dạng bản nháp, hoặc nhấn **BẮT ĐẦU** để kích hoạt chiến dịch theo lịch hẹn.
+
+*Kết quả: Hệ thống lưu toàn bộ cấu hình và đưa chiến dịch vào hàng đợi vận hành.*
+</Step>
 </Steps>
 
 ## Kiểm tra kết quả
 
-Sau khi nhấn Hoàn thành, hệ thống sẽ tự động lưu chiến dịch và hiển thị bản ghi tại tab **Đang chờ gọi** trên bảng Danh sách chiến dịch.
+Sau khi hoàn tất quá trình thiết lập, mở lại menu **Chiến dịch** → **Danh sách chiến dịch** để kiểm tra:
 
-## Xem thêm
+![Danh sách chiến dịch sau khi hoàn tất thiết lập](/media/ai-contact-center/user-guider-portal/autocall_ket-qua_danh-sach-chien-dich.png)
 
-- [Lịch chạy và báo cáo](/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/lich-va-bao-cao) — Theo dõi tiến độ và trạng thái vận hành của chiến dịch.
-- [Thêm âm thanh](/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/them-am-thanh) — Quản lý thư viện âm thanh và giọng đọc Text to Speech.
+- Chiến dịch xuất hiện tại tab **Đang chờ gọi** (nếu hẹn lịch chạy trong tương lai) hoặc tab **Đang tiến hành gọi** (nếu thời gian bắt đầu trùng với thời điểm hiện tại).
+- Cột **THAO TÁC** cung cấp 4 nút điều khiển trực tiếp:
+  - **Tạm dừng**: Tạm dừng phát sinh cuộc gọi mới.
+  - **Xem chi tiết**: Xem báo cáo tiến độ và thống kê kết quả gọi.
+  - **Sao chép**: Nhân bản chiến dịch sang bản mới để tái sử dụng cấu hình.
+  - **Xóa**: Hủy và chuyển chiến dịch sang tab Đã xóa.
+- Banner trên đầu trang hiển thị ước tính tổng số ký tự Text to Speech (TTS) sẽ tiêu hao khi chiến dịch khởi chạy.
+
+## Xử lý sự cố thường gặp
+
+<Accordions>
+<Accordion title="Không thể chỉnh sửa thông tin chiến dịch đã thiết lập">
+- **Nguyên nhân**: Hệ thống áp dụng quy tắc khóa "sửa" trước **10 phút** so với thời gian chạy dự kiến nhằm chốt danh sách hàng đợi gọi ra.
+- **Cách xử lý**: Nếu cần thay đổi cấu hình khẩn cấp, nhấn nút **Tạm dừng** hoặc nhấn biểu tượng **Sao chép** để tạo chiến dịch mới với thông số đã điều chỉnh.
+</Accordion>
+
+<Accordion title="Cuộc gọi tự động không phát sinh trong ngày">
+- **Nguyên nhân**: Thời điểm hiện tại nằm ngoài cấu hình **Khoảng thời gian chạy** (ví dụ ngoài khung 8:00 – 17:00), hệ thống tự động ngưng gọi để tránh vi phạm quy định chống cuộc gọi rác.
+- **Cách xử lý**: Kiểm tra lại thời gian chạy trong phần thiết lập chung. Cuộc gọi sẽ tự động kích hoạt tiếp khi bước vào khung giờ hợp lệ kế tiếp.
+</Accordion>
+
+<Accordion title="Tổng đài gọi ra báo lỗi hoặc không kết nối">
+- **Nguyên nhân**: Đầu số SIP Trunk bị gián đoạn tín hiệu hoặc số dư tài khoản cước thoại đã cạn.
+- **Cách xử lý**: Kiểm tra số dư tài khoản hiển thị ở góc dưới thanh điều hướng bên trái màn hình Portal, hoặc kiểm tra trạng thái kết nối đầu số tại menu **Tổng đài** → **Đầu số**.
+</Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Thêm âm thanh" href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/them-am-thanh" icon="Headphones">
+    Tạo giọng đọc Text to Speech và tải lên tệp ghi âm lời chào cho chiến dịch.
+  </Card>
+  <Card title="Thêm danh bạ" href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/danh-ba/them-danh-ba" icon="Users">
+    Quản lý danh sách khách hàng và nhập dữ liệu thuê bao từ file Excel.
+  </Card>
+  <Card title="Nhóm danh bạ" href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/danh-ba/them-nhom-danh-ba" icon="ListChecks">
+    Gom nhóm danh bạ theo tiêu chí tiếp cận để thêm nhanh vào chiến dịch.
+  </Card>
+  <Card title="Lịch và báo cáo" href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/lich-va-bao-cao" icon="BarChart3">
+    Theo dõi tiến độ thực hiện cuộc gọi và phân tích tỷ lệ kết nối của chiến dịch.
+  </Card>
+</Cards>

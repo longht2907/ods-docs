@@ -1,6 +1,173 @@
 ---
-title: "Gọi tự động thông qua ZaloOA"
-description: "Hướng dẫn tích hợp và kích hoạt tính năng cuộc gọi thoại tự động qua Zalo Official Account."
+title: "Gọi tự động qua Zalo OA"
+description: "Hướng dẫn thiết lập chiến dịch Zalo Call qua Zalo OA: chọn danh bạ, cơ chế fallback Auto Call, gán token Zalo và điều hướng kịch bản gọi."
 ---
 
-Thực hiện cuộc gọi thoại chăm sóc khách hàng trực tiếp thông qua tài khoản Zalo OA.
+Chiến dịch Zalo Call trên ODS AI Contact Center giúp doanh nghiệp kết nối và tương tác tự động với khách hàng thông qua tài khoản Zalo Official Account (Zalo OA). Giải pháp hiển thị rõ nhận diện thương hiệu của doanh nghiệp trên màn hình cuộc gọi Zalo và tối ưu chi phí so với cước thoại truyền thống.
+
+<Callout type="info" title="Trước khi bắt đầu">
+- **Vị trí màn hình**: **Chiến dịch** → **Danh sách chiến dịch** → nhấn **THÊM MỚI CHIẾN DỊCH** → chọn **Zalo Call**.
+- **Quyền hạn yêu cầu**: Tài khoản Quản trị viên (Admin) hoặc tài khoản được phân quyền Quản lý chiến dịch.
+- **Điều kiện cần**: Tài khoản Zalo OA đã kết nối và có **Zalo Token** còn hiệu lực; đầu số tổng đài SIP Trunk dự phòng (nếu dùng cơ chế fallback); ít nhất 01 tệp âm thanh trong thư viện.
+</Callout>
+
+## So sánh Zalo Call và Auto Call
+
+| Tiêu chí | Zalo Call (Zalo OA) | Auto Call (SIP Trunk) |
+| :--- | :--- | :--- |
+| **Kênh thực hiện** | Cuộc gọi thoại OTT qua ứng dụng Zalo | Cuộc gọi viễn thông GSM/PSTN qua đầu số SIP Trunk |
+| **Hiển thị người gọi** | Tên, ảnh đại diện và tích xác thực Zalo OA của doanh nghiệp | Số Hotline hoặc Voice Brandname viễn thông |
+| **Cơ chế dự phòng** | Tự động chuyển tiếp sang Auto Call khi số không dùng Zalo | Không áp dụng (chỉ gọi qua mạng viễn thông) |
+| **Mục đích phù hợp** | Tăng độ tin cậy, nâng cao tỷ lệ bắt máy và nhận diện thương hiệu | Thông báo khẩn cấp, nhắc nợ, chăm sóc thuê bao diện rộng |
+
+## Quy trình 5 bước thiết lập chiến dịch Zalo Call
+
+Tại màn hình **Chọn dịch vụ để phục vụ**, nhấn chọn thẻ **Zalo Call**, sau đó bấm **TIẾP TỤC** để mở trình hướng dẫn thiết lập.
+
+![Chọn dịch vụ Zalo Call](/media/ai-contact-center/user-guider-portal/zalocall_tong-quan_chon-dich-vu.png)
+
+<Steps>
+<Step>
+### Chọn nguồn dữ liệu khách hàng
+
+Tại bước **Nguồn khách hàng**, chọn danh sách số điện thoại cần thực hiện cuộc gọi:
+
+- Chọn một hoặc chọn song song cả hai nguồn: **Danh bạ tổng đài** và **Danh bạ chiến dịch**.
+- Hoặc chọn nguồn theo **Nhóm danh bạ** đã phân loại từ trước.
+- Nhấn nút **THÊM MỚI** màu xanh nếu cần nạp thêm danh bạ trực tiếp vào hệ thống.
+- Nhấn **Lưu thông tin bước 1** hoặc nhấn **TIẾP TỤC** để chuyển sang bước xem trước.
+
+![Chọn nguồn danh bạ cho chiến dịch Zalo Call](/media/ai-contact-center/user-guider-portal/zalocall_buoc1_nguon-khach-hang.png)
+
+*Kết quả: Nguồn dữ liệu được ghi nhận, mục số 1 chuyển sang trạng thái tích xanh.*
+</Step>
+
+<Step>
+### Xem trước và thiết lập cơ chế Fallback Auto Call
+
+Tại bước **Xem trước**, hệ thống hiển thị bảng **DANH SÁCH KHÁCH HÀNG ĐƯỢC THỰC HIỆN ZALO CALL**:
+
+- Cột **SỬ DỤNG ZALO** giúp nhận diện trạng thái thuê bao có đăng ký tài khoản Zalo hay không.
+- Nhấn **Thêm mới** để bổ sung liên hệ thủ công, hoặc nhấn **Nhập Excel** để tải lên danh sách bổ sung.
+- **Cơ chế Fallback dự phòng**: Hệ thống cung cấp tùy chọn tự động xử lý khi khách hàng không sử dụng Zalo:
+  > *Bạn có muốn thực hiện Autocall cho các số điện thoại này khi khách hàng không sử dụng Zalo không?*
+  - Chọn **Có** (mặc định khuyến nghị): Hệ thống tự động chuyển các số không dùng Zalo sang cuộc gọi Auto Call truyền thống qua SIP Trunk, đảm bảo mọi khách hàng đều nhận được thông điệp.
+  - Chọn **Không**: Hệ thống chỉ thực hiện cuộc gọi đến các thuê bao đang sử dụng Zalo hợp lệ.
+- Nhấn **TIẾP TỤC**.
+
+![Xem trước danh sách liên hệ và cấu hình Fallback Auto Call](/media/ai-contact-center/user-guider-portal/zalocall_buoc2_xem-truoc.png)
+
+*Kết quả: Danh sách người nhận và phương thức dự phòng được xác nhận.*
+</Step>
+
+<Step>
+### Cấu hình Zalo Token và lịch trình chạy
+
+Tại bước **Thiết lập chung**, khai báo thông số tài khoản Zalo OA và thời gian thực hiện:
+
+![Thiết lập Zalo Token và khung giờ chạy chiến dịch](/media/ai-contact-center/user-guider-portal/zalocall_buoc3_thiet-lap-chung.png)
+
+| Trường | Bắt buộc | Mô tả | Giá trị ví dụ |
+| :--- | :---: | :--- | :--- |
+| **Tên chiến dịch** | Có | Đặt tên gợi nhớ cho chiến dịch | `Chiến dịch CSKH Zalo Tháng 10` |
+| **Chọn Zalo Token** | Có | Chọn Token tài khoản Zalo OA thực hiện cuộc gọi | `OA_DoanhNghiep_Main` |
+| **Tổng đài gọi ra** | Có | Đầu số SIP Trunk dự phòng (dùng khi fallback sang Auto Call) | `CF-BS0000021` |
+| **Thời gian chạy** | Có | Ngày và giờ bắt đầu kích hoạt chiến dịch | `15/10/2026 09:00` |
+| **Khoảng thời gian chạy** | Không | Khung giờ gọi hợp lệ trong ngày. Khuyến nghị **08:00 – 17:00** | `Từ 8 Giờ Đến 17 Giờ` |
+| **Webhook Endpoint** | Không | URL API bên thứ ba nhận kết quả trạng thái cuộc gọi | `https://api.example.com/zalo-webhook` |
+| **Webhook Token Key** | Không | Chuỗi token bảo mật xác thực webhook | `sec_token_xyz123` |
+| **Prefix trước số điện thoại** | Không | Mã tiền tố quay số nếu cần can thiệp | `0` |
+| **Gọi qua Sim GateWay** | Không | Tùy chọn định tuyến cuộc gọi fallback qua SIM Gateway | Bỏ chọn (mặc định) |
+
+Nhấn **TIẾP TỤC** để lưu thông tin dưới dạng bản nháp và chuyển sang cấu hình âm thanh.
+
+*Kết quả: Tài khoản Zalo OA và thông số thời gian được lưu thành công.*
+</Step>
+
+<Step>
+### Thiết lập âm thanh phát cuộc gọi
+
+Tại bước **Âm thanh**, chỉ định thông điệp mà khách hàng sẽ nghe khi bắt máy cuộc gọi Zalo:
+
+![Cấu hình âm thanh phát trong cuộc gọi Zalo](/media/ai-contact-center/user-guider-portal/zalocall_buoc4_am-thanh.png)
+
+| Trường | Bắt buộc | Mô tả |
+| :--- | :---: | :--- |
+| **Âm thanh lời chào** | Có | Tệp âm thanh hoặc kịch bản TTS phát ngay khi khách hàng nhận cuộc gọi Zalo. |
+| **Âm báo sai phím** | Không | Tệp âm thanh phát khi khách hàng nhấn phím không nằm trong kịch bản IVR. |
+
+<Callout type="info" title="Cá nhân hóa lời thoại qua Zalo">
+Hệ thống hỗ trợ cá nhân hóa tự động bằng cách chèn biến danh xưng, họ tên khách hàng vào kịch bản đọc Text to Speech (TTS) lấy từ nguồn danh bạ đã nạp.
+</Callout>
+
+Nhấn vào biểu tượng chiếc loa bên cạnh mỗi tệp âm thanh để nghe thử trước khi nhấn **TIẾP TỤC**.
+
+*Kết quả: Kịch bản âm thanh được gán vào chiến dịch Zalo Call.*
+</Step>
+
+<Step>
+### Cấu hình phản hồi phím bấm (IVR)
+
+Tại bước **Phím bấm**, thiết lập các nhánh rẽ tương tác khi khách hàng nhấn phím trong cuộc gọi:
+
+![Cấu hình phím bấm điều hướng cho cuộc gọi Zalo](/media/ai-contact-center/user-guider-portal/zalocall_buoc5_phim-bam.png)
+
+1. Nhập phím số (`0` đến `9`) vào ô **Phím bấm**.
+2. Chọn hành động tương ứng tại mục **Hành động cho phím**:
+   - **Thông báo**: Phát tiếp một tệp âm thanh thông báo chi tiết.
+   - **Tổng đài viên**: Chuyển cuộc gọi về máy nhánh của tư vấn viên trực.
+   - **Nhóm tổng đài viên**: Đổ chuông nhóm hàng đợi nhân viên hỗ trợ.
+   - **Nghe lại hướng dẫn**: Phát lại tệp âm thanh lời chào từ đầu.
+   - **API**: Kích hoạt webhook gửi dữ liệu tương tác phím về hệ thống nội bộ.
+3. Chọn tệp âm thanh phản hồi tương ứng tại mục **Âm thanh**.
+4. Nhấn biểu tượng dấu **+** nếu cần thiết lập thêm nhiều phím bấm khác.
+5. Nhấn **LƯU** để lưu bản nháp hoặc nhấn **BẮT ĐẦU** để kích hoạt chiến dịch.
+
+*Kết quả: Toàn bộ kịch bản chiến dịch Zalo Call hoàn tất và sẵn sàng vận hành.*
+</Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+Sau khi hoàn tất quá trình thiết lập, mở menu **Chiến dịch** → **Danh sách chiến dịch** để kiểm tra:
+
+- Bản ghi chiến dịch xuất hiện với cột **TÊN DỊCH VỤ** hiển thị nhãn **Zalo Call**.
+- Trạng thái chiến dịch nằm tại tab **Đang chờ gọi** (nếu đặt lịch tương lai) hoặc tab **Đang tiến hành gọi** (nếu kích hoạt ngay).
+- Tại cột **THAO TÁC**, người dùng có thể sử dụng các nút **Tạm dừng**, **Xem chi tiết**, **Sao chép** hoặc **Xóa**.
+- Báo cáo chi tiết chiến dịch phân tách rõ số lượng cuộc gọi thành công qua kênh Zalo OA và số lượng cuộc gọi đã fallback sang Auto Call.
+
+## Xử lý sự cố thường gặp
+
+<Accordions>
+<Accordion title="Danh sách Chọn Zalo Token trống hoặc không hiển thị token">
+- **Nguyên nhân**: Doanh nghiệp chưa kết nối tài khoản Zalo OA với hệ thống, hoặc quyền cấp phép Token Zalo OA đã hết hạn (Access Token hết hiệu lực).
+- **Cách xử lý**: Truy cập menu **Thiết lập nâng cao** → **Tích hợp Zalo OA** để kiểm tra trạng thái liên kết hoặc thực hiện cấp lại quyền truy cập (Re-authorize token).
+</Accordion>
+
+<Accordion title="Khách hàng không nhận được cuộc gọi qua Zalo">
+- **Nguyên nhân**: Thuê bao chưa cài đặt ứng dụng Zalo, tài khoản Zalo bật tính năng chặn cuộc gọi từ người lạ / OA, hoặc thiết bị khách hàng đang mất kết nối Internet.
+- **Cách xử lý**: Luôn tích chọn **Có** tại tùy chọn *Thực hiện Autocall khi khách hàng không sử dụng Zalo* ở Bước 2 để hệ thống tự động quay số qua đầu số SIP Trunk truyền thống.
+</Accordion>
+
+<Accordion title="Không thể chỉnh sửa chiến dịch trước thời gian chạy">
+- **Nguyên nhân**: Hệ thống tự động khóa tính năng chỉnh sửa trước **10 phút** so với lịch chạy dự kiến nhằm chốt danh sách hàng đợi gọi ra.
+- **Cách xử lý**: Nhấn nút **Tạm dừng** hoặc bấm biểu tượng **Sao chép** để tạo chiến dịch mới với thông số đã điều chỉnh.
+</Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Gọi tự động (Auto Call)" href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/thiet-lap-chien-dich/goi-tu-dong-autocall" icon="PhoneCall">
+    Thiết lập chiến dịch phát âm thanh thông báo tự động qua đầu số viễn thông SIP Trunk.
+  </Card>
+  <Card title="Thêm âm thanh" href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/them-am-thanh" icon="Headphones">
+    Quản lý kho file ghi âm lời chào và kịch bản Text to Speech cho chiến dịch.
+  </Card>
+  <Card title="Thêm danh bạ" href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/danh-ba/them-danh-ba" icon="Users">
+    Nhập và đồng bộ danh bạ khách hàng từ file Excel vào hệ thống.
+  </Card>
+  <Card title="Lịch và báo cáo" href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/lich-va-bao-cao" icon="BarChart3">
+    Theo dõi tiến độ, tỷ lệ bắt máy và kết quả gọi ra của từng chiến dịch.
+  </Card>
+</Cards>

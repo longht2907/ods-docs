@@ -1,41 +1,85 @@
 ---
 title: Âm thanh một chiều / rè
-description: Khung xử lý sự cố âm thanh một chiều, chập chờn hoặc bị rè.
+description: Dàn ý chẩn đoán và xử lý case âm thanh một chiều, chập chờn hoặc bị rè.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Dàn ý — chờ bổ sung" type="warn">
+  Mục ghi *(đề xuất)* là gợi ý cần xác nhận. Mục **Cần bổ sung** là thông tin riêng của ODS. Câu hỏi xem tại file câu hỏi TASK-018.
 </Callout>
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Một bên nghe được nhưng bên còn lại không nghe, hoặc mất tiếng sau khi cuộc gọi đã kết nối. *(đề xuất)*
+- Âm thanh bị rè, ngắt quãng, trễ hoặc méo trên một hay cả hai chiều. *(đề xuất)*
+- Lỗi có thể giới hạn ở một thiết bị, một mạng, một chiều gọi, một trunk/nhà mạng hoặc nhiều tenant. *(đề xuất)*
+
+**Cần bổ sung:** Cách ODS phân loại one-way audio, no-audio và degraded audio cùng mức độ tương ứng.
+
+> **[Q-one-way-audio-1]** ODS dùng tiêu chí nào để tách âm thanh một chiều, mất tiếng hoàn toàn và chất lượng thoại kém?
 
 ## Cần hỏi KH
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+- Số gọi, số bị gọi, thời điểm kèm múi giờ và chiều nào không nghe được. *(đề xuất)*
+- Máy nhánh, thiết bị/softphone, headset, loại mạng và vị trí của hai đầu. *(đề xuất)*
+- Lỗi xảy ra với mọi cuộc gọi hay chỉ một số đích, nhà mạng hoặc chiều gọi. *(đề xuất)*
+- Có tái hiện khi đổi thiết bị, headset hoặc mạng; gần đây có thay đổi firewall/NAT không. *(đề xuất)*
+
+**Cần bổ sung:** Bài test âm thanh chuẩn và trường ticket ODS yêu cầu.
+
+> **[Q-one-way-audio-2]** ODS yêu cầu khách hàng thực hiện những bài test nào để xác định chiều và phạm vi lỗi âm thanh?
 
 ## Kiểm tra
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+1. Loại trừ microphone, loa, headset, quyền ứng dụng và chất lượng mạng trên thiết bị khách hàng. *(đề xuất)*
+2. Xác nhận máy nhánh đăng ký đúng contact và không có dấu hiệu NAT/contact bất thường. *(đề xuất)*
+3. Đối chiếu SIP/SDP để kiểm tra địa chỉ media, port và codec hai bên đã thương lượng. *(đề xuất)*
+4. Kiểm tra có luồng RTP theo cả hai chiều, packet loss/jitter và thay đổi đường đi qua trunk/nhà mạng. *(đề xuất)*
+5. Có thể tham khảo `pjsip show endpoints`, `pjsip show contacts`, CDR, log, `sngrep` hoặc RTP debug. *(đề xuất — cần xác nhận công cụ thực tế ODS)*
+
+**Cần bổ sung:** Công cụ xem RTP, quyền capture, codec được hỗ trợ và ngưỡng chất lượng mạng của ODS.
+
+> **[Q-one-way-audio-3]** ODS kiểm tra SIP/SDP và RTP hai chiều bằng công cụ nào, với ngưỡng packet loss/jitter nào?
 
 ## Xử lý
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+- Nếu lỗi do thiết bị/headset/quyền ứng dụng: sửa cấu hình đầu cuối và xác nhận bằng cuộc gọi thử. *(đề xuất)*
+- Nếu contact hoặc NAT sai: chuyển nhóm có quyền để điều chỉnh cấu hình theo chuẩn và kiểm tra lại media hai chiều. *(đề xuất)*
+- Nếu codec không tương thích: dùng codec được hai đầu và chính sách ODS hỗ trợ sau khi được phê duyệt. *(đề xuất)*
+- Nếu RTP mất trên trunk/nhà mạng: giữ capture tối thiểu, xác định chiều mất và chuyển bằng chứng cho nhóm phụ trách. *(đề xuất)*
+
+**Cần bổ sung:** Danh sách codec, quy tắc NAT/media và thao tác L1 được phép thực hiện.
+
+> **[Q-one-way-audio-4]** Codec và mô hình xử lý media nào đang được ODS hỗ trợ cho từng loại endpoint/trunk?
 
 ## Chuyển cấp
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Chuyển cấp khi lỗi ảnh hưởng nhiều tenant, không có RTP ở một chiều sau khi đã loại trừ thiết bị/mạng, hoặc cần thay đổi NAT, codec, firewall hay trunk. *(đề xuất)*
+- Đính kèm thời điểm/múi giờ, số gọi/bị gọi đã xử lý an toàn, Call-ID, chiều mất tiếng, thiết bị/mạng, codec và kết quả kiểm tra. *(đề xuất)*
+- Chỉ gửi log/pcap qua kênh được duyệt và loại bỏ credential hoặc dữ liệu không liên quan. *(đề xuất)*
+
+**Cần bổ sung:** Nhóm nhận chuyển cấp, kênh chung, SLA và chính sách thu thập/chia sẻ RTP capture.
+
+> **[Q-one-way-audio-5]** Case âm thanh được chuyển cho L2, NOC, ISP hay nhà mạng theo điều kiện nào?
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận tình trạng âm thanh bất thường. Anh/chị vui lòng cung cấp hai số, thời điểm, chiều không nghe được và thiết bị/mạng đang sử dụng để đội ngũ kiểm tra. *(đề xuất)*
+
+> **Đã xử lý:** ODS đã hoàn tất bước xử lý luồng âm thanh. Anh/chị vui lòng gọi thử hai chiều và xác nhận chất lượng thoại trên ticket. *(đề xuất)*
+
+**Cần bổ sung:** Mẫu phản hồi và tiêu chí chất lượng thoại được ODS chấp nhận.
+
+> **[Q-one-way-audio-6]** Sau xử lý, ODS dùng bài test hoặc tiêu chí nào để xác nhận âm thanh đã ổn định?
 
 ## Nguyên nhân đã gặp
 
-Chưa có dữ liệu đã xác minh.
+| Ngày | Nguyên nhân | Cách xử lý | Ticket |
+|---|---|---|---|
+| | | | |
+
+**Cần bổ sung:** Chỉ Human điền case thật đã được phép lưu và loại bỏ dữ liệu nhận diện khách hàng.
+
+> **[Q-one-way-audio-7]** Có ticket đã đóng nào phù hợp để tổng hợp nguyên nhân âm thanh mà không chứa dữ liệu bị cấm?
 
 ## Tra cứu liên quan
 
@@ -44,7 +88,12 @@ Chưa có dữ liệu đã xác minh.
 - [Nhà mạng & trunk SIP](/internal/ai-contact-center/knowledge-base/carriers)
 - [Mã lỗi SIP](/internal/ai-contact-center/knowledge-base/sip-codes)
 
+**Cần bổ sung:** Xác nhận có cần thêm trang tra cứu codec, NAT hoặc RTP.
+
+> **[Q-one-way-audio-8]** Runbook âm thanh cần liên kết thêm tài liệu codec, NAT hoặc RTP nào?
+
 ## Cập nhật lần cuối
 
-Chưa cập nhật.
+**Cần bổ sung:** Ngày duyệt gần nhất và vai trò chịu trách nhiệm cập nhật runbook.
 
+> **[Q-common-10]** Vai trò nào phê duyệt và duy trì nội dung Support Wiki?

@@ -1,19 +1,31 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Card as FumadocsCard } from 'fumadocs-ui/components/card';
+import { ImageZoom } from 'fumadocs-ui/components/image-zoom';
 import * as TabsComponents from 'fumadocs-ui/components/tabs';
 import * as StepsComponents from 'fumadocs-ui/components/steps';
 import {
   Activity,
   BarChart3,
   Bot,
+  CircleHelp,
   Clock,
   DollarSign,
+  Download,
   FileText,
   GitFork,
+  Headphones,
   Layers,
+  ListChecks,
+  MessageSquare,
+  Phone,
   PhoneCall,
   PhoneForwarded,
+  Settings,
+  ShieldCheck,
+  Tags,
+  Upload,
   UserCheck,
   Users,
 } from 'lucide-react';
@@ -31,13 +43,23 @@ const cardIcons = {
   Activity,
   BarChart3,
   Bot,
+  CircleHelp,
   Clock,
   DollarSign,
+  Download,
   FileText,
   GitFork,
+  Headphones,
   Layers,
+  ListChecks,
+  MessageSquare,
+  Phone,
   PhoneCall,
   PhoneForwarded,
+  Settings,
+  ShieldCheck,
+  Tags,
+  Upload,
   UserCheck,
   Users,
 };
@@ -58,6 +80,9 @@ export function getMDXComponents(components?: MDXComponents) {
     ...defaultMdxComponents,
     ...TabsComponents,
     ...StepsComponents,
+    Accordion,
+    Accordions,
+    img: (props) => <ImageZoom {...(props as any)} />,
     Callout,
     Card,
     ApiReferenceLayout,

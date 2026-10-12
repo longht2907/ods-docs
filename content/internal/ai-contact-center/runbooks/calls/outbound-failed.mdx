@@ -1,41 +1,85 @@
 ---
 title: Không gọi ra được
-description: Khung xử lý sự cố khách hàng không thực hiện được cuộc gọi ra.
+description: Dàn ý chẩn đoán và xử lý case máy nhánh không thực hiện được cuộc gọi ra.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Dàn ý — chờ bổ sung" type="warn">
+  Mục ghi *(đề xuất)* là gợi ý cần xác nhận. Mục **Cần bổ sung** là thông tin riêng của ODS. Câu hỏi xem tại file câu hỏi TASK-018.
 </Callout>
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Khách hàng báo bấm gọi nhưng cuộc gọi không thiết lập, bị ngắt ngay hoặc nghe thông báo lỗi. *(đề xuất)*
+- Sự cố có thể chỉ xảy ra với một máy nhánh, một nhóm số đích, một tenant hoặc toàn bộ cuộc gọi ra. *(đề xuất)*
+- Ghi nhận mã SIP, thông báo trên softphone/IP phone hoặc tín hiệu thoại nếu người dùng nhìn thấy hay nghe được. *(đề xuất)*
+
+**Cần bổ sung:** Cách ODS phân loại phạm vi ảnh hưởng và mức độ P1–P4 cho sự cố gọi ra.
+
+> **[Q-outbound-failed-1]** Dấu hiệu hoặc mã lỗi nào thường được ODS dùng để xác nhận case “không gọi ra được”?
 
 ## Cần hỏi KH
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+- Máy nhánh hoặc tài khoản thực hiện cuộc gọi; không ghi credential. *(đề xuất)*
+- Số bị gọi, thời điểm xảy ra kèm múi giờ và kết quả nghe/nhìn thấy. *(đề xuất)*
+- Lỗi xảy ra với mọi số hay chỉ một đầu số, nhà mạng hoặc loại đích. *(đề xuất)*
+- Có tái hiện được không; thiết bị, softphone, mạng truy cập và thay đổi gần nhất là gì. *(đề xuất)*
+
+**Cần bổ sung:** Các trường bắt buộc trên ticket và quy tắc che/mã hóa số điện thoại khi ghi nhận case.
+
+> **[Q-outbound-failed-2]** Ngoài số gọi, số bị gọi và thời điểm, ODS yêu cầu khách hàng cung cấp thêm dữ liệu nào cho case gọi ra?
 
 ## Kiểm tra
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+1. Xác nhận thiết bị có mạng ổn định, đúng tài khoản và máy nhánh đang đăng ký. *(đề xuất)*
+2. Đối chiếu quyền gọi ra, định dạng số và rule định tuyến phù hợp với loại số đích. *(đề xuất)*
+3. Tìm CDR hoặc log theo thời điểm và hai số để xác định cuộc gọi có vào hệ thống hay không. *(đề xuất)*
+4. Kiểm tra trạng thái trunk và phản hồi SIP trước khi kết luận lỗi thuộc nhà mạng. *(đề xuất)*
+5. Có thể tham khảo `pjsip show endpoints`, `pjsip show contacts`, CDR, log, `sngrep` hoặc RTP debug. *(đề xuất — cần xác nhận công cụ thực tế ODS)*
+
+**Cần bổ sung:** Tên hệ thống nội bộ, đường dẫn tra cứu và phạm vi lệnh/công cụ L1, L2 được phép dùng.
+
+> **[Q-outbound-failed-3]** ODS kiểm tra quyền gọi ra, outbound route, CDR và trạng thái trunk tại công cụ nào, theo thứ tự nào?
 
 ## Xử lý
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+- Nếu chỉ một thiết bị mất đăng ký: xử lý kết nối hoặc cấu hình thiết bị theo quy trình đã duyệt, rồi gọi thử lại. *(đề xuất)*
+- Nếu số sai định dạng hoặc không khớp rule: chuẩn hóa số hoặc điều chỉnh rule sau khi có phê duyệt thay đổi. *(đề xuất)*
+- Nếu máy nhánh thiếu quyền: cấp đúng quyền theo yêu cầu đã được xác minh, không mở rộng ngoài phạm vi cần thiết. *(đề xuất)*
+- Nếu trunk hoặc nhà mạng từ chối: lưu mã SIP, Call-ID và chuyển đúng nhóm phụ trách thay vì thử thay đổi lặp lại. *(đề xuất)*
+
+**Cần bổ sung:** Thao tác nào L1 được tự thực hiện, thao tác nào cần L2 hoặc phê duyệt thay đổi.
+
+> **[Q-outbound-failed-4]** Với từng nguyên nhân thường gặp, ODS cho phép L1 xử lý trực tiếp đến bước nào?
 
 ## Chuyển cấp
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Chuyển cấp khi lỗi ảnh hưởng nhiều tenant, toàn bộ cuộc gọi ra, trunk không sẵn sàng hoặc đã hết checklist L1 nhưng chưa xác định được nguyên nhân. *(đề xuất)*
+- Đính kèm ticket, thời điểm kèm múi giờ, số gọi/bị gọi đã xử lý an toàn, Call-ID, mã SIP, phạm vi ảnh hưởng và các bước đã thử. *(đề xuất)*
+- Chỉ đính kèm log/pcap đã loại bỏ credential và dữ liệu không liên quan. *(đề xuất)*
+
+**Cần bổ sung:** Nhóm nhận chuyển cấp, kênh chung, SLA và quy tắc thu thập/chia sẻ log hoặc pcap của ODS.
+
+> **[Q-outbound-failed-5]** Case gọi ra được chuyển cho L2, NOC hay vendor trong từng điều kiện nào?
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận tình trạng không gọi ra được. Anh/chị vui lòng cung cấp máy nhánh, số đích, thời điểm xảy ra và thông báo lỗi để đội ngũ kiểm tra. *(đề xuất)*
+
+> **Đã xử lý:** ODS đã hoàn tất bước xử lý và kiểm tra lại luồng gọi ra. Anh/chị vui lòng thực hiện một cuộc gọi thử và phản hồi kết quả trên ticket. *(đề xuất)*
+
+**Cần bổ sung:** Cách xưng hô, tên thương hiệu và trạng thái ticket chuẩn trong mẫu phản hồi của ODS.
+
+> **[Q-outbound-failed-6]** ODS có mẫu tiếp nhận và mẫu xác nhận xử lý chuẩn nào cho sự cố gọi ra?
 
 ## Nguyên nhân đã gặp
 
-Chưa có dữ liệu đã xác minh.
+| Ngày | Nguyên nhân | Cách xử lý | Ticket |
+|---|---|---|---|
+| | | | |
+
+**Cần bổ sung:** Chỉ Human điền case thật đã được phép lưu và loại bỏ dữ liệu nhận diện khách hàng.
+
+> **[Q-outbound-failed-7]** Có những ticket đã đóng nào có thể dùng để tổng hợp nguyên nhân gọi ra thất bại mà không chứa dữ liệu bị cấm?
 
 ## Tra cứu liên quan
 
@@ -44,7 +88,12 @@ Chưa có dữ liệu đã xác minh.
 - [Nhà mạng & trunk SIP](/internal/ai-contact-center/knowledge-base/carriers)
 - [Mã lỗi SIP](/internal/ai-contact-center/knowledge-base/sip-codes)
 
+**Cần bổ sung:** Xác nhận bốn trang trên đã đủ cho luồng gọi ra hay cần thêm tài liệu nội bộ khác.
+
+> **[Q-outbound-failed-8]** Runbook gọi ra cần liên kết thêm trang tra cứu nào?
+
 ## Cập nhật lần cuối
 
-Chưa cập nhật.
+**Cần bổ sung:** Ngày duyệt gần nhất và vai trò chịu trách nhiệm cập nhật runbook.
 
+> **[Q-common-10]** Vai trò nào phê duyệt và duy trì nội dung Support Wiki?

@@ -1,8 +1,80 @@
 ---
 title: "Thiết lập tích hợp đa kênh"
-description: "Hướng dẫn kết nối tổng đài với các kênh tương tác Zalo Official Account và Facebook Messenger."
+description: "Tổng quan kết nối và quản lý các kênh tương tác Zalo Official Account và Facebook Messenger trên ODS AI Contact Center."
 ---
 
-# Thiết lập tích hợp đa kênh
+Tính năng **Tích hợp đa kênh** cho phép kết nối các kênh mạng xã hội phổ biến với hệ thống ODS AI Contact Center, hợp nhất toàn bộ tương tác của khách hàng về một màn hình làm việc tập trung mà không cần chuyển đổi giữa nhiều ứng dụng.
 
-Hướng dẫn kết nối tổng đài với các kênh tương tác Zalo Official Account và Facebook Messenger.
+<Callout type="info" title="Trước khi bắt đầu">
+- Tài khoản người dùng có quyền quản trị cấp cao trong hệ thống ODS.
+- Bạn sở hữu quyền Quản trị viên (Admin) đối với trang **Zalo Official Account** hoặc **Fanpage Facebook** cần kết nối.
+- Các cấu hình tích hợp đa kênh được quản lý tập trung tại menu **Thiết lập nâng cao** trên ODS Portal.
+</Callout>
+
+## Các kênh tương tác hỗ trợ
+
+Hệ thống ODS AI Contact Center hiện hỗ trợ tích hợp chính thức 2 kênh tương tác mạng xã hội:
+
+| Kênh tương tác | Phương thức kết nối | Năng lực xử lý | Vị trí cấu hình trên Portal |
+| :--- | :--- | :--- | :--- |
+| **Zalo Official Account (Zalo OA)** | Zalo Open API & App ủy quyền ODS | Tiếp nhận và gửi tin nhắn tư vấn, gửi thông báo chăm sóc khách hàng, đồng bộ thông tin định danh Zalo | **Thiết lập nâng cao** → **Thiết lập Zalo Token** |
+| **Facebook Messenger** | Messenger Platform (Graph API & Webhooks) | Nhận và phản hồi tin nhắn Fanpage trực tiếp, gửi tệp đính kèm và hình ảnh, phân phối tin nhắn đến nhân viên | **Thiết lập nâng cao** → **Tích hợp Facebook** |
+
+![Giao diện quản lý tích hợp đa kênh trên ODS Portal](/media/ai-contact-center/user-guider-portal/tich-hop-da-kenh_tong-quan-portal.png)
+
+## Lợi ích khi vận hành đa kênh trên ODS
+
+Hợp nhất các kênh tương tác mạng xã hội vào ODS mang lại trải nghiệm liền mạch cho cả nhân viên và khách hàng:
+
+- **Hộp thư hợp nhất (Omnichannel Inbox):** Toàn bộ tin nhắn từ Zalo OA và Facebook Messenger tự động đổ về phân hệ **Tin nhắn** (`/chat`), giúp nhân viên tiếp nhận và phản hồi nhanh chóng mà không bỏ sót khách hàng.
+- **Hồ sơ khách hàng 360 độ:** Dữ liệu tương tác được lưu trữ tập trung. Quản trị viên và nhân viên có thể sử dụng tính năng **Hợp nhất thông tin khách hàng** để gộp phiên nhắn tin Zalo, Messenger và cuộc gọi hotline của cùng một khách hàng vào một hồ sơ duy nhất.
+- **Chuyển đổi kênh linh hoạt:** Nhân viên có thể vừa nhắn tin tư vấn vừa kích hoạt tính năng **Click-to-Call** để gọi điện trực tiếp cho khách hàng qua máy nhánh tổng đài ODS khi cần trao đổi nhanh.
+
+## Quy trình kết nối tổng quan
+
+Quá trình thiết lập một kênh tương tác mới được thực hiện qua các bước chuẩn:
+
+<Steps>
+  <Step title="Truy cập trang quản lý tích hợp">
+    Từ thanh điều hướng bên trái của Portal, mở menu **Thiết lập nâng cao**, sau đó chọn **Thiết lập Zalo Token** hoặc **Tích hợp Facebook** tùy theo kênh cần kết nối.
+  </Step>
+
+  <Step title="Ủy quyền ứng dụng">
+    Nhấp nút **Thêm mới Zalo** hoặc **Thêm mới Fanpage**, sau đó đăng nhập tài khoản quản trị mạng xã hội và chấp thuận các quyền truy cập tin nhắn cho ứng dụng ODS.
+  </Step>
+
+  <Step title="Kiểm tra và kích hoạt">
+    Sau khi ủy quyền thành công, trang quản trị hiển thị trạng thái hoạt động của kênh. Các tin nhắn mới phát sinh sẽ lập tức đồng bộ về phân hệ **Tin nhắn**.
+  </Step>
+</Steps>
+
+## Hướng dẫn chi tiết từng kênh
+
+Chọn tài liệu hướng dẫn cụ thể theo từng nền tảng để bắt đầu cấu hình:
+
+<Cards>
+  <Card
+    icon="MessageSquare"
+    title="Hướng dẫn tích hợp Zalo OA"
+    description="Chi tiết các bước cấp quyền ứng dụng ODS và kết nối tài khoản Zalo Official Account."
+    href="/docs/ai-contact-center/user-guider-portal/08-tich-hop-da-kenh/tich-hop-zalo-oa"
+  />
+  <Card
+    icon="MessageSquare"
+    title="Hướng dẫn tích hợp Facebook Messenger"
+    description="Kết nối Fanpage Facebook với ODS qua Graph API và thiết lập phân luồng tin nhắn tự động."
+    href="/docs/ai-contact-center/user-guider-portal/08-tich-hop-da-kenh/tich-hop-facebook-messenger"
+  />
+  <Card
+    icon="MessageSquare"
+    title="Quản lý hội thoại tin nhắn và cuộc gọi"
+    description="Hướng dẫn nhân viên tiếp nhận, phản hồi tin nhắn và tra cứu hồ sơ khách hàng trên giao diện tương tác."
+    href="/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/quan-ly-tin-nhan-cuoc-goi"
+  />
+  <Card
+    icon="Users"
+    title="Hợp nhất thông tin khách hàng"
+    description="Gộp các phiên hội thoại và hồ sơ trùng lặp từ nhiều kênh liên lạc vào một hồ sơ 360 độ duy nhất."
+    href="/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/hop-nhat-thong-tin-khach-hang"
+  />
+</Cards>

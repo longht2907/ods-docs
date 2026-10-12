@@ -1,6 +1,192 @@
 ---
 title: "Thêm danh bạ"
-description: "Hướng dẫn tạo và nhập dữ liệu danh bạ khách hàng cho chiến dịch."
+description: "Hướng dẫn thêm mới khách hàng vào danh bạ tổng đài thủ công hoặc từ file Excel, thiết lập tên gợi nhớ và danh xưng cho chiến dịch cá nhân hóa."
 ---
 
-Tạo mới và quản lý danh bạ khách hàng phục vụ các chiến dịch gọi tự động.
+Quản lý **Danh bạ** là bước chuẩn bị dữ liệu đầu vào cốt lõi cho các chiến dịch cuộc gọi tự động trên ODS AI Contact Center. Việc thiết lập chính xác số điện thoại, tên gợi nhớ và danh xưng giúp tối ưu hóa khả năng tìm kiếm khi gom nhóm cũng như đảm bảo tính năng cá nhân hóa lời thoại vận hành chuẩn xác.
+
+<Callout type="info" title="Trước khi bắt đầu">
+- **Quyền hạn tài khoản:** Người dùng cần quyền Quản trị viên (Admin) hoặc nhân sự quản lý chiến dịch được phân quyền quản lý danh bạ.
+- **Vị trí menu:** Điều hướng theo đường dẫn **Chiến dịch** → **Danh bạ** trên Cổng quản trị [app.ods.vn](https://app.ods.vn).
+- **Chuẩn bị dữ liệu:** Danh sách số điện thoại khách hàng, danh xưng (Ông/Bà/Anh/Chị) và tệp dữ liệu Excel (nếu nhập hàng loạt).
+</Callout>
+
+## Tổng quan giao diện quản lý danh bạ
+
+Màn hình **Danh sách danh bạ** quản lý toàn bộ các liên hệ khách hàng dùng chung cho các chiến dịch gọi ra.
+
+![Giao diện danh sách danh bạ trên Portal ODS](/media/ai-contact-center/user-guider-portal/danh-ba_danh-sach.png)
+
+Các chức năng và cột dữ liệu chính trên bảng:
+
+| Thành phần | Chức năng chi tiết |
+| :--- | :--- |
+| **THÊM DANH BẠ** | Mở biểu mẫu tạo mới liên hệ khách hàng thủ công. |
+| **NHẬP EXCEL** | Tải lên danh sách khách hàng hàng loạt từ tệp bảng tính. |
+| **XÓA TOÀN BỘ DANH BẠ** | Xóa sạch toàn bộ danh bạ hiện có (cần xác nhận cẩn trọng). |
+| **Thanh tìm kiếm & Xuất excel** | Tra cứu liên hệ theo từ khóa Tên gợi nhớ/SĐT và xuất dữ liệu ra file Excel. |
+| **Cột TÊN GỢI NHỚ** | Tên hiển thị giúp phân loại và tìm kiếm nhanh khi gán vào nhóm danh bạ. |
+| **Cột DANH XƯNG & TÊN** | Dữ liệu nguồn để hệ thống AI đọc lời chào cá nhân hóa cho từng khách hàng. |
+| **Cột THAO TÁC** | Chỉnh sửa thông tin liên hệ hoặc xóa từng khách hàng khỏi danh bạ. |
+
+## Thêm danh bạ thủ công
+
+Phương thức nhập thủ công phù hợp khi bạn cần bổ sung từng khách hàng đơn lẻ hoặc cập nhật nhanh thông tin người nhận.
+
+<Steps>
+<Step>
+### Mở biểu mẫu thêm danh bạ
+
+Tại màn hình **Danh sách danh bạ**, nhấn nút **THÊM DANH BẠ** màu xanh lá ở góc trên bên phải để mở cửa sổ nhập liệu.
+
+*Kết quả: Modal Thêm danh bạ hiển thị các trường thông tin khách hàng.*
+</Step>
+
+<Step>
+### Khai báo thông tin liên hệ và cá nhân hóa
+
+Điền các thông tin của khách hàng vào các trường trong biểu mẫu. Lưu ý nhập đầy đủ các trường có dấu sao đỏ (`*`).
+
+![Biểu mẫu thêm mới danh bạ thủ công trên Portal ODS](/media/ai-contact-center/user-guider-portal/danh-ba_them-thu-cong.png)
+
+Bảng chi tiết các trường nhập liệu:
+
+| Trường thông tin | Bắt buộc | Mô tả chi tiết | Ví dụ mẫu |
+| :--- | :---: | :--- | :--- |
+| **Tên hiển thị** | Có (`*`) | Tên gợi nhớ đại diện cho liên hệ, dùng để hiển thị và tìm kiếm nhanh khi gom nhóm danh bạ. | `Anh Tuan_VIP_Q1` |
+| **Số điện thoại** | Có (`*`) | Số thuê bao di động hoặc cố định nhận cuộc gọi trong chiến dịch. | `0901234567` |
+| **Danh xưng** | Có (`*`) | Lựa chọn từ danh sách: **Ông**, **Bà**, **Anh**, **Chị** phục vụ kịch bản cá nhân hóa. | `Anh` |
+| **Tên** | Không | Tên riêng của khách hàng để AI ghép vào câu thoại xưng hô. | `Tuấn` |
+| **Họ và tên đệm** | Không | Họ và tên đệm đầy đủ của khách hàng. | `Nguyễn Văn` |
+| **Email** | Không | Địa chỉ hòm thư điện tử liên hệ. | `tuan.nguyen@example.com` |
+| **Công ty / Bộ phận** | Không | Tên doanh nghiệp hoặc phòng ban công tác của khách hàng. | `Công ty ABC` |
+
+*Kết quả: Biểu mẫu được điền đầy đủ và sẵn sàng ghi nhận.*
+</Step>
+
+<Step>
+### Lưu thông tin vào hệ thống
+
+Nhấn nút **THÊM MỚI** màu xanh lá ở cuối biểu mẫu để hoàn tất tạo liên hệ.
+
+*Kết quả: Hệ thống hiển thị thông báo thành công và liên hệ mới xuất hiện ngay trên đầu danh sách danh bạ.*
+</Step>
+</Steps>
+
+<Callout type="tip" title="Lưu ý về Tên gợi nhớ và Cá nhân hóa cuộc gọi">
+- **Tên hiển thị (Tên gợi nhớ):** Nên đặt theo quy ước kèm đặc điểm nhận diện (ví dụ: `[Tên]_[Phân khúc]_[Khu vực]`). Khi tạo **Nhóm danh bạ** cho chiến dịch, bạn chỉ cần gõ từ khóa này vào ô tìm kiếm là có thể tích chọn hàng loạt liên hệ cực kỳ nhanh chóng.
+- **Danh xưng & Tên:** Trong chiến dịch Auto Call có cấu hình âm thanh cá nhân hóa, hệ thống Text to Speech sẽ tự động trích xuất: `"Kính chào [Danh xưng] [Tên]..."` (ví dụ: *"Kính chào Anh Tuấn..."*). Nếu thiếu hai trường này, hệ thống sẽ phát âm thanh mặc định không cá nhân hóa.
+</Callout>
+
+## Nhập danh bạ từ tệp Excel
+
+Phương thức nhập từ Excel giúp đưa hàng trăm hoặc hàng ngàn số điện thoại vào hệ thống cùng lúc chỉ trong vài giây.
+
+<Steps>
+<Step>
+### Mở giao diện nhập tệp Excel
+
+Trên thanh công cụ phía trên bảng danh sách, nhấn nút **NHẬP EXCEL** màu xanh dương.
+
+![Cửa sổ nhập dữ liệu Excel danh bạ trên Portal ODS](/media/ai-contact-center/user-guider-portal/danh-ba_nhap-excel.png)
+
+*Kết quả: Modal Nhập dữ liệu Excel danh sách danh bạ xuất hiện.*
+</Step>
+
+<Step>
+### Tải xuống và hoàn thiện tệp mẫu
+
+Nhấn vào dòng liên kết **Tải xuống tệp mẫu? Tải ngay** để tải file mẫu định dạng Excel về máy tính. Mở tệp và nhập danh sách khách hàng theo đúng cấu trúc cột quy định.
+
+Cấu trúc các cột chuẩn trong tệp Excel:
+
+| Cột dữ liệu | Bắt buộc | Quy tắc định dạng |
+| :--- | :---: | :--- |
+| **Tên hiển thị** | Có | Chuỗi ký tự tên gợi nhớ, không chứa ký tự đặc biệt lạ. |
+| **Số điện thoại** | Có | Định dạng 10 số (ví dụ: `0901234567` hoặc `84901234567`). |
+| **Danh xưng** | Có | Điền chính xác một trong các giá trị: `Ông`, `Bà`, `Anh`, `Chị`. |
+| **Tên** | Khuyến nghị | Tên riêng khách hàng viết đúng chính tả tiếng Việt để đọc chuẩn Text to Speech. |
+| **Họ và tên đệm** | Tùy chọn | Họ và tên đệm của khách hàng. |
+| **Công ty / Email** | Tùy chọn | Thông tin bổ trợ quản lý. |
+
+*Kết quả: File bảng tính được lưu dưới định dạng `.xlsx`, `.xls` hoặc `.csv`.*
+</Step>
+
+<Step>
+### Tải tệp lên hệ thống
+
+Kéo thả tệp dữ liệu vào khung **Thả tệp vào đây hoặc nhấn vào để thêm mới**, sau đó nhấn nút **TẢI LÊN** màu xanh lá.
+
+*Kết quả: Hệ thống tiếp nhận và đồng bộ danh sách khách hàng vào bảng danh bạ trung tâm.*
+</Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+Sau khi hoàn tất thao tác thêm thủ công hoặc nhập file:
+
+- Bảng **Danh sách danh bạ** hiển thị đầy đủ các dòng liên hệ mới được cập nhật.
+- Cột **TÊN GỢI NHỚ**, **SỐ ĐIỆN THOẠI**, **DANH XƯNG** và **TÊN** thể hiện đúng dữ liệu đã khai báo.
+- Nhập từ khóa Tên gợi nhớ vào ô tìm kiếm phía trên để xác nhận tính năng lọc hoạt động tức thời.
+
+## Xử lý sự cố thường gặp
+
+<Accordions>
+<Accordion title="Báo lỗi trùng số điện thoại khi thêm mới">
+**Nguyên nhân:**
+- Số điện thoại khách hàng đã tồn tại trong danh bạ trước đó.
+
+**Cách xử lý:**
+1. Nhập số điện thoại vào thanh tìm kiếm để kiểm tra liên hệ đã có trên hệ thống.
+2. Nhấn biểu tượng cây bút tại cột **Thao tác** để cập nhật thông tin thay vì tạo mới trùng lặp.
+</Accordion>
+
+<Accordion title="Tải tệp Excel lên thất bại hoặc báo sai cấu trúc">
+**Nguyên nhân:**
+- Tệp tải lên chưa đúng định dạng hỗ trợ (`.xlsx`, `.xls`, `.csv`) hoặc đã sửa đổi tiêu đề dòng đầu tiên của file mẫu.
+- Số điện thoại bị thiếu số 0 ở đầu do phần mềm bảng tính tự động cắt bỏ định dạng số.
+
+**Cách xử lý:**
+1. Nhấn **Tải ngay** để lấy lại file mẫu gốc và dán dữ liệu vào đúng vị trí.
+2. Định dạng cột Số điện thoại trong Excel dưới dạng văn bản (`Text`) để giữ nguyên số 0 ở đầu.
+</Accordion>
+
+<Accordion title="Cuộc gọi cá nhân hóa phát âm sai hoặc không đọc danh xưng">
+**Nguyên nhân:**
+- Trường Danh xưng bị bỏ trống hoặc nhập sai giá trị chuẩn (ví dụ gõ "anh." có dấu chấm hoặc viết thường).
+- Cột Tên chứa ký tự viết tắt hoặc ký tự đặc biệt lạ khiến bộ máy Text to Speech không đọc được.
+
+**Cách xử lý:**
+1. Kiểm tra lại danh bạ, đảm bảo Danh xưng được chọn đúng từ danh mục hệ thống (**Ông**, **Bà**, **Anh**, **Chị**).
+2. Viết hoa chuẩn tên riêng tiếng Việt có dấu để giọng đọc AI phát âm tự nhiên nhất.
+</Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    title="Thêm nhóm danh bạ"
+    description="Hướng dẫn tạo nhóm khách hàng và sử dụng tên gợi nhớ để gom nhóm phục vụ chiến dịch."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/danh-ba/them-nhom-danh-ba"
+    icon="Users"
+  />
+  <Card
+    title="Thêm âm thanh"
+    description="Chuẩn bị tệp ghi âm hoặc thiết lập kịch bản đọc văn bản Text to Speech cá nhân hóa."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/them-am-thanh"
+    icon="Headphones"
+  />
+  <Card
+    title="Tạo chiến dịch"
+    description="Bắt đầu khởi tạo chiến dịch cuộc gọi mới từ danh sách quản lý."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/tao-chien-dich"
+    icon="PhoneCall"
+  />
+  <Card
+    title="Gọi tự động (AutoCall)"
+    description="Cấu hình quy trình 5 bước chiến dịch Auto Call gán nguồn từ danh bạ và nhóm."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/thiet-lap-chien-dich/goi-tu-dong-autocall"
+    icon="PhoneForwarded"
+  />
+</Cards>

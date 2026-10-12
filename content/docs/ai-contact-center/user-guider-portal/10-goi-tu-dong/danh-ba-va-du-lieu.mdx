@@ -1,14 +1,31 @@
 ---
 title: "Danh bạ và dữ liệu"
-description: "Khung hướng dẫn chuẩn bị danh bạ và dữ liệu đầu vào cho chiến dịch Autocall."
+description: "Tổng quan phân hệ quản lý danh bạ khách hàng và nhóm danh bạ phục vụ chiến dịch cuộc gọi."
 ---
 
-Dữ liệu đầu vào cần được kiểm tra trước khi gắn với chiến dịch để hạn chế bản ghi thiếu thông tin hoặc không phù hợp với mục tiêu vận hành. Định dạng file và các trường bắt buộc sẽ được bổ sung khi có đặc tả chính thức.
+Phân hệ **Danh bạ và dữ liệu** quản lý nguồn thông tin người nhận cuộc gọi, đảm bảo các chiến dịch tiếp cận đúng danh sách khách hàng mục tiêu. Dữ liệu chuẩn xác về số điện thoại, danh xưng và họ tên là điều kiện tiên quyết để kịch bản gọi tự động vận hành hiệu quả.
 
-Các bước chuẩn bị gồm:
+Hệ thống AI Contact Center hỗ trợ hai nguồn danh bạ chính:
 
-- Xác định nguồn và phạm vi dữ liệu sử dụng.
-- Rà soát tính đầy đủ của thông tin liên hệ.
-- Đối chiếu dữ liệu với chiến dịch trước khi lập lịch.
+- **Danh bạ tổng đài**: Tập dữ liệu khách hàng dùng chung trên toàn bộ hệ thống tổng đài.
+- **Danh bạ chiến dịch**: Danh sách khách hàng được phân loại hoặc tải lên riêng cho từng đợt chiến dịch cụ thể.
 
-Đối với luồng tích hợp, xem [API Autocall](/docs/ai-contact-center/api/autocall).
+> [!NOTE]
+> Khi tạo chiến dịch Auto Call, hệ thống cho phép chọn song song cả hai nguồn **Danh bạ tổng đài** và **Danh bạ chiến dịch** để gộp danh sách người nhận trong cùng một đợt phát cuộc gọi.
+
+## Các tác vụ quản lý danh bạ
+
+Lựa chọn hướng dẫn thao tác chi tiết theo nhu cầu:
+
+<Cards>
+  <Card
+    title="Thêm danh bạ"
+    description="Hướng dẫn tạo mới khách hàng thủ công hoặc nhập dữ liệu hàng loạt từ tệp Excel."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/danh-ba/them-danh-ba"
+  />
+  <Card
+    title="Thêm nhóm danh bạ"
+    description="Hướng dẫn tạo nhóm khách hàng và gán các liên hệ theo tiêu chí phân loại chiến dịch."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/danh-ba/them-nhom-danh-ba"
+  />
+</Cards>

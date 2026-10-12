@@ -1,14 +1,32 @@
 ---
 title: "Lịch chạy và báo cáo"
-description: "Khung hướng dẫn lập lịch, theo dõi và đọc báo cáo chiến dịch Autocall."
+description: "Khung thông tin về lập lịch phát cuộc gọi và theo dõi tiến độ chiến dịch Auto Call."
 ---
 
-Lịch chạy xác định thời điểm chiến dịch được vận hành; báo cáo giúp đội ngũ theo dõi tiến độ và kết quả sau khi chiến dịch thực thi. Các chỉ số và trạng thái cụ thể sẽ được bổ sung khi có đặc tả nghiệp vụ chính thức.
+## Tổng quan lịch chạy và báo cáo
 
-Quy trình theo dõi gồm:
+Phân hệ **Lịch chạy và báo cáo** đóng vai trò điều phối thời điểm khởi phát các cuộc gọi tự động và theo dõi hiệu suất thực thi của từng chiến dịch Auto Call trên hệ thống ODS AI Contact Center.
 
-- Kiểm tra phạm vi dữ liệu trước thời điểm chạy.
-- Theo dõi trạng thái vận hành của chiến dịch.
-- Tổng hợp kết quả và các trường hợp cần xử lý tiếp.
+Sau khi người dùng hoàn thành quy trình thiết lập 5 bước, chiến dịch sẽ tự động được xếp vào danh sách quản lý để chuẩn bị quay số theo đúng khung giờ phát đã cấu hình (khuyến nghị từ 08:00 – 17:00).
 
-Đối với luồng tích hợp, xem [API Autocall](/docs/ai-contact-center/api/autocall).
+## Trạng thái vận hành chiến dịch
+
+Hệ thống quản lý trạng thái chiến dịch trên danh sách như sau:
+
+- **Đang chờ gọi**: Trạng thái mặc định của chiến dịch ngay sau khi hoàn tất thiết lập, biểu thị chiến dịch đã sẵn sàng trong hàng đợi và sẽ tự động kích hoạt khi đến khung giờ phát đã định.
+
+## Giới hạn tài liệu và các nội dung đang hoàn thiện
+
+> [!NOTE]
+> Tài liệu hướng dẫn thiết lập tính năng Auto Call hiện tại chỉ tập trung vào quy trình khởi tạo kịch bản gọi tự động. Các chức năng nâng cao và báo cáo chi tiết dưới đây chưa có trong tài liệu và sẽ được cập nhật sau khi có đặc tả chính thức từ đội ngũ sản phẩm:
+>
+> - **Báo cáo chi tiết chiến dịch**: Thống kê số lượng cuộc gọi thành công, tỷ lệ bắt máy, thời lượng trung bình và kết quả tương tác phím bấm.
+> - **Điều khiển chiến dịch**: Thao tác tạm dừng (Pause), tiếp tục (Resume) hoặc hủy bỏ (Stop) chiến dịch đang chạy.
+> - **Cơ chế gọi lại (Retry)**: Quy tắc tự động quay số lại đối với các cuộc gọi bận máy, không nhấc máy hoặc lỗi mạng.
+> - **Cấu hình kênh đồng thời**: Thiết lập số lượng cuộc gọi phát ra cùng một thời điểm dựa trên năng lực đường truyền của đầu số.
+> - **Các trạng thái chiến dịch khác**: Các trạng thái chi tiết ngoài danh mục "Đang chờ gọi" (như Đang chạy, Đã hoàn thành, Tạm dừng).
+
+## Xem thêm
+
+- [Thiết lập Auto Call](/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/thiet-lap-chien-dich/goi-tu-dong-autocall) — Hoàn tất cấu hình 5 bước chiến dịch Auto Call.
+- [Tạo chiến dịch](/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/tao-chien-dich) — Quản lý danh sách và khởi tạo chiến dịch mới.

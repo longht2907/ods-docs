@@ -1,64 +1,183 @@
 ---
 title: "Thêm âm thanh"
-description: "Hướng dẫn tải lên tệp ghi âm có sẵn hoặc chuyển đổi văn bản thành giọng nói (Text to Speech) cho chiến dịch."
+description: "Hướng dẫn tải lên tệp âm thanh hoặc tạo lời thoại Text to Speech và cấu hình chuỗi âm thanh cá nhân hóa cho chiến dịch Auto Call trên ODS."
 ---
 
-## Mục tiêu
+Phân hệ **Âm thanh** trên ODS AI Contact Center cho phép chuẩn bị và quản lý thư viện lời thoại phát tự động cho các chiến dịch cuộc gọi. Doanh nghiệp có thể tải lên tệp ghi âm có sẵn, sử dụng công nghệ chuyển văn bản thành giọng nói (Text to Speech), hoặc ghép nối nhiều đoạn để tạo thành kịch bản thoại cá nhân hóa theo từng khách hàng.
 
-Bài viết này hướng dẫn bạn chuẩn bị và khởi tạo các tệp âm thanh để phát tự động cho khách hàng khi kết nối cuộc gọi trong chiến dịch Auto Call.
+<Callout type="info" title="Trước khi bắt đầu">
+- **Quyền hạn tài khoản:** Người dùng cần quyền Quản trị viên (Admin) hoặc nhân sự quản lý chiến dịch được phân quyền trên tổng đài.
+- **Vị trí menu:** Điều hướng theo đường dẫn **Chiến dịch** → **Âm thanh** trên Cổng quản trị [app.ods.vn](https://app.ods.vn).
+- **Chuẩn bị tệp âm thanh:** File ghi âm định dạng `.mp3` hoặc `.wav`, hoặc kịch bản văn bản tiếng Việt có dấu hoàn chỉnh.
+</Callout>
 
-## Điều kiện cần
+## Tổng quan thư viện âm thanh
 
-Trước khi thực hiện, đảm bảo bạn đã:
+Màn hình **Âm thanh** tập trung toàn bộ các tệp lời thoại đã tạo trên hệ thống để gán vào các chiến dịch gọi ra.
 
-- Chuẩn bị sẵn tệp ghi âm giọng đọc chuẩn định dạng âm thanh hoặc nội dung văn bản kịch bản thoại.
-- Đăng nhập vào Cổng quản trị tại [app.ods.vn](https://app.ods.vn) với quyền quản trị viên.
+![Giao diện danh sách tệp âm thanh trên Portal ODS](/media/ai-contact-center/user-guider-portal/am-thanh_danh-sach.png)
 
-## Cấu trúc nội dung âm thanh
+Các thành phần quản lý chính trên bảng:
 
-Hệ thống hỗ trợ hai hình thức phát âm thanh cho chiến dịch:
+| Thành phần | Chức năng chi tiết |
+| :--- | :--- |
+| **TẠO FILE ÂM THANH** | Mở biểu mẫu tải lên tệp mới hoặc cấu hình kịch bản Text to Speech. |
+| **Thanh tìm kiếm** | Tra cứu tệp âm thanh theo từ khóa tên gọi. |
+| **Cột TÊN ÂM THANH** | Tên định danh của tệp âm thanh hoặc kịch bản phát. |
+| **Cột NGÀY TẠO** | Thời điểm tệp âm thanh được khởi tạo trên hệ thống. |
+| **Cột THAO TÁC** | Gồm các nút: **Sửa** (biểu tượng bút chì), **Nghe thử** (biểu tượng loa) và **Xóa** (biểu tượng thùng rác). |
 
-- **Âm thanh không cá nhân hóa**: Phát cùng một nội dung thông điệp chung cho toàn bộ danh sách khách hàng thông qua tệp ghi âm tải lên hoặc công nghệ chuyển văn bản thành giọng nói (Text to Speech).
-- **Âm thanh có cá nhân hóa**: Ghép nối tự động 4 khối nội dung để tạo thành câu thoại riêng biệt cho từng người nhận:
-  1. **Khối 1 (Xin chào)**: Lời chào mở đầu cuộc gọi.
-  2. **Khối 2 (Danh xưng)**: Tự động chèn danh xưng (Anh/Chị/Ông/Bà) từ trường dữ liệu của khách hàng.
-  3. **Khối 3 (Đọc tên)**: Trích xuất và đọc tên khách hàng theo danh bạ.
-  4. **Khối 4 (Nội dung chính)**: Phát nội dung thông báo hoặc thông điệp chi tiết của chiến dịch.
+## Tạo tệp âm thanh không cá nhân hóa
 
-> [!NOTE]
-> Ngoài việc tạo trước trong mục quản lý âm thanh, bạn cũng có thể tạo mới tệp ghi âm hoặc thiết lập Text to Speech trực tiếp tại bước cấu hình Âm thanh trong wizard tạo chiến dịch.
+Hình thức này phát cùng một thông điệp ghi âm hoặc nội dung Text to Speech chung cho toàn bộ danh sách khách hàng nhận cuộc gọi.
 
-## Các bước thực hiện
+<Steps>
+<Step>
+### Mở cửa sổ tạo file âm thanh
 
-### Bước 1: Truy cập quản lý âm thanh
+Tại màn hình quản lý, nhấn nút **TẠO FILE ÂM THANH** màu đen ở góc trên bên phải.
 
-Mở mục **Quản lý âm thanh** trên thanh điều hướng Cổng quản trị để xem thư viện âm thanh hiện có của tổng đài.
+*Kết quả: Modal Tạo file âm thanh xuất hiện trên màn hình.*
+</Step>
 
-Ảnh: Màn hình danh sách tệp âm thanh của tổng đài
+<Step>
+### Khai báo tên âm thanh
 
-### Bước 2: Tải lên tệp âm thanh ghi âm sẵn
+Nhập tên gợi nhớ vào trường **Tên âm thanh (*)** để dễ nhận diện khi chọn trong wizard chiến dịch (ví dụ: `ThongBaoBaoTri_102026`, `LoiChaoKhaiTruong`).
 
-Nhấn **Tải lên**, chọn tệp âm thanh từ máy tính và lưu vào hệ thống để dùng làm lời thoại phát tự động.
+![Biểu mẫu tạo file âm thanh trên Portal ODS](/media/ai-contact-center/user-guider-portal/am-thanh_tao-file.png)
 
-Ảnh: Cửa sổ popup tải lên tệp âm thanh từ máy tính
+*Kết quả: Tệp âm thanh được định danh trên hệ thống.*
+</Step>
 
-### Bước 3: Tạo âm thanh qua Text to Speech
+<Step>
+### Chọn hình thức phát âm thanh
 
-Chọn chức năng **Text to Speech**, nhập đoạn văn bản lời thoại cần đọc, lựa chọn giọng đọc AI phù hợp và nhấn tạo tệp âm thanh.
+Lựa chọn phương thức cung cấp nội dung tại dòng cấu hình:
 
-Ảnh: Giao diện nhập văn bản Text to Speech và chọn giọng đọc AI
+- **Tải file âm thanh lên:** Nhấn **Tải file lên (định dạng .mp3 hoặc .wav)** để chọn tệp âm thanh có sẵn từ máy tính.
+- **Text to Speech:** Chọn loại chuyển đổi văn bản thành giọng nói, nhập nội dung văn bản kịch bản cần đọc và chọn giọng đọc AI tương ứng.
 
-### Bước 4: Cấu hình cá nhân hóa nội dung thoại
+Bảng đặc tả các trường cấu hình:
 
-Khai báo các khối nội dung và gắn trường dữ liệu Danh xưng cùng Họ tên từ danh bạ vào kịch bản âm thanh cá nhân hóa.
+| Trường thông tin | Bắt buộc | Mô tả chi tiết | Định dạng hợp lệ |
+| :--- | :---: | :--- | :--- |
+| **Tên âm thanh** | Có (`*`) | Tên phân biệt tệp âm thanh trên danh sách. | Chuỗi văn bản, ví dụ: `ThongBaoChung` |
+| **Loại âm thanh** | Có (`*`) | Tùy chọn nguồn: Tải file ghi âm hoặc Text to Speech. | Dropdown chọn loại |
+| **Chọn file** | Tùy chọn | Tải tệp từ thiết bị lưu trữ cục bộ. | Tệp `.mp3` hoặc `.wav` |
+| **Ký tự tiêu tốn** | Tự động | Hệ thống tính toán số lượng ký tự văn bản sử dụng với tính năng TTS. | Theo dõi qua hạn mức ký tự khả dụng |
 
-Ảnh: Giao diện cấu hình 4 khối âm thanh cá nhân hóa theo thông tin người nhận
+*Kết quả: Nội dung âm thanh hiển thị tại khung Xem trước nội dung File âm thanh.*
+</Step>
+
+<Step>
+### Lưu file âm thanh
+
+Nhấn nút **TẠO FILE** màu xanh dương ở cuối biểu mẫu để lưu tệp vào thư viện.
+
+*Kết quả: Tệp âm thanh mới xuất hiện trên bảng danh sách và sẵn sàng nghe thử.*
+</Step>
+</Steps>
+
+## Cấu hình chuỗi âm thanh cá nhân hóa theo người nhận
+
+Tính năng cá nhân hóa cuộc gọi cho phép ghép nối tự động nhiều khối âm thanh để tạo thành câu thoại riêng biệt cho từng người nhận (đọc chính xác Danh xưng và Tên khách hàng theo danh bạ).
+
+Chuỗi âm thanh cá nhân hóa hoàn chỉnh gồm 4 khối nội dung theo thứ tự:
+
+1. **Khối 1 (Xin chào):** Lời chào mở đầu cuộc gọi (ví dụ: *"Xin chào"* hoặc *"Kính chào"*).
+2. **Khối 2 (Danh xưng):** Hệ thống tự động trích xuất giá trị trường Danh xưng từ danh bạ (*Anh*, *Chị*, *Ông*, *Bà*).
+3. **Khối 3 (Đọc tên):** Hệ thống đọc tên riêng của khách hàng tương ứng trong danh bạ (*Tuấn*, *Hương*...).
+4. **Khối 4 (Nội dung chính):** Phát thông điệp chi tiết của chiến dịch qua tệp ghi âm sẵn hoặc nội dung Text to Speech chung.
+
+<Steps>
+<Step>
+### Thêm các khối âm thanh thành phần
+
+Tại modal **TẠO FILE ÂM THANH**, sau khi thiết lập khối đầu tiên, nhấn nút **+ Thêm loại âm thanh** để bổ sung thêm các đoạn âm thanh tiếp theo vào chuỗi phát.
+
+*Kết quả: Một dòng cấu hình mới được thêm vào danh sách.*
+</Step>
+
+<Step>
+### Sắp xếp thứ tự và gắn biến cá nhân hóa
+
+Chọn biến thông tin tương ứng cho từng khối (Danh xưng, Tên khách hàng) và sắp xếp đúng thứ tự phát từ trên xuống dưới bằng biểu tượng mũi tên hai chiều.
+
+*Kết quả: Khung Xem trước hiển thị chuỗi câu thoại mẫu hoàn chỉnh.*
+</Step>
+
+<Step>
+### Xác nhận và tạo chuỗi âm thanh
+
+Kiểm tra số lượng ký tự Text to Speech tiêu tốn và nhấn **TẠO FILE** để hoàn tất.
+
+*Kết quả: Kịch bản âm thanh cá nhân hóa được lưu và sẵn sàng áp dụng vào chiến dịch Auto Call.*
+</Step>
+</Steps>
+
+<Callout type="tip" title="Tạo âm thanh trực tiếp trong Wizard chiến dịch">
+Ngoài việc khởi tạo trước tại phân hệ này, khi bạn thao tác tại **Bước 4 (Âm thanh)** trong wizard thiết lập chiến dịch Auto Call, hệ thống cũng cung cấp sẵn nút tạo mới và tải lên tệp âm thanh trực tiếp mà không cần thoát khỏi quy trình tạo chiến dịch.
+</Callout>
 
 ## Kiểm tra kết quả
 
-Nhấn biểu tượng phát nghe thử trực tiếp trên giao diện để kiểm tra chất lượng âm thanh, độ chính xác của giọng đọc Text to Speech trước khi gắn vào chiến dịch.
+Sau khi lưu tệp âm thanh:
 
-## Xem thêm
+- Tệp âm thanh mới hiển thị trên bảng danh sách tại mục **Chiến dịch** → **Âm thanh**.
+- Nhấn vào biểu tượng **Loa** tại cột **Thao tác** để nghe thử trực tiếp âm thanh phát ra, đảm bảo âm lượng to rõ và không bị rè tiếng.
+- Nhấn vào biểu tượng **Bút chì** nếu cần điều chỉnh lại nội dung hoặc thêm bớt các khối âm thanh thành phần.
 
-- [Tạo chiến dịch](/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/tao-chien-dich) — Bắt đầu khởi tạo chiến dịch cuộc gọi mới.
-- [Thiết lập Auto Call](/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/thiet-lap-chien-dich/goi-tu-dong-autocall) — Cấu hình quy trình 5 bước cho chiến dịch Auto Call.
+## Xử lý sự cố thường gặp
+
+<Accordions>
+<Accordion title="Tải tệp âm thanh lên báo lỗi không hỗ trợ định dạng">
+**Nguyên nhân:**
+- Tệp âm thanh có đuôi mở rộng khác với các định dạng được hỗ trợ hoặc dung lượng vượt quá giới hạn cho phép.
+
+**Cách xử lý:**
+1. Chuyển đổi định dạng tệp âm thanh về chuẩn `.mp3` hoặc `.wav` trước khi tải lên.
+2. Kiểm tra chất lượng nén âm thanh ở chuẩn Mono hoặc Stereo thông dụng để tối ưu tốc độ tải.
+</Accordion>
+
+<Accordion title="Không tạo được âm thanh do hết ký tự Text to Speech">
+**Nguyên nhân:**
+- Số dư ký tự Text to Speech của tài khoản tổng đài đã hết (thể hiện ở biểu tượng vương miện góc dưới bên trái màn hình).
+
+**Cách xử lý:**
+1. Quan sát số ký tự còn lại tại mục thông tin tài khoản ở chân sidebar.
+2. Nhấn nút **Mua thêm** hoặc liên hệ bộ phận hỗ trợ ODS để gia hạn thêm gói ký tự đọc thoại AI.
+</Accordion>
+
+<Accordion title="Chuỗi âm thanh cá nhân hóa đọc bị ngắt quãng giữa các từ">
+**Nguyên nhân:**
+- Khoảng dừng giữa các khối âm thanh chưa đồng đều hoặc nội dung văn bản chứa dấu câu ngắt quãng bất thường.
+
+**Cách xử lý:**
+1. Kiểm tra lại kịch bản Text to Speech, không đặt dấu chấm phẩy hoặc khoảng trắng thừa ở cuối các khối từ.
+2. Nghe thử nhiều lần bằng nút biểu tượng loa để tinh chỉnh ngữ điệu đọc tự nhiên nhất.
+</Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    title="Thêm danh bạ"
+    description="Chuẩn bị danh sách khách hàng và thiết lập chuẩn danh xưng phục vụ cá nhân hóa."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/danh-ba/them-danh-ba"
+    icon="ListChecks"
+  />
+  <Card
+    title="Tạo chiến dịch"
+    description="Khởi tạo chiến dịch cuộc gọi mới và chọn loại dịch vụ phục vụ."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/tao-chien-dich"
+    icon="PhoneCall"
+  />
+  <Card
+    title="Gọi tự động (AutoCall)"
+    description="Chi tiết 5 bước thiết lập chiến dịch Auto Call và chọn tệp âm thanh phát."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/thiet-lap-chien-dich/goi-tu-dong-autocall"
+    icon="PhoneForwarded"
+  />
+</Cards>

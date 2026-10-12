@@ -1,6 +1,179 @@
 ---
 title: "Tổng quan chiến dịch cuộc gọi"
-description: "Giới thiệu chức năng chiến dịch cuộc gọi tự động (Autocall, Auto Dialer, ZaloOA, ZNC) trên hệ thống AI Contact Center ODS."
+description: "Giới thiệu các giải pháp chiến dịch cuộc gọi tự động Auto Call, Auto Dialer, Zalo Call và Zalo Message trên AI Contact Center ODS."
 ---
 
-Chức năng **Chiến dịch cuộc gọi** cho phép doanh nghiệp thiết lập các kịch bản gọi tự động hàng loạt đến danh sách khách hàng để phát âm thông báo, chăm sóc khách hàng hoặc bán hàng tự động bằng công nghệ AI.
+Phân hệ **Chiến dịch** trên ODS AI Contact Center hỗ trợ doanh nghiệp tự động hóa việc tiếp cận khách hàng hàng loạt qua các kênh viễn thông hiện đại. Doanh nghiệp có thể thiết lập các đợt phát thông báo, nhắc lịch, khảo sát tự động hoặc kết nối thông minh với đội ngũ điện thoại viên nhằm tối ưu năng suất vận hành.
+
+<Callout type="info" title="Trước khi bắt đầu">
+- **Quyền hạn tài khoản:** Người dùng cần quyền Quản trị viên (Admin) hoặc nhân sự quản lý chiến dịch được cấp phép trên tổng đài.
+- **Vị trí menu:** Truy cập theo đường dẫn **Chiến dịch** → **Danh sách chiến dịch** trên Cổng quản trị [app.ods.vn](https://app.ods.vn).
+- **Điều kiện kỹ thuật:** Doanh nghiệp đã kích hoạt đầu số SIP Trunk hoặc tài khoản Zalo OA xác thực, cùng danh sách dữ liệu khách hàng mục tiêu.
+</Callout>
+
+## Tổng quan giao diện quản lý chiến dịch
+
+Màn hình **Danh sách chiến dịch** tập trung toàn bộ các chiến dịch đã khởi tạo, cho phép theo dõi trạng thái, lọc dữ liệu và điều phối lịch phát.
+
+![Giao diện danh sách quản lý chiến dịch cuộc gọi trên Portal ODS](/media/ai-contact-center/user-guider-portal/chien-dich_danh-sach-quan-ly.png)
+
+Các khu vực chính trên giao diện quản lý:
+
+| Khu vực | Chức năng chi tiết |
+| :--- | :--- |
+| **Thanh trạng thái (Tabs)** | Phân loại chiến dịch theo tiến độ: **Tổng quan**, **Nháp**, **Đang chờ gọi**, **Đang tiến hành gọi**, **Đã gọi xong**, **Đã xoá**, **Khác**. |
+| **Nút Thêm mới chiến dịch** | Mở trình lựa chọn dịch vụ để bắt đầu tạo chiến dịch mới. |
+| **Thanh tìm kiếm & Bộ lọc** | Tra cứu nhanh chiến dịch theo từ khóa tên gọi, phân loại theo loại dịch vụ hoặc trạng thái vận hành. |
+| **Bảng dữ liệu chiến dịch** | Hiển thị STT, Tên chiến dịch, Tên dịch vụ, Trạng thái, Lịch gọi, Ngày tạo và các nút thao tác nhanh (Xem, Tiếp tục, Đặt lịch, Nhân bản, Xóa). |
+| **Xuất Excel** | Xuất dữ liệu danh sách các chiến dịch phục vụ đối soát nội bộ. |
+
+## Các loại hình chiến dịch hỗ trợ
+
+Khi nhấn **Thêm mới chiến dịch**, hệ thống điều hướng đến màn hình lựa chọn giải pháp phù hợp với mục tiêu tiếp cận.
+
+![Giao diện lựa chọn dịch vụ chiến dịch trên Portal ODS](/media/ai-contact-center/user-guider-portal/chien-dich_chon-dich-vu.png)
+
+Hệ thống hỗ trợ 4 hình thức chiến dịch chuyên biệt:
+
+<Tabs items={['Auto Call (Gọi tự động)', 'Auto Dialer (Quay số tự động)', 'Zalo Call (Cuộc gọi Zalo)', 'Zalo Message (Tin nhắn Zalo)']}>
+<Tab value="Auto Call (Gọi tự động)">
+**Auto Call** là giải pháp gọi tự động phát âm thanh thông báo thông qua đầu số SIP Trunk đến thuê bao di động của khách hàng.
+
+- **Kênh kết nối:** Hạ tầng viễn thông di động thông qua đầu số cố định hoặc Hotline doanh nghiệp.
+- **Cá nhân hóa nội dung:** Hệ thống tự động ghép nối lời thoại theo từng khách hàng bằng cách đọc chính xác Danh xưng (Anh/Chị) và Họ tên kèm nội dung thông báo chung.
+- **Tương tác phím bấm:** Khách hàng có thể nhấn phím để xác nhận dịch vụ, gặp tổng đài viên hoặc từ chối thông tin.
+- **Ứng dụng điển hình:** Nhắc nợ cước, thông báo lịch hẹn khám, chúc mừng sinh nhật, khảo sát mức độ hài lòng tự động.
+</Tab>
+
+<Tab value="Auto Dialer (Quay số tự động)">
+**Auto Dialer** là giải pháp quay số tự động theo danh sách định sẵn và chỉ kết nối với điện thoại viên ngay khi khách hàng nhấc máy.
+
+- **Cơ chế vận hành:** Hệ thống tự động lọc bỏ các cuộc gọi bận máy, thuê bao không liên lạc được trước khi chuyển cuộc gọi đến điện thoại viên đang rảnh.
+- **Tối ưu năng suất:** Giảm thiểu thời gian chờ đợi quay số thủ công của nhân viên bán hàng hoặc chăm sóc khách hàng.
+- **Ứng dụng điển hình:** Bán hàng qua điện thoại (Telesales), xác nhận đơn hàng thương mại điện tử, tư vấn hồ sơ tài chính.
+</Tab>
+
+<Tab value="Zalo Call (Cuộc gọi Zalo)">
+**Zalo Call** thực hiện cuộc gọi thoại trực tiếp đến tài khoản Zalo của khách hàng thông qua kênh Zalo Official Account (Zalo OA).
+
+- **Kênh kết nối:** Nền tảng Zalo thông qua tài khoản Zalo OA đã xác thực của doanh nghiệp.
+- **Trải nghiệm khách hàng:** Hiển thị tên định danh thương hiệu (Brandname) và ảnh đại diện của doanh nghiệp trên màn hình cuộc gọi Zalo.
+- **Tối ưu chi phí:** Giảm thiểu chi phí cước viễn thông truyền thống đối với tệp khách hàng thường xuyên sử dụng Zalo.
+- **Ứng dụng điển hình:** Chăm sóc khách hàng thành viên, tư vấn hậu mãi, thông báo bảo hành sản phẩm.
+</Tab>
+
+<Tab value="Zalo Message (Tin nhắn Zalo)">
+**Zalo Message** gửi tin nhắn thông báo hoặc chăm sóc tự động hàng loạt đến danh sách người dùng Zalo.
+
+- **Kênh gửi:** Hệ thống Zalo Notification Service (ZNS) hoặc tin nhắn tương tác từ Zalo OA.
+- **Hình thức thể hiện:** Nội dung văn bản định dạng phong phú, có hình ảnh, nút bấm liên kết hành động (CTA) và mã xác nhận.
+- **Ứng dụng điển hình:** Gửi mã xác thực OTP, thông báo biến động số dư, xác nhận giao hàng, gửi voucher ưu đãi.
+</Tab>
+</Tabs>
+
+## Quy trình triển khai chiến dịch chuẩn
+
+Để thiết lập một chiến dịch vận hành hoàn chỉnh trên hệ thống, người dùng thực hiện theo các bước sau:
+
+<Steps>
+<Step>
+### Chuẩn bị dữ liệu danh bạ khách hàng
+
+Thu thập danh sách số điện thoại, danh xưng và họ tên của đối tượng cần liên hệ, sau đó tạo mới liên hệ hoặc tải lên tệp Excel tại mục **Chiến dịch** → **Danh bạ** hoặc **Nhóm danh bạ**.
+
+*Kết quả: Danh bạ hiển thị đầy đủ số lượng liên hệ hợp lệ sẵn sàng đưa vào chiến dịch.*
+</Step>
+
+<Step>
+### Thiết lập thư viện âm thanh hoặc kịch bản lời thoại
+
+Tải lên tệp ghi âm giọng đọc chuẩn định dạng hoặc nhập nội dung văn bản để sử dụng công nghệ chuyển văn bản thành giọng nói (Text to Speech) tại mục **Chiến dịch** → **Âm thanh**.
+
+*Kết quả: Tệp âm thanh lời thoại được lưu vào thư viện và nghe thử trực tiếp trước khi phát.*
+</Step>
+
+<Step>
+### Khởi tạo và thiết lập thông số chiến dịch
+
+Truy cập **Chiến dịch** → **Danh sách chiến dịch**, nhấn **Thêm mới chiến dịch**, chọn hình thức phục vụ (như **Auto Call**), sau đó hoàn thiện các thông số: nguồn khách hàng, đầu số gọi ra, khung giờ phát (08:00 – 17:00) và kịch bản tương tác phím bấm.
+
+*Kết quả: Chiến dịch hoàn thành cấu hình và tự động lưu vào hàng đợi hệ thống.*
+</Step>
+
+<Step>
+### Theo dõi tiến độ và đánh giá kết quả
+
+Quan sát chiến dịch tại bảng danh sách, theo dõi tiến độ quay số tự động khi đến khung giờ phát đã định và tải dữ liệu báo cáo đối soát.
+
+*Kết quả: Toàn bộ lịch sử cuộc gọi, thời lượng đàm thoại và phản hồi phím bấm được ghi nhận đầy đủ.*
+</Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+Sau khi hoàn tất khởi tạo hoặc kiểm tra chiến dịch trên giao diện:
+
+- Chiến dịch mới tạo xuất hiện trong bảng tại tab **Đang chờ gọi** (nếu đã đặt lịch) hoặc tab **Nháp** (nếu chưa hoàn tất thiết lập).
+- Tên dịch vụ hiển thị đúng biểu tượng loại hình tương ứng (ví dụ: nhãn màu xanh lá cây cho **Auto Call**).
+- Cột **Lịch gọi** hiển thị chính xác ngày và giờ bắt đầu chạy đã thiết lập.
+
+## Xử lý sự cố thường gặp
+
+<Accordions>
+<Accordion title="Chiến dịch không cho phép chỉnh sửa nội dung trước giờ chạy">
+**Nguyên nhân:**
+- Hệ thống áp dụng quy tắc khóa chức năng chỉnh sửa trước 10 phút tính từ thời điểm lịch gọi bắt đầu để đồng bộ dữ liệu vào hàng đợi quay số.
+
+**Cách xử lý:**
+1. Quan sát ghi chú trên màn hình: *Lưu ý: Chiến dịch sẽ khóa "sửa" trước 10 phút*.
+2. Nếu cần thay đổi gấp kịch bản hoặc danh sách nhận tin, nhấn nút **Nhân bản** (biểu tượng sao chép) ở cột **Thao tác** để tạo chiến dịch mới với khung giờ phù hợp hơn.
+</Accordion>
+
+<Accordion title="Cuộc gọi không tự động phát đi khi đã đến khung giờ cài đặt">
+**Nguyên nhân:**
+- Số dư tài khoản hoặc ký tự thoại của tổng đài không đủ để khởi tạo lưu lượng cuộc gọi.
+- Khung giờ cài đặt nằm ngoài khoảng thời gian cho phép của tổng đài hoặc đầu số SIP Trunk đang mất kết nối.
+
+**Cách xử lý:**
+1. Kiểm tra số dư tài khoản và số ký tự còn lại ở góc dưới bên trái màn hình Cổng quản trị.
+2. Kiểm tra lại trạng thái kết nối của đầu số gọi ra tại mục **Tổng đài** → **Đầu số**.
+</Accordion>
+
+<Accordion title="Tên khách hàng phát âm không chuẩn khi dùng tính năng cá nhân hóa">
+**Nguyên nhân:**
+- Tệp danh bạ khách hàng chứa các ký tự đặc biệt, viết hoa không đồng nhất hoặc từ ngữ viết tắt chưa được chuẩn hóa.
+
+**Cách xử lý:**
+1. Rà soát lại dữ liệu cột Họ tên trong danh bạ, loại bỏ các ký tự đặc biệt hoặc dấu câu thừa.
+2. Nhập thử tên vào tính năng Text to Speech tại mục **Âm thanh** để nghe thử trước khi gắn vào chiến dịch chính thức.
+</Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    title="Thêm danh bạ"
+    description="Hướng dẫn thêm mới khách hàng thủ công hoặc tải lên tệp Excel danh sách vào hệ thống."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/danh-ba/them-danh-ba"
+    icon="ListChecks"
+  />
+  <Card
+    title="Thêm âm thanh"
+    description="Hướng dẫn tải lên tệp ghi âm hoặc tạo giọng đọc tự động bằng Text to Speech."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/them-am-thanh"
+    icon="Headphones"
+  />
+  <Card
+    title="Tạo chiến dịch"
+    description="Thao tác khởi tạo chiến dịch mới từ bảng điều khiển và chọn dịch vụ phục vụ."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/tao-chien-dich"
+    icon="PhoneCall"
+  />
+  <Card
+    title="Gọi tự động (AutoCall)"
+    description="Chi tiết 5 bước thiết lập hoàn chỉnh chiến dịch gọi tự động phát âm thanh thông báo."
+    href="/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/thiet-lap-chien-dich/goi-tu-dong-autocall"
+    icon="PhoneForwarded"
+  />
+</Cards>

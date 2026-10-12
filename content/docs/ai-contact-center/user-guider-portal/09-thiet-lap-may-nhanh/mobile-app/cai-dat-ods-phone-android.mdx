@@ -1,53 +1,177 @@
 ---
-title: "Hướng dẫn cài đặt và sử dụng ứng dụng ODS Phone trên Android"
-description: "ODS Phone là ứng dụng dành cho tất cả khách hàng sử dụng tổng đài ảo tiết kiệm của ODS, cho phép người dùng đăng kí máy nhánh trên tổng đài VOIP thực hiện cuộc ..."
+title: "Cài đặt ứng dụng ODS Phone trên Android"
+description: "Hướng dẫn tải, cấp quyền và quét mã QR Code để kích hoạt máy nhánh tổng đài ODS trên điện thoại thông minh Android."
 ---
 
-ODS Phone là ứng dụng dành cho tất cả khách hàng sử dụng tổng đài ảo tiết kiệm của ODS, cho phép người dùng đăng kí máy nhánh trên tổng đài VOIP thực hiện cuộc gọi và tiếp nhận cuộc gọi trên ứng dụng di động.
+ODS Phone là ứng dụng Softphone di động dành cho doanh nghiệp sử dụng tổng đài ảo ODS. Ứng dụng biến smartphone Android của nhân viên thành một máy nhánh nội bộ, giúp tiếp nhận và thực hiện cuộc gọi của khách hàng mọi lúc mọi nơi qua kết nối Internet (4G/5G hoặc Wi-Fi).
 
-## I. Tải và cài đặt ứng dụng trên điện thoại
+<Callout type="info" title="Trước khi bắt đầu">
+- Quản trị viên cần tạo trước tài khoản nhân viên trên Portal ODS để xuất mã QR Code đăng nhập.
+- Điện thoại sử dụng hệ điều hành **Android 5.0 trở lên**.
+- Cần có kết nối mạng Internet ổn định và camera hoạt động tốt để quét mã xác thực.
+</Callout>
 
-Để tải và cài đặt ứng dụng ODS Phone trên điện thoại Android, người dùng thực hiện như sau:
+## 1. Lấy mã QR Code máy nhánh trên Portal ODS
 
-**Bước 1:** Vào **Google Play Store**, tìm kiếm từ khóa `ODS Phone` hoặc truy cập trực tiếp vào liên kết dưới đây:
+Quản trị viên hoặc nhân viên lấy mã QR Code kích hoạt máy nhánh theo các bước sau:
 
-* **Link tải ứng dụng:** [ODS Phone trên Google Play ](https://play.google.com/store/apps/details?id=com.ods.cfbusiness)
+1. Đăng nhập vào trang quản trị tổng đài ODS: `https://app.ods.vn/`.
+2. Truy cập menu **Tổng đài** → **Cài đặt tổng đài** → **Nhân viên**.
+3. Tại danh sách nhân viên, tìm số máy nhánh cần cài đặt và nhấn vào biểu tượng **QR Code** ở cột **THAO TÁC**.
 
-**Bước 2:** Mở ứng dụng sau khi cài đặt và cấp các quyền truy cập cần thiết khi được yêu cầu:
+![Giao diện lấy mã QR Code máy nhánh trên Portal ODS](/media/ai-contact-center/user-guider-portal/ods-phone_portal_modal-qr-code.png)
 
-* Truy cập micro (Để thực hiện cuộc gọi)
-* Truy cập danh bạ (Để hiển thị tên người gọi/đồng bộ danh bạ)
-* Cho phép nhận thông báo (Để nhận thông báo cuộc gọi đến)
+Cửa sổ **TẢI MÃ QR CODE** hiển thị chứa mã định danh SIP được mã hóa sẵn. Bạn có thể để nguyên màn hình này để quét trực tiếp bằng camera điện thoại hoặc nhấn nút **LƯU QRCODE VỀ MÁY** để gửi cho nhân viên.
 
-**Bước 3:** Đăng kí máy nhánh trên tổng đài ODS vào ứng dụng
+<Callout type="info" title="Tối ưu kịch bản gọi nhóm và phân bổ cuộc gọi">
+Đối với nhân viên tham gia vào nhóm trực cuộc gọi (Ring Group) hoặc hàng đợi tổng đài (Queue), quản trị viên nên kích hoạt tùy chọn chuyên biệt cho ứng dụng di động:
+1. Nhấn nút **Chỉnh sửa** (biểu tượng cây bút) tại dòng của nhân viên.
+2. Tích chọn ô **Số máy nhánh dùng ứng dụng ODS Phone**.
+3. Nhấn **Cập nhật** để lưu cấu hình.
 
-* Mở ứng dụng ODS Phone.
-* Nhấn vào nút **Thêm** (hoặc biểu tượng tương tự).
-* Chọn **Tài khoản PBX**.
-* Chọn biểu tượng **quét mã QR** (QR Code).
-* Sử dụng camera điện thoại để quét mã QR\_Code được lấy từ giao diện quản trị tổng đài (xem phần II).
+![Kích hoạt tùy chọn Số máy nhánh dùng ứng dụng ODS Phone trên Portal](/media/ai-contact-center/user-guider-portal/ods-phone_portal_tuy-chon-app.png)
 
-![](/media/ai-contact-center/user-guider-portal/img-ruWd8EpWJPfsZcVk0ZOm.png)
+*Thiết lập này giúp hệ thống ODS kích hoạt cơ chế gửi thông báo đẩy (Push Notification) ưu tiên cao, đảm bảo điện thoại đổ chuông đồng thời ngay cả khi máy đang ở chế độ ngủ sâu.*
+</Callout>
 
-## II. Thao tác lấy mã QR\_Code máy nhánh trên giao diện quản trị
+## 2. Các bước cài đặt và kích hoạt trên điện thoại Android
 
-Để lấy mã QR\_Code cho việc đăng nhập máy nhánh trên ứng dụng ODS Phone:
+Thực hiện cài đặt và quét mã kích hoạt lần lượt theo các bước sau:
 
-1. Đăng nhập vào giao diện quản trị tổng đài Mắt Bão tại địa chỉ: `https://app.matbao.one/`
-2. Điều hướng đến mục: **Tổng đài** => **Cài đặt tổng đài** => **Nhân viên**.
-3. Tìm đến nhân viên/số máy nhánh cần đăng ký trên ứng dụng.
-4. Nhấn vào biểu tượng **QR Code** tương ứng với nhân viên/số máy nhánh đó để hiển thị mã.
-5. Sử dụng ứng dụng ODS Phone trên điện thoại để quét mã QR này (như hướng dẫn ở Phần I, Bước 3).
+<Steps>
+<Step>
+### Bước 1: Tải ứng dụng ODS Phone từ Google Play Store
 
-![](/media/ai-contact-center/user-guider-portal/img-f2RGu8sKBkfUf16qkJBu.png)
+Mở kho ứng dụng Google Play Store trên điện thoại Android và tải ứng dụng:
 
-***
+- Tìm kiếm từ khóa: `ODS Phone`
+- Hoặc truy cập trực tiếp liên kết: [ODS Phone trên Google Play Store](https://play.google.com/store/apps/details?id=com.ods.cfbusiness).
+- Nhấn **Cài đặt** (Install) để tải và cài đặt ứng dụng vào điện thoại.
+</Step>
 
-## Lưu ý
+<Step>
+### Bước 2: Cấp quyền hệ thống cho ứng dụng
 
-* Ứng dụng yêu cầu hệ điều hành **Android 5 trở lên**.
-* **Không nên bật chế độ tiết kiệm pin** cho ứng dụng ODS Phone để đảm bảo ứng dụng có thể nhận thông báo cuộc gọi đến một cách tốt nhất, ngay cả khi không mở ứng dụng.
-* Đối với các số máy nhánh có kịch bản gọi đặc thù (ví dụ: đổ chuông xoay vòng trong nhóm gọi, hàng đợi cuộc gọi...), khuyến cáo nên bật tính năng **"Sử dụng trên ứng dụng ODS Phone"** (hoặc tên tương tự) trong cài đặt máy nhánh trên giao diện quản trị.
-  * Cách bật: Vào **Tổng đài** => **Cài đặt tổng đài** => **Nhân viên** => Chọn **Sửa** (biểu tượng cây bút) tại máy nhánh tương ứng => Tìm và kích hoạt tùy chọn liên quan đến CloudFone/Mobile App. Việc này giúp ứng dụng nhận thông báo (push notification) tốt hơn trong các kịch bản phức tạp.<br />
+Khởi chạy ứng dụng ODS Phone lần đầu. Để ứng dụng thực hiện và tiếp nhận cuộc gọi ổn định, hãy cấp đầy đủ các quyền hệ thống theo yêu cầu:
 
-    ![](/media/ai-contact-center/user-guider-portal/img-zj1mkDwDCvYSMpoHl8EP.png)
+| Quyền hệ thống | Thiết lập yêu cầu | Mục đích sử dụng |
+| :--- | :--- | :--- |
+| **Ghi âm (Microphone)** | Chọn **Trong khi dùng ứng dụng** | Thu âm giọng nói khi đàm thoại |
+| **Tối ưu pin (Battery)** | Chọn **Mở cài đặt** → Cho phép chạy nền | Giữ kết nối nhận cuộc gọi đến khi khóa máy |
+| **Danh bạ (Contacts)** | Chọn **Cho phép** | Đồng bộ danh bạ để hiển thị tên khách hàng gọi đến |
+| **Thông báo (Notifications)** | Chọn **Cho phép** | Hiển thị màn hình chuông reo khi có cuộc gọi |
+</Step>
+
+<Step>
+### Bước 3: Quét mã QR Code đăng ký máy nhánh
+
+1. Tại giao diện chính của ứng dụng ODS Phone, chạm vào tab **Xem thêm** (biểu tượng dấu 3 chấm ở góc dưới cùng bên phải).
+2. Chọn menu **Cài đặt tài khoản** → nhấn vào dòng **Cấu hình kết nối**.
+3. Chạm vào biểu tượng **Quét mã QR** (ở góc trên cùng bên phải màn hình).
+4. Hướng camera điện thoại về phía mã QR Code đang hiển thị trên Portal ODS để ứng dụng quét và tự động nạp cấu hình SIP.
+
+![Quy trình tải ứng dụng, cấp quyền và quét mã QR Code trên Android](/media/ai-contact-center/user-guider-portal/ods-phone-android_cac-buoc-kich-hoat.png)
+
+*Kết quả: Hệ thống tự động xác thực và kích hoạt tài khoản. Dòng trạng thái ở đầu ứng dụng chuyển sang màu xanh lá biểu thị máy nhánh đã sẵn sàng.*
+</Step>
+
+<Step>
+### Bước 4: Tắt tính năng tối ưu hóa pin nền (Khuyến nghị)
+
+Cơ chế quản lý pin nghiêm ngặt của hệ điều hành Android (Doze Mode) có thể ngắt kết nối nền của ứng dụng khi điện thoại tắt màn hình:
+
+1. Vào mục **Cài đặt** (Settings) của điện thoại Android → chọn **Ứng dụng** (Apps).
+2. Tìm và chọn ứng dụng **ODS Phone**.
+3. Chọn mục **Pin** (Battery) → chuyển sang tùy chọn **Không hạn chế** (Unrestricted) hoặc tắt mục **Tối ưu hóa sử dụng pin**.
+4. Bật tùy chọn **Cho phép tự khởi chạy** (Autostart) nếu sử dụng các thiết bị Xiaomi, OPPO, vivo hoặc Realme.
+</Step>
+</Steps>
+
+## 3. Thao tác gọi thoại trên ứng dụng
+
+<Tabs items={['Thực hiện cuộc gọi đi', 'Tiếp nhận cuộc gọi đến']}>
+<Tab value="Thực hiện cuộc gọi đi">
+1. Mở tab **Cuộc gọi** trên thanh điều hướng dưới cùng để mở bàn phím số.
+2. Nhập số điện thoại khách hàng hoặc số máy nhánh nội bộ cần kết nối.
+3. Nhấn nút gọi màu xanh để bắt đầu cuộc đàm thoại.
+4. Trong khi đàm thoại, bạn có thể bật loa ngoài (Speaker), tắt tiếng (Mute) hoặc nhấn nút màu đỏ để kết thúc cuộc gọi.
+</Tab>
+
+<Tab value="Tiếp nhận cuộc gọi đến">
+Khi có cuộc gọi từ khách hàng hoặc nội bộ công ty chuyển đến:
+
+1. Màn hình điện thoại hiển thị chuông reo kèm số điện thoại hoặc tên người gọi (nếu đã lưu danh bạ).
+2. Vuốt hoặc chạm nút **Trả lời** (màu xanh) để nhấc máy đàm thoại.
+3. Chạm nút **Từ chối** (màu đỏ) nếu đang bận hoặc muốn chuyển hướng cuộc gọi.
+</Tab>
+</Tabs>
+
+## 4. Kiểm tra kết quả
+
+Sau khi hoàn tất kích hoạt, bạn xác nhận hoạt động của ứng dụng qua các bước sau:
+
+- **Biểu tượng trạng thái**: Kiểm tra góc trên màn hình ứng dụng ODS Phone hiển thị chấm tròn màu xanh lá hoặc thông báo kết nối thành công.
+- **Thực hiện cuộc gọi nội bộ thử nghiệm**: Bấm gọi sang một máy nhánh đồng nghiệp trong công ty để kiểm tra khả năng bắt máy và chất lượng thoại.
+- **Thử tiếp nhận cuộc gọi khi khóa màn hình**: Khóa màn hình điện thoại, sau đó nhờ đồng nghiệp bấm số máy nhánh của bạn để kiểm tra tính năng chuông reo và nhận thông báo đẩy.
+
+## 5. Xử lý sự cố thường gặp (Troubleshooting)
+
+<Accordions>
+<Accordion title="Không nhận được cuộc gọi đến khi tắt màn hình điện thoại">
+**Nguyên nhân:**
+- Thiết bị Android tự động đưa ứng dụng vào trạng thái ngủ sâu (Sleep Mode) để tiết kiệm pin.
+- Máy nhánh chưa được bật tùy chọn hỗ trợ Mobile App trên Portal tổng đài.
+
+**Cách xử lý:**
+1. Kiểm tra lại cài đặt pin của điện thoại: Đảm bảo đã đặt ODS Phone ở chế độ **Không hạn chế pin** (Unrestricted).
+2. Yêu cầu quản trị viên vào Portal ODS tại mục **Tổng đài** → **Cài đặt tổng đài** → **Nhân viên**, nhấn sửa máy nhánh và tích chọn ô **Số máy nhánh dùng ứng dụng ODS Phone**.
+</Accordion>
+
+<Accordion title="Camera không quét được mã QR Code trên màn hình máy tính">
+**Nguyên nhân:**
+- Chưa cấp quyền truy cập Camera cho ứng dụng ODS Phone.
+- Màn hình máy tính bị chói sáng hoặc khoảng cách quét quá gần/quá xa.
+
+**Cách xử lý:**
+1. Vào **Cài đặt** của điện thoại → **Ứng dụng** → **ODS Phone** → **Quyền** → Bật quyền **Máy ảnh / Camera**.
+2. Tăng độ sáng màn hình máy tính hoặc zoom to mã QR Code để camera dễ lấy nét.
+</Accordion>
+
+<Accordion title="Đàm thoại nhưng đối phương không nghe thấy tiếng">
+**Nguyên nhân:**
+- Ứng dụng chưa được cấp quyền Microphone hoặc micro đang bị ứng dụng khác chiếm quyền sử dụng.
+
+**Cách xử lý:**
+1. Vào **Cài đặt** điện thoại → **Ứng dụng** → **ODS Phone** → **Quyền** → đảm bảo quyền **Micro** được đặt là **Cho phép khi dùng ứng dụng**.
+2. Khởi động lại ứng dụng ODS Phone và thử thực hiện lại cuộc gọi.
+</Accordion>
+</Accordions>
+
+## 6. Bài viết liên quan
+
+<Cards>
+  <Card
+    title="Cài đặt ODS Phone trên iOS"
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/mobile-app/cai-dat-ods-phone-ios"
+    icon="Smartphone"
+    description="Hướng dẫn cài đặt và kích hoạt ứng dụng tổng đài ODS Phone trên iPhone và iPad."
+  />
+  <Card
+    title="Tổng quan thiết lập máy nhánh"
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh"
+    icon="Layers"
+    description="So sánh và lựa chọn phương án thiết bị máy nhánh phù hợp cho doanh nghiệp."
+  />
+  <Card
+    title="Cài đặt Softphone Zoiper PC"
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/softphone/cai-dat-zoiper-may-tinh"
+    icon="Laptop"
+    description="Giải pháp biến máy tính thành điện thoại bàn với phần mềm Zoiper."
+  />
+  <Card
+    title="Cấu hình IP Phone Yealink"
+    href="/docs/ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/ip-phone/cau-hinh-yealink-t19x-t30x"
+    icon="Phone"
+    description="Hướng dẫn cấu hình thiết bị điện thoại bàn phần cứng chuyên dụng Yealink."
+  />
+</Cards>

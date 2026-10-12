@@ -1,6 +1,64 @@
 ---
 title: "Thêm âm thanh"
-description: "Hướng dẫn tải lên và quản lý các file âm thanh lời chào, thông báo sử dụng trong chiến dịch cuộc gọi."
+description: "Hướng dẫn tải lên tệp ghi âm có sẵn hoặc chuyển đổi văn bản thành giọng nói (Text to Speech) cho chiến dịch."
 ---
 
-Quản lý thư viện âm thanh dùng làm file IVR, thông báo phát tự động cho các chiến dịch Autocall.
+## Mục tiêu
+
+Bài viết này hướng dẫn bạn chuẩn bị và khởi tạo các tệp âm thanh để phát tự động cho khách hàng khi kết nối cuộc gọi trong chiến dịch Auto Call.
+
+## Điều kiện cần
+
+Trước khi thực hiện, đảm bảo bạn đã:
+
+- Chuẩn bị sẵn tệp ghi âm giọng đọc chuẩn định dạng âm thanh hoặc nội dung văn bản kịch bản thoại.
+- Đăng nhập vào Cổng quản trị tại [app.ods.vn](https://app.ods.vn) với quyền quản trị viên.
+
+## Cấu trúc nội dung âm thanh
+
+Hệ thống hỗ trợ hai hình thức phát âm thanh cho chiến dịch:
+
+- **Âm thanh không cá nhân hóa**: Phát cùng một nội dung thông điệp chung cho toàn bộ danh sách khách hàng thông qua tệp ghi âm tải lên hoặc công nghệ chuyển văn bản thành giọng nói (Text to Speech).
+- **Âm thanh có cá nhân hóa**: Ghép nối tự động 4 khối nội dung để tạo thành câu thoại riêng biệt cho từng người nhận:
+  1. **Khối 1 (Xin chào)**: Lời chào mở đầu cuộc gọi.
+  2. **Khối 2 (Danh xưng)**: Tự động chèn danh xưng (Anh/Chị/Ông/Bà) từ trường dữ liệu của khách hàng.
+  3. **Khối 3 (Đọc tên)**: Trích xuất và đọc tên khách hàng theo danh bạ.
+  4. **Khối 4 (Nội dung chính)**: Phát nội dung thông báo hoặc thông điệp chi tiết của chiến dịch.
+
+> [!NOTE]
+> Ngoài việc tạo trước trong mục quản lý âm thanh, bạn cũng có thể tạo mới tệp ghi âm hoặc thiết lập Text to Speech trực tiếp tại bước cấu hình Âm thanh trong wizard tạo chiến dịch.
+
+## Các bước thực hiện
+
+### Bước 1: Truy cập quản lý âm thanh
+
+Mở mục **Quản lý âm thanh** trên thanh điều hướng Cổng quản trị để xem thư viện âm thanh hiện có của tổng đài.
+
+Ảnh: Màn hình danh sách tệp âm thanh của tổng đài
+
+### Bước 2: Tải lên tệp âm thanh ghi âm sẵn
+
+Nhấn **Tải lên**, chọn tệp âm thanh từ máy tính và lưu vào hệ thống để dùng làm lời thoại phát tự động.
+
+Ảnh: Cửa sổ popup tải lên tệp âm thanh từ máy tính
+
+### Bước 3: Tạo âm thanh qua Text to Speech
+
+Chọn chức năng **Text to Speech**, nhập đoạn văn bản lời thoại cần đọc, lựa chọn giọng đọc AI phù hợp và nhấn tạo tệp âm thanh.
+
+Ảnh: Giao diện nhập văn bản Text to Speech và chọn giọng đọc AI
+
+### Bước 4: Cấu hình cá nhân hóa nội dung thoại
+
+Khai báo các khối nội dung và gắn trường dữ liệu Danh xưng cùng Họ tên từ danh bạ vào kịch bản âm thanh cá nhân hóa.
+
+Ảnh: Giao diện cấu hình 4 khối âm thanh cá nhân hóa theo thông tin người nhận
+
+## Kiểm tra kết quả
+
+Nhấn biểu tượng phát nghe thử trực tiếp trên giao diện để kiểm tra chất lượng âm thanh, độ chính xác của giọng đọc Text to Speech trước khi gắn vào chiến dịch.
+
+## Xem thêm
+
+- [Tạo chiến dịch](/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/tao-chien-dich) — Bắt đầu khởi tạo chiến dịch cuộc gọi mới.
+- [Thiết lập Auto Call](/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/thiet-lap-chien-dich/goi-tu-dong-autocall) — Cấu hình quy trình 5 bước cho chiến dịch Auto Call.

@@ -1,41 +1,85 @@
 ---
 title: Không nhận được cuộc gọi đến
-description: Khung xử lý sự cố khách hàng không nhận được cuộc gọi đến.
+description: Dàn ý chẩn đoán và xử lý case khách hàng không nhận được cuộc gọi đến.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Dàn ý — chờ bổ sung" type="warn">
+  Mục ghi *(đề xuất)* là gợi ý cần xác nhận. Mục **Cần bổ sung** là thông tin riêng của ODS. Câu hỏi xem tại file câu hỏi TASK-018.
 </Callout>
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Người gọi không kết nối được vào đầu số, nghe báo lỗi hoặc cuộc gọi kết thúc trước khi tới đích. *(đề xuất)*
+- Cuộc gọi vào hệ thống nhưng không đổ tới máy nhánh, queue, ring group hoặc IVR mong đợi. *(đề xuất)*
+- Phạm vi có thể là một người gọi, một đầu số, một nhánh định tuyến, một tenant hoặc toàn hệ thống. *(đề xuất)*
+
+**Cần bổ sung:** Dấu hiệu, mã lỗi và quy tắc phân mức độ ODS dùng cho sự cố gọi vào.
+
+> **[Q-inbound-failed-1]** ODS phân biệt “nhà mạng chưa đưa cuộc gọi vào” với “hệ thống đã nhận nhưng không chuyển tới đích” bằng dấu hiệu nào?
 
 ## Cần hỏi KH
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+- Số gọi, đầu số được gọi, thời điểm kèm múi giờ và kết quả người gọi nghe thấy. *(đề xuất)*
+- Lỗi xảy ra với mọi số gọi hay chỉ một nhà mạng hoặc một vùng số. *(đề xuất)*
+- Đích mong đợi là máy nhánh, queue, ring group hay IVR; các đích khác có nhận được không. *(đề xuất)*
+- Có tái hiện được không và gần đây có thay đổi lịch làm việc, IVR hoặc inbound route không. *(đề xuất)*
+
+**Cần bổ sung:** Trường ticket bắt buộc và cách ghi đầu số/số gọi phù hợp chính sách dữ liệu của ODS.
+
+> **[Q-inbound-failed-2]** Case gọi vào cần khách hàng cung cấp thêm thông tin nào ngoài hai số, thời điểm và đích mong đợi?
 
 ## Kiểm tra
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+1. Kiểm tra thiết bị hoặc máy nhánh đích có mạng và đang đăng ký nếu phạm vi chỉ ở một đích. *(đề xuất)*
+2. Tìm CDR và SIP trace để xác định INVITE có tới hệ thống, vào tenant và khớp đầu số hay không. *(đề xuất)*
+3. Đối chiếu inbound route, lịch làm việc, IVR, queue hoặc đích chuyển tiếp theo cấu hình đã duyệt. *(đề xuất)*
+4. Kiểm tra trạng thái trunk và phản hồi SIP; phối hợp nhà mạng nếu không thấy cuộc gọi tới hệ thống. *(đề xuất)*
+5. Có thể tham khảo `pjsip show endpoints`, `pjsip show contacts`, CDR, log, `sngrep` hoặc RTP debug. *(đề xuất — cần xác nhận công cụ thực tế ODS)*
+
+**Cần bổ sung:** Công cụ tra inbound route, CDR, SIP trace và quyền truy cập theo vai trò.
+
+> **[Q-inbound-failed-3]** ODS tra cứu đầu số, inbound route và log cuộc gọi đến trên những hệ thống nào?
 
 ## Xử lý
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+- Nếu đích không đăng ký: xử lý kết nối hoặc cấu hình thiết bị, sau đó gọi thử từ số ngoài. *(đề xuất)*
+- Nếu route hoặc lịch làm việc sai: điều chỉnh theo cấu hình đã được khách hàng/phụ trách xác nhận và lưu dấu thay đổi. *(đề xuất)*
+- Nếu IVR/queue không có đích khả dụng: khôi phục đích hợp lệ hoặc chuyển tạm theo phương án đã được phê duyệt. *(đề xuất)*
+- Nếu cuộc gọi không tới hệ thống: cung cấp bằng chứng kỹ thuật tối thiểu cho nhóm trunk/nhà mạng. *(đề xuất)*
+
+**Cần bổ sung:** Quyền thay đổi inbound route, IVR, queue và phương án rollback chuẩn của ODS.
+
+> **[Q-inbound-failed-4]** L1 được phép xử lý trực tiếp những lỗi gọi vào nào và thao tác nào bắt buộc chuyển L2?
 
 ## Chuyển cấp
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Chuyển cấp khi nhiều đầu số hoặc tenant cùng lỗi, không thấy lưu lượng từ trunk, route đúng nhưng hệ thống không chuyển cuộc gọi, hoặc cần thay đổi ngoài quyền L1. *(đề xuất)*
+- Đính kèm ticket, thời điểm/múi giờ, số gọi và đầu số đích đã xử lý an toàn, Call-ID, mã SIP, CDR và kết quả từng bước kiểm tra. *(đề xuất)*
+- Chỉ đính kèm log/pcap đã loại bỏ credential và dữ liệu không liên quan. *(đề xuất)*
+
+**Cần bổ sung:** Nhóm nhận theo lớp lỗi, kênh chung, SLA và quy định gửi dữ liệu cho nhà mạng.
+
+> **[Q-inbound-failed-5]** Điều kiện nào chuyển case gọi vào cho L2, NOC hoặc nhà mạng?
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận tình trạng không nhận được cuộc gọi đến. Anh/chị vui lòng cung cấp số gọi, đầu số được gọi, thời điểm và thông báo người gọi nghe thấy để đội ngũ kiểm tra. *(đề xuất)*
+
+> **Đã xử lý:** ODS đã hoàn tất bước xử lý luồng gọi đến. Anh/chị vui lòng gọi thử vào đầu số và xác nhận cuộc gọi đã tới đúng đích. *(đề xuất)*
+
+**Cần bổ sung:** Mẫu phản hồi và trạng thái ticket chuẩn của ODS.
+
+> **[Q-inbound-failed-6]** ODS có mẫu tiếp nhận và mẫu xác nhận xử lý chuẩn nào cho sự cố gọi vào?
 
 ## Nguyên nhân đã gặp
 
-Chưa có dữ liệu đã xác minh.
+| Ngày | Nguyên nhân | Cách xử lý | Ticket |
+|---|---|---|---|
+| | | | |
+
+**Cần bổ sung:** Chỉ Human điền case thật đã được phép lưu và loại bỏ dữ liệu nhận diện khách hàng.
+
+> **[Q-inbound-failed-7]** Có những ticket đã đóng nào có thể dùng để tổng hợp nguyên nhân gọi vào thất bại mà không chứa dữ liệu bị cấm?
 
 ## Tra cứu liên quan
 
@@ -44,7 +88,12 @@ Chưa có dữ liệu đã xác minh.
 - [Nhà mạng & trunk SIP](/internal/ai-contact-center/knowledge-base/carriers)
 - [Mã lỗi SIP](/internal/ai-contact-center/knowledge-base/sip-codes)
 
+**Cần bổ sung:** Xác nhận link về outbound rules có cần giữ cho case gọi vào hay thay bằng trang inbound routing trong tương lai.
+
+> **[Q-inbound-failed-8]** Runbook gọi vào cần giữ hoặc bổ sung những trang tra cứu nào?
+
 ## Cập nhật lần cuối
 
-Chưa cập nhật.
+**Cần bổ sung:** Ngày duyệt gần nhất và vai trò chịu trách nhiệm cập nhật runbook.
 
+> **[Q-common-10]** Vai trò nào phê duyệt và duy trì nội dung Support Wiki?

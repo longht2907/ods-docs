@@ -1,0 +1,38 @@
+---
+title: "Nhóm và phân quyền"
+description: "Tổng quan vai trò quản trị, nhóm người dùng và mô hình phân quyền CloudFile."
+---
+
+Nhóm giúp Admin cấp quyền theo phòng ban hoặc vai trò thay vì chia sẻ riêng cho từng cá nhân. Khi thành viên mới được thêm vào nhóm, họ nhận các quyền đang gắn với nhóm; khi bị gỡ khỏi nhóm, các quyền đến từ nhóm không còn áp dụng.
+
+## Mô hình phân quyền
+
+| Vai trò | Phạm vi |
+| --- | --- |
+| Tenant Admin / System Admin | Quản lý toàn bộ người dùng, nhóm và cấu hình trong phạm vi tenant. |
+| Group Admin | Quản lý người dùng trong nhóm được giao theo quyền hệ thống cho phép. |
+| User | Sử dụng dữ liệu và chức năng đã được cấp quyền. |
+
+**Cần bổ sung:** xác nhận chính xác Group Admin có thể tạo, xóa hoặc reset mật khẩu cho thành viên trong nhóm đến mức nào (`Q-GROUP-ADMIN-01`).
+
+## Luồng phân quyền
+
+```text
+User → Group → Quyền → Thư mục
+```
+
+Ví dụ, Admin tạo nhóm `Phong_Kinh_Doanh`, thêm nhân viên liên quan rồi chia sẻ thư mục phòng ban cho nhóm. Cách này giảm thao tác lặp và hạn chế bỏ sót khi có thay đổi nhân sự.
+
+## Quy tắc đặt tên nhóm
+
+- Dùng tên không dấu, viết liền hoặc nối bằng dấu gạch dưới.
+- Dùng tiền tố nhất quán để phân biệt phòng ban, dự án hoặc vai trò.
+- Ví dụ: `Phong_Kinh_Doanh`, `Phong_Ke_Toan`, `DuAn_A`.
+
+## Bài viết liên quan
+
+<Cards>
+  <Card icon="Users" title="Tạo và quản lý nhóm" description="Tạo nhóm, thêm hoặc gỡ thành viên và sử dụng Group Admin." href="/docs/cloudfile/07-quan-tri-admin/nhom-va-phan-quyen/tao-va-quan-ly-nhom" />
+  <Card icon="UserCheck" title="Tạo người dùng mới" description="Gán người dùng vào nhóm ngay khi tạo tài khoản." href="/docs/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/tao-nguoi-dung-moi" />
+  <Card icon="GitFork" title="Chia sẻ nội bộ" description="Chia sẻ thư mục cho người dùng hoặc nhóm." href="/docs/cloudfile/04-chia-se-phan-quyen/chia-se-noi-bo" />
+</Cards>

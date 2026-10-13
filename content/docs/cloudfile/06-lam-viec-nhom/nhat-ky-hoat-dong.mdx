@@ -1,0 +1,104 @@
+---
+title: "Theo dõi nhật ký hoạt động"
+description: "Hướng dẫn xem hoạt động tổng thể, lịch sử của từng tệp và cấu hình email thông báo."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Đăng nhập bằng tài khoản cần kiểm tra hoạt động.
+- Xác định bạn muốn xem dòng hoạt động tổng thể hay lịch sử của một tệp, thư mục cụ thể.
+- Chuẩn bị tên tệp hoặc thư mục để tìm nhanh trong khu vực **Files**.
+</Callout>
+
+## Xem dòng hoạt động tổng thể
+
+<Steps>
+  <Step>
+    ### Mở Activity
+
+    Chọn biểu tượng **Activity** hình tia sét trên thanh ứng dụng.
+
+    *Kết quả: Dòng hoạt động gần đây xuất hiện theo thứ tự thời gian.*
+  </Step>
+  <Step>
+    ### Lọc hoạt động
+
+    Chọn bộ lọc phù hợp ở cột bên trái: **All activities**, **By you**, **By others** hoặc **Favorites**.
+
+    *Kết quả: Danh sách chỉ còn các sự kiện thuộc phạm vi đã chọn.*
+  </Step>
+</Steps>
+
+## Xem lịch sử của một tệp hoặc thư mục
+
+<Steps>
+  <Step>
+    ### Tìm đối tượng cần kiểm tra
+
+    Mở **Files** và tìm tệp hoặc thư mục liên quan.
+
+    *Kết quả: Đối tượng cần kiểm tra xuất hiện trong danh sách.*
+  </Step>
+  <Step>
+    ### Mở bảng chi tiết
+
+    Chọn dấu ba chấm bên cạnh đối tượng, sau đó chọn **Details**.
+
+    *Kết quả: Bảng chi tiết mở ở cạnh màn hình.*
+  </Step>
+  <Step>
+    ### Đọc Activity
+
+    Mở tab **Activity** để xem ai đã tạo, thay đổi, chia sẻ, xóa hoặc khôi phục đối tượng cùng thời điểm tương ứng.
+
+    *Kết quả: Lịch sử thao tác của riêng tệp hoặc thư mục được hiển thị.*
+  </Step>
+</Steps>
+
+## Cấu hình email thông báo
+
+<Steps>
+  <Step>
+    ### Mở cài đặt Activity
+
+    Chọn avatar, mở **Settings** rồi chọn **Activity**.
+
+    *Kết quả: Các tùy chọn thông báo hoạt động xuất hiện.*
+  </Step>
+  <Step>
+    ### Chọn sự kiện và tần suất
+
+    Đánh dấu loại sự kiện muốn nhận, chẳng hạn tệp được tạo, thay đổi hoặc xóa. Sau đó chọn tần suất gửi email như **Hourly** hoặc **Daily** nếu giao diện cung cấp.
+
+    *Kết quả: Tùy chọn thông báo được lưu cho tài khoản.*
+  </Step>
+</Steps>
+
+**Cần bổ sung:** xác nhận các loại sự kiện, tần suất email và cấu hình gửi mail đang áp dụng trên CloudFile (`Q-ACTIVITY-NOTIFY-01`).
+
+## Kiểm tra kết quả
+
+- Bộ lọc Activity hiển thị đúng nhóm sự kiện mong muốn.
+- Tab Activity của tệp hoặc thư mục cho biết hành động, người thực hiện và thời gian.
+- Cài đặt thông báo phản ánh đúng loại sự kiện và tần suất đã chọn.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Không thấy biểu tượng Activity">
+    Mở menu ứng dụng để tìm **Activity**. Nếu vẫn không có, liên hệ Admin kiểm tra ứng dụng Activity đã được bật hay chưa.
+  </Accordion>
+  <Accordion title="Không thấy lịch sử mong muốn">
+    Kiểm tra lại bộ lọc thời gian và phạm vi. Với một tệp cụ thể, mở **Details** của chính tệp đó thay vì chỉ xem dòng hoạt động tổng thể.
+  </Accordion>
+  <Accordion title="Không nhận được email thông báo">
+    Kiểm tra email trong hồ sơ, thư rác, loại sự kiện và tần suất gửi. Nếu cài đặt đúng, liên hệ Admin kiểm tra dịch vụ gửi mail.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card icon="Users" title="Làm việc nhóm" description="Dùng Lịch, Danh bạ và Ghi chú để cộng tác." href="/docs/cloudfile/06-lam-viec-nhom/lam-viec-nhom" />
+  <Card icon="ListChecks" title="Nhật ký dành cho Admin" description="Truy vết hoạt động và chính sách lưu nhật ký." href="/docs/cloudfile/07-quan-tri-admin/nhat-ky-hoat-dong" />
+  <Card icon="Layers" title="Quản lý tệp tin" description="Tìm và thao tác với tệp trước khi xem lịch sử." href="/docs/cloudfile/03-quan-ly-thu-muc-tep-tin/tai-len-va-quan-ly-tep-tin" />
+</Cards>

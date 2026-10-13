@@ -1,0 +1,10 @@
+{
+  "title": "Quản trị Admin",
+  "pages": [
+    "index",
+    "quan-ly-nguoi-dung",
+    "nhom-va-phan-quyen",
+    "dung-luong-quota",
+    "nhat-ky-hoat-dong"
+  ]
+}

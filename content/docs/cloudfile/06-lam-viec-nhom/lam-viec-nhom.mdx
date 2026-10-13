@@ -1,0 +1,123 @@
+---
+title: "Làm việc nhóm với Lịch, Danh bạ và Ghi chú"
+description: "Hướng dẫn tạo lịch, quản lý liên hệ và chia sẻ ghi chú trong CloudFile."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Đăng nhập CloudFile và kiểm tra bạn thấy các ứng dụng **Calendar**, **Contacts** và **Notes** trên thanh ứng dụng.
+- Chuẩn bị tên người dùng hoặc nhóm cần cộng tác.
+- Quyền truy cập của người nhận phụ thuộc vào lựa chọn chia sẻ của bạn.
+</Callout>
+
+**Cần bổ sung:** xác nhận các ứng dụng Calendar, Contacts, Notes, Tasks và Deck được bật trong gói CloudFile đang cung cấp (`Q-COLLAB-MODULES-01`).
+
+## Tạo và chia sẻ lịch
+
+<Steps>
+  <Step>
+    ### Mở Calendar
+
+    Chọn biểu tượng ứng dụng trên thanh trên cùng, sau đó mở **Calendar**.
+
+    *Kết quả: Giao diện lịch cá nhân xuất hiện.*
+  </Step>
+  <Step>
+    ### Tạo sự kiện
+
+    Chọn ngày hoặc khung giờ cần tạo sự kiện, nhập tiêu đề, thời gian bắt đầu và kết thúc, sau đó chọn **Save**.
+
+    *Kết quả: Sự kiện mới xuất hiện trong lịch của bạn.*
+  </Step>
+  <Step>
+    ### Mời người tham dự
+
+    Mở sự kiện, nhập tên người dùng vào danh sách người tham dự rồi lưu thay đổi. Theo nguồn GitBook, hệ thống gửi lời mời qua email và cập nhật lịch khi người nhận chấp nhận.
+
+    *Kết quả: Người được mời xuất hiện trong danh sách người tham dự.*
+  </Step>
+  <Step>
+    ### Tạo lịch dùng chung
+
+    Trong danh sách **Calendars**, chọn dấu **+**, tạo lịch mới, chọn biểu tượng chia sẻ rồi nhập tên người dùng hoặc nhóm cần cấp quyền.
+
+    *Kết quả: Lịch dùng chung xuất hiện với những người hoặc nhóm đã chọn.*
+  </Step>
+</Steps>
+
+## Tạo và chia sẻ danh bạ
+
+<Steps>
+  <Step>
+    ### Mở Contacts
+
+    Mở menu ứng dụng và chọn **Contacts**.
+
+    *Kết quả: Danh sách liên hệ và sổ địa chỉ xuất hiện.*
+  </Step>
+  <Step>
+    ### Thêm liên hệ
+
+    Chọn tạo liên hệ mới, sau đó nhập các trường cần thiết như tên, email công việc, số điện thoại, công ty và địa chỉ.
+
+    *Kết quả: Liên hệ mới được lưu trong sổ địa chỉ đã chọn.*
+  </Step>
+  <Step>
+    ### Tổ chức và chia sẻ sổ địa chỉ
+
+    Gán liên hệ vào nhóm liên hệ nếu cần. Để cộng tác, chọn sổ địa chỉ, mở tùy chọn chia sẻ và nhập người dùng hoặc nhóm.
+
+    *Kết quả: Người nhận có thể truy cập sổ địa chỉ theo quyền được cấp.*
+  </Step>
+</Steps>
+
+**Cần bổ sung:** xác nhận danh bạ nhân viên có được tự động đồng bộ vào Contacts hay không (`Q-CONTACTS-DIRECTORY-01`).
+
+## Viết và chia sẻ ghi chú
+
+<Steps>
+  <Step>
+    ### Mở Notes và tạo ghi chú
+
+    Mở **Notes**, chọn tạo ghi chú mới rồi nhập nội dung. Bạn có thể dùng Markdown như `#` cho tiêu đề, `*` cho danh sách và `[ ]` cho việc cần làm.
+
+    *Kết quả: Ghi chú mới được lưu và hiển thị trong danh sách.*
+  </Step>
+  <Step>
+    ### Chia sẻ ghi chú
+
+    Mở tùy chọn chia sẻ của ghi chú, nhập tên người dùng hoặc nhóm và bật **Can edit** nếu người nhận được phép chỉnh sửa.
+
+    *Kết quả: Ghi chú xuất hiện với người nhận theo quyền đã chọn.*
+  </Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+- Sự kiện hiển thị đúng ngày giờ và đúng danh sách người tham dự.
+- Lịch hoặc sổ địa chỉ dùng chung xuất hiện với đúng người dùng hoặc nhóm.
+- Ghi chú được lưu, hiển thị đúng Markdown và có quyền chỉnh sửa phù hợp.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Không thấy Calendar, Contacts hoặc Notes">
+    Liên hệ Admin để kiểm tra ứng dụng tương ứng đã được bật cho tài khoản hoặc hệ thống hay chưa.
+  </Accordion>
+  <Accordion title="Không tìm thấy người dùng hoặc nhóm để chia sẻ">
+    Kiểm tra lại tên, xác nhận tài khoản hoặc nhóm đã tồn tại và liên hệ Admin nếu danh sách tìm kiếm không trả về kết quả.
+  </Accordion>
+  <Accordion title="Người nhận không chỉnh sửa được">
+    Mở lại tùy chọn chia sẻ và kiểm tra quyền **Can edit**. Nếu chia sẻ qua nhóm, xác nhận người nhận đang thuộc đúng nhóm.
+  </Accordion>
+  <Accordion title="Người tham dự không nhận được lời mời">
+    Kiểm tra địa chỉ email của người nhận và cấu hình thông báo email của hệ thống. Khả năng gửi email phụ thuộc cấu hình triển khai.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card icon="Activity" title="Nhật ký hoạt động" description="Theo dõi thay đổi trên tệp và thư mục." href="/docs/cloudfile/06-lam-viec-nhom/nhat-ky-hoat-dong" />
+  <Card icon="FileText" title="Online Office" description="Tạo và cùng chỉnh sửa tài liệu ngay trên trình duyệt." href="/docs/cloudfile/06-lam-viec-nhom/online-office" />
+  <Card icon="Users" title="Chia sẻ nội bộ" description="Chia sẻ dữ liệu cho người dùng và nhóm." href="/docs/cloudfile/04-chia-se-phan-quyen/chia-se-noi-bo" />
+</Cards>

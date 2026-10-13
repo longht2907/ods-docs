@@ -1,0 +1,150 @@
+---
+title: "Đồng bộ thư mục với Desktop Client"
+description: "Theo dõi trạng thái, quản lý Virtual Files, thêm thư mục, Selective Sync và tạm dừng đồng bộ."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Hoàn tất đăng nhập và cấu hình thư mục đồng bộ ban đầu.
+- Sao lưu dữ liệu quan trọng trước khi thay đổi phạm vi đồng bộ.
+- Đồng bộ hoạt động hai chiều: thay đổi ở máy tính được gửi lên server và thay đổi trên server được kéo về máy.
+- Nếu cùng một tệp được sửa trên nhiều thiết bị, Desktop Client có thể tạo bản conflict để bạn đối chiếu.
+</Callout>
+
+## Đọc trạng thái đồng bộ
+
+| Trạng thái | Ý nghĩa | Việc cần làm |
+| --- | --- | --- |
+| Tích xanh | Tệp đã tải về máy và khớp với server | Có thể mở offline |
+| Đám mây | Tệp online-only, chưa chiếm dung lượng nội dung trên máy | Nhấp đúp để tải khi cần mở |
+| Mũi tên xoay | Đang tải lên hoặc tải xuống | Giữ kết nối và không tắt máy |
+| Chấm than vàng | Có conflict do nhiều thay đổi đồng thời | Mở cả hai bản và chọn nội dung cần giữ |
+| Dấu chéo đỏ | Đồng bộ lỗi | Kiểm tra tên tệp, đường dẫn và thông báo của client |
+
+## Quản lý Virtual Files
+
+<Steps>
+  <Step>
+    ### Giữ tệp trên thiết bị
+
+    Nhấp phải tệp cần dùng offline và chọn **Always keep on this device**.
+
+    *Kết quả: Tệp được tải về máy và chuyển sang trạng thái tích xanh.*
+  </Step>
+  <Step>
+    ### Giải phóng dung lượng local
+
+    Nhấp phải tệp đã tải và chọn **Free up space**. Thao tác này bỏ bản nội dung local nhưng giữ tệp trên server.
+
+    *Kết quả: Tệp chuyển sang trạng thái đám mây và cần mạng để mở lại.*
+  </Step>
+</Steps>
+
+## Thêm một thư mục đồng bộ riêng
+
+<Steps>
+  <Step>
+    ### Mở Settings của Desktop Client
+
+    Chọn biểu tượng CloudFile/Nextcloud trên Taskbar hoặc Menu Bar, mở menu tài khoản rồi chọn **Settings**.
+
+    *Kết quả: Cửa sổ cấu hình tài khoản và các kết nối đồng bộ xuất hiện.*
+  </Step>
+  <Step>
+    ### Thêm kết nối đồng bộ
+
+    Chọn **Add folder sync connection**. Chọn thư mục local, ví dụ `D:\DuAn_X`, rồi chọn hoặc tạo thư mục đích trên CloudFile.
+
+    *Kết quả: Cặp thư mục local và cloud được hiển thị để xác nhận.*
+  </Step>
+  <Step>
+    ### Xác nhận kết nối
+
+    Chọn **Add sync connection** và theo dõi trạng thái cho đến khi đồng bộ hoàn tất.
+
+    *Kết quả: Thư mục local được đồng bộ với thư mục cloud đã chọn, tách biệt với kết nối chính.*
+  </Step>
+</Steps>
+
+## Dùng Selective Sync
+
+<Steps>
+  <Step>
+    ### Mở danh sách thư mục con
+
+    Trong **Settings**, mở menu ba chấm hoặc mũi tên bên cạnh kết nối đồng bộ.
+
+    *Kết quả: Danh sách thư mục con có checkbox xuất hiện.*
+  </Step>
+  <Step>
+    ### Bỏ chọn thư mục không cần trên máy
+
+    Bỏ tích thư mục không muốn đồng bộ về thiết bị rồi chọn **Apply**.
+
+    *Kết quả: Thư mục biến mất khỏi máy tính nhưng vẫn còn trên Web Portal/server.*
+  </Step>
+</Steps>
+
+## Tạm dừng và tiếp tục đồng bộ
+
+<Steps>
+  <Step>
+    ### Tạm dừng đồng bộ
+
+    Mở cửa sổ Desktop Client, chọn menu ba chấm rồi chọn **Pause sync** khi cần tiết kiệm dữ liệu di động, pin hoặc băng thông cho cuộc họp.
+
+    *Kết quả: Client tạm ngừng tải lên và tải xuống.*
+  </Step>
+  <Step>
+    ### Tiếp tục đồng bộ
+
+    Khi điều kiện mạng phù hợp, mở lại menu và chọn **Resume sync**.
+
+    *Kết quả: Client xử lý tiếp các thay đổi đang chờ và cập nhật trạng thái tệp.*
+  </Step>
+</Steps>
+
+**Cần bổ sung:** xác nhận hành vi xóa hai chiều, thời gian giữ dữ liệu đã xóa và khả năng khôi phục theo chính sách CloudFile ODS (`Q-SYNC-DELETE-01`).
+
+## Kiểm tra kết quả
+
+- Tệp thử nghiệm tạo trong thư mục local xuất hiện trên Web Portal sau khi trạng thái đồng bộ hoàn tất.
+- Tệp online-only chuyển sang tích xanh sau khi chọn **Always keep on this device**.
+- Thư mục bỏ chọn bằng Selective Sync không còn trên máy nhưng vẫn thấy trên Web Portal.
+- Sau **Resume sync**, các thay đổi đang chờ được tiếp tục xử lý.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Tệp hiển thị dấu chéo đỏ">
+    Mở thông báo trong Desktop Client và kiểm tra ký tự đặc biệt trong tên, đường dẫn quá dài, quyền truy cập, dung lượng trống và kết nối mạng.
+  </Accordion>
+  <Accordion title="Xuất hiện hai bản conflict">
+    Không xóa ngay một bản. Mở cả hai, đối chiếu nội dung và thời gian sửa, sau đó giữ hoặc hợp nhất phiên bản phù hợp.
+  </Accordion>
+  <Accordion title="Không mở được tệp khi offline">
+    Tệp đang ở trạng thái online-only hoặc đã dùng **Free up space**. Kết nối mạng, mở tệp để tải xuống hoặc chọn **Always keep on this device** trước khi làm việc offline.
+  </Accordion>
+  <Accordion title="Thư mục biến mất sau khi đổi Selective Sync">
+    Mở lại **Settings**, tích lại thư mục và chọn **Apply**. Việc bỏ tích chỉ loại thư mục khỏi máy; dữ liệu vẫn còn trên Web Portal/server.
+  </Accordion>
+  <Accordion title="Thay đổi không được gửi lên server">
+    Kiểm tra client có đang **Pause sync** hay không. Chọn **Resume sync**, giữ kết nối mạng và chờ biểu tượng chuyển sang trạng thái hoàn tất.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="UserCheck"
+    title="Đăng nhập và cấu hình"
+    description="Kết nối tài khoản và chọn chế độ đồng bộ ban đầu."
+    href="/docs/cloudfile/05-may-tinh-di-dong/desktop-client/dang-nhap-va-cau-hinh"
+  />
+  <Card
+    icon="Clock"
+    title="Nhật ký hoạt động"
+    description="Theo dõi thay đổi đã được ghi nhận trên CloudFile."
+    href="/docs/cloudfile/06-lam-viec-nhom/nhat-ky-hoat-dong"
+  />
+</Cards>

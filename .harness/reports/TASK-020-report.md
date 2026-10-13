@@ -6,7 +6,7 @@
 - Task status: `in-progress`.
 - Nguồn duy nhất: GitBook CloudFile ODS và các URL Markdown trong `llms.txt`.
 - Không sửa vùng AI Contact Center, `content/docs/meta.json`, source code, harness, dependency hoặc cấu hình.
-- Dev server được mở tại port 3002 theo yêu cầu kiểm tra của Human; không thao tác port 3001, không push và không mở Pull Request.
+- Dev server port 3002 đã được tắt khi bắt đầu bàn giao Git. Nhánh đã push tại commit triển khai `74acc44`; Pull Request đang chờ kết nối GitHub để tạo và theo dõi CI.
 
 ## Lô 0 — Task, nguồn và đối chiếu IA
 
@@ -331,3 +331,14 @@ Các hành vi phụ thuộc cấu hình hoặc có ảnh hưởng đến quyền
 - `npm run build`: PASS — 326/326 static pages.
 - Runtime port 3002: bốn trang đại diện ở root, quản lý tệp, máy tính/di động và quota đều HTTP 200; HTML có SVG và không còn chuỗi tên icon không hợp lệ.
 - `npm run check:scope`: vẫn FAIL duy nhất do tệp `.docx` untracked ngoài TASK-020; không liên quan đến hiệu chỉnh icon.
+
+## Bàn giao Git
+
+- Rebase nhánh `task/TASK-020-cloudfile-docs` lên `origin/main` tại `b7b8f26` trước khi push; `origin/main` là ancestor của commit triển khai.
+- Commit triển khai: `74acc44` (`docs(task-020): migrate CloudFile user guide`).
+- Remote branch: `origin/task/TASK-020-cloudfile-docs`, xác nhận cùng SHA `74acc44` sau push.
+- `npm run verify`: PASS sau rebase — typecheck, env, links, guard và build 326/326.
+- `check:scope`: PASS trong worktree sạch checkout từ đúng commit/branch CI; worktree kiểm chứng tạm đã được xóa sau khi dùng.
+- `npm run test:routes`: PASS 12/12 — public routes HTTP 200 và internal routes HTTP 401 đúng kỳ vọng.
+- Pull Request chưa được tạo tại thời điểm ghi nhận vì phiên chưa có GitHub connector và máy không cài `gh`; không tuyên bố PR/CI khi chưa có bằng chứng từ GitHub.
+- Task giữ `status: in-progress` cho đến khi PR tồn tại, CI xanh và Human finalization theo quy định repository.

@@ -1,0 +1,206 @@
+---
+title: "Webhook Popup"
+description: "Cấu trúc dữ liệu và hướng dẫn tiếp nhận sự kiện cuộc gọi Popup thời gian thực từ tổng đài ODS."
+---
+
+<Callout type="info">`POST` `{CUSTOMER_WEBHOOK_URL}`</Callout>
+
+Khi có cuộc gọi phát sinh (gọi vào hoặc gọi ra từ số máy nhánh), tổng đài ODS sẽ tự động gửi một HTTP POST request chứa thông tin chi tiết cuộc gọi đến địa chỉ URL Webhook do doanh nghiệp cấu hình trên Portal.
+
+## Cấu hình Webhook trên Portal tổng đài
+
+<Steps>
+  <Step>
+    Vào mục **Cấu hình API** ➔ **Thông báo - PopUp**.
+  </Step>
+  <Step>
+    Bật chức năng **Popup**, nhập URL tiếp nhận webhook của hệ thống bạn và tick chọn các Số nội bộ cần đẩy thông báo.
+  </Step>
+  <Step>
+    Vào mục **Hiện thông báo PopUp** để bật các sự kiện tương ứng (Đổ chuông, Nghe máy, Gác máy).
+  </Step>
+</Steps>
+
+## Cấu trúc Payload
+
+### 1. Khi đang đổ chuông (`Status: Ringing` hoặc `Ringing_Out`)
+
+```json
+{
+  "ApiKey": "YOUR_WEBHOOK_API_KEY",
+  "CallNumber": "0900000000",
+  "CallName": "Nguyen Van A",
+  "QueueNumber": "1000",
+  "ReceiptNumber": "101",
+  "Key": "1610523779.7006",
+  "Status": "Ringing",
+  "Direction": "Inbound",
+  "NumberPBX": "02873007788",
+  "Message": "101-0900000000-Nguyen Van A"
+}
+```
+
+### 2. Khi cuộc gọi kết thúc (`Status: Down` hoặc `Down_Out`)
+
+Khi gác máy, payload sẽ có thêm đối tượng `Data` chứa thời gian đàm thoại và liên kết file ghi âm:
+
+```json
+{
+  "ApiKey": "YOUR_WEBHOOK_API_KEY",
+  "CallNumber": "0900000000",
+  "CallName": "Nguyen Van A",
+  "QueueNumber": "1000",
+  "ReceiptNumber": "101",
+  "Key": "1610523779.7006",
+  "Status": "Down",
+  "Direction": "Inbound",
+  "NumberPBX": "02873007788",
+  "Message": "101-0900000000-Nguyen Van A",
+  "Data": {
+    "TotalTimeCall": "02:04",
+    "RealTimeCall": "124",
+    "LinkFile": "https://recording.ods.vn/recordings/audio.mp3"
+  }
+}
+```
+
+## Bảng mô tả tham số
+
+| Tham số | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `ApiKey` | string | Chuỗi khóa bảo mật do doanh nghiệp cấu hình trên Portal để xác thực nguồn gửi đến server của bạn. |
+| `CallNumber` | string | Số điện thoại gọi đi (Source - với cuộc gọi ra là số máy nhánh nhân viên). |
+| `CallName` | string | Tên người gọi (lấy theo danh bạ tổng đài nếu số đã được lưu). |
+| `ReceiptNumber` | string | Số nhận cuộc gọi (Destination - với cuộc gọi vào là số máy nhánh, với cuộc gọi ra là SĐT khách hàng). |
+| `QueueNumber` | string | Số nhóm máy nhánh tiếp nhận cuộc gọi (Queue / Ring Group). |
+| `Key` | string | Mã định danh duy nhất của phiên cuộc gọi (dùng để tra cứu trong nhật ký cuộc gọi). |
+| `KeyRinging` | string | Tham số định danh phiên chuông cũ (hiện đã deprecated, khuyến nghị dùng `Key`). |
+| `Status` | string | Trạng thái cuộc gọi tại thời điểm bắn webhook (xem bảng trạng thái bên dưới). |
+| `Direction` | string | Hướng cuộc gọi: `Inbound` (Gọi vào) hoặc `Outbound` (Gọi ra). |
+| `NumberPBX` | string | Đầu số tổng đài: có thể là tên cấu hình Inbound (cuộc gọi vào), Trunk đầu số (cuộc gọi ra) hoặc `TRANSFERRED` (khi cuộc gọi được chuyển tiếp). |
+| `Message` | string | Chuỗi tóm tắt thông tin: `{ReceiptNumber}-{CallNumber}-{CallName}`. |
+| `Data` | object | Dữ liệu mở rộng sau khi kết thúc đàm thoại (chỉ xuất hiện khi `Status` là `Down` hoặc `Down_Out`). |
+| `Data.TotalTimeCall` | string | Tổng thời gian cuộc gọi tính từ khi đổ chuông (`mm:ss`). |
+| `Data.RealTimeCall` | string | Thời gian đàm thoại thực tế (tính bằng giây). |
+| `Data.LinkFile` | string | Đường dẫn URL tải file ghi âm cuộc gọi. |
+
+## Bảng trạng thái cuộc gọi (`Status`)
+
+| Trạng thái | Hướng áp dụng | Ý nghĩa nghiệp vụ |
+| :-- | :-- | :-- |
+| `Ringing` | Inbound (Gọi vào) | Máy nhánh nhân viên đang đổ chuông, khách hàng đang chờ. Thích hợp để bật Popup CRM hiển thị thông tin khách hàng. |
+| `Up` | Inbound (Gọi vào) | Nhân viên đã nhấc máy, bắt đầu đàm thoại. |
+| `Down` | Inbound (Gọi vào) | Cuộc gọi đã kết thúc (gác máy). Lúc này payload có thêm trường `Data` chứa thời gian đàm thoại và link ghi âm. |
+| `Ringing_Out` | Outbound (Gọi ra) | Tổng đài đang đổ chuông số điện thoại khách hàng. |
+| `Up_Out` | Outbound (Gọi ra) | Khách hàng đã nhấc máy, nhân viên và khách hàng bắt đầu đàm thoại. |
+| `Down_Out` | Outbound (Gọi ra) | Cuộc gọi ra đã kết thúc, payload đính kèm trường `Data` và link ghi âm. |
+
+## Vòng đời sự kiện cuộc gọi (Call Events)
+
+Một cuộc gọi hoàn chỉnh trên tổng đài sẽ tuần tự phát sinh các sự kiện tương ứng:
+
+1. **register**: Phát sinh khi tổng đài bắt đầu tiếp nhận hoặc khởi tạo cuộc gọi.
+2. **show** (tương ứng `Ringing` / `Ringing_Out`): Máy nhánh bắt đầu đổ chuông.
+3. **answer** (tương ứng `Up` / `Up_Out`): Một bên nhấc máy nghe điện thoại.
+4. **hide**: Máy nhánh dừng đổ chuông (chuyển máy hoặc hết thời gian chờ).
+5. **finish** (tương ứng `Down` / `Down_Out`): Cuộc gọi kết thúc hoàn toàn.
+
+## Ví dụ Webhook Receiver
+
+<Tabs items={['Node.js (Express)', 'PHP']}>
+  <Tab value="Node.js (Express)">
+```javascript
+import express from 'express';
+
+const app = express();
+app.use(express.json());
+
+app.post('/webhook/ods-popup', (req, res) => {
+  const { ApiKey, CallNumber, ReceiptNumber, Status, Direction, Data } = req.body;
+
+  // 1. Xác thực ApiKey bí mật của bạn
+  if (ApiKey !== process.env.ODS_WEBHOOK_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  console.log(`[ODS Webhook] ${Direction} | Status: ${Status} | ${CallNumber} -> ${ReceiptNumber}`);
+
+  // 2. Xử lý nghiệp vụ theo từng trạng thái
+  if (Status === 'Ringing') {
+    // Bắn WebSocket / SSE để bật Popup CRM màn hình máy nhánh ReceiptNumber
+  } else if (Status === 'Down' && Data) {
+    // Lưu link ghi âm Data.LinkFile và thời lượng Data.RealTimeCall vào CRM
+  }
+
+  // 3. Phản hồi HTTP 200 ngay lập tức (dưới 3s)
+  return res.status(200).json({ status: 'ok' });
+});
+
+app.listen(3000, () => console.log('Webhook server running on port 3000'));
+```
+  </Tab>
+  <Tab value="PHP">
+```php
+<?php
+header('Content-Type: application/json');
+
+$payload = file_get_contents('php://input');
+$data = json_decode($payload, true);
+
+if (!$data) {
+    http_response_code(400);
+    exit(json_encode(['error' => 'Invalid JSON']));
+}
+
+// 1. Kiểm tra ApiKey
+if (($data['ApiKey'] ?? '') !== 'YOUR_WEBHOOK_API_KEY') {
+    http_response_code(401);
+    exit(json_encode(['error' => 'Unauthorized']));
+}
+
+$status = $data['Status'] ?? '';
+$callNumber = $data['CallNumber'] ?? '';
+
+// 2. Xử lý nghiệp vụ
+if ($status === 'Ringing') {
+    // Xử lý bật popup CRM
+} elseif ($status === 'Down' && isset($data['Data'])) {
+    $recordingUrl = $data['Data']['LinkFile'] ?? '';
+    // Lưu link ghi âm vào database
+}
+
+// 3. Luôn phản hồi HTTP 200
+http_response_code(200);
+echo json_encode(['result' => 'success']);
+```
+  </Tab>
+</Tabs>
+
+## Lưu ý quan trọng & Khuyến nghị
+
+<Callout type="warning">
+- **Xử lý bất đồng bộ (Asynchronous)**: Endpoint tiếp nhận webhook của bạn phải phản hồi HTTP `200 OK` trong vòng **dưới 3 giây**. Các tác vụ nặng (như ghi database phức tạp, gọi API bên thứ ba, tải file ghi âm) nên được đưa vào Message Queue (RabbitMQ, Redis Queue) để xử lý nền.
+- **Tránh trùng lặp sự kiện**: Sử dụng trường `Key` kết hợp `Status` làm khóa định danh duy nhất (Idempotency Key) để tránh xử lý trùng nếu tổng đài retry gửi webhook.
+- **Bảo mật**: Luôn thiết lập `ApiKey` trong Portal và xác thực lại ở đầu nhận để đảm bảo request xuất phát từ hệ thống ODS.
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="Tổng đài báo gửi Webhook thất bại / Timeout">
+    - Server tiếp nhận webhook của bạn không phản hồi HTTP 200 trong vòng 3 giây.
+    - URL Webhook bị chặn bởi Firewall / Cloudflare / WAF chặn IP tổng đài.
+    - Chứng chỉ SSL của Webhook URL bị hết hạn hoặc không hợp lệ.
+  </Accordion>
+  <Accordion title="Không nhận được dữ liệu ghi âm LinkFile">
+    - Sự kiện nhận được có `Status` là `Ringing` hoặc `Up`. Dữ liệu ghi âm chỉ có trong payload khi cuộc gọi đã kết thúc (`Status: Down` hoặc `Down_Out`).
+    - Máy nhánh không được cấu hình ghi âm cuộc gọi trên Portal tổng đài.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Khởi tạo cuộc gọi Click-to-Call" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call" description="Tạo cuộc gọi từ CRM kết hợp Webhook Popup." />
+  <Card title="Nhật ký cuộc gọi" href="/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs" description="Tra cứu toàn bộ lịch sử cuộc gọi." />
+</Cards>

@@ -1,6 +1,9 @@
 {
-  "title": "Autocall",
+  "title": "API Autocall",
   "pages": [
-    "index"
+    "index",
+    "chien-dich",
+    "am-thanh",
+    "danh-ba"
   ]
 }

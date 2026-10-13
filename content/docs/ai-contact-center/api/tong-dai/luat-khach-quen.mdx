@@ -1,0 +1,173 @@
+---
+title: "Luật khách quen"
+description: "Thiết lập định tuyến ưu tiên cuộc gọi của khách hàng quen tới máy nhánh phụ trách."
+---
+
+<Callout type="info">`POST` `{BASE_URL}/api/CloudFone/CreateAndUpdateFamiliar`</Callout>
+
+Tính năng Luật khách quen (Sticky Agent) cho phép hệ thống tự động ghi nhớ và ưu tiên đổ chuông trực tiếp tới máy nhánh của nhân viên phụ trách khi khách hàng gọi vào số Hotline của tổng đài.
+
+**Nguyên tắc hoạt động:**
+- Khi có cuộc gọi đến Inbound, nếu số điện thoại (`Phone`) khớp trong danh sách: tổng đài sẽ ưu tiên đổ chuông thẳng tới máy nhánh (`Extention`) tương ứng thay vì đi qua menu IVR thông thường.
+- Một số điện thoại khách hàng có thể được ánh xạ vào nhiều đầu số Hotline (`Inbound`).
+- Hỗ trợ xử lý hàng loạt bản ghi thông qua mảng `Items`.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceName` | string | Có | Mã dịch vụ tổng đài khi mua tại ODS (ví dụ: `CF-BS0XXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng (ví dụ: `ODSXXXX`). |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `Type` | string | Có | Thao tác thực hiện: `"insert"` (thêm mới), `"update"` (cập nhật) hoặc `"delete"` (xóa khỏi danh sách). |
+| `Items` | array | Có | Mảng danh sách các bản ghi khách hàng cần xử lý. |
+
+### Cấu trúc từng phần tử trong `Items`
+
+| Thuộc tính | Kiểu dữ liệu | Bắt buộc | Mô tả |
+| :-- | :-- | :-: | :-- |
+| `Inbound` | string | Có | Đầu số Hotline tổng đài cần áp dụng luật (ví dụ: `02873070809`). |
+| `Extention` | string | Có | Số máy nhánh của nhân viên sẽ nhận cuộc gọi (ví dụ: `998`, `5000`). *(Lưu ý: Giữ nguyên tên trường `Extention` có chữ 't')*. |
+| `Phone` | string | Có | Số điện thoại của khách hàng cần định danh (ví dụ: `0900000000`). |
+
+## Ví dụ request
+
+<Tabs items={['Thêm mới (cURL)', 'Xóa (cURL)', 'JavaScript', 'Python']}>
+  <Tab value="Thêm mới (cURL)">
+```bash
+curl -X POST "{BASE_URL}/api/CloudFone/CreateAndUpdateFamiliar" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceName": "YOUR_SERVICE_NAME",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Type": "insert",
+    "Items": [
+      {
+        "Inbound": "02873070809",
+        "Extention": "998",
+        "Phone": "0900000000"
+      }
+    ]
+  }'
+```
+  </Tab>
+  <Tab value="Xóa (cURL)">
+```bash
+curl -X POST "{BASE_URL}/api/CloudFone/CreateAndUpdateFamiliar" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceName": "YOUR_SERVICE_NAME",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Type": "delete",
+    "Items": [
+      {
+        "Inbound": "02873070809",
+        "Extention": "998",
+        "Phone": "0900000000"
+      }
+    ]
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{BASE_URL}/api/CloudFone/CreateAndUpdateFamiliar', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceName: 'YOUR_SERVICE_NAME',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    Type: 'insert',
+    Items: [
+      {
+        Inbound: '02873070809',
+        Extention: '998',
+        Phone: '0900000000',
+      },
+    ],
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceName": "YOUR_SERVICE_NAME",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Type": "insert",
+    "Items": [
+        {
+            "Inbound": "02873070809",
+            "Extention": "998",
+            "Phone": "0900000000",
+        }
+    ],
+}
+response = requests.post(
+    "{BASE_URL}/api/CloudFone/CreateAndUpdateFamiliar",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": "Xử lý thành công 1/1 bản ghi.",
+  "data": [
+    {
+      "serviceName": "CF-BS0000085",
+      "type": "insert",
+      "inbound": "02873070809",
+      "extention": "998",
+      "phone": "0900000000",
+      "result": "success",
+      "message": "Xử lý thành công.",
+      "data": "last"
+    }
+  ]
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái xử lý chung của toàn bộ request (`success` hoặc `failed`). |
+| `message` | string | Thông báo tổng quan số lượng bản ghi đã xử lý. |
+| `data` | array | Danh sách kết quả chi tiết từng phần tử trong `Items`. |
+| `data[].result` | string | Trạng thái xử lý của riêng bản ghi đó (`success` hoặc `failed`). |
+| `data[].message` | string | Thông báo chi tiết cho từng bản ghi (ví dụ: "Xử lý thành công", "Số điện thoại đã tồn tại"). |
+
+## Lưu ý quan trọng
+- Tên trường trong mảng `Items` là **`Extention`** (viết bằng chữ `t`), không phải `Extension`. Vui lòng giữ đúng cú pháp để hệ thống nhận diện.
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="Số điện thoại đã tồn tại khi insert">
+    Nếu cặp `Inbound` + `Phone` đã tồn tại, hãy dùng `Type: "update"` thay vì `"insert"`.
+  </Accordion>
+  <Accordion title="Không tìm thấy dữ liệu khi update hoặc delete">
+    Bản ghi định danh khách hàng chưa từng được cấu hình luật khách quen trên tổng đài.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Danh bạ tổng đài" href="/docs/ai-contact-center/api/tong-dai/danh-ba/add-phonebook" description="Lưu trữ tên khách hàng để hiển thị trên màn hình máy nhánh." />
+  <Card title="Popup Webhook" href="/docs/ai-contact-center/api/webhook/popup" description="Nhận thông báo cuộc gọi đến thời gian thực." />
+</Cards>

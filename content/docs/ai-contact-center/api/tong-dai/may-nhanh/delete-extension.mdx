@@ -1,0 +1,105 @@
+---
+title: "Xóa máy nhánh"
+description: "Xóa máy nhánh (extension) trên tổng đài AI Contact Center."
+---
+
+<Callout type="info">`POST` `{BASE_URL}/api/CloudFone/DeleteExtension`</Callout>
+
+Thu hồi và xóa số nội bộ (extension) trên tổng đài khi nhân sự nghỉ việc hoặc tái cấu trúc phòng ban.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ tổng đài khi đăng ký tại ODS (ví dụ: `CF-BSXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản định danh khách hàng (ví dụ: `ODSXXXX`). |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `Ext` | string | Có | Số máy nhánh cần xóa (ví dụ: `1997`). |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{BASE_URL}/api/CloudFone/DeleteExtension" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "Ext": "1001"
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{BASE_URL}/api/CloudFone/DeleteExtension', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    Ext: '1001',
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "Ext": "1001",
+}
+response = requests.post(
+    "{BASE_URL}/api/CloudFone/DeleteExtension",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": "Thành công!"
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+| `message` | string | Thông báo kết quả chi tiết từ hệ thống tổng đài. |
+
+## Lưu ý quan trọng
+- Khi xóa máy nhánh, các thiết bị IP Phone hoặc Softphone đang đăng ký SIP bằng tài khoản này sẽ lập tức mất kết nối.
+- Lịch sử cuộc gọi cũ của máy nhánh này vẫn được lưu trữ và có thể tra cứu qua API [GetCallLogs](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs).
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="Không tìm thấy số máy nhánh cần xóa">
+    Số máy nhánh không tồn tại trong hệ thống hoặc đã được xóa trước đó.
+  </Accordion>
+  <Accordion title="Sai thông tin xác thực">
+    Kiểm tra lại `AuthUser` và `AuthKey` của gói dịch vụ.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Tạo máy nhánh" href="/docs/ai-contact-center/api/tong-dai/may-nhanh/add-extension" description="Thêm số nội bộ mới cho nhân viên." />
+  <Card title="API Tổng đài" href="/docs/ai-contact-center/api/tong-dai" description="Danh mục API tổng đài PBX." />
+</Cards>

@@ -1,0 +1,131 @@
+---
+title: "Danh sách tệp âm thanh (GetAudioList)"
+description: "Tra cứu danh sách các tệp âm thanh TTS và file ghi âm đã tạo trên hệ thống Autocall."
+---
+
+<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Audio/GetAudioList`</Callout>
+
+Lấy danh sách các tệp âm thanh hiện có trong kho dữ liệu của doanh nghiệp, hỗ trợ phân trang và tìm kiếm theo tên tệp để lấy mã `AudioId` cấu hình cho chiến dịch.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `Key` | string | Không | Từ khóa tìm kiếm theo tên tệp âm thanh. |
+| `PageIndex` | number | Không | Số thứ tự trang hiện tại (mặc định là `1`). |
+| `PageSize` | number | Không | Số lượng bản ghi trên một trang (mặc định là `20`). |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Audio/GetAudioList" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Key": "",
+    "PageIndex": 1,
+    "PageSize": 20
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{AUTOCALL_BASE_URL}/api/Audio/GetAudioList', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    PageIndex: 1,
+    PageSize: 20,
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "PageIndex": 1,
+    "PageSize": 20,
+}
+response = requests.post(
+    "{AUTOCALL_BASE_URL}/api/Audio/GetAudioList",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": "",
+  "total": 5,
+  "data": [
+    {
+      "id": 41,
+      "audioName": "Loi chao CSKH",
+      "type": "FPT",
+      "voiceType": "female",
+      "createdDate": "2026-10-13 08:30:00"
+    }
+  ]
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+| `total` | number | Tổng số lượng file âm thanh tìm thấy. |
+| `data` | array | Danh sách thông tin chi tiết từng tệp âm thanh. |
+| `data[].id` | number | Mã ID tệp âm thanh (dùng trong chiến dịch Autocall). |
+| `data[].audioName` | string | Tên định danh của tệp âm thanh. |
+| `data[].type` | string | Loại âm thanh (`Google`, `FPT`, `VBEE`, `VTCC`, `File`). |
+| `data[].voiceType` | string | Mã kiểu giọng đọc đã cấu hình. |
+| `data[].createdDate` | string | Thời điểm tạo file âm thanh. |
+
+## Lưu ý quan trọng
+
+<Callout type="info">
+- **Lấy danh sách mã tệp**: Sử dụng trường `data[].id` để gán vào thuộc tính `ActionParam` trong mảng `Audios` khi thiết lập kịch bản cuộc gọi qua API [StartCampaign](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign).
+- **Phân trang**: Sử dụng `PageIndex` và `PageSize` để duyệt toàn bộ danh sách khi kho âm thanh có nhiều tệp.
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="400 Bad Request / result: failed">
+    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+    - Dịch vụ `ServiceCode` không hợp lệ.
+  </Accordion>
+  <Accordion title="Danh sách data rỗng []">
+    - Doanh nghiệp chưa tạo tệp âm thanh nào, hoặc từ khóa tìm kiếm `Key` không khớp với tên tệp nào.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Tạo âm thanh TTS" href="/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio" description="Tạo thêm tệp âm thanh mới." />
+  <Card title="Xóa tệp âm thanh" href="/docs/ai-contact-center/api/autocall/am-thanh/delete-audio" description="Xóa tệp âm thanh khỏi kho dữ liệu." />
+</Cards>

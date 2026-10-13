@@ -1,0 +1,157 @@
+---
+title: "Tạo âm thanh TTS và tải tệp (CreateTTSAudio)"
+description: "Chuyển văn bản thành giọng nói (Text-to-Speech) qua Google, FPT, Vbee, Viettel hoặc tải lên tệp Base64."
+---
+
+<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Audio/CreateTTSAudio`</Callout>
+
+Tạo tệp âm thanh phát thoại cho chiến dịch Autocall bằng công nghệ Text-to-Speech (chuyển văn bản tiếng Việt thành giọng đọc AI tự nhiên) hoặc tải tệp âm thanh có sẵn (`.mp3`, `.wav`) dưới dạng chuỗi Base64.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `AudioName` | string | Có | Tên định danh gợi nhớ của tệp âm thanh (ví dụ: `Xin chào buổi sáng`). |
+| `Type` | string | Có | Động cơ âm thanh: `"Google"`, `"FPT"`, `"VBEE"`, `"VTCC"` hoặc `"File"`. |
+| `Content` | string | Có | Nội dung văn bản cần đọc thành tiếng (nếu `Type` là TTS) hoặc chuỗi Base64 của tệp âm thanh (nếu `Type` là `"File"`). |
+| `VoiceType` | string | Không | Mã kiểu giọng đọc tương ứng với từng nhà cung cấp (xem bảng chi tiết bên dưới). |
+
+### Bảng lựa chọn kiểu giọng đọc (`VoiceType`)
+
+| Động cơ (`Type`) | Kiểu giọng (`VoiceType`) | Đặc điểm giọng đọc |
+| :-- | :-- | :-- |
+| **Google** | *(Bỏ trống)* | Giọng đọc Google tiếng Việt chuẩn. |
+| **FPT** | `male` | Giọng Nam miền Bắc. |
+| | `female` | Giọng Nữ miền Nam. |
+| | `hatieumai` | Giọng Nữ miền Nam truyền cảm. |
+| **VBEE** | `hn_male_xuantin_vdts_48k-hsmm` | Giọng Nam miền Bắc (Xuân Tín). |
+| | `hn_female_xuanthu_news_48k-hsmm` | Giọng Nữ miền Bắc (Xuân Thu). |
+| | `hn_female_thutrang_phrase_48k-hsmm` | Giọng Nữ miền Bắc (Thu Trang). |
+| | `sg_male_xuankien_vdts_48k-hsmm` | Giọng Nam miền Nam (Xuân Kiên). |
+| | `sg_female_xuanhong_vdts_48k-hsmm` | Giọng Nữ miền Nam (Xuân Hồng). |
+| **VTCC (Viettel)**| `lethiyen-2018` | Giọng Lê Thị Yến (Nữ miền Nam). |
+| | `doanngocle2` | Giọng Đoàn Ngọc Lê (Nam miền Bắc). |
+| | `trinhthiviettrinh` | Giọng Trịnh Việt Trinh (Nữ miền Bắc). |
+| **File** | *(Bỏ trống)* | Tải trực tiếp file `.mp3` hoặc `.wav` qua chuỗi Base64 ở trường `Content`. |
+
+## Ví dụ request
+
+<Tabs items={['TTS FPT (cURL)', 'Tải file Base64 (cURL)', 'JavaScript', 'Python']}>
+  <Tab value="TTS FPT (cURL)">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Audio/CreateTTSAudio" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "AudioName": "Loi chao CSKH",
+    "Type": "FPT",
+    "VoiceType": "female",
+    "Content": "Chào bạn, ODS xin gửi lời chúc sức khỏe và thành công đến quý doanh nghiệp."
+  }'
+```
+  </Tab>
+  <Tab value="Tải file Base64 (cURL)">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Audio/CreateTTSAudio" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "AudioName": "Ghi am san co",
+    "Type": "File",
+    "VoiceType": "",
+    "Content": "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA..."
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{AUTOCALL_BASE_URL}/api/Audio/CreateTTSAudio', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    AudioName: 'Loi chao CSKH',
+    Type: 'FPT',
+    VoiceType: 'female',
+    Content: 'Chào bạn, ODS xin gửi lời chúc sức khỏe đến quý doanh nghiệp.',
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "AudioName": "Loi chao CSKH",
+    "Type": "FPT",
+    "VoiceType": "female",
+    "Content": "Chào bạn, ODS xin gửi lời chúc sức khỏe đến quý doanh nghiệp.",
+}
+response = requests.post(
+    "{AUTOCALL_BASE_URL}/api/Audio/CreateTTSAudio",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": "",
+  "data": 41
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+| `data` | number | Mã ID của tệp âm thanh vừa tạo (dùng cho trường `ActionParam` trong [StartCampaign](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign)). |
+
+## Lưu ý quan trọng
+
+<Callout type="warning">
+- **Chất lượng giọng đọc TTS**: Để AI đọc tự nhiên và chuẩn ngữ điệu, nội dung văn bản tiếng Việt trong trường `Content` cần có đầy đủ dấu câu (dấu phẩy, dấu chấm) để phân tách nhịp thở và ngắt câu.
+- **Tải tệp âm thanh Base64**: Khi `Type` là `"File"`, chuỗi Base64 chỉ chấp nhận định dạng âm thanh `.mp3` hoặc `.wav` (tần số lấy mẫu khuyến nghị 8000Hz hoặc 16000Hz, kênh Mono).
+- **Lưu trữ mã AudioId**: Giá trị số nguyên trả về trong trường `data` (ví dụ: `41`) là ID định danh file âm thanh. Bạn cần lưu mã này để gán vào tham số `ActionParam` khi tạo chiến dịch qua API [StartCampaign](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign).
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="400 Bad Request / result: failed">
+    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+    - Chọn sai mã `VoiceType` so với nhà cung cấp `Type` tương ứng.
+    - Chuỗi Base64 bị lỗi cú pháp hoặc dung lượng tệp vượt quá giới hạn hệ thống cho phép.
+  </Accordion>
+  <Accordion title="Giọng đọc bị ngắt quãng hoặc phát âm sai từ ngữ">
+    - Nội dung văn bản có chứa các ký tự đặc biệt lạ hoặc viết tắt không thông dụng. Nên viết chữ số thành chữ (ví dụ viết "hai mươi nghìn đồng" thay vì "20.000đ").
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Danh sách âm thanh" href="/docs/ai-contact-center/api/autocall/am-thanh/get-audio-list" description="Xem tất cả file âm thanh đã tạo." />
+  <Card title="Khởi chạy chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Gán ID âm thanh vào chiến dịch gọi tự động." />
+</Cards>

@@ -1,24 +1,72 @@
 ---
-title: "API Reference"
-description: "Danh mục REST API và Webhook tích hợp AI Contact Center."
+title: "Tổng quan API Reference"
+description: "Tài liệu kỹ thuật REST API, Webhook và WebSocket RTC tích hợp ODS AI Contact Center."
 ---
 
-Chọn nhóm tài liệu phù hợp với luồng tích hợp của bạn. Các trang khung chỉ mô tả phạm vi đã xác định và sẽ được bổ sung khi có đặc tả kỹ thuật chính thức.
+Chào mừng bạn đến với tài liệu kỹ thuật tích hợp **ODS AI Contact Center**. Hệ thống cung cấp nền tảng API toàn diện giúp doanh nghiệp kết nối tổng đài thoại thông minh vào các ứng dụng nội bộ như CRM, ERP, Helpdesk, hệ thống quản lý bán hàng hoặc website.
 
-<Cards className="grid-cols-1 md:grid-cols-3">
+<Callout type="info">
+  **Domain tích hợp chính thức:**
+  - API Tổng đài PBX: `https://api.ods.vn`
+  - API Chiến dịch Autocall: `https://apiai.cloudfone.vn`
+  - *Lưu ý tương thích:* Hệ thống vẫn hỗ trợ các domain cũ (`api.cloudfone.vn`, `api.matbao.one`) cho các đối tác đã tích hợp trước đó, nhưng khuyến nghị chuyển đổi sang `https://api.ods.vn`.
+</Callout>
+
+## Các nhóm API chính
+
+Hệ thống được chia thành 4 trụ cột tích hợp chính tùy theo nhu cầu nghiệp vụ của doanh nghiệp:
+
+<Cards className="grid-cols-1 md:grid-cols-2">
   <Card
-    title="API tổng đài"
-    description="Các luồng tích hợp tổng đài, Click-to-Call và lịch sử cuộc gọi."
+    title="Bắt đầu tích hợp"
+    description="Tìm hiểu cơ chế xác thực ServiceName / AuthUser / AuthKey và các quy ước chung về Base URL, Envelope JSON."
+    href="/docs/ai-contact-center/api/bat-dau/xac-thuc"
+  />
+  <Card
+    title="API Tổng đài PBX"
+    description="Quản lý máy nhánh, khởi tạo cuộc gọi Click-to-Call, đồng bộ danh bạ, thiết lập luật khách quen và tra cứu lịch sử cuộc gọi."
     href="/docs/ai-contact-center/api/tong-dai"
   />
   <Card
-    title="Autocall"
-    description="Không gian tài liệu API dành cho chiến dịch gọi tự động."
+    title="Webhook sự kiện"
+    description="Tiếp nhận thông báo cuộc gọi thời gian thực (Popup) về hệ thống CRM khi có cuộc gọi vào hoặc ra."
+    href="/docs/ai-contact-center/api/webhook"
+  />
+  <Card
+    title="WebSocket RTC (WebRTC)"
+    description="Tích hợp thoại trực tiếp trên trình duyệt web thông qua SIP over WSS (JsSIP) hoặc nhúng Widget ODSPhone."
+    href="/docs/ai-contact-center/api/websocket-rtc"
+  />
+  <Card
+    title="API Gọi tự động (Autocall)"
+    description="Tự động hóa chiến dịch phát âm thanh hàng loạt: quản lý file TTS, nhóm liên hệ, khởi chạy chiến dịch và trích xuất báo cáo."
     href="/docs/ai-contact-center/api/autocall"
   />
   <Card
-    title="Webhook"
-    description="Không gian tài liệu sự kiện cuộc gọi và Autocall."
-    href="/docs/ai-contact-center/api/webhook"
+    title="Hướng dẫn sử dụng Portal"
+    description="Xem hướng dẫn thao tác trực quan trên giao diện quản trị tổng đài ODS Portal."
+    href="/docs/ai-contact-center/user-guider-portal"
   />
 </Cards>
+
+## Quy trình tích hợp nhanh
+
+Để kết nối ứng dụng của bạn với ODS AI Contact Center, hãy thực hiện theo 3 bước cơ bản:
+
+<Steps>
+  <Step>
+    ### Lấy thông tin xác thực API
+    Đăng nhập vào Portal quản trị tổng đài, truy cập mục **Cấu hình API** để lấy bộ 3 khóa: `ServiceName` (Mã dịch vụ), `AuthUser` (Mã khách hàng) và `AuthKey` (API Key bí mật).
+  </Step>
+  <Step>
+    ### Lựa chọn giao thức kết nối
+    - **Gọi ra nhanh từ CRM**: Sử dụng [Click-to-Call](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call) để kích hoạt cuộc gọi tới máy nhánh nhân viên.
+    - **Hiển thị thông tin khách gọi đến**: Cấu hình URL nhận [Popup Webhook](/docs/ai-contact-center/api/webhook/popup).
+    - **Thoại trực tiếp không cần cài app**: Tích hợp [WebRTC qua WSS](/docs/ai-contact-center/api/websocket-rtc/ket-noi-webrtc).
+    - **CSKH / Nhắc nợ tự động**: Sử dụng [Chiến dịch Autocall](/docs/ai-contact-center/api/autocall).
+  </Step>
+  <Step>
+    ### Kiểm thử và triển khai
+    Thực thi request với các ví dụ code mẫu cURL, JavaScript hoặc Python đi kèm trong từng trang tài liệu endpoint.
+  </Step>
+</Steps>

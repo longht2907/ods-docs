@@ -1,0 +1,135 @@
+---
+title: "Danh sách chiến dịch (GetCampaignList)"
+description: "Tra cứu danh sách các chiến dịch gọi tự động Autocall theo trạng thái và từ khóa."
+---
+
+<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignList`</Callout>
+
+Lấy danh sách các chiến dịch gọi tự động đã tạo trên hệ thống, lọc theo trạng thái tiến độ hoặc từ khóa tìm kiếm.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `Status` | number | Có | Trạng thái chiến dịch cần lấy: `0` (đang chờ), `1` (đang chạy), `2` (đã chạy xong), `3` (lấy tất cả). |
+| `PageIndex` | number | Không | Số thứ tự trang cần lấy (mặc định là `1`). |
+| `PageSize` | number | Không | Số lượng bản ghi trên một trang (ví dụ: `20`). |
+| `Key` | string | Không | Từ khóa tìm kiếm theo tên chiến dịch. |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignList" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Status": 3,
+    "PageIndex": 1,
+    "PageSize": 20,
+    "Key": ""
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignList', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    Status: 3,
+    PageIndex: 1,
+    PageSize: 20,
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Status": 3,
+    "PageIndex": 1,
+    "PageSize": 20,
+}
+response = requests.post(
+    "{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignList",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": "",
+  "total": 12,
+  "data": [
+    {
+      "campaignId": "a8f192b0-4b7e-41a2-9bc3-xxxxxxxxxxxx",
+      "campaignName": "Chien dich CSKH Thang 10",
+      "status": 2,
+      "totalContact": 150,
+      "timeStartCall": "2026-10-19 08:30:00"
+    }
+  ]
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+| `total` | number | Tổng số lượng chiến dịch tìm thấy theo điều kiện lọc. |
+| `data` | array | Danh sách thông tin chi tiết các chiến dịch. |
+| `data[].campaignId` | string | Mã định danh duy nhất của chiến dịch. |
+| `data[].campaignName` | string | Tên chiến dịch. |
+| `data[].status` | number | Trạng thái hiện tại: `0` (đang chờ), `1` (đang chạy), `2` (đã chạy xong). |
+| `data[].totalContact` | number | Tổng số lượng số điện thoại trong danh bạ chiến dịch. |
+| `data[].timeStartCall` | string | Thời gian lên lịch kích hoạt gọi. |
+
+## Lưu ý quan trọng
+
+<Callout type="info">
+- **Bộ lọc Status**: Truyền `3` để lấy danh sách toàn bộ chiến dịch bất kể trạng thái. Khi muốn theo dõi các chiến dịch đang thực hiện cuộc gọi, truyền `Status: 1`.
+- **Phân trang**: `PageIndex` bắt đầu từ `1`. Khuyến nghị đặt `PageSize` từ `20` đến `50` bản ghi trên mỗi trang để đảm bảo thời gian phản hồi nhanh nhất.
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="400 Bad Request / result: failed">
+    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+    - `ServiceCode` không hợp lệ hoặc tài khoản không có quyền truy cập gói Autocall.
+  </Accordion>
+  <Accordion title="Danh sách data rỗng [] mặc dù total = 0">
+    - Chưa có chiến dịch nào được tạo trên tài khoản, hoặc từ khóa tìm kiếm `Key` không khớp với tên chiến dịch nào.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Chi tiết chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-detail" description="Xem thông số cấu hình cụ thể của một chiến dịch." />
+  <Card title="Xóa chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/delete-campaign" description="Hủy bỏ hoặc xóa một chiến dịch khỏi hệ thống." />
+</Cards>

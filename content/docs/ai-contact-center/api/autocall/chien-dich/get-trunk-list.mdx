@@ -1,0 +1,114 @@
+---
+title: "Danh sách đầu số Trunk (GetTrunkList)"
+description: "Lấy danh sách các đầu số SIP Trunk của khách hàng để cấu hình gọi ra cho chiến dịch Autocall."
+---
+
+<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Autocall/GetTrunkList`</Callout>
+
+Tra cứu danh sách các đầu số SIP Trunk đã đăng ký và gán quyền cho gói dịch vụ Autocall của doanh nghiệp. Giá trị tên Trunk nhận được từ API này sẽ được điền vào tham số `Trunk` khi tạo chiến dịch qua [StartCampaign](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign).
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/GetTrunkList" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY"
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/GetTrunkList', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+}
+response = requests.post(
+    "{AUTOCALL_BASE_URL}/api/Autocall/GetTrunkList",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": "",
+  "data": [
+    {
+      "trunkName": "CF-BS0000003",
+      "phoneNumber": "02873007788",
+      "telco": "ODS"
+    }
+  ]
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+| `data` | array | Danh sách các Trunk gọi ra khả dụng của khách hàng. |
+| `data[].trunkName` | string | Tên định danh của Trunk (dùng để điền vào trường `Trunk` khi tạo chiến dịch). |
+| `data[].phoneNumber` | string | Số điện thoại hiển thị khi gọi ra tới khách hàng. |
+
+## Lưu ý quan trọng
+
+<Callout type="info">
+- **Áp dụng Trunk chính xác**: Tên Trunk trả về (ví dụ: `CF-BS0000003`) phải được truyền chính xác vào trường `Trunk` của API [StartCampaign](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign).
+- **Quyền hạn đầu số**: Đảm bảo đầu số Trunk đã được khai báo và cấp hạn mức số cuộc gọi đồng thời (Concurrent Calls) tương ứng với quy mô chiến dịch.
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="400 Bad Request / result: failed">
+    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+    - Dịch vụ `ServiceCode` không hợp lệ hoặc đã hết hạn thuê bao.
+  </Accordion>
+  <Accordion title="Danh sách data rỗng []">
+    - Gói dịch vụ chưa được cấu hình gán đầu số Trunk gọi ra. Liên hệ đội ngũ kỹ thuật ODS để được hỗ trợ kiểm tra.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Khởi chạy chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Sử dụng tên Trunk để cấu hình chiến dịch gọi ra." />
+  <Card title="Tạo âm thanh TTS" href="/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio" description="Tạo file âm thanh đính kèm." />
+</Cards>

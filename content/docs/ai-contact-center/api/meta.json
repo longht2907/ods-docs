@@ -4,8 +4,10 @@
   "defaultOpen": true,
   "pages": [
     "index",
+    "bat-dau",
     "tong-dai",
-    "autocall",
-    "webhook"
+    "webhook",
+    "websocket-rtc",
+    "autocall"
   ]
 }

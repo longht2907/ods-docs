@@ -1,0 +1,128 @@
+---
+title: "Khởi tạo cuộc gọi Click-to-Call"
+description: "Thực hiện cuộc gọi ra cho máy nhánh nhân viên thông qua API AutoCall."
+---
+
+<Callout type="info">`POST` `{BASE_URL}/api/CloudFone/AutoCall`</Callout>
+
+API thực thi cuộc gọi từ phần mềm (CRM, ERP, Web) đến khách hàng thông qua máy nhánh của tổng đài viên.
+
+**Cơ chế hoạt động (2 chặng):**
+1. Ứng dụng gửi request POST API tới tổng đài.
+2. Tổng đài đổ chuông máy nhánh (`Ext`) của nhân viên trước.
+3. Khi nhân viên nhấc máy, tổng đài lập tức quay số đến khách hàng (`PhoneNumber`) và kết nối đàm thoại.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceName` | string | Có | Mã dịch vụ tổng đài khi mua tại ODS (ví dụ: `CF-BS00XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng (ví dụ: `ODSXXXX`). |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `Ext` | string | Có | Số máy nhánh của nhân viên thực hiện cuộc gọi (ví dụ: `101`). |
+| `PhoneNumber` | string | Có | Số điện thoại khách hàng cần gọi đến (ví dụ: `0900000000`). |
+| `Prefix` | string | Không | Tiền tố đầu số gọi ra (mặc định là `"0"` hoặc lấy theo cấu hình Outbound Route). |
+| `PhoneName` | string | Không | Tên hiển thị của khách hàng. Nếu để trống, màn hình máy nhánh sẽ hiển thị `"tongdaitudong"`. |
+| `KeySearch` | string | Không | Mã định danh cuộc gọi (khuyến nghị định dạng GUID). Nếu không truyền, hệ thống sẽ tự sinh ngẫu nhiên. |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{BASE_URL}/api/CloudFone/AutoCall" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceName": "YOUR_SERVICE_NAME",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Ext": "101",
+    "PhoneNumber": "0900000000",
+    "PhoneName": "Nguyen Van A",
+    "Prefix": "0",
+    "KeySearch": "1b38fbda-4b7e-41a2-9bc3-xxxxxxxxxxxx"
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{BASE_URL}/api/CloudFone/AutoCall', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceName: 'YOUR_SERVICE_NAME',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    Ext: '101',
+    PhoneNumber: '0900000000',
+    PhoneName: 'Nguyen Van A',
+    Prefix: '0',
+    KeySearch: '1b38fbda-4b7e-41a2-9bc3-xxxxxxxxxxxx',
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceName": "YOUR_SERVICE_NAME",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Ext": "101",
+    "PhoneNumber": "0900000000",
+    "PhoneName": "Nguyen Van A",
+    "Prefix": "0",
+    "KeySearch": "1b38fbda-4b7e-41a2-9bc3-xxxxxxxxxxxx",
+}
+response = requests.post(
+    "{BASE_URL}/api/CloudFone/AutoCall",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": "GỌI TỰ ĐỘNG THÀNH CÔNG",
+  "keySearch": "1b38fbda-4b7e-41a2-9bc3-xxxxxxxxxxxx"
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
+| `message` | string | Thông báo chi tiết từ hệ thống. |
+| `keySearch` | string | Mã định danh cuộc gọi trả về (dùng để tra cứu CDR hoặc nhận webhook). |
+
+## Lưu ý quan trọng
+- Máy nhánh nhân viên (`Ext`) bắt buộc phải đang online (đã đăng ký trên IP Phone hoặc Softphone) thì mới có thể nhận chuông.
+- Để theo dõi trạng thái cuộc gọi kết nối thành công hay không, hãy kết hợp với [Popup Webhook](/docs/ai-contact-center/api/webhook/popup).
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="Máy nhánh không online hoặc bận">
+    Tổng đài không thể đổ chuông về `Ext`. Hãy kiểm tra trạng thái máy nhánh trên thiết bị hoặc Portal.
+  </Accordion>
+  <Accordion title="Số điện thoại khách hàng không đúng định dạng">
+    Đảm bảo `PhoneNumber` là số điện thoại hợp lệ (10 chữ số, không chứa khoảng trắng hoặc dấu gạch nối).
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Click-to-Call V2" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call-v2" description="Khởi tạo cuộc gọi tự động theo kịch bản Inbound Route." />
+  <Card title="Webhook Popup" href="/docs/ai-contact-center/api/webhook/popup" description="Nhận thông báo cuộc gọi thời gian thực." />
+</Cards>

@@ -1,0 +1,125 @@
+---
+title: "Danh sách hành động phím bấm (GetListAction)"
+description: "Lấy danh mục các hành động rẽ nhánh IVR khi khách hàng bấm phím trong chiến dịch Autocall."
+---
+
+<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Autocall/GetListAction`</Callout>
+
+Tra cứu danh sách các mã hành động (Action codes) được hỗ trợ trên hệ thống tổng đài để cấu hình cho tham số `Keypress` khi tạo chiến dịch Autocall (ví dụ: chuyển tiếp gặp tổng đài viên, nghe lại thông báo, gọi API, kết thúc cuộc gọi).
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/GetListAction" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY"
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/GetListAction', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+}
+response = requests.post(
+    "{AUTOCALL_BASE_URL}/api/Autocall/GetListAction",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": "",
+  "data": [
+    {
+      "actionId": "1",
+      "actionName": "Phát thông báo âm thanh"
+    },
+    {
+      "actionId": "2",
+      "actionName": "Chuyển tiếp đến số máy nhánh"
+    },
+    {
+      "actionId": "3",
+      "actionName": "Chuyển tiếp vào nhóm tổng đài viên"
+    },
+    {
+      "actionId": "4",
+      "actionName": "Nghe lại nội dung hướng dẫn"
+    },
+    {
+      "actionId": "5",
+      "actionName": "Gọi Webhook API của khách hàng"
+    }
+  ]
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+| `data` | array | Danh sách các hành động cấu hình phím bấm khả dụng. |
+| `data[].actionId` | string | Mã ID của hành động (dùng điền vào `Action` trong mảng `Keypress`). |
+| `data[].actionName` | string | Tên mô tả hành động nghiệp vụ trên hệ thống. |
+
+## Lưu ý quan trọng
+
+<Callout type="info">
+- **Áp dụng trong kịch bản IVR**: Khi gọi API [StartCampaign](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign), các giá trị `actionId` trả về từ API này sẽ được gán vào trường `Action` tương ứng với từng phím bấm `Key` (từ `0` đến `9`, `*`, `#`).
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="400 Bad Request / result: failed">
+    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+    - Dịch vụ `ServiceCode` không hợp lệ.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Khởi chạy chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Áp dụng mã hành động vào cấu hình Keypress." />
+  <Card title="Tạo âm thanh TTS" href="/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio" description="Tạo nội dung âm thanh cho chiến dịch." />
+</Cards>

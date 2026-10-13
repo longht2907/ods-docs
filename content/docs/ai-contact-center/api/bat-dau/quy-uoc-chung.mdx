@@ -1,0 +1,119 @@
+---
+title: "Quy ước chung"
+description: "Quy chuẩn kỹ thuật về Base URL, định dạng dữ liệu, cấu trúc response envelope, phân trang và mã lỗi."
+---
+
+Để việc tích hợp diễn ra nhất quán và ổn định, toàn bộ các API trong hệ thống ODS AI Contact Center tuân theo các quy chuẩn kỹ thuật dưới đây.
+
+## Base URL
+
+| Nhóm dịch vụ | Base URL chính thức | Mô tả |
+| :-- | :-- | :-- |
+| **Tổng đài PBX** | `https://api.ods.vn` | Máy nhánh, Click-to-Call, Lịch sử cuộc gọi, Danh bạ, Luật khách quen. |
+| **Chiến dịch Autocall** | `https://apiai.cloudfone.vn` | Chiến dịch gọi tự động hàng loạt, Audio TTS, Quản lý nhóm liên hệ. |
+
+<Callout type="info">
+  **Khả năng tương thích ngược (Backward Compatibility):**  
+  Hệ thống ODS vẫn duy trì hỗ trợ song song các domain cũ như `https://api.cloudfone.vn` hoặc `https://api.matbao.one` cho các ứng dụng đã kết nối trước đây. Tuy nhiên, mọi dự án mới và các bản nâng cấp được khuyến nghị chuyển sang sử dụng `https://api.ods.vn`.
+</Callout>
+
+## Giao thức & Headers
+
+Tất cả các endpoint trong hệ thống đều sử dụng phương thức **`POST`** với dữ liệu đóng gói trong phần thân (Request Body) dạng JSON:
+
+```http
+POST /api/CloudFone/GetCallLogs HTTP/1.1
+Host: api.ods.vn
+Content-Type: application/json; charset=utf-8
+```
+
+## Cấu trúc phản hồi (Response Envelope)
+
+Hệ thống trả về dữ liệu chuẩn JSON với cấu trúc bao gói (envelope) tiêu chuẩn:
+
+### 1. Phản hồi danh sách (List Response)
+
+```json
+{
+  "result": "success",
+  "message": "Lấy dữ liệu thành công!",
+  "total": 415,
+  "data": [
+    { ... }
+  ]
+}
+```
+
+- `result`: Trạng thái xử lý (`success` hoặc `failed`).
+- `message`: Thông điệp diễn giải chi tiết từ hệ thống.
+- `total`: Tổng số lượng bản ghi thỏa mãn điều kiện lọc (dùng để tính toán phân trang phía client).
+- `data`: Mảng danh sách các bản ghi kết quả trả về.
+
+### 2. Phản hồi thực thi lệnh (Action Response)
+
+Đối với các API tạo cuộc gọi hoặc thêm dữ liệu, hệ thống trả về mã định danh kết quả:
+
+```json
+{
+  "result": "success",
+  "message": "GỌI TỰ ĐỘNG THÀNH CÔNG",
+  "keySearch": "1b38fbda-4b7e-4f12-9c99-xxxxxxxxxxxx"
+}
+```
+
+Hoặc trả về ID bản ghi vừa tạo:
+
+```json
+{
+  "result": "success",
+  "message": "Lưu thành công!",
+  "idPhoneBook": 12
+}
+```
+
+## Quy tắc phân trang (Pagination)
+
+Đối với các API tra cứu lịch sử cuộc gọi và danh sách chiến dịch:
+
+- `PageIndex` *(int, bắt buộc)*: Số thứ tự trang cần lấy, bắt đầu từ `1`.
+- `PageSize` *(int, bắt buộc)*: Số lượng bản ghi trên một trang. **Giá trị tối đa là `200`**. Nếu truyền lớn hơn 200, hệ thống có thể giới hạn về ngưỡng mặc định hoặc từ chối request.
+
+## Định dạng ngày tháng (Date/Time Format)
+
+- Định dạng chuẩn đầy đủ: `YYYY-MM-DD HH:mm:ss` (ví dụ: `2026-10-13 08:30:00`).
+- Định dạng rút gọn: `YYYY-MM-DD` (ví dụ: `2026-10-13`). Khi truyền chỉ ngày, hệ thống sẽ tự động gán mốc giờ bắt đầu là `00:00:00`.
+- Thời gian trả về trong kết quả cuộc gọi thường ở chuẩn ISO 8601: `YYYY-MM-DDTHH:mm:ss`.
+
+## Khóa tìm kiếm cuộc gọi `KeySearch`
+
+Trong các API Click-to-Call ([AutoCall](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call) và [AutoCallV2](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call-v2)), tham số `KeySearch` đóng vai trò liên kết dữ liệu quan trọng:
+
+- Khuyến nghị truyền vào một chuỗi mã định danh chuẩn **UUID / GUID** đại diện cho đơn hàng, khách hàng hoặc ticket trên CRM (ví dụ: `1b38fbda-4b7e-4a12-89cd-xxxxxxxxxxxx`).
+- Nếu client không truyền `KeySearch`, hệ thống tổng đài sẽ tự động sinh ngẫu nhiên một chuỗi key và trả về trong response.
+- Sau khi cuộc gọi hoàn tất, bạn có thể dùng `KeySearch` này để tra cứu chính xác bản ghi nhật ký qua API [GetCallLogs](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs) hoặc nhận lại qua Webhook [Popup](/docs/ai-contact-center/api/webhook/popup).
+
+## Xử lý lỗi (Error Handling)
+
+Khi request không thành công, thuộc tính `result` sẽ mang giá trị `"failed"` kèm theo nguyên nhân cụ thể trong `message`:
+
+<Accordions>
+  <Accordion title="Lỗi xác thực (Authentication Failure)">
+    Xảy ra khi `AuthUser`, `AuthKey` hoặc `ServiceName` không khớp với gói dịch vụ đang hoạt động. Kiểm tra lại thông tin trong Portal.
+  </Accordion>
+  <Accordion title="Thiếu tham số bắt buộc">
+    Một số trường bắt buộc (như số điện thoại, máy nhánh, ngày bắt đầu/kết thúc) bị bỏ trống hoặc mang giá trị rỗng `""`.
+  </Accordion>
+  <Accordion title="Máy nhánh không online hoặc không tồn tại">
+    Số máy nhánh được chỉ định trong cuộc gọi chưa đăng ký thành công SIP client hoặc đang bận.
+  </Accordion>
+  <Accordion title="Khoảng thời gian tra cứu không hợp lệ">
+    `DateStart` lớn hơn `DateEnd` hoặc khoảng cách thời gian vượt quá giới hạn tra cứu cho phép.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Xác thực API" href="/docs/ai-contact-center/api/bat-dau/xac-thuc" description="Tìm hiểu bộ khóa ServiceName, AuthUser và AuthKey." />
+  <Card title="API Tổng đài PBX" href="/docs/ai-contact-center/api/tong-dai" description="Danh mục API quản lý tổng đài và cuộc gọi." />
+</Cards>

@@ -1,0 +1,60 @@
+---
+title: "Widget ODSPhone"
+description: "Nhúng bàn phím gọi thoại WebRTC dựng sẵn vào ứng dụng web của doanh nghiệp."
+---
+
+Widget ODSPhone là module giao diện nhúng (Embeddable Softphone Widget) do ODS phát triển, giúp doanh nghiệp tích hợp toàn bộ bàn phím quay số, bảng điều khiển cuộc gọi và hiển thị trạng thái máy nhánh vào phần mềm CRM/ERP mà không cần tự phát triển giao diện WebRTC từ đầu.
+
+<Callout type="info">
+  **Trạng thái tài liệu:** Đang hoàn thiện đặc tả SDK chính thức **(Cần bổ sung: [Q6])**. Dưới đây là kiến trúc nhúng dự kiến.
+</Callout>
+
+## Cách thức tích hợp dự kiến
+
+### 1. Nhúng script SDK vào website
+
+Thêm thẻ script vào phần `<head>` hoặc trước thẻ đóng `</body>` của website:
+
+```html
+<script src="https://cdn.ods.vn/sdk/odsphone-widget.v1.js" async></script>
+```
+
+### 2. Khởi tạo Widget
+
+```html
+<div id="ods-phone-container"></div>
+
+<script>
+  window.addEventListener('load', function () {
+    if (window.ODSPhone) {
+      window.ODSPhone.init({
+        container: '#ods-phone-container',
+        apiKey: 'YOUR_WIDGET_KEY',
+        extension: '101',
+        password: 'YOUR_EXTENSION_PASSWORD',
+        theme: 'light', // 'light' hoặc 'dark'
+        autoAnswer: false,
+        onCallStateChange: function (state) {
+          console.log('Trạng thái cuộc gọi:', state);
+        },
+      });
+    }
+  });
+</script>
+```
+
+## Các phương thức điều khiển chính (API Methods)
+
+| Phương thức | Tham số | Mô tả |
+| :-- | :-- | :-- |
+| `ODSPhone.makeCall(phoneNumber)` | `string` | Kích hoạt quay số trực tiếp đến một số điện thoại từ giao diện CRM. |
+| `ODSPhone.hangup()` | - | Kết thúc cuộc gọi hiện tại. |
+| `ODSPhone.mute()` | - | Bật/tắt micro của nhân viên. |
+| `ODSPhone.hold()` | - | Tạm giữ (Hold) cuộc gọi. |
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Kết nối WebRTC qua JsSIP" href="/docs/ai-contact-center/api/websocket-rtc/ket-noi-webrtc" description="Tự xây dựng giao diện gọi thoại riêng." />
+  <Card title="Click-to-Call API" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call" description="Phương thức gọi ra kết hợp thiết bị ngoài." />
+</Cards>

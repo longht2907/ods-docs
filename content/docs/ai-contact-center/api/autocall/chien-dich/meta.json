@@ -1,0 +1,12 @@
+{
+  "title": "Chiến dịch",
+  "pages": [
+    "start-campaign",
+    "get-campaign-list",
+    "get-campaign-detail",
+    "delete-campaign",
+    "get-campaign-report",
+    "get-list-action",
+    "get-trunk-list"
+  ]
+}

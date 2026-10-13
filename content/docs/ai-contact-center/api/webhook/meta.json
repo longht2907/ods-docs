@@ -1,6 +1,7 @@
 {
   "title": "Webhook",
   "pages": [
-    "index"
+    "index",
+    "popup"
   ]
 }

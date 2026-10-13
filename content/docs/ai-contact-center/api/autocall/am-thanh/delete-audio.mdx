@@ -1,0 +1,107 @@
+---
+title: "Xóa tệp âm thanh (DeleteAudio)"
+description: "Xóa tệp âm thanh khỏi kho lưu trữ Autocall theo mã Id."
+---
+
+<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Audio/DeleteAudio`</Callout>
+
+Xóa một tệp âm thanh ghi âm hoặc tệp TTS khỏi kho lưu trữ của doanh nghiệp khi không còn sử dụng trong chiến dịch nào.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `Id` | number | Có | Mã ID của tệp âm thanh cần xóa (ví dụ: `41`). |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Audio/DeleteAudio" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Id": 41
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{AUTOCALL_BASE_URL}/api/Audio/DeleteAudio', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    Id: 41,
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Id": 41,
+}
+response = requests.post(
+    "{AUTOCALL_BASE_URL}/api/Audio/DeleteAudio",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": ""
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
+| `message` | string | Thông báo phản hồi từ hệ thống. |
+
+## Lưu ý quan trọng
+
+<Callout type="warning">
+- **Ràng buộc chiến dịch**: Không thể xóa tệp âm thanh nếu tệp này đang được sử dụng trong một chiến dịch Autocall đang chờ hoặc đang chạy. Hãy kiểm tra các chiến dịch trước khi thực hiện xóa.
+- **Tính bất biến**: Hành động xóa là vĩnh viễn và không thể phục hồi tệp âm thanh sau khi đã xóa.
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="400 Bad Request / result: failed">
+    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+    - Mã `Id` tệp âm thanh không tồn tại.
+    - Tệp âm thanh đang bị ràng buộc bởi chiến dịch chưa hoàn tất.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Danh sách âm thanh" href="/docs/ai-contact-center/api/autocall/am-thanh/get-audio-list" description="Xem các tệp âm thanh hiện có." />
+  <Card title="Tạo âm thanh TTS" href="/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio" description="Tạo thêm file âm thanh mới." />
+</Cards>

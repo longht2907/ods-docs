@@ -1,0 +1,106 @@
+---
+title: "Xóa liên hệ (DeleteContact)"
+description: "Xóa một khách hàng khỏi toàn bộ danh bạ hệ thống Autocall."
+---
+
+<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Contact/DeleteContact`</Callout>
+
+Xóa vĩnh viễn thông tin một liên hệ khách hàng khỏi hệ thống Autocall theo mã `Contact_Id`.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `Contact_Id` | string / number | Có | Mã định danh `ContactId` của liên hệ cần xóa. |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/DeleteContact" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Contact_Id": "1052"
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/DeleteContact', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    Contact_Id: '1052',
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Contact_Id": "1052",
+}
+response = requests.post(
+    "{AUTOCALL_BASE_URL}/api/Contact/DeleteContact",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": ""
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
+| `message` | string | Thông báo kết quả từ máy chủ. |
+
+## Lưu ý quan trọng
+
+<Callout type="warning">
+- **Phạm vi tác động toàn diện**: Xóa liên hệ bằng API này sẽ xóa hoàn toàn thông tin khách hàng khỏi toàn bộ hệ thống Autocall và đồng thời gỡ khách hàng này ra khỏi tất cả các nhóm danh bạ đang chứa họ.
+- Nếu chỉ muốn gỡ khách hàng khỏi một nhóm cụ thể mà vẫn giữ lại thông tin trong danh bạ, hãy sử dụng API [DeleteContactFromGroup](/docs/ai-contact-center/api/autocall/danh-ba/delete-contact-from-group).
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="400 Bad Request / result: failed">
+    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+    - `Contact_Id` không tồn tại hoặc đã bị xóa trước đó.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Danh sách liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/get-contact-list" description="Tra cứu các liên hệ hiện có." />
+  <Card title="Thêm liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact" description="Thêm mới liên hệ vào danh bạ." />
+</Cards>

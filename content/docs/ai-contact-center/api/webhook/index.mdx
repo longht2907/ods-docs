@@ -1,8 +1,31 @@
 ---
-title: "Webhook"
-description: "Khung tài liệu Webhook cho sự kiện cuộc gọi và chiến dịch Autocall."
+title: "Tổng quan Webhook"
+description: "Cơ chế tiếp nhận thông báo sự kiện cuộc gọi thời gian thực từ tổng đài ODS."
 ---
 
-Webhook sẽ cung cấp sự kiện để hệ thống tích hợp tiếp nhận thay đổi trong vòng đời cuộc gọi hoặc chiến dịch Autocall. Danh sách event, cơ chế xác thực và payload sẽ được bổ sung khi có đặc tả chính thức.
+Webhook là cơ chế thông báo chủ động từ tổng đài ODS đến hệ thống máy chủ của khách hàng (CRM, ERP, Helpdesk) qua giao thức HTTP POST mỗi khi phát sinh các sự kiện trong vòng đời cuộc gọi.
 
-Không triển khai xử lý production dựa trên payload suy đoán. Hãy chờ phiên bản tài liệu có schema và quy tắc retry được công bố.
+## Các sự kiện cuộc gọi
+
+Một cuộc gọi thoại trên tổng đài phát sinh các sự kiện (event) chính:
+
+- `register`: Bắt đầu khởi tạo cuộc gọi.
+- `show`: Máy nhánh đang đổ chuông (cuộc gọi đến hoặc gọi ra).
+- `answer`: Cuộc gọi được nhân viên hoặc khách hàng nhấc máy.
+- `hide`: Máy nhánh dừng đổ chuông.
+- `finish`: Cuộc gọi kết thúc hoàn toàn (gác máy).
+
+## Tính năng Popup Webhook
+
+Trong thực tế tích hợp CRM, tính năng **Popup Webhook** là giải pháp phổ biến nhất giúp:
+1. Bật cửa sổ thông tin khách hàng (Customer Pop-up) trên màn hình máy tính của nhân viên ngay khi chuông điện thoại reo (`Status: Ringing`).
+2. Cập nhật thời điểm bắt đầu đàm thoại (`Status: Up`).
+3. Gửi thông tin tổng kết cuộc gọi, thời lượng thoại và liên kết tệp ghi âm ngay khi gác máy (`Status: Down`).
+
+<Cards>
+  <Card
+    title="Đặc tả Webhook Popup"
+    description="Cấu trúc payload, bảng trạng thái cuộc gọi và code mẫu receiver bằng Node.js / PHP."
+    href="/docs/ai-contact-center/api/webhook/popup"
+  />
+</Cards>

@@ -1,10 +1,46 @@
 ---
-title: "API tổng đài"
-description: "Tổng quan các luồng API tích hợp tổng đài AI Contact Center."
+title: "API Tổng đài PBX"
+description: "Tổng quan các API quản lý số nội bộ, khởi tạo cuộc gọi và truy xuất lịch sử tổng đài ODS."
 ---
 
-Nhóm API tổng đài dành cho các luồng tích hợp liên quan đến máy nhánh, khởi tạo cuộc gọi và tra cứu lịch sử. Hiện tại, tài liệu đã công bố đặc tả Click-to-Call; các luồng khác sẽ được bổ sung khi có đặc tả chính thức.
+Nhóm API Tổng đài PBX cho phép các hệ thống phần mềm doanh nghiệp (CRM, ERP, HRM, thương mại điện tử) tương tác trực tiếp với tổng đài điện thoại ODS: quản trị máy nhánh nhân viên, điều khiển cuộc gọi ra, quản lý danh bạ khách hàng, thiết lập định tuyến thông minh và tra cứu nhật ký đàm thoại.
 
-## Tài liệu hiện có
+<Callout type="info">
+  **Base URL chính thức:** `https://api.ods.vn`
+  Mọi request đều sử dụng phương thức `POST` với phần thân `application/json`.
+</Callout>
 
-- [Khởi tạo cuộc gọi](/docs/ai-contact-center/api/tong-dai/khoi-tao-cuoc-goi) — đặc tả Click-to-Call và ví dụ cho cURL, Python, Node.js, PHP.
+## Các phân hệ chức năng
+
+<Cards className="grid-cols-1 md:grid-cols-2">
+  <Card
+    title="Máy nhánh (Extensions)"
+    description="Tự động tạo mới và thu hồi số nội bộ khi có nhân sự mới hoặc nhân viên nghỉ việc."
+    href="/docs/ai-contact-center/api/tong-dai/may-nhanh/add-extension"
+  />
+  <Card
+    title="Khởi tạo cuộc gọi (Click-to-Call)"
+    description="Kích hoạt cuộc gọi trực tiếp từ phần mềm CRM tới máy nhánh nhân viên hoặc qua kịch bản tự động."
+    href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call"
+  />
+  <Card
+    title="Danh bạ tổng đài"
+    description="Thêm mới và cập nhật danh bạ khách hàng đồng bộ với hệ thống CSKH."
+    href="/docs/ai-contact-center/api/tong-dai/danh-ba/add-phonebook"
+  />
+  <Card
+    title="Luật khách quen"
+    description="Tự động ghi nhớ và ưu tiên đổ chuông khách hàng về đúng nhân viên phụ trách."
+    href="/docs/ai-contact-center/api/tong-dai/luat-khach-quen"
+  />
+  <Card
+    title="Lịch sử & Báo cáo cuộc gọi"
+    description="Tra cứu chi tiết nhật ký cuộc gọi (GetCallLogs), link file ghi âm và báo cáo đánh giá chất lượng cuộc gọi."
+    href="/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs"
+  />
+  <Card
+    title="Xác thực & Quy ước"
+    description="Xem hướng dẫn lấy AuthKey và quy chuẩn định dạng dữ liệu."
+    href="/docs/ai-contact-center/api/bat-dau/xac-thuc"
+  />
+</Cards>

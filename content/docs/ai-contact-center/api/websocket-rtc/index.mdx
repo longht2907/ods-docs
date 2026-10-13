@@ -1,0 +1,33 @@
+---
+title: "Tích hợp thoại WebRTC"
+description: "So sánh giải pháp tích hợp Softphone và WebRTC trực tiếp trên trình duyệt web cho CRM và ERP."
+---
+
+Khi tích hợp tính năng thoại của ODS AI Contact Center vào phần mềm quản lý quan hệ khách hàng (CRM) hoặc ERP, doanh nghiệp có thể lựa chọn một trong hai kiến trúc triển khai chính:
+
+## So sánh hai phương thức tích hợp
+
+| Tiêu chí | 1. Softphone / IP Phone + API | 2. WebRTC trên trình duyệt |
+| :-- | :-- | :-- |
+| **Cơ chế hoạt động** | Sử dụng [Click-to-Call](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call) để kích hoạt cuộc gọi về thiết bị ngoài và nhận sự kiện qua [Popup Webhook](/docs/ai-contact-center/api/webhook/popup). | Đăng ký trực tiếp tài khoản SIP vào tổng đài thông qua giao thức SIP over Secure WebSocket (WSS). |
+| **Thiết bị client** | Bắt buộc nhân viên phải cài Softphone (Zoiper, MicroSIP) hoặc dùng máy điện thoại IP Phone vật lý. | Hoạt động trực tiếp trên trình duyệt web (Chrome, Edge, Firefox, Safari) thông qua mic/tai nghe của máy tính. |
+| **Trải nghiệm người dùng** | Khi click "Gọi", thiết bị Softphone đổ chuông trước, nhân viên nhấc máy rồi hệ thống mới quay số khách hàng. | Nhấn "Gọi" là hệ thống quay số ngay lập tức trên giao diện web, giao diện bàn phím quay số hiển thị trực tiếp trong CRM. |
+| **Độ phức tạp tích hợp** | **Thấp**: Chỉ cần gửi HTTP POST request và nhận Webhook. | **Trung bình - Cao**: Cần xây dựng module SIP client trên Frontend (hoặc nhúng Widget có sẵn). |
+| **Độ ổn định** | Rất cao, phụ thuộc vào chất lượng phần cứng và mạng chuyên dụng. | Rất tốt trên các trình duyệt hiện đại hỗ trợ đầy đủ WebRTC. |
+
+## Lựa chọn phương thức triển khai WebRTC
+
+Nếu bạn chọn hướng đi WebRTC để nhân viên thoại trực tiếp trên giao diện CRM, ODS hỗ trợ 2 hướng tiếp cận:
+
+<Cards className="grid-cols-1 md:grid-cols-2">
+  <Card
+    title="Tự xây dựng SIP Client (JsSIP)"
+    description="Tích hợp thư viện mã nguồn mở JsSIP hoặc SIP.js để tùy biến hoàn toàn giao diện và trải nghiệm gọi thoại theo thiết kế riêng."
+    href="/docs/ai-contact-center/api/websocket-rtc/ket-noi-webrtc"
+  />
+  <Card
+    title="Nhúng Widget ODSPhone"
+    description="Nhúng nhanh component bàn phím và bảng điều khiển cuộc gọi có sẵn do ODS phát triển vào CRM chỉ với một vài dòng code."
+    href="/docs/ai-contact-center/api/websocket-rtc/widget-odsphone"
+  />
+</Cards>

@@ -1,0 +1,121 @@
+---
+title: "Chi tiết chiến dịch (GetCampaignDetail)"
+description: "Lấy thông tin cấu hình chi tiết của một chiến dịch Autocall theo mã định danh Id."
+---
+
+<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignDetail`</Callout>
+
+Tra cứu toàn bộ thông số cấu hình của một chiến dịch gọi tự động bao gồm tệp âm thanh áp dụng, nhóm danh bạ, thời gian chạy và kịch bản phím bấm IVR.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `Id` | string | Có | Mã UUID định danh của chiến dịch cần xem chi tiết. |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignDetail" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Id": "a8f192b0-4b7e-41a2-9bc3-xxxxxxxxxxxx"
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignDetail', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    Id: 'a8f192b0-4b7e-41a2-9bc3-xxxxxxxxxxxx',
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "Id": "a8f192b0-4b7e-41a2-9bc3-xxxxxxxxxxxx",
+}
+response = requests.post(
+    "{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignDetail",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": "",
+  "data": [
+    {
+      "campaignId": "a8f192b0-4b7e-41a2-9bc3-xxxxxxxxxxxx",
+      "campaignName": "Chien dich CSKH Thang 10",
+      "contactId": 1006,
+      "trunk": "CF-BS0000003",
+      "timeStartCall": "2026-10-19 08:30:00.000",
+      "status": 1
+    }
+  ]
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+| `data` | array | Mảng chứa dữ liệu chi tiết cấu hình của chiến dịch. |
+| `data[].campaignId` | string | Mã định danh duy nhất của chiến dịch. |
+| `data[].campaignName` | string | Tên chiến dịch. |
+| `data[].contactId` | number | ID nhóm danh bạ áp dụng cho chiến dịch. |
+| `data[].trunk` | string | Đầu số Trunk gọi ra. |
+| `data[].timeStartCall` | string | Thời gian lên lịch kích hoạt gọi. |
+| `data[].status` | number | Trạng thái: `0` (đang chờ), `1` (đang chạy), `2` (đã chạy xong). |
+
+## Lưu ý quan trọng
+
+<Callout type="info">
+- **Kiểm tra thông số trước khi chạy**: Endpoint này cho phép kiểm tra lại toàn bộ tệp âm thanh, nhóm liên hệ và kịch bản phím bấm trước khi chiến dịch đến giờ kích hoạt.
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="400 Bad Request / result: failed">
+    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+    - `Id` chiến dịch không tồn tại hoặc sai định dạng UUID.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Khởi chạy chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Chỉnh sửa cấu hình chiến dịch." />
+  <Card title="Báo cáo chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-report" description="Xem báo cáo kết quả cuộc gọi." />
+</Cards>

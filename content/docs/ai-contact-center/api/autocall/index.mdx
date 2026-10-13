@@ -1,8 +1,55 @@
 ---
-title: "API Autocall"
-description: "Khung tài liệu API tích hợp chiến dịch gọi tự động."
+title: "API Gọi tự động (Autocall)"
+description: "Tổng quan các API tự động hóa chiến dịch cuộc gọi thoại hàng loạt, chuyển văn bản thành giọng nói (TTS) và báo cáo."
 ---
 
-Không gian này dành cho API tích hợp chiến dịch Autocall từ hệ thống bên ngoài. REST path, request fields và response schema sẽ được bổ sung sau khi có đặc tả kỹ thuật được duyệt.
+API Autocall cung cấp bộ công cụ lập trình mạnh mẽ giúp doanh nghiệp tự động hóa các chiến dịch gọi điện thoại hàng loạt phục vụ chăm sóc khách hàng, thông báo nhắc nợ, khảo sát ý kiến hoặc gửi mã xác thực tự động (Voice OTP).
 
-Trong thời gian chờ đặc tả API, xem [hướng dẫn Gọi tự động trên Portal](/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/tong-quan) để nắm quy trình vận hành tổng thể.
+<Callout type="info">
+  **Base URL Autocall chính thức:** `https://apiai.cloudfone.vn`
+  Mọi endpoint đều sử dụng phương thức `POST` với dữ liệu định dạng `application/json`.
+</Callout>
+
+## Quy trình 4 bước triển khai chiến dịch
+
+Để tạo và vận hành một chiến dịch gọi tự động thông qua API, hệ thống tuân theo quy trình tuần tự:
+
+<Steps>
+  <Step>
+    ### Tạo tệp âm thanh phát thoại
+    Sử dụng API [Tạo âm thanh TTS](/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio) để chuyển đổi nội dung văn bản thành giọng đọc tự nhiên (Google, FPT, Vbee, Viettel) hoặc tải tệp âm thanh ghi âm sẵn dạng chuỗi Base64. Lấy mã `AudioId` trả về.
+  </Step>
+  <Step>
+    ### Tạo nhóm liên hệ và nhập danh bạ khách hàng
+    - Tạo nhóm khách hàng bằng API [Tạo nhóm danh bạ](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-group) để lấy `ContactGroupID`.
+    - Thêm danh sách số điện thoại qua API [Thêm danh bạ](/docs/ai-contact-center/api/autocall/danh-ba/add-contact) và gán vào nhóm bằng API [Thêm danh bạ vào nhóm](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-to-group).
+  </Step>
+  <Step>
+    ### Khởi tạo và thiết lập chiến dịch
+    Gọi API [Khởi chạy chiến dịch](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign), liên kết `ContactGroupID`, tệp âm thanh `Audios`, cấu hình hành động khi bấm phím `Keypress` và thời gian bắt đầu gọi `TimeStartCall`.
+  </Step>
+  <Step>
+    ### Giám sát tiến độ và lấy báo cáo
+    Sử dụng API [Báo cáo chiến dịch](/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-report) để theo dõi tỷ lệ kết nối thành công, số lượng cuộc gọi không bắt máy hoặc bận theo thời gian thực.
+  </Step>
+</Steps>
+
+## Các nhóm API chức năng
+
+<Cards className="grid-cols-1 md:grid-cols-3">
+  <Card
+    title="Quản lý chiến dịch"
+    description="Khởi chạy, xem danh sách, tra cứu chi tiết, xóa chiến dịch và trích xuất báo cáo kết quả."
+    href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign"
+  />
+  <Card
+    title="Quản lý âm thanh TTS"
+    description="Tạo file âm thanh chuyển văn bản thành giọng nói (Google, FPT, Vbee, Viettel) hoặc upload Base64."
+    href="/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio"
+  />
+  <Card
+    title="Quản lý danh bạ & Nhóm"
+    description="Quản lý danh sách số điện thoại khách hàng, tạo nhóm chiến dịch và gán liên hệ vào nhóm."
+    href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact"
+  />
+</Cards>

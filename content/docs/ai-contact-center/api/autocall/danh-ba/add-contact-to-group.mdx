@@ -1,0 +1,111 @@
+---
+title: "Thêm liên hệ vào nhóm (AddContactToGroup)"
+description: "Gán một hoặc nhiều liên hệ vào nhóm danh bạ Autocall."
+---
+
+<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Contact/AddContactToGroup`</Callout>
+
+Gán danh sách các liên hệ khách hàng vào một nhóm danh bạ cụ thể để sẵn sàng cho chiến dịch gọi tự động.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `ContactGroupID` | number / string | Có | ID của nhóm danh bạ muốn thêm liên hệ vào. |
+| `ContactId` | array | Có | Mảng chứa danh sách các mã `ContactId` của khách hàng (ví dụ: `["1051", "1052"]`). |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/AddContactToGroup" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "ContactGroupID": 1006,
+    "ContactId": ["1051", "1052"]
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/AddContactToGroup', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    ContactGroupID: 1006,
+    ContactId: ['1051', '1052'],
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "ContactGroupID": 1006,
+    "ContactId": ["1051", "1052"],
+}
+response = requests.post(
+    "{AUTOCALL_BASE_URL}/api/Contact/AddContactToGroup",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": ""
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
+| `message` | string | Thông báo phản hồi từ hệ thống. |
+
+## Lưu ý quan trọng
+
+<Callout type="info">
+- **Thêm hàng loạt**: Mảng `ContactId` hỗ trợ truyền nhiều mã liên hệ cùng lúc (ví dụ: `["1051", "1052", "1053"]`).
+- Một liên hệ có thể thuộc về nhiều nhóm danh bạ khác nhau tùy theo phân loại chiến dịch của bạn.
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="400 Bad Request / result: failed">
+    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+    - `ContactGroupID` không tồn tại.
+    - Một hoặc nhiều `ContactId` trong mảng không hợp lệ hoặc đã bị xóa.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Tạo nhóm danh bạ" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact-group" description="Tạo nhóm trước khi thêm liên hệ." />
+  <Card title="Khởi chạy chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Sử dụng nhóm để chạy chiến dịch Autocall." />
+</Cards>

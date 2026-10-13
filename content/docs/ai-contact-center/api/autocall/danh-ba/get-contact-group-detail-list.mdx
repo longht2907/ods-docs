@@ -1,0 +1,135 @@
+---
+title: "Chi tiết nhóm danh bạ (GetContactGroupDetailList)"
+description: "Tra cứu danh sách các khách hàng nằm trong một nhóm danh bạ Autocall cụ thể."
+---
+
+<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Contact/GetContactGroupDetailList`</Callout>
+
+Lấy danh sách các liên hệ (số điện thoại, tên khách hàng) đang thuộc về một nhóm danh bạ nhất định, hỗ trợ tìm kiếm và phân trang.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `ContactGroupID` | number / string | Có | Mã ID của nhóm danh bạ cần xem chi tiết. |
+| `Key` | string | Không | Từ khóa tìm kiếm theo tên hoặc số điện thoại. |
+| `PageIndex` | number | Không | Số thứ tự trang hiện tại (mặc định là `1`). |
+| `PageSize` | number | Không | Số lượng bản ghi trên một trang (mặc định là `20`). |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/GetContactGroupDetailList" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "ContactGroupID": 1006,
+    "Key": "",
+    "PageIndex": 1,
+    "PageSize": 20
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/GetContactGroupDetailList', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    ContactGroupID: 1006,
+    PageIndex: 1,
+    PageSize: 20,
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "ContactGroupID": 1006,
+    "PageIndex": 1,
+    "PageSize": 20,
+}
+response = requests.post(
+    "{AUTOCALL_BASE_URL}/api/Contact/GetContactGroupDetailList",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": "",
+  "total": 150,
+  "data": [
+    {
+      "contactId": 1052,
+      "phone": "0900000000",
+      "contactName": "Nguyen Van A",
+      "company": "ODS JSC",
+      "email": "nguyenvana@example.com"
+    }
+  ]
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+| `total` | number | Tổng số lượng liên hệ trong nhóm. |
+| `data` | array | Danh sách thông tin chi tiết từng khách hàng trong nhóm. |
+| `data[].contactId` | number | Mã định danh duy nhất của liên hệ. |
+| `data[].phone` | string | Số điện thoại khách hàng. |
+| `data[].contactName` | string | Tên định danh của liên hệ. |
+| `data[].company` | string | Tên công ty / tổ chức. |
+| `data[].email` | string | Địa chỉ email của liên hệ. |
+
+## Lưu ý quan trọng
+
+<Callout type="info">
+- **Kiểm tra danh bạ trước khi chạy chiến dịch**: Sử dụng endpoint này để rà soát danh sách số điện thoại trong nhóm, loại bỏ các số không hợp lệ trước khi kích hoạt gọi tự động.
+- **Phân trang**: `PageIndex` và `PageSize` giúp duyệt các nhóm có số lượng liên hệ lớn (hàng nghìn số).
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="400 Bad Request / result: failed">
+    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+    - `ContactGroupID` không tồn tại.
+  </Accordion>
+  <Accordion title="Nhóm rỗng data []">
+    - Nhóm mới được tạo qua [AddContactGroup](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-group) và chưa được gán liên hệ nào qua [AddContactToGroup](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-to-group).
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Xóa liên hệ khỏi nhóm" href="/docs/ai-contact-center/api/autocall/danh-ba/delete-contact-from-group" description="Loại bỏ một số điện thoại khỏi nhóm này." />
+  <Card title="Danh sách nhóm danh bạ" href="/docs/ai-contact-center/api/autocall/danh-ba/get-contact-group-list" description="Xem tất cả các nhóm." />
+</Cards>

@@ -1,0 +1,148 @@
+---
+title: "Báo cáo chiến dịch (GetCampaignReport)"
+description: "Trích xuất danh sách báo cáo chi tiết kết quả chạy cuộc gọi của chiến dịch Autocall."
+---
+
+<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignReport`</Callout>
+
+Tra cứu báo cáo chi tiết kết quả thực hiện cuộc gọi của một chiến dịch Autocall cụ thể, hỗ trợ lọc theo các trạng thái kết nối đàm thoại.
+
+## Tham số request
+
+| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+| :-- | :-- | :-: | :-- |
+| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+| `CampaignId` | string | Có | Mã UUID của chiến dịch cần lấy báo cáo. |
+| `ReportType` | number | Có | Bộ lọc trạng thái cuộc gọi: `0` (Tất cả), `1` (Gọi thành công), `2` (Không bắt máy), `3` (Bấm bận), `4` (Người dùng chặn số), `5` (Không thể kết nối). |
+| `PageIndex` | number | Không | Số thứ tự trang cần lấy (mặc định là `1`). |
+| `PageSize` | number | Không | Số lượng bản ghi trên một trang (mặc định là `20`). |
+| `Key` | string | Không | Từ khóa tìm kiếm theo số điện thoại hoặc tên khách hàng. |
+
+## Ví dụ request
+
+<Tabs items={['cURL', 'JavaScript', 'Python']}>
+  <Tab value="cURL">
+```bash
+curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignReport" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "CampaignId": "a8f192b0-4b7e-41a2-9bc3-xxxxxxxxxxxx",
+    "ReportType": 0,
+    "PageIndex": 1,
+    "PageSize": 20,
+    "Key": ""
+  }'
+```
+  </Tab>
+  <Tab value="JavaScript">
+```javascript
+const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignReport', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ServiceCode: 'YOUR_SERVICE_CODE',
+    AuthUser: 'YOUR_AUTH_USER',
+    AuthKey: 'YOUR_AUTH_KEY',
+    CampaignId: 'a8f192b0-4b7e-41a2-9bc3-xxxxxxxxxxxx',
+    ReportType: 0,
+    PageIndex: 1,
+    PageSize: 20,
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import requests
+
+payload = {
+    "ServiceCode": "YOUR_SERVICE_CODE",
+    "AuthUser": "YOUR_AUTH_USER",
+    "AuthKey": "YOUR_AUTH_KEY",
+    "CampaignId": "a8f192b0-4b7e-41a2-9bc3-xxxxxxxxxxxx",
+    "ReportType": 0,
+    "PageIndex": 1,
+    "PageSize": 20,
+}
+response = requests.post(
+    "{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignReport",
+    json=payload,
+    headers={"Content-Type": "application/json"},
+    timeout=15,
+)
+print(response.json())
+```
+  </Tab>
+</Tabs>
+
+## Response mẫu
+
+```json
+{
+  "result": "success",
+  "message": "",
+  "total": 150,
+  "data": [
+    {
+      "phone": "0900000000",
+      "customerName": "Nguyen Van A",
+      "status": "ANSWERED",
+      "duration": 45,
+      "keypress": "1",
+      "timeCall": "2026-10-19 08:35:10"
+    }
+  ]
+}
+```
+
+| Trường | Kiểu dữ liệu | Mô tả |
+| :-- | :-- | :-- |
+| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+| `total` | number | Tổng số lượng cuộc gọi trong chiến dịch theo bộ lọc. |
+| `data` | array | Danh sách chi tiết kết quả từng cuộc gọi. |
+| `data[].phone` | string | Số điện thoại khách hàng được gọi. |
+| `data[].customerName` | string | Tên khách hàng (nếu có lưu trong danh bạ nhóm). |
+| `data[].status` | string | Trạng thái cuộc gọi (`ANSWERED`, `NO ANSWER`, `BUSY`). |
+| `data[].duration` | number | Thời lượng đàm thoại thực tế (giây). |
+| `data[].keypress` | string | Phím IVR khách hàng đã bấm tương tác. |
+| `data[].timeCall` | string | Thời điểm thực hiện cuộc gọi. |
+
+## Lưu ý quan trọng
+
+<Callout type="info">
+- **Ý nghĩa mã ReportType**:
+  - `0`: Toàn bộ các cuộc gọi phát sinh trong chiến dịch.
+  - `1`: Gọi thành công (khách hàng nhấc máy nghe thông báo).
+  - `2`: Không bắt máy (chuông đổ nhưng không trả lời).
+  - `3`: Khách hàng bấm máy bận (User Busy / Reject).
+  - `4`: Số máy bị chặn hoặc nằm trong danh sách đen DNC.
+  - `5`: Không thể kết nối (thuê bao ngoài vùng phủ sóng, tắt máy).
+- **Phân tích dữ liệu**: Kết hợp trường `keypress` và `duration` để đánh giá mức độ tương tác và quan tâm thực tế của khách hàng đối với kịch bản thoại.
+</Callout>
+
+## Lỗi thường gặp
+
+<Accordions>
+  <Accordion title="400 Bad Request / result: failed">
+    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+    - `CampaignId` không tồn tại hoặc sai định dạng UUID.
+  </Accordion>
+  <Accordion title="Báo cáo data rỗng []">
+    - Chiến dịch mới tạo và chưa đến thời điểm kích hoạt gọi (`TimeStartCall`).
+    - Bộ lọc `ReportType` không có cuộc gọi nào thuộc trạng thái này.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Khởi chạy chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Tạo hoặc cấu hình chiến dịch mới." />
+  <Card title="Danh sách chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-list" description="Xem tổng quan tiến độ các chiến dịch." />
+</Cards>

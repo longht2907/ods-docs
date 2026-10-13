@@ -1,0 +1,13 @@
+{
+  "title": "Danh bạ & Nhóm",
+  "pages": [
+    "add-contact",
+    "add-contact-group",
+    "add-contact-to-group",
+    "get-contact-group-list",
+    "get-contact-group-detail-list",
+    "get-contact-list",
+    "delete-contact",
+    "delete-contact-from-group"
+  ]
+}

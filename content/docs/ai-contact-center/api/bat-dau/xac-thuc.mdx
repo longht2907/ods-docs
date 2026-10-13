@@ -1,0 +1,73 @@
+---
+title: "Xác thực API"
+description: "Cơ chế xác thực tài khoản và khóa bảo mật ServiceName, AuthUser, AuthKey trên ODS AI Contact Center."
+---
+
+Hệ thống ODS AI Contact Center sử dụng cơ chế xác thực dựa trên bộ tham số khóa định danh truyền trực tiếp trong phần thân (`body`) của mỗi HTTP POST request dưới định dạng JSON.
+
+## Bộ ba thông số xác thực
+
+Mọi request gọi tới API của ODS đều yêu cầu các trường nhận diện sau:
+
+| Tên tham số | Kiểu dữ liệu | Ý nghĩa | Ví dụ |
+| :-- | :-- | :-- | :-- |
+| `ServiceName` / `ServiceCode` | string | Mã gói dịch vụ tổng đài khi doanh nghiệp đăng ký với ODS. | `CF-BS001234` |
+| `AuthUser` | string | Mã tài khoản định danh khách hàng trên hệ thống ODS. | `ODS12345` |
+| `AuthKey` | string | Chuỗi khóa bí mật (API Key) đại diện cho quyền truy cập tổng đài. | `eea8c834-f0d5-4ff5-91fc-xxxxxxxxxxxx` |
+
+<Callout type="warning">
+  **Lưu ý quan trọng về tên tham số dịch vụ:**
+  - Nhóm API **Tổng đài** (`AutoCall`, `AutoCallV2`, `GetCallLogs`, `GetCallHistory`, `AddPhoneBook`, `CreateAndUpdateFamiliar`) sử dụng tên trường là `ServiceName`.
+  - Nhóm API **Quản lý máy nhánh** (`AddExtension`, `DeleteExtension`) và toàn bộ nhóm **Autocall** sử dụng tên trường là `ServiceCode`.
+  - Nhóm **Báo cáo đánh giá** (`GetCallReport`, `GetCallReportDetail`) trong body JSON sử dụng `ServiceCode`.
+  
+  Vui lòng đối chiếu chính xác tên trường được định nghĩa trong bảng tham số của từng endpoint.
+</Callout>
+
+## Nơi lấy thông tin xác thực trên Portal
+
+Bạn có thể tra cứu và tạo mới các khóa tích hợp trực tiếp trên giao diện quản trị tổng đài:
+
+<Steps>
+  <Step>
+    ### Đăng nhập Portal ODS
+    Truy cập trang quản trị dịch vụ tổng đài của doanh nghiệp.
+  </Step>
+  <Step>
+    ### Truy cập mục Cấu hình API
+    Vào menu **Cấu hình hệ thống** ➔ chọn **Cấu hình API** (hoặc mục **Thông báo - PopUp** đối với webhook).
+  </Step>
+  <Step>
+    ### Sao chép thông tin
+    Ghi nhận lại giá trị `Mã dịch vụ`, `Mã khách hàng` và sao chép chuỗi `AuthKey` (API Key).
+  </Step>
+</Steps>
+
+## Nguyên tắc bảo mật bắt buộc
+
+Để đảm bảo an toàn cho tổng đài và ngăn chặn nguy cơ bị kẻ xấu lợi dụng gọi ra phát sinh cước:
+
+1. **Tuyệt đối không nhúng AuthKey vào Frontend/Client-side**:
+   Không bao giờ lưu `AuthKey` trong mã nguồn JavaScript chạy trên trình duyệt web, mã nguồn ứng dụng di động (iOS/Android) hoặc kho lưu trữ Git công khai.
+2. **Luôn gọi API từ Backend (Server-to-Server)**:
+   Mọi thao tác gọi API ODS phải được thực hiện từ máy chủ ứng dụng của bạn (Node.js, Python, PHP, Java, .NET, Go). Phía Frontend chỉ gửi yêu cầu về Backend của bạn để kiểm tra quyền hạn trước khi chuyển tiếp.
+3. **Lưu trữ dưới dạng biến môi trường**:
+   Lưu `ODS_SERVICE_NAME`, `ODS_AUTH_USER` và `ODS_AUTH_KEY` trong file `.env` hoặc dịch vụ quản lý secret an toàn (AWS Secrets Manager, HashiCorp Vault, v.v.).
+
+## Ví dụ cấu hình biến môi trường
+
+```bash title=".env"
+# Thông tin xác thực ODS AI Contact Center
+ODS_BASE_URL="https://api.ods.vn"
+ODS_AUTOCALL_BASE_URL="https://apiai.cloudfone.vn"
+ODS_SERVICE_NAME="YOUR_SERVICE_NAME"
+ODS_AUTH_USER="YOUR_AUTH_USER"
+ODS_AUTH_KEY="YOUR_AUTH_KEY"
+```
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Quy ước chung" href="/docs/ai-contact-center/api/bat-dau/quy-uoc-chung" description="Base URL, Envelope response, phân trang và mã lỗi." />
+  <Card title="Khởi tạo cuộc gọi Click-to-Call" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call" description="Ví dụ áp dụng xác thực để thực thi cuộc gọi đầu tiên." />
+</Cards>

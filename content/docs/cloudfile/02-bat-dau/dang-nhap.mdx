@@ -1,0 +1,102 @@
+---
+title: "Đăng nhập CloudFile"
+description: "Hướng dẫn đăng nhập Web Portal, bảo vệ tài khoản trong lần đầu sử dụng và đăng xuất an toàn."
+---
+
+Đăng nhập Web Portal để truy cập dữ liệu CloudFile trên trình duyệt. Sau lần đăng nhập đầu tiên, bạn có thể đổi mật khẩu và kích hoạt 2FA để bổ sung lớp xác thực cho tài khoản.
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Chuẩn bị domain CloudFile riêng do Quản trị viên cung cấp: `https://[URL_DOMAIN_CLOUD_CUA_BAN]`.
+- Chuẩn bị Username hoặc email công việc và mật khẩu được cấp.
+- Không dùng tùy chọn giữ đăng nhập trên máy tính công cộng hoặc thiết bị của người khác.
+</Callout>
+
+## Đăng nhập và bảo vệ tài khoản
+
+<Steps>
+  <Step>
+    ### Mở Web Portal của doanh nghiệp
+
+    Mở Google Chrome, Firefox hoặc Microsoft Edge, sau đó truy cập domain CloudFile được cấp.
+
+    ![Màn hình đăng nhập CloudFile với các trường tài khoản và mật khẩu để trống](/media/cloudfile/02-bat-dau/man-hinh-dang-nhap-cloudfile.png)
+
+    *Kết quả: Màn hình đăng nhập hiển thị trường Account name or email, Password và nút Log in.*
+  </Step>
+  <Step>
+    ### Nhập thông tin tài khoản
+
+    Nhập Username hoặc email công việc vào trường tài khoản, nhập mật khẩu và chọn **Log in** hoặc nhấn `Enter`.
+
+    **Keep me logged in** giúp duy trì trạng thái đăng nhập cho những lần truy cập sau. Chỉ bật tùy chọn này trên máy tính cá nhân an toàn; không bật trên máy tính công cộng hoặc thiết bị của người khác.
+
+    *Kết quả: Hệ thống xác thực tài khoản và mở không gian làm việc CloudFile.*
+  </Step>
+  <Step>
+    ### Đổi mật khẩu ban đầu
+
+    Chọn **Avatar** ở góc trên bên phải, mở **Settings** → **Security**. Tại mục **Password**, nhập mật khẩu hiện tại và mật khẩu mới.
+
+    *Kết quả: Tài khoản sử dụng mật khẩu mới thay cho mật khẩu được cấp ban đầu.*
+  </Step>
+  <Step>
+    ### Kích hoạt xác thực hai bước
+
+    Trong trang **Security**, tìm **Two-Factor Authentication** và bật **TOTP**. Dùng Google Authenticator hoặc Microsoft Authenticator quét mã QR, sau đó nhập mã xác thực từ điện thoại.
+
+    *Kết quả: 2FA được kích hoạt cho tài khoản CloudFile.*
+  </Step>
+  <Step>
+    ### Đăng xuất khi kết thúc
+
+    Chọn **Avatar** ở góc trên bên phải và chọn **Log out**, đặc biệt khi bạn đang sử dụng thiết bị không thuộc sở hữu của mình.
+
+    *Kết quả: Phiên làm việc CloudFile được đóng.*
+  </Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+- Sau khi đăng nhập, CloudFile hiển thị Dashboard hoặc không gian làm việc được cấu hình cho tài khoản.
+- Mật khẩu mới được lưu sau lần đổi đầu tiên.
+- Khi 2FA đã bật, tài khoản sử dụng mã TOTP trong quy trình xác thực.
+- Sau khi chọn **Log out**, hệ thống quay lại màn hình đăng nhập.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Quên mật khẩu">
+    Tại màn hình đăng nhập, chọn **Forgot password?**, nhập Username hoặc email, chọn đặt lại mật khẩu và kiểm tra email nhận liên kết tạo mật khẩu mới.
+
+    Nếu không nhận được email hoặc hệ thống báo lỗi, liên hệ Quản trị viên của đơn vị để được hỗ trợ cấp lại mật khẩu.
+  </Accordion>
+  <Accordion title="Tài khoản tạm thời bị khóa hoặc đăng nhập chậm">
+    Nguồn GitBook ghi nhận hệ thống có thể tạm khóa hoặc làm chậm đăng nhập sau nhiều lần nhập sai mật khẩu, thường là 5 lần. Chờ khoảng 30 giây đến 1 phút rồi thử lại bằng thông tin chính xác.
+  </Accordion>
+  <Accordion title="Không biết địa chỉ Web Portal">
+    Mỗi khách hàng được cung cấp domain riêng. Liên hệ Quản trị viên để nhận đúng địa chỉ thay cho placeholder `https://[URL_DOMAIN_CLOUD_CUA_BAN]`.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="BarChart3"
+    title="Tổng quan giao diện"
+    description="Nhận biết Dashboard, thanh điều hướng và khu vực quản lý tệp."
+    href="/docs/cloudfile/02-bat-dau/tong-quan-giao-dien"
+  />
+  <Card
+    icon="Settings"
+    title="Đăng nhập Desktop Client"
+    description="Kết nối ứng dụng trên máy tính với domain CloudFile của doanh nghiệp."
+    href="/docs/cloudfile/05-may-tinh-di-dong/desktop-client/dang-nhap-va-cau-hinh"
+  />
+  <Card
+    icon="Phone"
+    title="Đăng nhập Mobile App"
+    description="Tìm ứng dụng Nextcloud trong store và kết nối tài khoản trên điện thoại."
+    href="/docs/cloudfile/05-may-tinh-di-dong/mobile-app/tai-cai-dat-dang-nhap"
+  />
+</Cards>

@@ -1,0 +1,93 @@
+---
+title: "Truy cập hệ thống CloudFile"
+description: "Hướng dẫn chọn và truy cập CloudFile qua Web Portal, Desktop Client hoặc Mobile App."
+---
+
+Bạn có thể sử dụng CloudFile trên trình duyệt, máy tính hoặc điện thoại. Chọn phương thức phù hợp với cách bạn cần truy cập và đồng bộ dữ liệu.
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Chuẩn bị tài khoản CloudFile do đơn vị của bạn cấp.
+- Lấy domain CloudFile riêng của doanh nghiệp từ Quản trị viên.
+- Với Desktop Client hoặc Mobile App, cài ứng dụng Nextcloud trước khi đăng nhập.
+</Callout>
+
+## Truy cập CloudFile
+
+<Steps>
+  <Step>
+    ### Mở Web Portal
+
+    Mở Google Chrome, Firefox, Microsoft Edge hoặc Safari phiên bản mới nhất, sau đó nhập domain do doanh nghiệp cung cấp:
+
+    `https://[URL_DOMAIN_CLOUD_CUA_BAN]`
+
+    ![Màn hình đăng nhập CloudFile với domain riêng của doanh nghiệp](/media/cloudfile/01-tong-quan/phuong-thuc-truy-cap-cloudfile.png)
+
+    *Kết quả: Trình duyệt hiển thị màn hình đăng nhập CloudFile mà không cần cài thêm phần mềm.*
+  </Step>
+  <Step>
+    ### Sử dụng Desktop Client khi cần đồng bộ
+
+    Cài Desktop Client trên máy tính nếu bạn muốn đồng bộ thư mục chọn lọc, làm việc offline, sử dụng Virtual Files hoặc thao tác CloudFile từ menu chuột phải của Windows Explorer/Finder.
+
+    *Kết quả: CloudFile xuất hiện như một vùng dữ liệu trên máy tính và sẵn sàng kết nối với máy chủ.*
+  </Step>
+  <Step>
+    ### Sử dụng Mobile App khi di chuyển
+
+    Trên iOS hoặc Android, mở store của thiết bị và tìm ứng dụng **Nextcloud**. Tài liệu không cung cấp link store trực tiếp; hãy chọn ứng dụng theo hướng dẫn cài đặt Mobile App.
+
+    *Kết quả: Bạn có thể truy cập dữ liệu và sử dụng chức năng tự động sao lưu ảnh trên điện thoại.*
+  </Step>
+  <Step>
+    ### Chuẩn bị thông tin đăng nhập
+
+    Sử dụng Username là email công việc hoặc tên đăng nhập được cấp cùng mật khẩu ban đầu. Sau lần đăng nhập đầu tiên, đổi mật khẩu và kích hoạt 2FA theo chính sách của đơn vị.
+
+    *Kết quả: Tài khoản sẵn sàng đăng nhập trên phương thức truy cập đã chọn.*
+  </Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+- Web Portal hiển thị màn hình đăng nhập từ đúng domain doanh nghiệp cung cấp.
+- Desktop Client mở được cửa sổ kết nối tài khoản sau khi cài đặt.
+- Mobile App Nextcloud được cài từ store của thiết bị.
+- Bạn có Username và mật khẩu do đơn vị cấp để chuyển sang bước đăng nhập.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Không biết domain CloudFile của doanh nghiệp">
+    Domain được cấp riêng cho từng khách hàng. Liên hệ Quản trị viên của đơn vị để nhận đúng địa chỉ thay vì tự thay nội dung trong placeholder.
+  </Accordion>
+  <Accordion title="Cần tự động đồng bộ nhưng đang dùng trình duyệt">
+    Web Portal phù hợp với truy cập không cần cài đặt. Hãy cài Desktop Client nếu cần đồng bộ thư mục chọn lọc, làm việc offline hoặc dùng Virtual Files.
+  </Accordion>
+  <Accordion title="Không tìm thấy link tải Mobile App trong tài liệu">
+    Mở App Store hoặc Google Play trên thiết bị và tìm ứng dụng **Nextcloud**.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="UserCheck"
+    title="Đăng nhập CloudFile"
+    description="Đăng nhập Web Portal, đổi mật khẩu ban đầu và kích hoạt 2FA."
+    href="/docs/cloudfile/02-bat-dau/dang-nhap"
+  />
+  <Card
+    icon="Download"
+    title="Tải và cài đặt Desktop Client"
+    description="Cài ứng dụng Nextcloud trên Windows hoặc macOS."
+    href="/docs/cloudfile/05-may-tinh-di-dong/desktop-client/tai-va-cai-dat"
+  />
+  <Card
+    icon="Phone"
+    title="Cài đặt Mobile App"
+    description="Tìm Nextcloud trong store và đăng nhập trên thiết bị di động."
+    href="/docs/cloudfile/05-may-tinh-di-dong/mobile-app/tai-cai-dat-dang-nhap"
+  />
+</Cards>

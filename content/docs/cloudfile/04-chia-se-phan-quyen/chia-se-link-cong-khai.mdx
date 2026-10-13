@@ -1,0 +1,133 @@
+---
+title: "Chia sẻ link công khai"
+description: "Hướng dẫn tạo, bảo vệ, kiểm tra và thu hồi liên kết công khai trên CloudFile."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Dùng link công khai khi người nhận không có tài khoản trong cùng hệ thống CloudFile.
+- Xác định người nhận cần xem, tải xuống, tải lên hay chỉnh sửa dữ liệu.
+- Chuẩn bị mật khẩu và ngày hết hạn phù hợp; gửi mật khẩu qua một kênh khác với liên kết.
+- Không chia sẻ dữ liệu nhạy cảm bằng liên kết mở nếu không có biện pháp bảo vệ phù hợp.
+- Người nhận có thể chuyển tiếp liên kết cho người khác. Hoạt động của public link có thể chỉ được ghi nhận ở mức tổng hợp thay vì xác định từng người truy cập.
+</Callout>
+
+## Tạo liên kết công khai
+
+<Steps>
+  <Step>
+    ### Mở bảng Sharing
+
+    Trong **Files**, chọn biểu tượng chia sẻ bên cạnh tệp hoặc thư mục cần gửi.
+
+    ![Biểu tượng chia sẻ bên cạnh một tệp trong danh sách Files](/media/cloudfile/04-chia-se-phan-quyen/mo-menu-chia-se-cong-khai.png)
+
+    *Kết quả: Bảng thông tin của mục được chọn mở tại thẻ **Sharing**.*
+  </Step>
+  <Step>
+    ### Tạo public link
+
+    Trong phần **External shares**, chọn **Create public link**.
+
+    ![Bảng Sharing với nút Create public link được đánh dấu](/media/cloudfile/04-chia-se-phan-quyen/tao-public-link.png)
+
+    *Kết quả: CloudFile tạo một liên kết chia sẻ để tiếp tục cấu hình.*
+  </Step>
+  <Step>
+    ### Chọn quyền truy cập
+
+    Chọn mức phù hợp như **View only**, **Allow editing**, **File request** hoặc **Custom permissions**. Với **File request**, người nhận chỉ tải dữ liệu lên và không xem các tệp đã có.
+
+    ![Danh sách quyền của public link gồm View only, Allow upload and editing, File request và Custom permissions](/media/cloudfile/04-chia-se-phan-quyen/cau-hinh-quyen-public-link.png)
+
+    *Kết quả: Liên kết chỉ cung cấp các thao tác đã được chọn.*
+  </Step>
+  <Step>
+    ### Bật mật khẩu
+
+    Mở **Advanced settings**, bật **Set password** và nhập mật khẩu dành riêng cho lần chia sẻ này.
+
+    ![Tùy chọn Set password và trường Password của public link](/media/cloudfile/04-chia-se-phan-quyen/dat-mat-khau-public-link.png)
+
+    *Kết quả: Người mở liên kết phải nhập mật khẩu trước khi truy cập dữ liệu.*
+  </Step>
+  <Step>
+    ### Đặt ngày hết hạn
+
+    Bật **Set expiration date**, chọn ngày liên kết tự ngừng hoạt động rồi lưu cấu hình.
+
+    ![Tùy chọn Set expiration date với trường chọn ngày hết hạn](/media/cloudfile/04-chia-se-phan-quyen/dat-ngay-het-han.png)
+
+    *Kết quả: Liên kết chỉ hoạt động đến ngày đã đặt.*
+  </Step>
+  <Step>
+    ### Sao chép và kiểm tra liên kết
+
+    Chọn biểu tượng sao chép bên cạnh **Share link**. Liên kết có dạng `https://[URL_DOMAIN_CLOUD_CUA_BAN]/s/abc123xyz`. Mở một cửa sổ riêng tư/ẩn danh để kiểm tra mật khẩu, quyền và ngày hết hạn trước khi gửi.
+
+    *Kết quả: Liên kết hoạt động với đúng mức bảo vệ và quyền truy cập đã cấu hình.*
+  </Step>
+</Steps>
+
+**Cần bổ sung:** xác nhận hệ thống CloudFile ODS có bật **Hide download**, giới hạn số lượt tải và thống kê lượt truy cập cho public link hay không (`Q-PUBLIC-01`).
+
+## Thu hồi liên kết
+
+<Steps>
+  <Step>
+    ### Mở lại thông tin chia sẻ
+
+    Chọn tệp hoặc thư mục, mở thẻ **Sharing** và tìm liên kết cần thu hồi.
+
+    *Kết quả: Các public link hiện có của dữ liệu được hiển thị.*
+  </Step>
+  <Step>
+    ### Chọn Unshare
+
+    Mở menu ba chấm của liên kết rồi chọn **Unshare**. Nếu một liên kết đã bị lộ, hãy thu hồi liên kết cũ trước khi tạo liên kết mới.
+
+    ![Menu của public link với tùy chọn Unshare](/media/cloudfile/04-chia-se-phan-quyen/vo-hieu-hoa-public-link.png)
+
+    *Kết quả: Liên kết cũ ngừng hoạt động và không thể tiếp tục truy cập dữ liệu.*
+  </Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+- Liên kết mở được trong cửa sổ riêng tư/ẩn danh.
+- Mật khẩu được yêu cầu nếu đã bật **Set password**.
+- Người nhận chỉ thấy các thao tác tương ứng với mức quyền đã chọn.
+- Sau ngày hết hạn hoặc sau khi **Unshare**, liên kết không còn truy cập được.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Liên kết báo 404 hoặc không còn tồn tại">
+    Kiểm tra URL đã được sao chép đầy đủ, ngày hết hạn và trạng thái của tệp/thư mục gốc. Liên kết cũng ngừng hoạt động nếu đã bị chủ sở hữu thu hồi.
+  </Accordion>
+  <Accordion title="Mật khẩu không được chấp nhận">
+    Kiểm tra chữ hoa, chữ thường và khoảng trắng khi sao chép. Gửi lại mật khẩu qua kênh riêng; không gửi mật khẩu cùng tin nhắn chứa liên kết.
+  </Accordion>
+  <Accordion title="Người nhận không tải xuống hoặc chỉnh sửa được">
+    Mở cấu hình liên kết và kiểm tra mức quyền. Tính năng tải xuống có thể bị ẩn, còn chỉnh sửa chỉ khả dụng khi đã cấp quyền tương ứng.
+  </Accordion>
+  <Accordion title="Liên kết bị gửi nhầm hoặc lộ ra ngoài">
+    Thu hồi liên kết ngay, tạo liên kết mới với mật khẩu và ngày hết hạn, sau đó thông báo cho người phụ trách nếu dữ liệu có nội dung nhạy cảm.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="Users"
+    title="Chia sẻ nội bộ"
+    description="Chia sẻ cho người dùng hoặc nhóm có tài khoản CloudFile."
+    href="/docs/cloudfile/04-chia-se-phan-quyen/chia-se-noi-bo"
+  />
+  <Card
+    icon="ShieldCheck"
+    title="Chia sẻ và phân quyền"
+    description="So sánh phương thức chia sẻ và áp dụng least privilege."
+    href="/docs/cloudfile/04-chia-se-phan-quyen"
+  />
+</Cards>

@@ -1,0 +1,133 @@
+---
+title: "Tải và cài đặt Desktop Client"
+description: "Hướng dẫn tải và cài Nextcloud Desktop Client trên Windows hoặc macOS."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Kiểm tra máy đang dùng Windows hay macOS và loại chip/kiến trúc phù hợp.
+- Đóng các ứng dụng đang mở, đặc biệt là chương trình đang dùng tệp cần đồng bộ.
+- Dùng trang tải Desktop Client được nêu trong nguồn: `https://nextcloud.com/install/#install-clients`.
+- Nếu phần mềm bảo mật chặn installer, thực hiện theo chính sách IT của đơn vị và bật lại bảo vệ sau khi xử lý.
+</Callout>
+
+**Cần bổ sung:** xác nhận yêu cầu hệ điều hành, RAM, CPU, dung lượng và băng thông được ODS hỗ trợ chính thức (`Q-CLIENT-SYSTEM-01`).
+
+## Cài đặt trên Windows
+
+<Steps>
+  <Step>
+    ### Tải installer cho Windows
+
+    Mở trang tải Desktop Client, chọn bản dành cho Windows và lưu tệp `.msi` vào thư mục **Downloads**. Tên tệp có dạng `Nextcloud-3.x.x-x64.msi`.
+
+    *Kết quả: Installer Windows xuất hiện trong thư mục tải xuống.*
+  </Step>
+  <Step>
+    ### Khởi chạy installer
+
+    Nhấp đúp tệp `.msi`. Nếu Windows hiển thị User Account Control, kiểm tra tên ứng dụng rồi chọn **Yes** để cho phép cài đặt.
+
+    *Kết quả: Nextcloud Setup Wizard mở ra.*
+  </Step>
+  <Step>
+    ### Xác nhận tùy chọn cài đặt
+
+    Trong Setup Wizard, chọn **Next**, chấp nhận License Agreement, kiểm tra thư mục cài đặt rồi chọn **Install**.
+
+    ![Nextcloud Setup Wizard ở màn hình Ready to install với nút Install](/media/cloudfile/05-may-tinh-di-dong/desktop-client/windows-uac.png)
+
+    *Kết quả: Wizard bắt đầu cài Desktop Client vào máy.*
+  </Step>
+  <Step>
+    ### Hoàn tất và mở ứng dụng
+
+    Khi màn hình **Completed the Nextcloud Setup Wizard** xuất hiện, giữ tùy chọn **Launch Nextcloud** nếu muốn mở ngay rồi chọn **Finish**.
+
+    ![Màn hình hoàn tất Nextcloud Setup Wizard với tùy chọn Launch Nextcloud](/media/cloudfile/05-may-tinh-di-dong/desktop-client/windows-cai-dat-hoan-tat.png)
+
+    *Kết quả: Biểu tượng Nextcloud xuất hiện trong system tray và Setup Wizard đăng nhập mở ra.*
+  </Step>
+</Steps>
+
+## Cài đặt trên macOS
+
+<Steps>
+  <Step>
+    ### Tải installer cho macOS
+
+    Mở trang tải Desktop Client, chọn bản dành cho macOS và lưu tệp `.pkg`. Chọn đúng bản Intel hoặc Apple Silicon theo loại chip của máy.
+
+    *Kết quả: Installer macOS xuất hiện trong thư mục **Downloads**.*
+  </Step>
+  <Step>
+    ### Mở tệp cài đặt
+
+    Nhấp đúp tệp `.pkg`. Nếu Gatekeeper chặn ứng dụng, Control-click tệp, chọn **Open** rồi xác nhận **Open** trong hộp thoại.
+
+    *Kết quả: Nextcloud Installer mở ra.*
+  </Step>
+  <Step>
+    ### Chạy Nextcloud Installer
+
+    Chọn **Continue**, đọc và chấp nhận License Agreement, chọn ổ cài đặt rồi chọn **Install**. Nhập mật khẩu người dùng macOS khi hệ thống yêu cầu xác thực cài phần mềm.
+
+    *Kết quả: Nextcloud được cài vào thư mục **Applications**.*
+  </Step>
+  <Step>
+    ### Cấp quyền cần thiết
+
+    Mở **System Settings** → **Privacy & Security** → **Full Disk Access**, thêm `Nextcloud.app` và bật quyền. Nếu muốn nhận thông báo, mở **Notifications** và bật thông báo cho Nextcloud.
+
+    *Kết quả: Desktop Client có quyền truy cập tệp và hiển thị thông báo theo lựa chọn của bạn.*
+  </Step>
+  <Step>
+    ### Khởi chạy Desktop Client
+
+    Mở **Finder** → **Applications**, sau đó nhấp đúp `Nextcloud.app`.
+
+    *Kết quả: Biểu tượng Nextcloud xuất hiện trên Menu Bar và Setup Wizard đăng nhập mở ra.*
+  </Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+- Windows hiển thị biểu tượng Nextcloud trong system tray; macOS hiển thị biểu tượng trên Menu Bar.
+- Cửa sổ thêm tài khoản Nextcloud mở và có nút **Log in**.
+- Ứng dụng có thể khởi chạy lại từ Start Menu hoặc thư mục **Applications**.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Windows báo Installation failed">
+    Kiểm tra quyền cài đặt, tệp installer và phần mềm bảo mật. Có thể nhấp phải tệp `.msi`, chọn **Run as administrator**, tải lại installer hoặc khởi động lại máy. Nếu phải thay đổi Antivirus/Firewall, làm theo chính sách IT và khôi phục bảo vệ sau khi cài.
+  </Accordion>
+  <Accordion title="Windows báo This app can't run on your PC">
+    Mở **This PC** → **Properties** và kiểm tra **System type**, sau đó tải đúng installer cho kiến trúc Windows của máy.
+  </Accordion>
+  <Accordion title="macOS không xác minh được nhà phát triển">
+    Control-click tệp `.pkg` và chọn **Open**. Nếu vẫn bị chặn, mở **Privacy & Security** và dùng **Open Anyway** cho đúng installer vừa tải.
+  </Accordion>
+  <Accordion title="Cài xong nhưng macOS không hiện biểu tượng">
+    Mở `Nextcloud.app` trực tiếp từ **Applications**. Nếu ứng dụng không truy cập được tệp, kiểm tra lại **Full Disk Access**.
+  </Accordion>
+  <Accordion title="Tải nhầm bản Intel hoặc Apple Silicon">
+    Mở Apple menu → **About This Mac**, kiểm tra dòng **Chip**, sau đó tải lại đúng installer dành cho Intel hoặc Apple Silicon.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="UserCheck"
+    title="Đăng nhập và cấu hình"
+    description="Kết nối Desktop Client với domain CloudFile của đơn vị."
+    href="/docs/cloudfile/05-may-tinh-di-dong/desktop-client/dang-nhap-va-cau-hinh"
+  />
+  <Card
+    icon="Activity"
+    title="Đồng bộ thư mục"
+    description="Theo dõi trạng thái và quản lý kết nối đồng bộ."
+    href="/docs/cloudfile/05-may-tinh-di-dong/desktop-client/dong-bo-thu-muc"
+  />
+</Cards>

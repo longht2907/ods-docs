@@ -1,0 +1,57 @@
+---
+title: "Chia sẻ và phân quyền"
+description: "Chọn phương thức chia sẻ dữ liệu và kiểm soát quyền truy cập trên CloudFile."
+---
+
+CloudFile cho phép chia sẻ một tệp hoặc thư mục thay vì gửi nhiều bản sao qua email. Người nhận làm việc trên cùng dữ liệu, còn chủ sở hữu có thể điều chỉnh hoặc thu hồi quyền khi không còn cần thiết.
+
+## Chọn phương thức chia sẻ
+
+| Phương thức | Dùng khi | Đặc điểm |
+| --- | --- | --- |
+| Chia sẻ nội bộ | Người nhận có tài khoản trong cùng hệ thống CloudFile | Chọn chính xác người dùng hoặc nhóm; người nhận phải đăng nhập. |
+| Link công khai | Người nhận ở bên ngoài hoặc không có tài khoản | Người có liên kết có thể truy cập theo quyền đã cấu hình; cần mật khẩu và ngày hết hạn để giảm rủi ro. |
+| Chia sẻ theo nhóm | Nhiều người trong cùng phòng ban hoặc dự án | Quyền được áp dụng theo thành viên của nhóm do Quản trị viên quản lý. |
+
+<Cards>
+  <Card
+    icon="GitFork"
+    title="Chia sẻ link công khai"
+    description="Tạo liên kết cho đối tác hoặc khách hàng không có tài khoản CloudFile."
+    href="/docs/cloudfile/04-chia-se-phan-quyen/chia-se-link-cong-khai"
+  />
+  <Card
+    icon="Users"
+    title="Chia sẻ nội bộ"
+    description="Cấp quyền cho người dùng hoặc nhóm trong cùng hệ thống."
+    href="/docs/cloudfile/04-chia-se-phan-quyen/chia-se-noi-bo"
+  />
+</Cards>
+
+## Nguyên tắc phân quyền
+
+- Áp dụng **least privilege**: chỉ cấp mức quyền cần thiết cho công việc.
+- Dùng **View only** khi người nhận chỉ cần xem dữ liệu.
+- Chỉ bật quyền chỉnh sửa, chia sẻ tiếp hoặc xóa khi vai trò công việc yêu cầu.
+- Với liên kết công khai, đặt mật khẩu, ngày hết hạn và ghi chú cho người nhận khi các tùy chọn này có sẵn.
+- Dùng **File request** cho trường hợp người bên ngoài chỉ cần tải tệp lên mà không được xem dữ liệu hiện có.
+- Kiểm tra **Activity** để theo dõi các sự kiện chia sẻ và thay đổi liên quan.
+
+**Cần bổ sung:** xác nhận tên và hành vi chính xác của từng mức quyền chia sẻ trên phiên bản CloudFile ODS đang vận hành (`Q-PERMISSION-01`).
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="GitFork"
+    title="Quản lý thư mục và tệp tin"
+    description="Sắp xếp dữ liệu trước khi chia sẻ cho người khác."
+    href="/docs/cloudfile/03-quan-ly-thu-muc-tep-tin"
+  />
+  <Card
+    icon="Users"
+    title="Làm việc nhóm"
+    description="Theo dõi hoạt động và cộng tác trên tài liệu dùng chung."
+    href="/docs/cloudfile/06-lam-viec-nhom/lam-viec-nhom"
+  />
+</Cards>

@@ -1,0 +1,117 @@
+---
+title: "Quản lý tài khoản"
+description: "Hướng dẫn cập nhật, khóa và quản lý thông tin tài khoản người dùng CloudFile."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Đăng nhập bằng tài khoản có quyền Admin và mở **Accounts**.
+- Xác định tài khoản cần sửa và thay đổi đã được phê duyệt.
+- Với offboarding, xác nhận kế hoạch bàn giao dữ liệu trước khi xóa tài khoản.
+</Callout>
+
+**Cần bổ sung:** xác nhận tên đăng nhập có thể thay đổi hay không; quy trình reset mật khẩu; hành vi Disable/Enable, link chia sẻ và chuyển dữ liệu khi xóa (`Q-ADMIN-ACCOUNT-01`).
+
+## Cập nhật thông tin tài khoản
+
+<Steps>
+  <Step>
+    ### Chọn tài khoản
+
+    Trong **Accounts**, tìm dòng của người dùng cần cập nhật.
+
+    ![Danh sách Accounts với thông tin mẫu đã được ẩn danh và các cột chỉnh sửa tài khoản](/media/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/chinh-sua-tai-khoan.png)
+
+    *Kết quả: Bạn xác định đúng tài khoản và các trường cần thay đổi.*
+  </Step>
+  <Step>
+    ### Sửa tên hiển thị hoặc email
+
+    Chọn biểu tượng bút chì tại trường cần sửa, nhập giá trị mới rồi nhấn `Enter` nếu giao diện yêu cầu.
+
+    *Kết quả: Tên hiển thị hoặc email mới xuất hiện trên dòng tài khoản.*
+  </Step>
+  <Step>
+    ### Cập nhật nhóm
+
+    Mở trường **Groups**, chọn nhóm mới và bỏ chọn nhóm không còn phù hợp. Chọn ra ngoài danh sách để hoàn tất nếu giao diện tự lưu.
+
+    *Kết quả: Tài khoản hiển thị đúng các nhóm hiện tại.*
+  </Step>
+  <Step>
+    ### Điều chỉnh quota
+
+    Mở trường **Quota**, chọn một mức có sẵn hoặc **Other** để nhập hạn mức khác nếu tùy chọn này xuất hiện.
+
+    *Kết quả: Hạn mức mới hiển thị trên tài khoản.*
+  </Step>
+</Steps>
+
+## Đặt lại mật khẩu
+
+<Steps>
+  <Step>
+    ### Mở trường Password
+
+    Trên dòng người dùng, mở trường **Password** hoặc tùy chọn đặt lại mật khẩu trong menu của tài khoản.
+
+    *Kết quả: Giao diện cho phép nhập hoặc khởi tạo quy trình đặt lại mật khẩu.*
+  </Step>
+  <Step>
+    ### Áp dụng mật khẩu mới
+
+    Nhập mật khẩu tạm theo chính sách của doanh nghiệp hoặc dùng luồng email đặt lại mật khẩu nếu hệ thống được cấu hình hỗ trợ.
+
+    *Kết quả: Hệ thống xác nhận thay đổi mật khẩu.*
+  </Step>
+</Steps>
+
+## Khóa hoặc mở khóa tài khoản
+
+<Steps>
+  <Step>
+    ### Mở menu tài khoản
+
+    Chọn dấu ba chấm ở cuối dòng của người dùng cần xử lý.
+
+    *Kết quả: Các hành động quản trị tài khoản xuất hiện.*
+  </Step>
+  <Step>
+    ### Thay đổi trạng thái
+
+    Chọn hành động **Disable** để chặn đăng nhập hoặc **Enable** để cho phép tài khoản hoạt động lại.
+
+    *Kết quả: Trạng thái tài khoản thay đổi theo hành động đã chọn.*
+  </Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+- Tên hiển thị, email, nhóm và quota khớp với yêu cầu thay đổi.
+- Tài khoản bị Disable không còn đăng nhập được; tài khoản được Enable có thể đăng nhập lại.
+- Dữ liệu cần bàn giao vẫn còn nguyên trước mọi thao tác xóa.
+- Nhật ký hoạt động ghi nhận thao tác quản trị nếu hệ thống hỗ trợ sự kiện tương ứng.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Không thấy biểu tượng chỉnh sửa">
+    Kiểm tra tài khoản hiện tại có quyền Admin phù hợp. Một số trường nằm trong menu dấu ba chấm thay vì hiển thị trực tiếp trên bảng.
+  </Accordion>
+  <Accordion title="Thay đổi nhóm nhưng quyền chưa đúng">
+    Kiểm tra quyền được cấp trực tiếp cho người dùng và quyền đến từ các nhóm khác. Đăng nhập lại hoặc đồng bộ lại client nếu giao diện chưa phản ánh thay đổi.
+  </Accordion>
+  <Accordion title="Người dùng vẫn không đăng nhập sau khi Enable">
+    Kiểm tra tên đăng nhập, mật khẩu và trạng thái tài khoản. Nếu cần, thực hiện quy trình đặt lại mật khẩu theo cấu hình hệ thống.
+  </Accordion>
+  <Accordion title="Cần đổi tên đăng nhập">
+    Không tự xóa tài khoản. Xác nhận quy trình chính thức, kế hoạch chuyển dữ liệu và ảnh hưởng đến chia sẻ trước khi xử lý.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card icon="UserCheck" title="Tạo người dùng mới" description="Tạo tài khoản và gán cấu hình ban đầu." href="/docs/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/tao-nguoi-dung-moi" />
+  <Card icon="Users" title="Nhóm và phân quyền" description="Hiểu ảnh hưởng của nhóm đến quyền truy cập." href="/docs/cloudfile/07-quan-tri-admin/nhom-va-phan-quyen" />
+  <Card icon="ListChecks" title="Nhật ký hoạt động Admin" description="Truy vết các thay đổi liên quan đến dữ liệu." href="/docs/cloudfile/07-quan-tri-admin/nhat-ky-hoat-dong" />
+</Cards>

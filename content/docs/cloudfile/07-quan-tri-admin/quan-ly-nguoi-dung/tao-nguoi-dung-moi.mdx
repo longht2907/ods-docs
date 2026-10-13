@@ -1,0 +1,98 @@
+---
+title: "Tạo người dùng mới"
+description: "Hướng dẫn tạo tài khoản người dùng mới trong hệ thống CloudFile."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Đăng nhập bằng tài khoản có quyền Admin.
+- Chuẩn bị tên đăng nhập, tên hiển thị, email công việc, nhóm và quota của nhân viên.
+- Không gửi mật khẩu thật qua kênh chat không an toàn.
+</Callout>
+
+**Cần bổ sung:** xác nhận quy tắc mật khẩu, khả năng để trống mật khẩu để gửi email kích hoạt và các trường bắt buộc khi tạo tài khoản (`Q-ADMIN-CREATE-01`).
+
+<Steps>
+  <Step>
+    ### Mở trang Accounts
+
+    Chọn avatar ở góc trên bên phải, sau đó chọn **Accounts**.
+
+    ![Menu tài khoản CloudFile với mục Accounts được đánh dấu](/media/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/mo-menu-account.png)
+
+    *Kết quả: Trang quản lý tài khoản xuất hiện.*
+  </Step>
+  <Step>
+    ### Mở biểu mẫu New account
+
+    Chọn **+ New account** ở đầu cột bên trái.
+
+    ![Trang Accounts với danh sách người dùng mẫu đã ẩn thông tin khách hàng](/media/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/trang-quan-ly-nguoi-dung.png)
+
+    *Kết quả: Biểu mẫu **New account** mở ra.*
+  </Step>
+  <Step>
+    ### Nhập thông tin tài khoản
+
+    Điền các trường theo chính sách của doanh nghiệp:
+
+    | Trường | Nội dung |
+    | --- | --- |
+    | Account name | Tên đăng nhập không dấu, không khoảng trắng và duy nhất. |
+    | Display name | Tên hiển thị của nhân viên. |
+    | Password hoặc Email | Cung cấp theo yêu cầu của biểu mẫu và chính sách tài khoản. |
+    | Member of the following groups | Nhóm phòng ban hoặc vai trò của người dùng. |
+    | Admin of the following groups | Chỉ chọn khi cần giao quyền Group Admin. |
+    | Quota | Hạn mức lưu trữ phù hợp. |
+    | Manager | Người quản lý trực tiếp nếu đơn vị sử dụng trường này. |
+
+    ![Biểu mẫu New account với các trường Account name, Display name, Password, Email, Groups và Quota](/media/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/form-tao-nguoi-dung.png)
+
+    *Kết quả: Biểu mẫu có đủ dữ liệu cần thiết và không báo lỗi trường bắt buộc.*
+  </Step>
+  <Step>
+    ### Tạo tài khoản
+
+    Kiểm tra lại tên đăng nhập, email, nhóm và quota, sau đó chọn **Add new account**.
+
+    *Kết quả: Tài khoản mới xuất hiện trong danh sách Accounts.*
+  </Step>
+  <Step>
+    ### Bàn giao truy cập
+
+    Gửi cho người dùng domain CloudFile riêng của doanh nghiệp, tên đăng nhập và hướng dẫn đặt hoặc đổi mật khẩu theo quy trình nội bộ.
+
+    *Kết quả: Người dùng có đủ thông tin để thực hiện đăng nhập lần đầu.*
+  </Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+- Tài khoản xuất hiện trong **All accounts** với đúng tên hiển thị và email.
+- Người dùng thuộc đúng nhóm và có quota đã chọn.
+- Người dùng đăng nhập được bằng domain riêng của doanh nghiệp.
+- Không có mật khẩu thật hoặc thông tin nhạy cảm trong tài liệu bàn giao công khai.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Account name đã tồn tại">
+    Chọn một định danh khác theo quy tắc đặt tên của doanh nghiệp. Kiểm tra cả tài khoản cũ chưa được xử lý offboarding trước khi tạo biến thể mới.
+  </Accordion>
+  <Accordion title="Mật khẩu không được chấp nhận">
+    Làm theo thông báo trên biểu mẫu và chính sách mật khẩu của hệ thống. Không dùng ví dụ mật khẩu có thể bị hiểu là thông tin đăng nhập thật.
+  </Accordion>
+  <Accordion title="Không chọn được nhóm">
+    Kiểm tra nhóm đã được tạo hay chưa. Nếu chưa có, tạo nhóm trước rồi quay lại gán tài khoản.
+  </Accordion>
+  <Accordion title="Không nhận được email kích hoạt">
+    Kiểm tra email đã nhập, thư rác và cấu hình gửi mail của hệ thống. Nếu cần, liên hệ đơn vị quản trị dịch vụ.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card icon="Settings" title="Quản lý tài khoản" description="Cập nhật thông tin và trạng thái sau khi tạo." href="/docs/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/quan-ly-tai-khoan" />
+  <Card icon="Users" title="Tạo và quản lý nhóm" description="Chuẩn bị nhóm trước khi gán người dùng." href="/docs/cloudfile/07-quan-tri-admin/nhom-va-phan-quyen/tao-va-quan-ly-nhom" />
+  <Card icon="Layers" title="Dung lượng và Quota" description="Theo dõi và điều chỉnh hạn mức lưu trữ." href="/docs/cloudfile/07-quan-tri-admin/dung-luong-quota" />
+</Cards>

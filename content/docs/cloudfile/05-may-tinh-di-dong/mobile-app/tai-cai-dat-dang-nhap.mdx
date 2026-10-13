@@ -1,0 +1,149 @@
+---
+title: "Tải, cài đặt và đăng nhập Mobile App"
+description: "Hướng dẫn tìm ứng dụng Nextcloud trên Android hoặc iOS, kết nối CloudFile và cấp quyền cần thiết."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Chuẩn bị điện thoại Android hoặc iPhone/iPad có kết nối Wi-Fi, 4G hoặc 5G.
+- Chuẩn bị domain `https://[URL_DOMAIN_CLOUD_CUA_BAN]`, username/email công việc và mật khẩu hoặc SSO của đơn vị.
+- Chỉ tìm ứng dụng **Nextcloud** trong store; không cài **Nextcloud Talk** cho quy trình quản lý tệp này.
+- Cài ứng dụng bằng cách tìm **Nextcloud** trực tiếp trong store; tài liệu không cung cấp link tải trực tiếp.
+</Callout>
+
+**Cần bổ sung:** xác nhận phiên bản Android/iOS tối thiểu và yêu cầu dung lượng được ODS hỗ trợ chính thức (`Q-CLIENT-SYSTEM-01`).
+
+## Cài đặt ứng dụng
+
+<Steps>
+  <Step>
+    ### Mở store trên điện thoại
+
+    Trên Android, mở **Google Play Store**. Trên iPhone hoặc iPad, mở **App Store** và chọn **Search/Tìm kiếm**.
+
+    *Kết quả: Thanh tìm kiếm ứng dụng xuất hiện.*
+  </Step>
+  <Step>
+    ### Tìm ứng dụng Nextcloud
+
+    Nhập `Nextcloud`, chọn ứng dụng **Nextcloud** dùng để quản lý tệp và không chọn **Nextcloud Talk**.
+
+    ![Trang ứng dụng Nextcloud trong App Store sau khi tìm kiếm](/media/cloudfile/05-may-tinh-di-dong/mobile-app/tim-nextcloud-app-store.png)
+
+    *Kết quả: Trang thông tin ứng dụng Nextcloud mở trong store.*
+  </Step>
+  <Step>
+    ### Cài đặt và mở ứng dụng
+
+    Chọn **Install/Cài đặt** trên Android hoặc **GET/Tải** trên iOS. Sau khi hoàn tất, chọn **Open/Mở**.
+
+    ![Màn hình chào mừng Nextcloud Mobile với nút Log in](/media/cloudfile/05-may-tinh-di-dong/mobile-app/man-hinh-welcome-nextcloud-mobile.png)
+
+    *Kết quả: Màn hình chào mừng Nextcloud hiển thị nút **Log in**.*
+  </Step>
+</Steps>
+
+## Đăng nhập CloudFile
+
+<Steps>
+  <Step>
+    ### Bắt đầu đăng nhập
+
+    Chọn **Log in** trên màn hình chào mừng.
+
+    *Kết quả: Ứng dụng hiển thị trường **Server address**.*
+  </Step>
+  <Step>
+    ### Nhập domain của đơn vị
+
+    Nhập `https://[URL_DOMAIN_CLOUD_CUA_BAN]` rồi chọn **Next/Continue**. Giữ `https://` và không thêm `/login`, `/index.php` hoặc `/apps`.
+
+    *Kết quả: Ứng dụng kết nối đến trang xác thực của CloudFile.*
+  </Step>
+  <Step>
+    ### Xác thực tài khoản
+
+    Nhập username hoặc email công việc, mật khẩu hoặc thực hiện SSO theo cấu hình của đơn vị, sau đó chọn **Log in**.
+
+    *Kết quả: Ứng dụng xác thực tài khoản và bắt đầu tải danh sách tệp, thư mục.*
+  </Step>
+</Steps>
+
+**Cần bổ sung:** xác nhận CloudFile ODS có hỗ trợ quy trình **Log in with QR Code** trên Mobile App hay không; nguồn nhắc QR nhưng chỉ mô tả các bước đăng nhập bằng domain và tài khoản (`Q-MOBILE-LOGIN-01`).
+
+## Cấp quyền trên điện thoại
+
+<Steps>
+  <Step>
+    ### Chọn quyền ảnh và tệp
+
+    Trên Android, chọn **Allow/Cho phép** khi ứng dụng yêu cầu quyền Files/Storage. Trên iOS, chọn quyền truy cập toàn bộ ảnh nếu dùng Auto-upload, hoặc chỉ chọn các ảnh cần thiết.
+
+    *Kết quả: Ứng dụng có thể tải tệp, ảnh và video được bạn cho phép lên CloudFile.*
+  </Step>
+  <Step>
+    ### Cấp quyền camera khi cần
+
+    Chọn **Allow/Cho phép** nếu bạn muốn chụp ảnh hoặc dùng Document Scanner để tạo tệp PDF.
+
+    *Kết quả: Camera có thể được mở từ nút thêm dữ liệu của ứng dụng.*
+  </Step>
+  <Step>
+    ### Chọn quyền thông báo và vị trí
+
+    Bật **Notifications** nếu muốn nhận trạng thái upload/download, dữ liệu được chia sẻ hoặc thông báo từ Quản trị viên. Trên iOS, quyền Location là tùy chọn và chỉ cần khi muốn gắn vị trí vào ảnh.
+
+    *Kết quả: Ứng dụng chỉ sử dụng các quyền bổ sung mà bạn đã chọn.*
+  </Step>
+</Steps>
+
+## Nhận biết màn hình chính
+
+- **Menu**: mở Settings và thông tin tài khoản.
+- **Search**: tìm tệp hoặc thư mục.
+- **More**: mở các tùy chọn bổ sung.
+- **Thư mục/Tệp**: chạm để mở hoặc xem.
+- **Nút Add (+)**: tải tệp, chụp ảnh hoặc quét tài liệu.
+- **Bottom tabs**: truy cập Files, Upload, Shares và More khi các tab này xuất hiện trên phiên bản ứng dụng đang dùng.
+
+**Cần bổ sung:** ảnh đã ẩn danh của màn hình chính sau khi đăng nhập (`Q-IMAGE-MOBILE-01`).
+
+## Kiểm tra kết quả
+
+- Ứng dụng mở đúng tài khoản và hiển thị danh sách tệp/thư mục CloudFile.
+- Domain được lưu đúng theo địa chỉ riêng của đơn vị.
+- Nút thêm dữ liệu có thể mở tệp hoặc camera theo quyền đã cấp.
+- Một tệp thử nghiệm mở được; dữ liệu đánh dấu offline vẫn truy cập được sau khi đã tải về thiết bị.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Không tìm thấy đúng ứng dụng trong store">
+    Tìm từ khóa **Nextcloud** và kiểm tra tên ứng dụng. Không chọn **Nextcloud Talk** vì đây không phải ứng dụng quản lý tệp được mô tả trong hướng dẫn.
+  </Accordion>
+  <Accordion title="Ứng dụng không kết nối được server">
+    Kiểm tra domain bắt đầu bằng `https://` và không có `/login`, `/index.php` hoặc `/apps`. Dùng đúng domain do Quản trị viên của đơn vị cung cấp.
+  </Accordion>
+  <Accordion title="Không tải được ảnh hoặc không mở được camera">
+    Mở Settings của điện thoại và kiểm tra quyền Photos/Files/Storage hoặc Camera cho Nextcloud. Chỉ bật quyền cần cho tác vụ của bạn.
+  </Accordion>
+  <Accordion title="Không thấy dữ liệu sau khi đăng nhập">
+    Kiểm tra bạn đã dùng đúng tài khoản và domain, giữ kết nối mạng và chờ lần tải dữ liệu đầu tiên hoàn tất.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="Settings"
+    title="Desktop Client"
+    description="Cài và đồng bộ CloudFile trên máy tính."
+    href="/docs/cloudfile/05-may-tinh-di-dong/desktop-client"
+  />
+  <Card
+    icon="Upload"
+    title="Tải lên và quản lý tệp tin"
+    description="Quản lý dữ liệu đã tải lên từ điện thoại hoặc máy tính."
+    href="/docs/cloudfile/03-quan-ly-thu-muc-tep-tin/tai-len-va-quan-ly-tep-tin"
+  />
+</Cards>

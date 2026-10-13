@@ -1,0 +1,161 @@
+---
+title: "Tạo và quản lý thư mục"
+description: "Hướng dẫn tạo, đổi tên, di chuyển, sao chép, xóa và khôi phục thư mục trên CloudFile."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Đăng nhập Web Portal và mở ứng dụng **Files**.
+- Xác định thư mục cha và kiểm tra bạn có quyền tạo hoặc thay đổi nội dung tại đó.
+- Nếu thao tác với thư mục đang chia sẻ, thông báo cho các thành viên trước khi đổi tên, di chuyển hoặc xóa.
+</Callout>
+
+## Tạo thư mục mới
+
+<Steps>
+  <Step>
+    ### Chọn vị trí lưu
+
+    Mở **My files**, **Team folders**, **Shared** hoặc thư mục cha phù hợp với dữ liệu cần tổ chức.
+
+    ![Khu vực Files với nút New và tùy chọn New folder được đánh dấu](/media/cloudfile/03-quan-ly-thu-muc-tep-tin/files-chon-vi-tri-thu-muc.png)
+
+    *Kết quả: Thanh đường dẫn hiển thị đúng vị trí sẽ chứa thư mục mới.*
+  </Step>
+  <Step>
+    ### Mở hộp thoại tạo thư mục
+
+    Chọn **New** rồi chọn **New folder**.
+
+    ![Hộp thoại Create new folder yêu cầu nhập tên thư mục](/media/cloudfile/03-quan-ly-thu-muc-tep-tin/menu-tao-thu-muc.png)
+
+    *Kết quả: Hộp thoại **Create new folder** xuất hiện.*
+  </Step>
+  <Step>
+    ### Đặt tên và tạo thư mục
+
+    Nhập tên mô tả rõ nội dung, ví dụ `Ky_Thuat_02`, rồi chọn **Create** hoặc nhấn `Enter`. Không dùng các ký tự `/`, `\`, `:`, `*`, `?`, `"`, `<`, `>` và `|`.
+
+    ![Tên Ky_Thuat_02 được nhập trong hộp thoại tạo thư mục](/media/cloudfile/03-quan-ly-thu-muc-tep-tin/dat-ten-thu-muc.png)
+
+    *Kết quả: Thư mục mới xuất hiện trong danh sách tại vị trí đã chọn.*
+  </Step>
+</Steps>
+
+Nếu cần tạo hơn 20 thư mục, nguồn khuyến nghị lập trước cấu trúc và quy tắc đặt tên. Bạn có thể tạo cây thư mục trên máy tính rồi để Desktop Client đồng bộ, hoặc tải cả thư mục cha lên thay vì lặp lại từng thao tác trên Web Portal. Với hệ thống đồng bộ cũ gặp lỗi tên tiếng Việt, thử dùng tên không dấu hoặc tiếng Anh.
+
+## Đổi tên thư mục
+
+<Steps>
+  <Step>
+    ### Mở menu của thư mục
+
+    Chọn biểu tượng ba chấm bên cạnh thư mục hoặc nhấp chuột phải, sau đó chọn **Rename**.
+
+    ![Menu thao tác của thư mục với tùy chọn Rename được đánh dấu](/media/cloudfile/03-quan-ly-thu-muc-tep-tin/doi-ten-thu-muc.png)
+
+    *Kết quả: Tên hiện tại chuyển sang trạng thái có thể chỉnh sửa.*
+  </Step>
+  <Step>
+    ### Lưu tên mới
+
+    Nhập tên mới rồi nhấn `Enter` hoặc chọn nút xác nhận. Liên kết chia sẻ hiện có vẫn sử dụng định danh nội bộ của thư mục, nhưng nên thông báo tên mới cho người đang cộng tác.
+
+    *Kết quả: Danh sách hiển thị thư mục với tên mới.*
+  </Step>
+</Steps>
+
+## Di chuyển hoặc sao chép thư mục
+
+<Steps>
+  <Step>
+    ### Chọn thao tác Move or copy
+
+    Mở menu ba chấm của thư mục và chọn **Move or copy**. Bạn cũng có thể kéo thả thư mục đến vị trí khác khi giao diện cho phép.
+
+    ![Menu thư mục với tùy chọn Move or copy được đánh dấu](/media/cloudfile/03-quan-ly-thu-muc-tep-tin/menu-di-chuyen-thu-muc.png)
+
+    *Kết quả: Hộp thoại **Choose destination** mở ra.*
+  </Step>
+  <Step>
+    ### Chọn thư mục đích
+
+    Duyệt đến vị trí nhận dữ liệu. Chọn **Move to...** để di chuyển hoặc **Copy to...** để tạo một bản sao.
+
+    ![Hộp thoại chọn thư mục đích với hai nút Copy to và Move to](/media/cloudfile/03-quan-ly-thu-muc-tep-tin/chon-thu-muc-dich.png)
+
+    *Kết quả: Thư mục được chuyển đến vị trí mới hoặc được sao chép sang vị trí đã chọn.*
+  </Step>
+  <Step>
+    ### Kiểm tra bản sao hoặc vị trí mới
+
+    Mở thư mục đích và kiểm tra các thư mục con, tệp tin cùng quyền truy cập cần thiết. Khi sao chép, hệ thống có thể thêm hậu tố như `_Copy` hoặc `(2)` nếu tên đã tồn tại.
+
+    ![Nút Copy to thư mục đích trong hộp thoại Choose destination](/media/cloudfile/03-quan-ly-thu-muc-tep-tin/sao-chep-thu-muc.png)
+
+    *Kết quả: Nội dung cần thiết có mặt tại thư mục đích và người dùng phù hợp vẫn truy cập được.*
+  </Step>
+</Steps>
+
+## Xóa và khôi phục thư mục
+
+<Steps>
+  <Step>
+    ### Đưa thư mục vào Deleted files
+
+    Mở menu ba chấm và chọn **Delete folder**. Thao tác này áp dụng cho toàn bộ tệp và thư mục con bên trong.
+
+    ![Menu thao tác của thư mục với tùy chọn Delete folder được đánh dấu](/media/cloudfile/03-quan-ly-thu-muc-tep-tin/xoa-thu-muc.png)
+
+    *Kết quả: Thư mục không còn ở vị trí cũ và được chuyển vào **Deleted files**.*
+  </Step>
+  <Step>
+    ### Khôi phục khi cần
+
+    Mở **Deleted files**, tìm thư mục rồi chọn **Restore**. Nếu không tìm thấy dữ liệu, liên hệ Quản trị viên để kiểm tra khả năng khôi phục từ bản sao lưu.
+
+    *Kết quả: Thư mục được đưa trở lại vị trí ban đầu nếu vẫn còn trong thời gian lưu.*
+  </Step>
+</Steps>
+
+**Cần bổ sung:** xác nhận thời gian lưu dữ liệu trong **Deleted files** của hệ thống CloudFile ODS (`Q-TRASH-01`).
+
+## Kiểm tra kết quả
+
+- Thư mục mới, tên mới hoặc bản sao xuất hiện đúng vị trí.
+- Thư mục được di chuyển vẫn chứa đầy đủ dữ liệu và có quyền truy cập phù hợp.
+- Thư mục đã xóa xuất hiện trong **Deleted files** và có thể khôi phục khi còn trong thời gian lưu.
+- Có thể chọn biểu tượng ngôi sao để đưa thư mục thường dùng vào **Favorites**.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Không thấy nút New hoặc không thể tạo thư mục">
+    Bạn có thể chỉ có quyền đọc tại vị trí hiện tại. Chuyển sang thư mục có quyền ghi hoặc đề nghị chủ sở hữu/Quản trị viên cấp quyền phù hợp.
+  </Accordion>
+  <Accordion title="Thư mục mới chưa xuất hiện trên máy tính hoặc điện thoại">
+    Kiểm tra kết nối mạng và trạng thái đồng bộ của Desktop Client hoặc Mobile App. Nếu đang dùng **Selective sync**, xác nhận thư mục đó đã được chọn để đồng bộ.
+  </Accordion>
+  <Accordion title="Di chuyển thư mục không hoàn tất">
+    Kiểm tra quyền ở thư mục nguồn và đích, kết nối mạng và số lượng tệp bên trong. Thư mục có nhiều dữ liệu có thể cần thêm thời gian xử lý.
+  </Accordion>
+  <Accordion title="Không tìm thấy thư mục đã xóa">
+    Kiểm tra **Deleted files**. Nếu dữ liệu không còn ở đó, liên hệ Quản trị viên để kiểm tra chính sách lưu và bản sao lưu của đơn vị.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="Upload"
+    title="Tải lên và quản lý tệp tin"
+    description="Đưa tệp lên CloudFile và xử lý trùng tên, tải xuống hoặc xóa tệp."
+    href="/docs/cloudfile/03-quan-ly-thu-muc-tep-tin/tai-len-va-quan-ly-tep-tin"
+  />
+  <Card
+    icon="GitFork"
+    title="Chia sẻ nội bộ"
+    description="Cấp quyền cho người dùng hoặc nhóm trong cùng hệ thống."
+    href="/docs/cloudfile/04-chia-se-phan-quyen/chia-se-noi-bo"
+  />
+</Cards>

@@ -1,0 +1,36 @@
+---
+title: "Quản lý người dùng"
+description: "Tổng quan các trường tài khoản và thao tác quản lý người dùng CloudFile."
+---
+
+Mỗi tài khoản CloudFile gồm các thuộc tính phục vụ đăng nhập, nhận diện, phân quyền và kiểm soát tài nguyên. Admin cần phân biệt rõ từng trường trước khi tạo hoặc cập nhật người dùng.
+
+| Thành phần | Tên kỹ thuật | Mục đích |
+| --- | --- | --- |
+| Tên đăng nhập | `Username` / `Account name` | Định danh duy nhất dùng để đăng nhập. |
+| Tên hiển thị | `Display Name` | Tên hiển thị khi chia sẻ và cộng tác. |
+| Email | `Email` | Nhận thông báo và hỗ trợ khôi phục mật khẩu theo cấu hình hệ thống. |
+| Nhóm | `Group` | Đại diện phòng ban hoặc vai trò, dùng để phân quyền tập trung. |
+| Hạn mức | `Quota` | Giới hạn dung lượng lưu trữ của người dùng. |
+
+**Cần bổ sung:** xác nhận tên đăng nhập có thể thay đổi hay không; quy trình reset mật khẩu; hành vi Disable/Delete và chuyển quyền sở hữu dữ liệu (`Q-ADMIN-ACCOUNT-01`).
+
+## Vòng đời tài khoản
+
+| Giai đoạn | Thao tác chính | Mục tiêu |
+| --- | --- | --- |
+| Onboarding | Tạo tài khoản, gán nhóm, bàn giao cách đăng nhập. | Nhân viên có quyền cần thiết để bắt đầu công việc. |
+| Maintenance | Cập nhật tên hiển thị, email, nhóm, quota hoặc mật khẩu khi cần. | Duy trì quyền và thông tin chính xác. |
+| Offboarding | Disable tài khoản, bàn giao dữ liệu, sau đó xử lý xóa theo chính sách. | Ngăn truy cập trái phép và bảo vệ dữ liệu doanh nghiệp. |
+
+## Quy tắc đặt tên
+
+Nguồn GitBook đề xuất thống nhất tên đăng nhập ngay từ đầu, chẳng hạn `ho.ten`, `ten.hovat` hoặc mã nhân viên. Dùng tên không dấu, dễ nhận diện và tránh đưa thông tin nhạy cảm không cần thiết vào định danh.
+
+## Bài viết liên quan
+
+<Cards>
+  <Card icon="UserCheck" title="Tạo người dùng mới" description="Tạo tài khoản, gán nhóm và quota ban đầu." href="/docs/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/tao-nguoi-dung-moi" />
+  <Card icon="Settings" title="Quản lý tài khoản" description="Cập nhật thông tin, mật khẩu và trạng thái tài khoản." href="/docs/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/quan-ly-tai-khoan" />
+  <Card icon="Users" title="Nhóm và phân quyền" description="Tổ chức tài khoản theo phòng ban hoặc vai trò." href="/docs/cloudfile/07-quan-tri-admin/nhom-va-phan-quyen" />
+</Cards>

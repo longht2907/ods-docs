@@ -1,0 +1,119 @@
+---
+title: "Dung lượng và Quota"
+description: "Hướng dẫn kiểm tra, thiết lập và quản lý hạn mức lưu trữ của người dùng CloudFile."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Đăng nhập bằng tài khoản có quyền Admin và mở trang **Accounts** hoặc **Users**.
+- Xác định người dùng cần kiểm tra hoặc điều chỉnh.
+- Không dùng các con số trong ví dụ GitBook làm quota mặc định nếu chưa có chính sách của doanh nghiệp.
+</Callout>
+
+**Cần bổ sung:** xác nhận chính sách quota, các mức có sẵn, tùy chọn Unlimited, ngưỡng cảnh báo và cách tính Deleted files trên hệ thống đang cung cấp (`Q-QUOTA-01`).
+
+## Kiểm tra mức sử dụng
+
+<Steps>
+  <Step>
+    ### Mở danh sách người dùng
+
+    Vào trang **Accounts** hoặc **Users** trong khu vực quản trị.
+
+    *Kết quả: Danh sách người dùng và cột **Quota** hoặc **Used** xuất hiện.*
+  </Step>
+  <Step>
+    ### Đọc mức sử dụng
+
+    Quan sát dung lượng đã dùng, hạn mức và thanh trạng thái trên từng dòng. Nguồn GitBook mô tả thanh đỏ là dấu hiệu quota sắp đầy hoặc đã đầy.
+
+    *Kết quả: Bạn xác định được các tài khoản cần kiểm tra.*
+  </Step>
+  <Step>
+    ### Sắp xếp danh sách
+
+    Chọn tiêu đề **Used** hoặc **Quota** để sắp xếp từ cao xuống thấp nếu giao diện hỗ trợ.
+
+    *Kết quả: Các tài khoản sử dụng nhiều dung lượng xuất hiện trước.*
+  </Step>
+</Steps>
+
+## Thiết lập quota
+
+<Steps>
+  <Step>
+    ### Mở Default Quota
+
+    Tại trang quản lý người dùng, mở phần cài đặt và tìm **Default Quota**.
+
+    *Kết quả: Mức quota mặc định dành cho tài khoản mới được hiển thị.*
+  </Step>
+  <Step>
+    ### Chọn mức mặc định
+
+    Chọn mức phù hợp với chính sách lưu trữ của doanh nghiệp.
+
+    *Kết quả: Tài khoản mới sẽ nhận mức mặc định khi không được cấp mức riêng.*
+  </Step>
+  <Step>
+    ### Điều chỉnh quota cá nhân
+
+    Tìm người dùng, mở trường **Quota**, chọn mức có sẵn hoặc **Other** để nhập giá trị khác nếu được hỗ trợ.
+
+    *Kết quả: Hạn mức riêng của người dùng được cập nhật.*
+  </Step>
+</Steps>
+
+## Xử lý tài khoản đầy quota
+
+<Steps>
+  <Step>
+    ### Xác nhận mức sử dụng
+
+    Kiểm tra tài khoản đã chạm hạn mức và đối chiếu lỗi upload hoặc đồng bộ mà người dùng báo cáo.
+
+    *Kết quả: Xác định quota là nguyên nhân của sự cố.*
+  </Step>
+  <Step>
+    ### Yêu cầu dọn dữ liệu
+
+    Hướng dẫn người dùng xóa tệp không còn cần và kiểm tra **Deleted files**. Theo nguồn GitBook, dữ liệu trong thùng rác vẫn có thể được tính vào quota.
+
+    *Kết quả: Dung lượng sử dụng giảm nếu dữ liệu đã được xóa vĩnh viễn.*
+  </Step>
+  <Step>
+    ### Tăng quota khi được phê duyệt
+
+    Nếu dữ liệu vẫn cần cho công việc, cập nhật quota lên mức đã được duyệt.
+
+    *Kết quả: Người dùng có thêm dung lượng để tiếp tục upload hoặc đồng bộ.*
+  </Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+- Cột quota hiển thị mức mới của tài khoản.
+- Tài khoản còn đủ dung lượng để tải lên hoặc đồng bộ tệp.
+- Default Quota phù hợp chính sách và không bị hiểu nhầm là quota riêng.
+- Không cấp Unlimited nếu chưa đánh giá ảnh hưởng đến dung lượng lưu trữ chung.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Đã xóa tệp nhưng quota chưa giảm">
+    Kiểm tra **Deleted files** và xóa vĩnh viễn nếu chính sách cho phép. Chờ hệ thống cập nhật lại mức sử dụng rồi kiểm tra lần nữa.
+  </Accordion>
+  <Accordion title="Đã tăng quota nhưng vẫn không upload được">
+    Tải lại trang, kiểm tra quota mới đã áp dụng và xem lỗi đồng bộ hoặc upload chi tiết. Nguyên nhân có thể không nằm ở quota.
+  </Accordion>
+  <Accordion title="Không thấy tùy chọn Other hoặc Unlimited">
+    Dùng các mức giao diện đang cung cấp và liên hệ đơn vị quản trị dịch vụ nếu cần hạn mức khác. Không giả định mọi triển khai đều có các tùy chọn này.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card icon="Settings" title="Quản lý tài khoản" description="Cập nhật quota trên từng tài khoản." href="/docs/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/quan-ly-tai-khoan" />
+  <Card icon="Activity" title="Quản lý tệp tin" description="Xóa và khôi phục tệp trong CloudFile." href="/docs/cloudfile/03-quan-ly-thu-muc-tep-tin/tai-len-va-quan-ly-tep-tin" />
+  <Card icon="Settings" title="Đồng bộ thư mục" description="Kiểm tra client khi đồng bộ dừng do hết dung lượng." href="/docs/cloudfile/05-may-tinh-di-dong/desktop-client/dong-bo-thu-muc" />
+</Cards>

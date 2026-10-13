@@ -4,6 +4,13 @@
   "root": true,
   "defaultOpen": false,
   "pages": [
-    "index"
+    "index",
+    "01-tong-quan",
+    "02-bat-dau",
+    "03-quan-ly-thu-muc-tep-tin",
+    "04-chia-se-phan-quyen",
+    "05-may-tinh-di-dong",
+    "06-lam-viec-nhom",
+    "07-quan-tri-admin"
   ]
 }

@@ -1,0 +1,34 @@
+---
+title: "Tổng quan quản lý Admin"
+description: "Tổng quan vai trò và các nhóm công việc quản trị hệ thống CloudFile."
+---
+
+CloudFile vận hành theo mô hình dịch vụ được quản lý: ODS Cloud phụ trách hạ tầng kỹ thuật, còn Tenant Admin phụ trách người dùng, phân quyền, quota và cấu trúc dữ liệu nội bộ.
+
+| Phạm vi | Đơn vị phụ trách | Công việc chính |
+| --- | --- | --- |
+| Hạ tầng kỹ thuật | ODS Cloud | Bảo trì máy chủ, điện, mạng; cập nhật bản vá hệ điều hành; sao lưu định kỳ; xử lý lỗi server hoặc SSL. |
+| Vận hành nội bộ | Tenant Admin | Tạo và quản lý tài khoản; tổ chức nhóm; cấp quyền; phân bổ quota; tổ chức cây thư mục phòng ban. |
+
+## Công việc quản trị cốt lõi
+
+- **Onboarding:** tạo tài khoản, gán đúng nhóm và bàn giao thông tin truy cập.
+- **Offboarding:** khóa tài khoản, bàn giao dữ liệu rồi mới xóa tài khoản.
+- **Phân quyền:** tổ chức nhóm theo phòng ban và chia sẻ dữ liệu theo nhóm.
+- **Tài nguyên:** theo dõi mức dùng và điều chỉnh quota.
+- **Giám sát:** dùng Activity Logs để truy vết thay đổi và chia sẻ.
+
+<Callout type="warning" title="Bảo vệ dữ liệu khi nhân sự nghỉ việc">
+Khóa quyền truy cập trước, xác nhận việc bàn giao dữ liệu rồi mới cân nhắc xóa tài khoản. Một số hành vi khóa, xóa và chuyển dữ liệu cần được xác nhận theo cấu hình CloudFile hiện tại (`Q-ADMIN-ACCOUNT-01`).
+</Callout>
+
+## Chọn nội dung quản trị
+
+<Cards>
+  <Card icon="Users" title="Quản lý người dùng" description="Tạo tài khoản và quản lý vòng đời người dùng." href="/docs/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung" />
+  <Card icon="Settings" title="Nhóm và phân quyền" description="Tổ chức phòng ban và quản lý quyền theo nhóm." href="/docs/cloudfile/07-quan-tri-admin/nhom-va-phan-quyen" />
+  <Card icon="Layers" title="Dung lượng và Quota" description="Theo dõi và điều chỉnh hạn mức lưu trữ." href="/docs/cloudfile/07-quan-tri-admin/dung-luong-quota" />
+  <Card icon="ListChecks" title="Nhật ký hoạt động" description="Truy vết thao tác và quản lý thời gian lưu nhật ký." href="/docs/cloudfile/07-quan-tri-admin/nhat-ky-hoat-dong" />
+</Cards>
+
+Nếu gặp lỗi hạ tầng như không truy cập được website, lỗi server hoặc SSL, hãy chuyển yêu cầu tới kênh hỗ trợ kỹ thuật của ODS Cloud.

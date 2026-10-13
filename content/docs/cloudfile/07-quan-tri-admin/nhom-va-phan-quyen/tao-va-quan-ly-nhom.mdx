@@ -1,0 +1,110 @@
+---
+title: "Tạo và quản lý nhóm"
+description: "Hướng dẫn tạo nhóm, thêm thành viên và quản lý nhóm người dùng CloudFile."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Đăng nhập bằng tài khoản System Admin hoặc Tenant Admin.
+- Chuẩn bị danh sách nhóm theo phòng ban, dự án hoặc vai trò.
+- Thống nhất quy tắc đặt tên, ví dụ `Phong_Kinh_Doanh` hoặc `DuAn_A`.
+</Callout>
+
+**Cần bổ sung:** xác nhận phạm vi quyền thực tế của Group Admin trên hệ thống đang cung cấp (`Q-GROUP-ADMIN-01`).
+
+## Tạo nhóm
+
+<Steps>
+  <Step>
+    ### Mở khu vực Groups
+
+    Mở **Settings** → **Accounts**, sau đó tìm khu vực **Groups** ở cột bên trái.
+
+    ![Khu vực Groups trong trang Accounts với nhóm mẫu Kinh Doanh](/media/cloudfile/07-quan-tri-admin/nhom-va-phan-quyen/khu-vuc-quan-ly-nhom.png)
+
+    *Kết quả: Danh sách nhóm và nút dấu cộng xuất hiện.*
+  </Step>
+  <Step>
+    ### Tạo nhóm mới
+
+    Chọn dấu **+** cạnh tiêu đề **Groups**, nhập tên nhóm rồi xác nhận.
+
+    *Kết quả: Nhóm mới xuất hiện trong danh sách và chưa có thành viên.*
+  </Step>
+</Steps>
+
+## Thêm hoặc gỡ thành viên
+
+<Steps>
+  <Step>
+    ### Tìm người dùng
+
+    Trong **Accounts**, chọn người dùng cần thay đổi.
+
+    *Kết quả: Dòng tài khoản và trường **Groups** được xác định.*
+  </Step>
+  <Step>
+    ### Gán nhóm
+
+    Mở trường **Groups**, nhập tên và chọn một hoặc nhiều nhóm phù hợp.
+
+    *Kết quả: Người dùng xuất hiện trong các nhóm đã chọn.*
+  </Step>
+  <Step>
+    ### Gỡ nhóm không còn phù hợp
+
+    Mở lại trường **Groups** và bỏ chọn nhóm cần thu hồi.
+
+    *Kết quả: Người dùng không còn nhận các quyền đến từ nhóm đã gỡ.*
+  </Step>
+</Steps>
+
+## Giao quyền Group Admin
+
+<Steps>
+  <Step>
+    ### Chọn tài khoản quản lý
+
+    Tìm tài khoản trưởng nhóm hoặc người được giao quản lý.
+
+    *Kết quả: Đúng tài khoản cần cấp quyền được chọn.*
+  </Step>
+  <Step>
+    ### Chọn nhóm được quản lý
+
+    Mở trường **Group admin for** và chọn nhóm tương ứng.
+
+    *Kết quả: Tài khoản được gắn vai trò Group Admin cho nhóm đã chọn.*
+  </Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+- Nhóm mới xuất hiện đúng tên trong cột **Groups**.
+- Người dùng thuộc đúng nhóm, không còn ở nhóm đã thu hồi.
+- Thư mục chia sẻ cho nhóm hiển thị với thành viên phù hợp.
+- Group Admin chỉ thao tác trong phạm vi được giao theo cấu hình hệ thống.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Có quá nhiều nhóm nhỏ lẻ">
+    Rà soát và gom nhóm theo phòng ban hoặc vai trò chính. Không xóa nhóm trước khi kiểm tra các quyền chia sẻ đang phụ thuộc vào nhóm đó.
+  </Accordion>
+  <Accordion title="Tên nhóm không nhất quán">
+    Chuẩn hóa quy tắc đặt tên không dấu và dùng tiền tố chung. Ghi lại ánh xạ trước khi thay đổi để tránh nhầm nhóm trong các chia sẻ hiện có.
+  </Accordion>
+  <Accordion title="Người dùng mất quyền sau khi gỡ nhóm">
+    Kiểm tra thư mục đang được chia sẻ cho nhóm nào. Nếu người dùng vẫn cần truy cập, gán họ vào nhóm phù hợp thay vì cấp quyền trực tiếp không có kế hoạch.
+  </Accordion>
+  <Accordion title="Group Admin không thực hiện được thao tác">
+    Kiểm tra trường **Group admin for** và phạm vi nhóm được giao. Một số hành động có thể chỉ dành cho System Admin.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card icon="Users" title="Tổng quan nhóm và phân quyền" description="Hiểu mô hình User → Group → Quyền → Thư mục." href="/docs/cloudfile/07-quan-tri-admin/nhom-va-phan-quyen" />
+  <Card icon="UserCheck" title="Tạo người dùng mới" description="Gán nhóm ngay trong quá trình tạo tài khoản." href="/docs/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/tao-nguoi-dung-moi" />
+  <Card icon="GitFork" title="Chia sẻ nội bộ" description="Chia sẻ tệp và thư mục cho nhóm." href="/docs/cloudfile/04-chia-se-phan-quyen/chia-se-noi-bo" />
+</Cards>

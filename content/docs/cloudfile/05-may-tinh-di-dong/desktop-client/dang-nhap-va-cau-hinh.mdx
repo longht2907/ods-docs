@@ -1,0 +1,131 @@
+---
+title: "Đăng nhập và cấu hình Desktop Client"
+description: "Kết nối Nextcloud Desktop Client với CloudFile và chọn cách lưu dữ liệu ban đầu."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Cài Desktop Client và chuẩn bị domain `https://[URL_DOMAIN_CLOUD_CUA_BAN]`.
+- Chuẩn bị username hoặc email công việc và mật khẩu; dùng SSO nếu đơn vị đã cấu hình.
+- Chọn ổ đĩa có đủ dung lượng cho dữ liệu cần lưu offline.
+- Không đặt thư mục CloudFile bên trong thư mục OneDrive hoặc Dropbox.
+</Callout>
+
+## Kết nối tài khoản
+
+<Steps>
+  <Step>
+    ### Mở Desktop Client
+
+    Trên Windows, tìm **Nextcloud** trong Start Menu hoặc chọn biểu tượng trên system tray. Trên macOS, mở `Nextcloud.app` trong **Applications** hoặc chọn biểu tượng trên Menu Bar.
+
+    *Kết quả: Cửa sổ **Add Nextcloud account** xuất hiện.*
+  </Step>
+  <Step>
+    ### Bắt đầu đăng nhập
+
+    Chọn **Log in** trên màn hình chào mừng.
+
+    ![Cửa sổ Add Nextcloud account với nút Log in](/media/cloudfile/05-may-tinh-di-dong/desktop-client/desktop-client-welcome.png)
+
+    *Kết quả: Desktop Client hiển thị trường nhập địa chỉ server.*
+  </Step>
+  <Step>
+    ### Nhập domain CloudFile
+
+    Nhập chính xác `https://[URL_DOMAIN_CLOUD_CUA_BAN]` rồi chọn **Next**. Không thêm `/index.php`, `/login` hoặc đường dẫn ứng dụng khác.
+
+    *Kết quả: Desktop Client xác minh server và mở trình duyệt mặc định.*
+  </Step>
+  <Step>
+    ### Đăng nhập trên trình duyệt
+
+    Trên trang **Connect to your account**, chọn **Log in**, nhập username hoặc email công việc và mật khẩu rồi tiếp tục. Chỉ thực hiện nếu tên thiết bị hiển thị đúng máy bạn đang cấu hình.
+
+    ![Trang Connect to your account với domain và tên thiết bị đã ẩn danh](/media/cloudfile/05-may-tinh-di-dong/desktop-client/dang-nhap-trinh-duyet.png)
+
+    *Kết quả: Trình duyệt chuyển sang màn hình cấp quyền cho Desktop Client.*
+  </Step>
+  <Step>
+    ### Cấp quyền cho thiết bị
+
+    Kiểm tra tài khoản và tên thiết bị, sau đó chọn **Grant access**. Nếu bạn không chủ động thêm thiết bị này, dừng thao tác và liên hệ Quản trị viên.
+
+    ![Trang Account access với tài khoản và tên thiết bị mẫu đã ẩn danh](/media/cloudfile/05-may-tinh-di-dong/desktop-client/cap-quyen-desktop-client.png)
+
+    *Kết quả: Trình duyệt báo kết nối thành công và Desktop Client chuyển sang cấu hình thư mục.*
+  </Step>
+</Steps>
+
+## Chọn chế độ đồng bộ ban đầu
+
+| Lựa chọn | Cách hoạt động | Phù hợp khi |
+| --- | --- | --- |
+| Virtual Files | Hiển thị toàn bộ tệp nhưng chỉ tải nội dung khi mở | Muốn tiết kiệm dung lượng ổ cứng và thường xuyên có mạng |
+| Sync everything | Tải toàn bộ dữ liệu được chọn về máy | Cần làm việc offline và máy có đủ dung lượng |
+
+<Steps>
+  <Step>
+    ### Chọn cách lưu tệp
+
+    Chọn **Virtual Files** hoặc **Sync everything** theo nhu cầu. Nếu giao diện không có Virtual Files, tiếp tục với các tùy chọn đồng bộ mà client hiển thị.
+
+    *Kết quả: Desktop Client xác định phạm vi dữ liệu cần hiển thị hoặc tải về.*
+  </Step>
+  <Step>
+    ### Chọn thư mục local
+
+    Giữ thư mục mặc định `Nextcloud`/`CloudFile` hoặc chọn vị trí khác trên ổ đĩa. Trên Windows, nguồn minh họa đường dẫn dạng `C:\Users\[TenBan]\Nextcloud`; trên macOS/Linux dùng thư mục trong home directory.
+
+    *Kết quả: Một vị trí local được chọn làm đầu đồng bộ trên máy tính.*
+  </Step>
+  <Step>
+    ### Hoàn tất kết nối
+
+    Chọn **Connect** và để ứng dụng bắt đầu đồng bộ. Không tắt máy hoặc ngắt mạng khi trạng thái vẫn báo đang xử lý.
+
+    *Kết quả: Tài khoản xuất hiện trong Desktop Client và thư mục CloudFile được tạo trên máy.*
+  </Step>
+</Steps>
+
+**Cần bổ sung:** xác nhận hành vi xóa hai chiều và chính sách khôi phục khi tệp bị xóa từ thư mục sync (`Q-SYNC-DELETE-01`).
+
+## Kiểm tra kết quả
+
+- Desktop Client hiển thị đúng tài khoản và domain CloudFile.
+- File Explorer hoặc Finder có thư mục `Nextcloud`/`CloudFile` tại vị trí đã chọn.
+- Dữ liệu bắt đầu hiển thị hoặc tải về theo chế độ cấu hình.
+- Khi trạng thái đồng bộ hoàn tất, tệp thử nghiệm xuất hiện trên cả máy tính và Web Portal.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Không kết nối được server">
+    Kiểm tra domain có bắt đầu bằng `https://` và không chứa `/index.php`, `/login` hoặc đường dẫn khác. Nếu chưa biết domain, liên hệ IT Support hoặc xem thông tin onboarding của đơn vị.
+  </Accordion>
+  <Accordion title="Trình duyệt không mở trang đăng nhập">
+    Mở lại Desktop Client và thực hiện **Log in** lần nữa. Kiểm tra trình duyệt mặc định, kết nối mạng và phần mềm bảo mật đang chặn cửa sổ đăng nhập.
+  </Accordion>
+  <Accordion title="Tên thiết bị hoặc tài khoản không đúng">
+    Không chọn **Grant access**. Đóng trang và khởi động lại quy trình từ Desktop Client; liên hệ Quản trị viên nếu yêu cầu cấp quyền không phải do bạn tạo.
+  </Accordion>
+  <Accordion title="Đồng bộ lần đầu không hoàn tất">
+    Kiểm tra trạng thái trong Desktop Client, kết nối mạng và dung lượng trống. Lần đồng bộ đầu phụ thuộc vào số lượng dữ liệu và tốc độ mạng, vì vậy không tắt máy khi ứng dụng vẫn đang xử lý.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="Download"
+    title="Tải và cài đặt"
+    description="Cài Desktop Client trên Windows hoặc macOS."
+    href="/docs/cloudfile/05-may-tinh-di-dong/desktop-client/tai-va-cai-dat"
+  />
+  <Card
+    icon="Activity"
+    title="Đồng bộ thư mục"
+    description="Quản lý trạng thái, Virtual Files và Selective Sync."
+    href="/docs/cloudfile/05-may-tinh-di-dong/desktop-client/dong-bo-thu-muc"
+  />
+</Cards>

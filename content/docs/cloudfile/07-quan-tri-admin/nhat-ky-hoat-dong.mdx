@@ -1,0 +1,122 @@
+---
+title: "Nhật ký hoạt động Admin"
+description: "Hướng dẫn quản trị viên theo dõi và quản lý Activity Logs của hệ thống CloudFile."
+---
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Đăng nhập bằng tài khoản Admin.
+- Xác định tệp, thư mục, hành động hoặc khoảng thời gian cần truy vết.
+- Activity chỉ phản ánh các sự kiện mà ứng dụng và cấu hình hệ thống ghi nhận.
+</Callout>
+
+**Cần bổ sung:** xác nhận tùy chọn retention, thời gian lưu mặc định, phạm vi log dành cho Admin và quyền bật/tắt Activity App (`Q-ADMIN-LOG-01`).
+
+## Xem nhật ký
+
+<Steps>
+  <Step>
+    ### Mở Global Activity
+
+    Chọn biểu tượng **Activity** hình tia sét trên thanh ứng dụng. Dùng **By you** hoặc **By others** để thu hẹp dòng sự kiện.
+
+    *Kết quả: Danh sách hoạt động liên quan xuất hiện theo thời gian.*
+  </Step>
+  <Step>
+    ### Xem lịch sử của tệp hoặc thư mục
+
+    Trong **Files**, tìm đối tượng cần kiểm tra, chọn dấu ba chấm → **Details** → **Activity**.
+
+    *Kết quả: Lịch sử riêng của đối tượng hiển thị người thực hiện, hành động và thời điểm.*
+  </Step>
+  <Step>
+    ### Diễn giải sự kiện
+
+    Đối chiếu các sự kiện **Created**, **Changed**, **Deleted**, **Restored** và **Shared** để xác định chuỗi thao tác.
+
+    *Kết quả: Bạn xác định được sự kiện liên quan đến yêu cầu điều tra.*
+  </Step>
+</Steps>
+
+## Truy vết tệp bị xóa
+
+<Steps>
+  <Step>
+    ### Mở Activity của thư mục cha
+
+    Đi tới thư mục chứa tệp trước khi bị xóa và mở tab **Activity**.
+
+    *Kết quả: Các sự kiện gần đây của thư mục được hiển thị.*
+  </Step>
+  <Step>
+    ### Tìm sự kiện Deleted
+
+    Tìm dòng có hành động **Deleted**, sau đó ghi nhận tên tài khoản và thời gian hiển thị.
+
+    *Kết quả: Có dữ kiện để xác định thao tác xóa.*
+  </Step>
+  <Step>
+    ### Khôi phục khi phù hợp
+
+    Mở **Deleted files**, tìm đối tượng và chọn khôi phục nếu tệp vẫn còn trong thùng rác.
+
+    *Kết quả: Tệp trở lại vị trí được hệ thống khôi phục.*
+  </Step>
+</Steps>
+
+## Cấu hình thời gian lưu nhật ký
+
+<Steps>
+  <Step>
+    ### Mở Administration settings
+
+    Chọn avatar → **Administration settings**, sau đó chọn **Activity** ở cột bên trái.
+
+    *Kết quả: Trang cấu hình Activity dành cho quản trị xuất hiện.*
+  </Step>
+  <Step>
+    ### Chọn retention
+
+    Nếu giao diện có **Enable retention**, bật tùy chọn và chọn thời gian lưu theo chính sách doanh nghiệp.
+
+    *Kết quả: Giá trị retention mong muốn được chọn.*
+  </Step>
+  <Step>
+    ### Lưu cấu hình
+
+    Chọn **Save** và kiểm tra thông báo xác nhận.
+
+    *Kết quả: Chính sách lưu nhật ký được áp dụng theo cấu hình hệ thống.*
+  </Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+- Nhật ký hiển thị đúng đối tượng, hành động, người thực hiện và thời gian.
+- Tệp khôi phục xuất hiện lại và có thể mở được.
+- Trang quản trị hiển thị đúng giá trị retention đã chọn.
+- Activity App vẫn được bật nếu doanh nghiệp cần khả năng truy vết.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Không thấy sự kiện cần tìm">
+    Kiểm tra phạm vi của Global Activity và Activity trên đúng tệp hoặc thư mục. Nếu sự kiện quá cũ, đối chiếu với chính sách retention.
+  </Accordion>
+  <Accordion title="Không thấy mục cấu hình retention">
+    Tùy chọn có thể phụ thuộc phiên bản, ứng dụng hoặc quyền Admin. Không thay đổi ứng dụng hệ thống; liên hệ đơn vị quản trị dịch vụ để xác nhận.
+  </Accordion>
+  <Accordion title="Không khôi phục được tệp">
+    Kiểm tra **Deleted files** của đúng tài khoản và thời gian lưu thùng rác. Nếu tệp không còn, chuyển yêu cầu sang quy trình hỗ trợ hoặc khôi phục dữ liệu của đơn vị.
+  </Accordion>
+  <Accordion title="Activity không ghi nhận sự kiện mới">
+    Kiểm tra Activity App còn được bật và thử lại với một thao tác không nhạy cảm. Nếu vẫn thiếu sự kiện, liên hệ hỗ trợ kỹ thuật.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card icon="Activity" title="Nhật ký hoạt động người dùng" description="Xem Activity và cấu hình thông báo cho tài khoản." href="/docs/cloudfile/06-lam-viec-nhom/nhat-ky-hoat-dong" />
+  <Card icon="Activity" title="Quản lý tệp tin" description="Xóa, khôi phục và xem chi tiết tệp." href="/docs/cloudfile/03-quan-ly-thu-muc-tep-tin/tai-len-va-quan-ly-tep-tin" />
+  <Card icon="Settings" title="Quản lý tài khoản" description="Quản lý vòng đời tài khoản người dùng." href="/docs/cloudfile/07-quan-tri-admin/quan-ly-nguoi-dung/quan-ly-tai-khoan" />
+</Cards>

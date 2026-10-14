@@ -1,9 +1,10 @@
 # TASK-021 — Báo cáo & Kế hoạch Chi tiết (Lô 0) API Reference AI Contact Center
 
-> **Trạng thái**: Hoàn thành Lô 0 (Khảo sát toàn bộ nguồn, phân tích mâu thuẫn, thiết kế IA, lập mapping ma trận, đã tiếp nhận và cập nhật đầy đủ phản hồi từ Human cho Q1 – Q11). Sẵn sàng tiến hành Lô 1.  
-> **Nhánh**: `task/TASK-021-contact-center-api`  
-> **Task file**: [tasks/TASK-021-contact-center-api.md](../../tasks/TASK-021-contact-center-api.md)  
-> **Questions file**: [.harness/reports/TASK-021-questions.md](TASK-021-questions.md)  
+> **Trạng thái**: Đóng đợt triển khai hiện tại theo xác nhận của Human. PR #21 đã merge vào `main` tại commit `67d8e6b` với CI verify xanh. **KHÔNG coi API đã nghiệm thu toàn bộ**; 6 finding review kỹ thuật được chuyển sang backlog [TASK-021-follow-up.md](TASK-021-follow-up.md).<br />
+> **Nhánh**: `task/TASK-021-contact-center-api`<br />
+> **Task file**: [tasks/TASK-021-contact-center-api.md](../../tasks/TASK-021-contact-center-api.md)<br />
+> **Questions file**: [.harness/reports/TASK-021-questions.md](TASK-021-questions.md)<br />
+> **Follow-up Backlog**: [.harness/reports/TASK-021-follow-up.md](TASK-021-follow-up.md)
 
 ---
 
@@ -417,4 +418,38 @@ print(response.json())
 - `git diff --check`: **PASS**
 - Quét Secret / UUID: **PASS**
 
+---
 
+## 12. Bàn giao & Nghiệm thu Đợt Triển khai Ban đầu
+
+### 12.1 Bằng chứng Pull Request & Merge Git
+
+- **Pull Request**: [#21 (Task/task 021 contact center api)](https://github.com/longht2907/ods-docs/pull/21)
+- **Branch**: `task/TASK-021-contact-center-api`
+- **Head commit trên nhánh PR**: `489cd97784e4713dd32059847565d330e5b956fa` (short `489cd97`, commit nội dung trước đó `1b97429` và `e3e6109`)
+- **Merge commit SHA trên `main`**: `67d8e6bc6cb96f4d71f3525a25c5931dd88c1770` (short `67d8e6b`)
+- **Người merge**: `longht2907` vào lúc `2026-10-13T04:06:58Z`
+
+### 12.2 Bằng chứng GitHub Actions CI
+
+- **CI Check Run trên Merge commit (`67d8e6b`)**:
+  - Run ID: `38344900353`
+  - Job ID: `115123906020` (`verify`)
+  - Trạng thái: `completed`, Kết luận: `success`
+  - Thời gian: `2026-10-13T04:07:03Z` -> `2026-10-13T04:07:55Z`
+
+### 12.3 Kết luận từ Human & Ranh giới Nghiệm thu
+
+1. **Đóng đợt triển khai hiện tại**:
+   - Human xác nhận chấp nhận đóng đợt triển khai ban đầu của TASK-021 (hoàn thành cấu trúc IA, skeleton 32 endpoints, chuyển đổi nội dung từ 5 tài liệu nguồn thô sang định dạng Fumadocs / Claude Docs style, không có broken link và không rò rỉ secret).
+2. **CẢNH BÁO QUAN TRỌNG — KHÔNG COI API ĐÃ NGHIỆM THU TOÀN BỘ**:
+   - Các finding review kỹ thuật chưa được kiểm chứng runtime do thiếu môi trường sandbox và phản hồi chính thức từ backend.
+   - Toàn bộ 6 finding đã được chuyển thành tài liệu backlog độc lập tại [.harness/reports/TASK-021-follow-up.md](TASK-021-follow-up.md):
+     1. Schema response và Action mapping Autocall thiếu bằng chứng.
+     2. SDK Widget ODSPhone chưa xác minh.
+     3. Webhook receiver fail-open khi thiếu env key.
+     4. Listener peerconnection JsSIP outgoing gắn quá muộn.
+     5. Timeout, mã lỗi, phân trang và side effects chưa xác nhận.
+     6. Ví dụ code, layout Reference và alias route cũ cần hoàn thiện.
+3. **Vòng đời task**:
+   - Task được chuyển sang `status: done` trong `tasks/TASK-021-contact-center-api.md` để đóng hồ sơ đợt triển khai hiện tại, đồng thời chuyển giao backlog cho đợt tiếp theo.

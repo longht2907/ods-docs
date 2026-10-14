@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: done
 branch: task/TASK-020-cloudfile-docs
-commit: "74acc44"
+commit: "22b95a9"
 verified-by: npm run verify:task
 ---
 
@@ -86,7 +86,7 @@ Mỗi lô kết thúc bằng báo cáo cho Human và không tự chuyển sang l
 - [x] Mọi ảnh local có tên kebab-case không dấu và alt tiếng Việt.
 - [x] Không có credential, dữ liệu cá nhân thật hoặc claim ngoài nguồn.
 - [x] Link nội bộ trỏ tới route tồn tại.
-- [ ] `npm run check:links`, `npm run check:scope` và `git diff --check` PASS sau mỗi lô.
+- [x] `npm run check:links`, `npm run check:scope` và `git diff --check` PASS sau mỗi lô.
 - [x] `npm run build` PASS ở cuối mỗi lô nội dung.
 - [x] Tiến độ, trang hoàn thành, ảnh và câu hỏi mở được cập nhật trong `.harness/reports/TASK-020-report.md`.
 
@@ -101,6 +101,8 @@ Dừng và hỏi Human nếu:
 
 ## Báo cáo và vòng đời
 
-- Task giữ `status: in-progress` đến khi Pull Request CI xanh và Human finalization.
-- Trường `commit` chỉ được điền bằng hash commit thật cuối cùng trên branch.
-- Không push hoặc mở Pull Request trong task này khi chưa có yêu cầu mới của Human.
+- Task đạt `status: done` sau khi Pull Request CI xanh và Human xác nhận nghiệm thu.
+- Hash commit hoàn thành trên branch: `22b95a9` (`22b95a9992adebdc07c304f09f3aec5d8ac44e1c`).
+- PR #20 (`task/TASK-020-cloudfile-docs`) đã merge vào `main` tại merge commit `cdb570d` (`cdb570d70ac5bff87b063b80a9b2bc705fff1487`).
+- GitHub Actions CI `verify` (run ID: 38342918157 và 38343038362) đều hoàn thành `success`.
+- Human xác nhận chấp nhận kết quả triển khai cơ bản. 19 câu hỏi chi tiết về chính sách/quota/retention tiếp tục được giữ mở trong `.harness/reports/TASK-020-questions.md` cho các đợt cập nhật tiếp theo.

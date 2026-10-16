@@ -9,16 +9,10 @@ Webhook là cơ chế thông báo chủ động theo thời gian thực (Event-d
 
 ## Khái niệm và cơ chế hoạt động
 
-Để thiết kế hệ thống backend tiếp nhận chính xác, lập trình viên cần phân biệt rõ Webhook với các thành phần công nghệ khác trong hệ sinh thái tổng đài ODS:
+Để tích hợp đúng phạm vi dịch vụ ODS, cần phân biệt Webhook với các thành phần công nghệ khác trong hệ sinh thái tổng đài:
 
 ```
-[Tổng đài ODS] ───────── HTTP POST (JSON Event) ─────────► [Backend Khách hàng]
-                                                                    │
-                                                        Kênh Realtime nội bộ (WebSocket / SSE)
-                                                                    │
-                                                                    ▼
-                                                       [Giao diện CRM Nhân viên]
-                                                       (Hiển thị Popup cuộc gọi)
+[Tổng đài ODS] ───────── HTTP POST (JSON Event) ─────────► [Endpoint khách hàng cung cấp]
 ```
 
 - **Khác biệt với REST API**:
@@ -28,7 +22,7 @@ Webhook là cơ chế thông báo chủ động theo thời gian thực (Event-d
   - Webhook chỉ mang các gói tin JSON chứa siêu dữ liệu (Metadata) của cuộc gọi như số điện thoại, máy nhánh, mốc thời gian và trạng thái kết nối.
   - Webhook **không phải là WebSocket hay WebRTC** và không truyền dẫn luồng âm thanh thoại. Luồng đàm thoại được xử lý độc lập qua kênh SIP/WebRTC hoặc thiết bị đầu cuối IP Phone.
 - **Bản chất của tính năng Popup cuộc gọi**:
-  - Popup hiển thị thông tin khách hàng trên màn hình CRM là **kết quả ứng dụng của dữ liệu Webhook**, không phải là một giao thức viễn thông riêng biệt. Backend của CRM nhận Webhook từ ODS, sau đó tự điều phối dữ liệu qua kênh realtime nội bộ (như WebSocket, Server-Sent Events hoặc SignalR) tới trình duyệt của đúng nhân viên.
+  - Popup hiển thị thông tin khách hàng là **một ứng dụng của dữ liệu Webhook**, không phải một cơ chế truyền sự kiện khác của ODS. Cách hệ thống khách hàng chuyển dữ liệu đã nhận đến giao diện nằm ngoài contract Webhook này.
 
 ---
 
@@ -42,11 +36,12 @@ Trước khi tiếp nhận dữ liệu Webhook từ tổng đài, doanh nghiệp
 2. **Giao thức bảo mật HTTPS**:
    - Khuyến nghị sử dụng HTTPS để mã hóa dữ liệu cuộc gọi và thông tin khách hàng trên đường truyền Internet.
 3. **Khóa xác thực Webhook (`apikey`) — Tùy chọn**:
-   - Doanh nghiệp có thể cấu hình một chuỗi khóa bí mật để tổng đài gửi kèm trong trường `apikey` của body JSON, giúp backend xác thực nguồn gửi.
-4. **Hạ tầng xử lý backend**:
-   - Máy chủ backend cần phản hồi HTTP Status `2xx` nhanh chóng sau khi tiếp nhận để tránh tổng đài ghi nhận lỗi kết nối, sau đó lưu trữ hoặc đẩy vào hàng đợi xử lý.
-5. **Cấu hình trên tổng đài ODS**:
-   - Doanh nghiệp cung cấp Endpoint URL và `apikey` (nếu có) cho đội ngũ hỗ trợ kỹ thuật ODS để cấu hình kích hoạt trên hệ thống máy chủ.
+   - Doanh nghiệp có thể cung cấp một giá trị khóa đã thống nhất với ODS. Khi được cấu hình, ODS gửi khóa trong field **`apikey`** của body JSON; không đổi tên thành `ApiKey`, `X-API-Key` hoặc `Authorization`.
+   - Nếu chưa cấu hình khóa, payload mẫu hiện tại có thể chứa `"apikey": null`. Đây không phải chỉ dẫn để bỏ qua một khóa sai và `apikey` Webhook không phải `AuthKey` của REST API.
+4. **Thông tin cung cấp cho ODS**:
+   - Doanh nghiệp cung cấp Endpoint URL và `apikey` nếu muốn dùng xác thực tùy chọn. Tài liệu này không giả định một giao diện Portal cụ thể để cấu hình hai giá trị đó.
+5. **Phản hồi xác nhận tiếp nhận**:
+   - Sau khi tiếp nhận body JSON, endpoint trả một HTTP status thuộc dải `2xx`. Phản hồi này chỉ xác nhận endpoint đã tiếp nhận request, không phải trạng thái cuộc gọi và ODS không yêu cầu một response JSON cố định trong contract hiện tại.
 
 ---
 
@@ -89,11 +84,11 @@ Trong môi trường tổng đài doanh nghiệp, một cuộc gọi có thể �
 - **`Uid` (Unique ID)**:
   - Mã định danh của từng nhánh kênh thoại viễn thông cụ thể (Channel Unique ID).
   - Khi một cuộc gọi đổ chuông đồng thời 4 máy nhánh, tổng đài sẽ tạo ra 4 nhánh kênh với 4 `Uid` khác nhau nhưng dùng chung 1 `LID`.
-  - **Không bao giờ đồng nhất `Uid` với `LID`**.
+  - `Uid` và `LID` có vai trò khác nhau. Giá trị có thể bằng nhau trong một số kịch bản, nhưng không được giả định chúng luôn bằng nhau.
 
 ### Lưu ý cho hệ thống quản lý nhiều tổng đài:
 - Nếu doanh nghiệp vận hành nhiều tổng đài ODS cùng lúc và trỏ về chung một backend endpoint, cần phân vùng dữ liệu theo **`Nguồn tổng đài + LID`** để tránh xung đột mã định danh.
-- Trường `apikey` chỉ giúp phân biệt nguồn khi doanh nghiệp đã cấu hình các khóa riêng biệt cho từng tổng đài. Nếu để giá trị mặc định (`apikey: null`), backend không thể dựa vào trường này để phân định nguồn gửi.
+- Contract hiện tại không bổ sung field `tenant` hoặc `source` vào payload. `apikey: null` không cung cấp thông tin để xác định nguồn tổng đài; cách nhận biết nguồn tích hợp phải được thống nhất riêng theo cấu hình thực tế.
 
 ---
 
@@ -156,11 +151,11 @@ Khi khách hàng gọi vào Hotline, nghe lời chào IVR và cuộc gọi đư�
 Dữ liệu sự kiện từ Webhook cho phép doanh nghiệp hiện thực hóa các chức năng:
 
 - **Bật cửa sổ thông tin khách hàng (Screen Pop-up)**:
-  Khi nhận sự kiện `show`, trích xuất số điện thoại `CID` để mở sẵn hồ sơ khách hàng, lịch sử mua hàng hoặc ticket đang xử lý trên màn hình của nhân viên sở hữu `Ext`.
+  Dùng `CID` và `Ext` trong sự kiện `show` để hệ thống khách hàng xác định thông tin cần hiển thị cho đúng máy nhánh.
 - **Cập nhật trạng thái bàn làm việc (Agent Presence)**:
   Hiển thị trạng thái nhân viên đang bận đàm thoại (`answer`) hoặc đã sẵn sàng nhận cuộc gọi mới (`finish`).
-- **Tự động lưu nhật ký và đối soát cước thoại**:
-  Lưu trữ toàn bộ lịch sử cuộc gọi (`LID`, thời lượng đàm thoại thực tế `TimeEnd - TimeAnswer`) vào cơ sở dữ liệu CRM ngay khi cuộc gọi kết thúc mà không cần quét API định kỳ.
+- **Đối chiếu vòng đời cuộc gọi**:
+  Dùng `LID`, các mốc thời gian và `Disposition` để liên kết dữ liệu sự kiện với nghiệp vụ của ứng dụng tiếp nhận.
 - **Đồng bộ tệp ghi âm tự động**:
   Lấy liên kết `recordingfileURL` từ sự kiện `finish` để gắn vào hồ sơ khách hàng phục vụ quản lý chất lượng cuộc gọi.
 
@@ -168,12 +163,12 @@ Dữ liệu sự kiện từ Webhook cho phép doanh nghiệp hiện thực hóa
 
 ## Bài viết tiếp theo
 
-Để xem chi tiết cấu trúc JSON payload của từng sự kiện, từ điển toàn bộ các trường dữ liệu và mã nguồn máy chủ tiếp nhận mẫu, vui lòng xem:
+Để xem chi tiết cấu trúc JSON payload của từng sự kiện và từ điển các trường dữ liệu, vui lòng xem:
 
 <Cards>
   <Card
     title="Tích hợp Webhook và Popup cuộc gọi"
-    description="Cấu trúc payload chi tiết, ma trận tham số, mẫu JSON thực tế và code mẫu backend tiếp nhận an toàn."
+    description="Cấu trúc payload chi tiết, ma trận tham số và mẫu JSON sự kiện."
     href="/docs/ai-contact-center/api/webhook/popup"
   />
   <Card

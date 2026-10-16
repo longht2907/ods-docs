@@ -14,8 +14,8 @@ export function ApiReferenceMain({ children }: { children: ReactNode }) {
 
 export function ApiReferenceCode({ children }: { children: ReactNode }) {
   return (
-    <aside className="ods-api-grid-code min-w-0">
-      <div className="xl:sticky xl:top-[calc(var(--fd-nav-height)+1.5rem)] xl:max-h-[calc(100vh-var(--fd-nav-height)-3rem)] xl:overflow-y-auto space-y-6 pr-1">
+    <aside className="ods-api-grid-code min-w-0" data-api-reference-code>
+      <div className="ods-api-sticky-panel space-y-6 pr-1" data-api-sticky-panel>
         {children}
       </div>
     </aside>

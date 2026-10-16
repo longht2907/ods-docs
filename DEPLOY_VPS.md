@@ -32,6 +32,14 @@ cd ods-docs
 ---
 
 ### Bước 2: Khởi chạy bằng Docker Compose
+Đặt public origin đã được xác nhận của website tài liệu trước khi build. Chỉ dùng origin, không thêm path, query hoặc fragment:
+
+```bash
+export ODS_DOCS_SITE_URL="<PUBLIC_DOCS_ORIGIN_DA_XAC_NHAN>"
+```
+
+Biến `ODS_DOCS_SITE_URL` bắt buộc có **tại thời điểm build** vì Next.js prerender `og:image` và `twitter:image` vào HTML. Chỉ thêm biến này khi container đã chạy sẽ không sửa metadata của image đã build.
+
 ```bash
 docker compose up -d --build
 ```
@@ -61,6 +69,7 @@ cd /var/www/ods-docs
 git fetch origin
 git switch main
 git pull --ff-only origin main
+export ODS_DOCS_SITE_URL="<PUBLIC_DOCS_ORIGIN_DA_XAC_NHAN>"
 docker compose up -d --build
 ```
 

@@ -1,11 +1,21 @@
 ---
 status: in-progress
 branch: task/TASK-022-api-reference-ui
-commit: "67d8e6b"
+commit: "59072a9"
 verified-by: npm run verify:task
 ---
 
 # TASK-022 — API Reference UI & Routes
+
+## Đính chính sau review (TASK-023)
+
+- Snapshot TASK-022 được review là commit `59072a9` (`docs(task-022): finalize API reference UI and documentation`). Commit `67d8e6b` là parent/baseline trước implementation, không phải commit hoàn thiện TASK-022.
+- Sticky Request + Response của snapshot `59072a9` **có lỗi**: code aside không stretch theo grid và wrapper dùng biến `--fd-nav-height` không tồn tại, làm computed `top: auto` và `max-height: none`. Phần sửa và regression test thuộc TASK-023.
+- Human quyết định giữ nguyên nội dung/schema/Action mapping Autocall hiện tại và hoãn xác minh đến khi có case thực tế. Nội dung này chưa được kiểm thử API thực tế và không được mô tả là schema đã verified.
+- Human quyết định tài liệu Webhook chỉ mô tả phạm vi dịch vụ ODS; không yêu cầu backend receiver mẫu hoặc kiến trúc ứng dụng khách hàng. Phần đính chính thuộc TASK-023.
+- `GetCallReport` và `GetCallReportDetail` bị loại bỏ theo quyết định Human vì không còn sử dụng. Hai route trả 404 là kết quả mong muốn, không redirect hay tuyên bố hợp nhất vào API khác.
+- Auth `/internal` được hoãn; hệ thống tiếp tục fail-closed. TASK-023 không sửa proxy, auth, session hoặc public/internal boundary.
+- TASK-022 tiếp tục `in-progress`. Việc sửa review được liên kết qua TASK-023; trạng thái `done` chỉ có thể cập nhật sau PR/CI xanh và Human chốt.
 
 ## Bối cảnh
 
@@ -109,8 +119,8 @@ Khách hàng và lập trình viên tích hợp (CRM, ERP, Webhook) cần một 
 - [x] `npm run verify:task` PASS (toàn bộ chuỗi kiểm thử và build production).
 - [x] Bố cục responsive hiển thị đúng tại 390px, 768px, 1280px, 1440px, 1920px cả Light và Dark mode.
 - [x] Thứ tự mobile: Tên/mô tả -> Endpoint -> Tham số -> Request mẫu -> Response -> Lưu ý.
-- [x] Panel code sticky trên desktop không che navigation, code dài cuộn bên trong.
+- [ ] Panel code sticky trên desktop không che navigation, code dài cuộn bên trong. **Review phát hiện snapshot TASK-022 lỗi; sửa tại TASK-023.**
 - [x] Endpoint Header có badge method, full URL, nút Copy URL hoạt động chính xác kèm visual feedback.
 - [x] Tabs ghi nhớ ngôn ngữ được chọn giữa các trang (`groupId="api-lang"`).
 - [x] Route cũ `/docs/ai-contact-center/api/tong-dai/khoi-tao-cuoc-goi` redirect 308 tới `/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call`.
-- [x] Không có lỗi console runtime, không tràn ngang trang (`overflow-x` trên body/html).
+- [ ] Không có lỗi console runtime, không tràn ngang trang (`overflow-x` trên body/html). **Cần nghiệm thu lại cùng TASK-023 vì bằng chứng browser cũ không đủ tin cậy.**

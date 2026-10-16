@@ -3,6 +3,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        # Required at build-time because docs pages and social metadata are prerendered.
+        ODS_DOCS_SITE_URL: ${ODS_DOCS_SITE_URL:?Set ODS_DOCS_SITE_URL to the confirmed public docs origin}
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"

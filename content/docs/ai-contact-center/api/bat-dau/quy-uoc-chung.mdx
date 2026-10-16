@@ -184,22 +184,51 @@ Lập trình viên bắt buộc phải kiểm tra thuộc tính `result` bên tr
 ```
 
 ```javascript title="Mẫu xử lý kết quả đúng chuẩn (JavaScript)"
-const response = await fetch('https://api.ods.vn/api/CloudFone/AutoCall', { ... });
+// Node.js 22+ (Backend / Server-side)
+async function createClickToCall({ ext, phoneNumber, phoneName = '' }) {
+  const credentials = {
+    ServiceName: process.env.ODS_SERVICE_NAME,
+    AuthUser: process.env.ODS_AUTH_USER,
+    AuthKey: process.env.ODS_AUTH_KEY,
+  };
 
-// 1. Kiểm tra tầng HTTP
-if (!response.ok) {
-  throw new Error(`Lỗi HTTP: ${response.status} ${response.statusText}`);
+  const missing = Object.entries(credentials)
+    .filter(([, value]) => !value)
+    .map(([name]) => name);
+
+  if (missing.length > 0) {
+    throw new Error(`Thiếu cấu hình bắt buộc: ${missing.join(', ')}`);
+  }
+  if (!ext || !phoneNumber) {
+    throw new Error('ext và phoneNumber là bắt buộc');
+  }
+
+  const response = await fetch('https://api.ods.vn/api/CloudFone/AutoCall', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ...credentials,
+      Ext: ext,
+      PhoneNumber: phoneNumber,
+      PhoneName: phoneName,
+      Prefix: '0',
+      KeySearch: crypto.randomUUID(),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Lỗi HTTP: ${response.status} ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  if (data.result !== 'success') {
+    throw new Error(`Tổng đài từ chối: ${data.message ?? 'Không rõ nguyên nhân'}`);
+  }
+
+  return data;
 }
 
-const data = await response.json();
-
-// 2. Bắt buộc kiểm tra tầng nghiệp vụ
-if (data.result !== 'success') {
-  throw new Error(`Tổng đài từ chối: ${data.message}`);
-}
-
-// 3. Xử lý thành công
-console.log('Khởi tạo cuộc gọi thành công, KeySearch:', data.keySearch);
+// Không tự động retry hàm tạo cuộc gọi khi chưa xác định kết quả request trước.
 ```
 
 ---

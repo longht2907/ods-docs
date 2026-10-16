@@ -109,6 +109,56 @@ html > body[data-scroll-locked] {
   background: var(--color-fd-accent);
 }
 
+.ods-search-result[data-result-type='page'] > div:first-child {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ods-search-result[data-result-type='text'] > div:last-child,
+.ods-search-result[data-result-type='heading'] > div:last-child {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.ods-search-state {
+  padding: 3rem 1rem;
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.ods-search-scope {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-top: 1px solid var(--color-fd-border);
+  padding: 0.5rem 0.75rem;
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.75rem;
+}
+
+.ods-search-scope select {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-fd-foreground);
+  font: inherit;
+  font-weight: 600;
+  outline: none;
+}
+
+.ods-search-scope select:focus-visible {
+  border-radius: 0.25rem;
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 2px;
+}
+
 .ods-search-suggestion:focus-visible,
 .ods-solution-chip:focus-visible,
 .ods-external-link:focus-visible,
@@ -354,9 +404,16 @@ html > body[data-scroll-locked] {
 
   .ods-api-grid-code {
     grid-area: code;
+    align-self: stretch;
   }
 
-  .ods-api-grid-code > div {
+  .ods-api-sticky-panel {
+    --ods-api-sticky-top: calc(var(--fd-docs-row-1, 0px) + 1.5rem);
+    position: sticky;
+    top: var(--ods-api-sticky-top);
+    max-height: calc(100vh - var(--ods-api-sticky-top) - 1.5rem);
+    max-height: calc(100dvh - var(--ods-api-sticky-top) - 1.5rem);
+    overflow-y: auto;
     scrollbar-width: thin;
   }
 

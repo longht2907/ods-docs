@@ -15,6 +15,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+ARG ODS_DOCS_SITE_URL
+ENV ODS_DOCS_SITE_URL=$ODS_DOCS_SITE_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 

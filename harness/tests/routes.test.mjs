@@ -73,6 +73,34 @@ async function checkRoute(baseUrl, path, expectedStatus, desc, expectedText = []
   }
 }
 
+async function checkRedirect(baseUrl, path, expectedLocation, desc) {
+  const res = await fetch(`${baseUrl}${path}`, { redirect: 'manual' });
+  const location = res.headers.get('location');
+  const pass = res.status === 308 && location === expectedLocation;
+  console.log(
+    `  ${pass ? '✓' : '✗'} ${desc} [${path}] -> mong đợi 308 ${expectedLocation}, thực tế ${res.status} ${location ?? '(không có Location)'}`,
+  );
+  return pass;
+}
+
+async function checkSocialMetadata(baseUrl, path) {
+  const res = await fetch(`${baseUrl}${path}`);
+  const html = await res.text();
+  const ogImage = html.match(/<meta property="og:image" content="([^"]+)"/i)?.[1];
+  const twitterImage = html.match(/<meta name="twitter:image" content="([^"]+)"/i)?.[1];
+  const images = [ogImage, twitterImage];
+  const pass =
+    res.status === 200 &&
+    images.every((value) =>
+      value && /^https?:\/\//i.test(value) && !/localhost|127\.0\.0\.1|\[::1\]/i.test(value),
+    );
+
+  console.log(
+    `  ${pass ? '✓' : '✗'} Social metadata uses non-loopback absolute URLs [${path}] -> og=${ogImage ?? '(thiếu)'}, twitter=${twitterImage ?? '(thiếu)'}`,
+  );
+  return pass;
+}
+
 async function main() {
   const port = await getFreePort();
   const baseUrl = `http://127.0.0.1:${port}`;
@@ -107,7 +135,7 @@ async function main() {
       process.exit(1);
     }
 
-    console.log('[test:routes] Server đã sẵn sàng. Bắt đầu kiểm tra 12 cases:');
+    console.log('[test:routes] Server đã sẵn sàng. Bắt đầu kiểm tra 16 cases:');
 
     let passedCases = true;
 
@@ -141,27 +169,60 @@ async function main() {
     const t7 = await checkRoute(baseUrl, '/api/search', 200, 'Public search API accessible');
     passedCases = passedCases && t7;
 
-    // 8-12. Vùng internal tiếp tục fail-closed
-    const t8 = await checkRoute(baseUrl, '/internal', 401, 'Internal root blocked');
+    // 8-9. Hai API đã loại bỏ phải giữ 404, không redirect sang API khác.
+    const t8 = await checkRoute(
+      baseUrl,
+      '/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-report',
+      404,
+      'Removed GetCallReport stays unavailable',
+    );
     passedCases = passedCases && t8;
 
-    const t9 = await checkRoute(baseUrl, '/internal/', 401, 'Internal trailing slash blocked');
+    const t9 = await checkRoute(
+      baseUrl,
+      '/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-report-detail',
+      404,
+      'Removed GetCallReportDetail stays unavailable',
+    );
     passedCases = passedCases && t9;
 
-    const t10 = await checkRoute(baseUrl, '/internal/onboarding', 401, 'Internal subpage blocked');
+    // 10. Redirect Click-to-Call cũ vẫn hoạt động.
+    const t10 = await checkRedirect(
+      baseUrl,
+      '/docs/ai-contact-center/api/tong-dai/khoi-tao-cuoc-goi',
+      '/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call',
+      'Legacy Click-to-Call redirect',
+    );
     passedCases = passedCases && t10;
 
-    const t11 = await checkRoute(baseUrl, '/api/search/internal', 401, 'Internal search API blocked');
+    // 11. Social metadata phải tuyệt đối và không dùng loopback trong production build.
+    const t11 = await checkSocialMetadata(
+      baseUrl,
+      '/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call',
+    );
     passedCases = passedCases && t11;
 
-    const t12 = await checkRoute(baseUrl, '/api/search/internal/', 401, 'Internal search API trailing slash blocked');
+    // 12-16. Vùng internal tiếp tục fail-closed.
+    const t12 = await checkRoute(baseUrl, '/internal', 401, 'Internal root blocked');
     passedCases = passedCases && t12;
+
+    const t13 = await checkRoute(baseUrl, '/internal/', 401, 'Internal trailing slash blocked');
+    passedCases = passedCases && t13;
+
+    const t14 = await checkRoute(baseUrl, '/internal/onboarding', 401, 'Internal subpage blocked');
+    passedCases = passedCases && t14;
+
+    const t15 = await checkRoute(baseUrl, '/api/search/internal', 401, 'Internal search API blocked');
+    passedCases = passedCases && t15;
+
+    const t16 = await checkRoute(baseUrl, '/api/search/internal/', 401, 'Internal search API trailing slash blocked');
+    passedCases = passedCases && t16;
 
     if (!passedCases) {
       console.error('\n[test:routes FAIL] Một hoặc nhiều route không đạt mã HTTP mong đợi.');
       allPassed = false;
     } else {
-      console.log('\n[test:routes PASS] Toàn bộ 12/12 route test case đều đạt chuẩn.\n');
+      console.log('\n[test:routes PASS] Toàn bộ 16/16 route test case đều đạt chuẩn.\n');
       allPassed = true;
     }
   } finally {

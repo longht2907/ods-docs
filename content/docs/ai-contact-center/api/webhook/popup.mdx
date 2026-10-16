@@ -1,11 +1,11 @@
 ---
 title: "Tích hợp Webhook và Popup cuộc gọi"
-description: "Đặc tả kỹ thuật payload Webhook cuộc gọi ODS, từ điển tham số, chuỗi JSON mẫu thực tế và cơ chế đồng bộ Popup CRM."
+description: "Đặc tả payload Webhook cuộc gọi ODS, từ điển tham số, chuỗi JSON mẫu và ý nghĩa ứng dụng Popup."
 ---
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-Tài liệu này cung cấp đặc tả kỹ thuật chi tiết về cấu trúc dữ liệu JSON Webhook do tổng đài ODS gửi đến, từ điển tham số theo nhóm nghiệp vụ, chuỗi sự kiện JSON mẫu thực tế và kiến trúc đồng bộ cửa sổ cuộc gọi (Popup) trên phần mềm CRM/ERP.
+Tài liệu này mô tả cấu trúc dữ liệu JSON Webhook do tổng đài ODS gửi đến endpoint khách hàng cung cấp, từ điển tham số, chuỗi sự kiện mẫu và ý nghĩa của dữ liệu đối với Popup. Cách triển khai ứng dụng tiếp nhận nằm ngoài contract dịch vụ ODS.
 
 ---
 
@@ -16,11 +16,11 @@ Hệ thống tổng đài ODS đóng vai trò là bên gửi (**Sender**), chủ
 - **Địa chỉ tiếp nhận**: Endpoint URL công khai thuộc máy chủ của doanh nghiệp (ví dụ: `https://crm.example.com/api/webhook/ods-call`).
 - **Giao thức và Phương thức**: `HTTP POST`, `Content-Type: application/json`.
 - **Trường định danh sự kiện**: Trường **`Event`** (chữ cái đầu viết hoa, mang một trong 5 giá trị: `register`, `show`, `answer`, `hide`, `finish`). Tuyệt đối không dùng trường `Status`.
-- **Tiêu chuẩn phản hồi từ Receiver**:
-  - Máy chủ backend của khách hàng cần xử lý nhanh và phản hồi mã trạng thái HTTP thuộc dải **`2xx`** (khuyến nghị `200 OK`).
-  - Phía tổng đài ODS coi mọi mã phản hồi `200 <= statusCode < 300` là chuyển phát thành công.
-  - Phía ODS không áp đặt cấu trúc JSON body bắt buộc đối với phản hồi xác nhận của Receiver.
-  - *Lưu ý*: Mã `200 OK` của endpoint tiếp nhận chỉ mang ý nghĩa **đã nhận được gói tin Webhook thành công**, không phản ánh kết quả cuộc gọi (nhấc máy hay cuộc gọi nhỡ).
+- **Xác thực tùy chọn**: Khách hàng có thể cung cấp một khóa đã thống nhất với ODS. Khóa được gửi trong field **`apikey` của body JSON**; không dùng `ApiKey`, `X-API-Key`, `Authorization` và không nhầm với REST `AuthKey`.
+- **Phản hồi xác nhận tiếp nhận**:
+  - Endpoint trả HTTP status thuộc dải **`2xx`** sau khi tiếp nhận body JSON.
+  - HTTP `2xx` chỉ xác nhận endpoint đã tiếp nhận request, không phản ánh trạng thái cuộc gọi và không phải ACK trước khi dữ liệu được tiếp nhận.
+  - Contract hiện tại không áp đặt response JSON bắt buộc.
 
 ---
 
@@ -36,7 +36,7 @@ Nhóm tham số cốt lõi phục vụ điều phối và đồng bộ cửa s�
 | :-- | :-- | :-- | :-- | :-- |
 | **`Event`** | string | Tên sự kiện vòng đời | Mọi sự kiện | Giá trị: `register`, `show`, `answer`, `hide`, `finish`. Không dùng trường `Status`. |
 | **`LID`** | string | Mã phiên tổng thể (Linked ID) | Mọi sự kiện | Khóa liên kết xuyên suốt toàn bộ cuộc gọi. Mọi sự kiện cùng một cuộc gọi đều chung `LID`. |
-| **`Uid`** | string | Mã định danh kênh máy nhánh (Unique ID) | `show`, `answer`, `hide`, `finish` | Khác với `LID`. Mỗi máy nhánh trong nhóm đổ chuông sở hữu một `Uid` riêng biệt. |
+| **`Uid`** | string | Mã định danh nhánh kênh thoại (Unique ID) | `show`, `answer`, `hide`, `finish` | Có vai trò khác `LID`. Giá trị có thể bằng `LID` trong một số kịch bản, nhưng không được giả định luôn bằng nhau. |
 | **`Dir`** | string | Hướng cuộc gọi | Mọi sự kiện | Nhận giá trị: `Inbound` (gọi vào), `Outbound` (gọi ra), hoặc `Local` (gọi nội bộ). |
 | **`CID`** | string | Số điện thoại khách hàng | Mọi sự kiện | Luôn đại diện cho số khách hàng ở cả 2 chiều gọi (gọi vào là số người gọi, gọi ra là số người nhận). |
 | **`DID`** | string | Đầu số Hotline doanh nghiệp | Hầu hết sự kiện | Đầu số tổng đài đại diện của doanh nghiệp. |
@@ -79,7 +79,7 @@ Nhóm tham số phục vụ lưu trữ nhật ký CDR, tải file ghi âm và x�
 | **`Disposition`** | string | Kết quả cuộc gọi / trạng thái nhánh | `hide`, `finish` | Nhận các giá trị: `ANSWERED`, `ANSWERED_ELSEWHERE`, `BUSY`, `NO ANSWER`, `FAILED`. |
 | **`recordingfile`** | string | Tên file ghi âm gốc | `answer`, `finish`, Outbound | Tên file âm thanh trên máy chủ (ví dụ: `in-089616...wav`). Chưa đồng nghĩa file đã sẵn sàng tải. |
 | **`recordingfileURL`** | string | URL tải/nghe file ghi âm | `finish` (khi có nghe máy) | Đường dẫn HTTPS chính thức có mã bảo mật để tải hoặc nghe lại tệp ghi âm từ ODS. |
-| **`apikey`** | string \| null | Khóa xác thực nguồn gửi Webhook | Mọi sự kiện trong body | Do doanh nghiệp cấu hình trên tổng đài. Mặc định là `null` nếu chưa thiết lập. |
+| **`apikey`** | string \| null | Khóa xác thực Webhook tùy chọn | Mọi sự kiện trong body | ODS gửi đúng field chữ thường `apikey`. Payload mẫu chưa cấu hình khóa có giá trị `null`; khi đã thống nhất khóa, ứng dụng tiếp nhận kiểm tra đúng giá trị đó. |
 
 ---
 
@@ -321,53 +321,28 @@ Dưới đây là các chuỗi sự kiện JSON hoàn chỉnh dựa trên dữ l
 
 ---
 
-## Kiến trúc đồng bộ Popup thời gian thực trên CRM
+## Ý nghĩa dữ liệu đối với Popup
 
-Để biến dữ liệu Webhook thành cửa sổ Popup bật tự động trên màn hình làm việc của nhân viên, hệ thống CRM cần triển khai theo mô hình kiến trúc phân tầng:
+Popup là một ứng dụng của payload Webhook. ODS cung cấp sự kiện và dữ liệu cuộc gọi; cách khách hàng tổ chức backend, giao diện hoặc lưu trữ không thuộc contract này.
 
-```
-[Tổng đài ODS] ──── 1. HTTP POST Webhook ────► [CRM Backend Receiver]
-                                                       │
-                                            2. Ánh xạ Ext ➔ User ID
-                                                       │
-                                            3. WebSocket / SSE Server
-                                                       │
-                         ┌─────────────────────────────┴─────────────────────────────┐
-                         ▼                                                           ▼
-         [Trình duyệt Nhân viên A (Ext 101)]                         [Trình duyệt Nhân viên B (Ext 102)]
-               (Bật Popup cuộc gọi)                                         (Tắt chuông khi hide)
-```
-
-### Quy tắc điều phối trạng thái giao diện:
 1. **Khi nhận sự kiện `show`**:
-   - Backend tra cứu trong cơ sở dữ liệu CRM để ánh xạ số máy lẻ `Ext` với tài khoản người dùng tương ứng đang đăng nhập.
-   - Bắn thông điệp qua kênh Socket/SSE đến **duy nhất máy tính của nhân viên sở hữu `Ext`** để mở cửa sổ Popup kèm thông tin khách hàng (tìm kiếm theo số điện thoại `CID`).
-   - *Lưu ý an toàn*: Tuyệt đối không phát sóng (broadcast) sự kiện cuộc gọi của một nhân viên đến toàn bộ người dùng khác trong hệ thống.
+   - `CID` cho biết số khách hàng và `Ext` cho biết máy nhánh liên quan; ứng dụng khách hàng có thể dùng hai giá trị này để chọn thông tin Popup phù hợp.
 2. **Khi nhận sự kiện `answer`**:
-   - Chuyển giao diện Popup của nhân viên nhấc máy sang trạng thái "Đang đàm thoại", bắt đầu bấm giờ đàm thoại cục bộ.
+   - Dữ liệu cho biết nhánh cuộc gọi đã được trả lời.
 3. **Khi nhận sự kiện `hide`**:
-   - Dừng hiệu ứng đổ chuông trên cửa sổ Popup của đúng máy nhánh mang số `Ext` đó.
-   - **Tuyệt đối không đóng toàn bộ phiên cuộc gọi theo `LID`**: Trong cuộc gọi nhóm, sự kiện `hide` của máy nhánh phụ (mang trạng thái `ANSWERED_ELSEWHERE`) chỉ có nghĩa là máy nhánh đó ngừng reo chuông do đồng nghiệp đã nhấc máy, cuộc gọi chính vẫn đang diễn ra bình thường.
+   - `hide` mô tả một nhánh ngừng đổ chuông. Trong cuộc gọi nhóm, `hide` của nhánh có `ANSWERED_ELSEWHERE` không đồng nghĩa toàn bộ cuộc gọi theo `LID` đã `finish`.
 4. **Khi nhận sự kiện `finish`**:
-   - Đóng cửa sổ Popup hoặc chuyển sang giao diện nhập ghi chú sau cuộc gọi (Call Wrap-up).
-   - Cập nhật thời lượng đàm thoại thực tế và lưu trữ liên kết ghi âm `recordingfileURL`.
+   - Dữ liệu cho biết cuộc gọi kết thúc và có thể kèm thông tin tổng kết như `Disposition` hoặc `recordingfileURL`.
 
 ---
 
-## Xử lý sự kiện trùng lặp, độ trễ và lệch thứ tự
+## Giới hạn định danh thông báo
 
-Trên môi trường mạng Internet công cộng, việc tiếp nhận Webhook có thể gặp hiện tượng gửi lặp (Duplicate) hoặc nhận lệch thứ tự (Out-of-order). Hệ thống tiếp nhận cần áp dụng các chiến lược sau:
-
-### 1. Chiến lược chống trùng lặp (Deduplication)
-- **Không dùng `LID` làm khóa chống trùng duy nhất**: Một cuộc gọi luôn phát sinh ít nhất 3 đến 5 sự kiện mang cùng một `LID`. Nếu coi cùng `LID` là trùng, bạn sẽ đánh rơi toàn bộ các sự kiện `show`, `answer` và `finish`.
-- **Không dùng `LID + Ext` làm khóa duy nhất**: Sẽ làm mất tiến trình vòng đời của máy nhánh đó (không phân biệt được giữa lúc bắt đầu đổ chuông `show`, lúc nghe `answer` và lúc gác máy `finish`).
-- **Khóa phân biệt sự kiện khuyến nghị**:  
-  Tạo khóa nghiệp vụ dựa trên tổ hợp: **`LID + Event + (Uid || Ext || 'root')`**.  
-  Lưu khóa này vào bộ nhớ đệm (như Redis với thời gian hết hạn TTL 30–60 giây). Nếu gặp gói tin có cùng khóa trong khoảng thời gian này, backend có thể bỏ qua hoặc chỉ cập nhật nhẹ.
-
-### 2. Xử lý sự kiện đến lệch thứ tự
-- Do độ trễ mạng khác nhau giữa các request, đôi khi sự kiện `show` của một máy nhánh phụ có thể đến backend **sau khi** sự kiện `finish` của cuộc gọi đã kết thúc.
-- **Quy tắc an toàn**: Khi nhận sự kiện `show`, backend cần kiểm tra trạng thái của `LID` trong cơ sở dữ liệu/cache. Nếu cuộc gọi đã chuyển sang trạng thái `finish`, **tuyệt đối không kích hoạt lại trạng thái đổ chuông** trên giao diện người dùng.
+- **Correlation cấp cuộc gọi**: `LID` liên kết các sự kiện thuộc cùng một cuộc gọi. Một `LID` có thể xuất hiện trong nhiều thông báo khác nhau.
+- **Nhánh gọi**: `Uid` nhận diện nhánh kênh thoại và `Ext` nhận diện máy nhánh liên quan. Một cuộc gọi có thể có nhiều `Uid`/`Ext`; các field này không phải định danh duy nhất của thông báo.
+- **Định danh duy nhất của thông báo**: Payload hiện tại chưa có event ID duy nhất đã được xác nhận. Vì vậy không thể dùng `LID`, `LID + Ext` hoặc một công thức ghép field để khẳng định phổ quát rằng hai request là trùng nhau.
+- **Ứng dụng tiếp nhận**: Nếu cần chống xử lý trùng, khách hàng phải xác định và kiểm thử quy tắc theo kịch bản tích hợp thực tế. Tài liệu hiện tại không xác nhận retry, timeout, exactly-once hay thứ tự nhận tuyệt đối.
+- **Nhiều tổng đài**: Khi một endpoint nhận dữ liệu từ nhiều nguồn tích hợp, cần phân vùng correlation theo **nguồn tích hợp + `LID`**. Contract không tự thêm field nguồn mới và `apikey: null` không xác định được tổng đài gửi.
 
 ---
 
@@ -395,11 +370,11 @@ Trường `Disposition` phản ánh kết quả xử lý của một nhánh ho�
 | Hiện tượng lỗi | Nguyên nhân gốc rễ | Hướng xử lý |
 | :-- | :-- | :-- |
 | **Endpoint không nhận được request nào** | 1. URL cấu hình sai hoặc server bị chặn firewall.<br/>2. Chưa gửi thông tin cho ODS cấu hình kích hoạt. | - Kiểm tra server có nhận được request từ Internet qua công cụ kiểm thử (như Webhook.site).<br/>- Liên hệ bộ phận kỹ thuật ODS xác nhận trạng thái kích hoạt Webhook. |
-| **Lỗi HTTP 401 Unauthorized** | Khóa `apikey` trong body JSON không khớp với giá trị backend kỳ vọng. | Kiểm tra lại giá trị biến môi trường `ODS_WEBHOOK_KEY`. Đảm bảo backend chấp nhận giá trị `null` nếu hệ thống chưa bật tính năng xác thực key. |
-| **Một cuộc gọi phát nhiều sự kiện `show`** | Cuộc gọi đến nhóm máy nhánh (Queue / Ring Group) làm nhiều máy đổ chuông cùng lúc. | Đây là hành vi bình thường. Backend cần trích xuất trường `Ext` để chỉ mở popup trên máy tính của đúng nhân viên sở hữu máy lẻ đó. |
-| **Không có trường `Ext` trong sự kiện `register`** | Cuộc gọi vào mới tiếp nhận ở tầng đầu số/IVR, chưa định tuyến đến máy lẻ nào. | Kiểm tra mã nguồn receiver: không đặt ràng buộc bắt buộc phải có `Ext` trong mọi sự kiện. |
+| **Lỗi HTTP 401 Unauthorized** | Tích hợp đã dùng xác thực tùy chọn nhưng giá trị `apikey` trong body không khớp giá trị hai bên đã thống nhất. | Đối chiếu cấu hình với ODS và giá trị ứng dụng tiếp nhận đang kiểm tra. Không coi `null` là cách bỏ qua một khóa sai. |
+| **Một cuộc gọi phát nhiều sự kiện `show`** | Cuộc gọi đến nhóm máy nhánh (Queue / Ring Group) làm nhiều máy đổ chuông cùng lúc. | Đây là hành vi bình thường. Ứng dụng tiếp nhận dùng `Ext` để phân biệt máy nhánh liên quan đến từng thông báo. |
+| **Không có trường `Ext` trong sự kiện `register`** | Cuộc gọi vào mới tiếp nhận ở tầng đầu số/IVR, chưa định tuyến đến máy lẻ nào. | Không giả định mọi sự kiện đều có `Ext`; đối chiếu theo loại `Event`. |
 | **Không có trường `recordingfileURL`** | Cuộc gọi nhỡ (không có người bắt máy) hoặc cuộc gọi chưa kết thúc. | Link ghi âm chỉ được máy chủ ODS sinh ra duy nhất tại sự kiện `finish` đối với các cuộc gọi có trạng thái `ANSWERED`. |
-| **Popup hiển thị sai nhân viên** | Hệ thống broadcast nhầm sự kiện cho tất cả người dùng hoặc ánh xạ sai máy nhánh. | Kiểm tra bảng phân quyền người dùng trong CRM; chỉ đẩy sự kiện tới kênh WebSocket riêng của nhân viên có `user.extension === payload.Ext`. |
+| **Popup hiển thị sai máy nhánh** | Ứng dụng khách hàng ánh xạ sai `Ext` hoặc bỏ qua ngữ cảnh nhánh gọi. | Đối chiếu `Ext`, `Uid`, `LID` và `Event` của thông báo với kịch bản thực tế. |
 
 ---
 

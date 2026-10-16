@@ -1,12 +1,19 @@
 import { createMDX } from 'fumadocs-mdx/next';
 
 const withMDX = createMDX();
+const metadataSiteUrl =
+  process.env.ODS_DOCS_SITE_URL?.trim() ||
+  (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : '');
 
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
   output: 'standalone',
   skipTrailingSlashRedirect: true,
+  // Public origin, embedded at build-time so prerendered pages and dynamic 404s agree.
+  env: {
+    ODS_DOCS_SITE_URL: metadataSiteUrl,
+  },
   async redirects() {
     return [
       {

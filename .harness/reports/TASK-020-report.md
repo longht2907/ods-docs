@@ -3,10 +3,10 @@
 ## Trạng thái
 
 - Branch: `task/TASK-020-cloudfile-docs`.
-- Task status: `in-progress`.
+- Task status: `done` (Human chấp nhận kết quả triển khai cơ bản).
 - Nguồn duy nhất: GitBook CloudFile ODS và các URL Markdown trong `llms.txt`.
 - Không sửa vùng AI Contact Center, `content/docs/meta.json`, source code, harness, dependency hoặc cấu hình.
-- Dev server port 3002 đã được tắt khi bắt đầu bàn giao Git. Nhánh đã push tại commit triển khai `74acc44`; Pull Request đang chờ kết nối GitHub để tạo và theo dõi CI.
+- PR #20 đã merge vào `main` tại merge commit `cdb570d` (branch head `22b95a9`); CI job `verify` PASS.
 
 ## Lô 0 — Task, nguồn và đối chiếu IA
 
@@ -340,5 +340,33 @@ Các hành vi phụ thuộc cấu hình hoặc có ảnh hưởng đến quyền
 - `npm run verify`: PASS sau rebase — typecheck, env, links, guard và build 326/326.
 - `check:scope`: PASS trong worktree sạch checkout từ đúng commit/branch CI; worktree kiểm chứng tạm đã được xóa sau khi dùng.
 - `npm run test:routes`: PASS 12/12 — public routes HTTP 200 và internal routes HTTP 401 đúng kỳ vọng.
-- Pull Request chưa được tạo tại thời điểm ghi nhận vì phiên chưa có GitHub connector và máy không cài `gh`; không tuyên bố PR/CI khi chưa có bằng chứng từ GitHub.
-- Task giữ `status: in-progress` cho đến khi PR tồn tại, CI xanh và Human finalization theo quy định repository.
+- Pull Request #20 (`https://github.com/longht2907/ods-docs/pull/20`) đã được tạo và merge vào nhánh `main`.
+
+## Nghiệm thu cuối & Đóng hồ sơ TASK-020
+
+### 1. Bằng chứng Pull Request & Merge Git
+
+- **Pull Request**: [#20 (Task/task 020 cloudfile docs)](https://github.com/longht2907/ods-docs/pull/20)
+- **Branch**: `task/TASK-020-cloudfile-docs`
+- **Head commit trên nhánh PR**: `22b95a9992adebdc07c304f09f3aec5d8ac44e1c` (short `22b95a9`)
+- **Merge commit SHA trên `main`**: `cdb570d70ac5bff87b063b80a9b2bc705fff1487` (short `cdb570d`)
+- **Người merge**: `longht2907` vào lúc `2026-10-13T03:43:16Z`
+
+### 2. Bằng chứng GitHub Actions CI
+
+- **CI Check Run trên Head commit (`22b95a9`)**:
+  - Run ID: `38342918157`
+  - Job ID: `115117705263` (`verify`)
+  - Status: `completed`, Conclusion: `success`
+  - Thời gian: `2026-10-13T03:41:45Z` -> `2026-10-13T03:42:43Z`
+- **CI Check Run trên Merge commit (`cdb570d`)**:
+  - Run ID: `38343038362`
+  - Job ID: `115118083834` (`verify`)
+  - Status: `completed`, Conclusion: `success`
+  - Thời gian: `2026-10-13T03:43:21Z` -> `2026-10-13T03:44:01Z`
+
+### 3. Kết luận từ Human & Trạng thái tồn đọng
+
+- **Kết luận Human**: Chấp nhận kết quả triển khai cơ bản của tài liệu CloudFile (đầy đủ 31 trang MDX chuyển từ GitBook, IA chuẩn hóa, 35 hình ảnh local ẩn danh, 100 Card icon hợp lệ, không broken link, không rò rỉ secret).
+- **Trạng thái câu hỏi mở**: 19 câu hỏi chi tiết kỹ thuật/vận hành (từ `Q-FOLDER-01` đến `Q-ADMIN-LOG-01`) tiếp tục được **giữ mở** ở trạng thái `Chưa trả lời.` trong [.harness/reports/TASK-020-questions.md](TASK-020-questions.md). Không tự tiện đánh dấu đã giải quyết; các thông số này sẽ được ODS cập nhật bổ sung theo chính sách vận hành của từng giai đoạn.
+- **Vòng đời task**: Đóng hồ sơ nhiệm vụ với `status: done` trong `tasks/TASK-020-cloudfile-docs.md`.

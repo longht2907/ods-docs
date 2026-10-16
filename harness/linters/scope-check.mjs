@@ -35,13 +35,13 @@ if (!branch || branch === 'main' || branch === 'master' || branch === 'HEAD') {
   process.exit(0);
 }
 
-// 2. Trích xuất mã TASK (VD: TASK-002)
-const taskMatch = branch.match(/TASK-\d+/i);
+// 2. Trích xuất mã TASK (VD: TASK-002) từ segment branch bắt đầu bằng TASK-XXX
+const taskMatch = branch.match(/(?:^|\/)(TASK-\d+)(?=-|$)/i);
 if (!taskMatch) {
   console.log(`[scope-check] Nhánh "${branch}" không chứa mã TASK-XXX. Bỏ qua.`);
   process.exit(0);
 }
-const taskId = taskMatch[0].toUpperCase();
+const taskId = taskMatch[1].toUpperCase();
 
 // 3. Tìm task file trong tasks/
 const tasksDir = path.join(root, 'tasks');

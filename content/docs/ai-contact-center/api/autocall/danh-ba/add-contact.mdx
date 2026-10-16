@@ -1,35 +1,40 @@
 ---
 title: "Thêm liên hệ (AddContact)"
 description: "Thêm mới một khách hàng hoặc số điện thoại vào danh bạ Autocall."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Contact/AddContact`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Contact/AddContact" />
 
-Thêm mới thông tin một khách hàng vào cơ sở dữ liệu danh bạ Autocall để phục vụ các chiến dịch gọi tự động.
+    Thêm mới thông tin một khách hàng vào cơ sở dữ liệu danh bạ Autocall để phục vụ các chiến dịch gọi tự động.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Phone` | string | Có | Số điện thoại của khách hàng (ví dụ: `0900000000`). |
-| `Contact_Name` | string | Không | Tên gợi nhớ định danh liên hệ. |
-| `First_Name` | string | Không | Tên của khách hàng. |
-| `Last_Name` | string | Không | Họ và tên đệm. |
-| `Email_Address` | string | Không | Địa chỉ Email. |
-| `Company` | string | Không | Tên công ty/doanh nghiệp. |
-| `Department` | string | Không | Phòng ban/chức vụ. |
-| `Address` | string | Không | Địa chỉ liên hệ. |
-| `Web_Site` | string | Không | Website của khách hàng. |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `Phone` | string | Có | Số điện thoại của khách hàng (ví dụ: `0900000000`). |
+    | `Contact_Name` | string | Không | Tên gợi nhớ định danh liên hệ. |
+    | `First_Name` | string | Không | Tên của khách hàng. |
+    | `Last_Name` | string | Không | Họ và tên đệm. |
+    | `Email_Address` | string | Không | Địa chỉ Email. |
+    | `Company` | string | Không | Tên công ty/doanh nghiệp. |
+    | `Department` | string | Không | Phòng ban/chức vụ. |
+    | `Address` | string | Không | Địa chỉ liên hệ. |
+    | `Web_Site` | string | Không | Website của khách hàng. |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/AddContact" \
+curl -X POST "https://apiai.cloudfone.vn/api/Contact/AddContact" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -44,10 +49,11 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/AddContact" \
     "Address": "TP. Ho Chi Minh"
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/AddContact', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Contact/AddContact', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -61,8 +67,8 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/AddContact', {
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -74,17 +80,17 @@ payload = {
     "Contact_Name": "Nguyen Van A",
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Contact/AddContact",
+    "https://apiai.cloudfone.vn/api/Contact/AddContact",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -93,32 +99,40 @@ print(response.json())
   "data": 1052
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
-| `data` | number | Mã `ContactId` của khách hàng vừa tạo (dùng để thêm vào nhóm). |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    ### Bảng mô tả trường
 
-<Callout type="info">
-- **Định dạng số điện thoại**: Trường `Phone` phải là chuỗi số hợp lệ (ví dụ: `0900000000` hoặc `84900000000`), không chứa dấu chấm, khoảng trắng hay ký tự gạch nối.
-- **Quy trình gán nhóm**: Tạo liên hệ xong hệ thống trả về mã `data` (chính là `ContactId`). Bạn cần tiếp tục gọi API [AddContactToGroup](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-to-group) để gán liên hệ này vào nhóm chiến dịch.
-</Callout>
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+    | `data` | number | Mã `ContactId` của khách hàng vừa tạo (dùng để thêm vào nhóm). |
 
-## Lỗi thường gặp
+    ## Lưu ý quan trọng
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - Thiếu số điện thoại bắt buộc `Phone`.
-    - Số điện thoại sai định dạng viễn thông.
-  </Accordion>
-</Accordions>
+    <Callout type="info">
+    - **Định dạng số điện thoại**: Trường `Phone` phải là chuỗi số hợp lệ (ví dụ: `0900000000` hoặc `84900000000`), không chứa dấu chấm, khoảng trắng hay ký tự gạch nối.
+    - **Quy trình gán nhóm**: Tạo liên hệ xong hệ thống trả về mã `data` (chính là `ContactId`). Bạn cần tiếp tục gọi API [AddContactToGroup](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-to-group) để gán liên hệ này vào nhóm chiến dịch.
+    </Callout>
 
-## Bài viết liên quan
+    ## Lỗi thường gặp
 
-<Cards>
-  <Card title="Thêm liên hệ vào nhóm" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact-to-group" description="Gán liên hệ vào nhóm chiến dịch." />
-  <Card title="Tạo nhóm liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact-group" description="Tạo nhóm để gom danh bạ." />
-</Cards>
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - Thiếu số điện thoại bắt buộc `Phone`.
+        - Số điện thoại sai định dạng viễn thông.
+      </Accordion>
+    </Accordions>
+
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Thêm liên hệ vào nhóm" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact-to-group" description="Gán liên hệ vào nhóm chiến dịch." />
+      <Card title="Tạo nhóm liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact-group" description="Tạo nhóm để gom danh bạ." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

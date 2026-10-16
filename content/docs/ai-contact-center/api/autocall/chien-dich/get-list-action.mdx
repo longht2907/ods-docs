@@ -1,26 +1,31 @@
 ---
 title: "Danh sách hành động phím bấm (GetListAction)"
 description: "Lấy danh mục các hành động rẽ nhánh IVR khi khách hàng bấm phím trong chiến dịch Autocall."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Autocall/GetListAction`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Autocall/GetListAction" />
 
-Tra cứu danh sách các mã hành động (Action codes) được hỗ trợ trên hệ thống tổng đài để cấu hình cho tham số `Keypress` khi tạo chiến dịch Autocall (ví dụ: chuyển tiếp gặp tổng đài viên, nghe lại thông báo, gọi API, kết thúc cuộc gọi).
+    Tra cứu danh sách các mã hành động (Action codes) được hỗ trợ trên hệ thống tổng đài để cấu hình cho tham số `Keypress` khi tạo chiến dịch Autocall (ví dụ: chuyển tiếp gặp tổng đài viên, nghe lại thông báo, gọi API, kết thúc cuộc gọi).
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/GetListAction" \
+curl -X POST "https://apiai.cloudfone.vn/api/Autocall/GetListAction" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -28,10 +33,11 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/GetListAction" \
     "AuthKey": "YOUR_AUTH_KEY"
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/GetListAction', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Autocall/GetListAction', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -43,8 +49,8 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/GetListAction', {
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -54,17 +60,17 @@ payload = {
     "AuthKey": "YOUR_AUTH_KEY",
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Autocall/GetListAction",
+    "https://apiai.cloudfone.vn/api/Autocall/GetListAction",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -94,32 +100,40 @@ print(response.json())
   ]
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
-| `data` | array | Danh sách các hành động cấu hình phím bấm khả dụng. |
-| `data[].actionId` | string | Mã ID của hành động (dùng điền vào `Action` trong mảng `Keypress`). |
-| `data[].actionName` | string | Tên mô tả hành động nghiệp vụ trên hệ thống. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    ### Bảng mô tả trường
 
-<Callout type="info">
-- **Áp dụng trong kịch bản IVR**: Khi gọi API [StartCampaign](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign), các giá trị `actionId` trả về từ API này sẽ được gán vào trường `Action` tương ứng với từng phím bấm `Key` (từ `0` đến `9`, `*`, `#`).
-</Callout>
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+    | `data` | array | Danh sách các hành động cấu hình phím bấm khả dụng. |
+    | `data[].actionId` | string | Mã ID của hành động (dùng điền vào `Action` trong mảng `Keypress`). |
+    | `data[].actionName` | string | Tên mô tả hành động nghiệp vụ trên hệ thống. |
 
-## Lỗi thường gặp
+    ## Lưu ý quan trọng
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - Dịch vụ `ServiceCode` không hợp lệ.
-  </Accordion>
-</Accordions>
+    <Callout type="info">
+    - **Áp dụng trong kịch bản IVR**: Khi gọi API [StartCampaign](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign), các giá trị `actionId` trả về từ API này sẽ được gán vào trường `Action` tương ứng với từng phím bấm `Key` (từ `0` đến `9`, `*`, `#`).
+    </Callout>
 
-## Bài viết liên quan
+    ## Lỗi thường gặp
 
-<Cards>
-  <Card title="Khởi chạy chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Áp dụng mã hành động vào cấu hình Keypress." />
-  <Card title="Tạo âm thanh TTS" href="/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio" description="Tạo nội dung âm thanh cho chiến dịch." />
-</Cards>
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - Dịch vụ `ServiceCode` không hợp lệ.
+      </Accordion>
+    </Accordions>
+
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Khởi chạy chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Áp dụng mã hành động vào cấu hình Keypress." />
+      <Card title="Tạo âm thanh TTS" href="/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio" description="Tạo nội dung âm thanh cho chiến dịch." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

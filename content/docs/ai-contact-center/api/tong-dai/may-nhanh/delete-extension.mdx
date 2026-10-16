@@ -1,74 +1,87 @@
 ---
-title: "Xóa máy nhánh"
-description: "Xóa máy nhánh (extension) trên tổng đài AI Contact Center."
+title: "Xóa máy nhánh (DeleteExtension)"
+description: "API thu hồi và xóa tài khoản máy nhánh (extension) trên tổng đài PBX ODS khi nhân sự nghỉ việc hoặc thay đổi cơ cấu."
+full: true
 ---
 
-<Callout type="info">`POST` `{BASE_URL}/api/CloudFone/DeleteExtension`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://api.ods.vn/api/CloudFone/DeleteExtension" />
 
-Thu hồi và xóa số nội bộ (extension) trên tổng đài khi nhân sự nghỉ việc hoặc tái cấu trúc phòng ban.
+    API **DeleteExtension** cho phép hệ thống HRM hoặc CRM tự động thu hồi và xóa số máy nhánh (extension) trên tổng đài PBX ODS khi nhân viên nghỉ việc hoặc doanh nghiệp tái cấu trúc phòng ban.
 
-## Tham số request
+    ### Ứng dụng thực tế
+    - **Tự động hóa Offboarding**: Tự động vô hiệu hóa và xóa tài khoản thoại ngay khi hoàn tất quy trình bàn giao nghỉ việc trên HRM.
+    - **Giải phóng tài nguyên máy nhánh**: Thu hồi số nội bộ để sẵn sàng cấp phát lại cho nhân sự mới, tối ưu số lượng extension trên gói cước.
+    - **Bảo mật kênh thoại doanh nghiệp**: Ngăn chặn việc nhân sự đã nghỉ việc tiếp tục sử dụng tài khoản SIP cũ để gọi ra ngoài hoặc gọi nội bộ.
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ tổng đài khi đăng ký tại ODS (ví dụ: `CF-BSXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản định danh khách hàng (ví dụ: `ODSXXXX`). |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Ext` | string | Có | Số máy nhánh cần xóa (ví dụ: `1997`). |
+    ## Tham số request
 
-## Ví dụ request
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ tổng đài khi đăng ký tại ODS (ví dụ: `CF-BSXXXX`). *Lưu ý: Endpoint này sử dụng `ServiceCode`, không dùng `ServiceName`.* |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng do ODS cấp (ví dụ: `ODSXXXX`). |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp để xác thực quyền quản trị. |
+    | `Ext` | string | Có | Số máy nhánh cần xóa trên tổng đài (ví dụ: `1001`, `1997`). |
+  </ApiReferenceMain>
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+  <ApiReferenceCode>
+    ## Ví dụ request
+
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{BASE_URL}/api/CloudFone/DeleteExtension" \
+curl -X POST "https://api.ods.vn/api/CloudFone/DeleteExtension" \
   -H "Content-Type: application/json" \
   -d '{
+    "ServiceCode": "CF-BSXXXX",
     "AuthUser": "YOUR_AUTH_USER",
     "AuthKey": "YOUR_AUTH_KEY",
-    "ServiceCode": "YOUR_SERVICE_CODE",
     "Ext": "1001"
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{BASE_URL}/api/CloudFone/DeleteExtension', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://api.ods.vn/api/CloudFone/DeleteExtension', {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+  },
   body: JSON.stringify({
-    AuthUser: 'YOUR_AUTH_USER',
-    AuthKey: 'YOUR_AUTH_KEY',
-    ServiceCode: 'YOUR_SERVICE_CODE',
+    ServiceCode: process.env.ODS_SERVICE_CODE,
+    AuthUser: process.env.ODS_AUTH_USER,
+    AuthKey: process.env.ODS_AUTH_KEY,
     Ext: '1001',
   }),
 });
+
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
+import os
 import requests
 
+url = "https://api.ods.vn/api/CloudFone/DeleteExtension"
+headers = {"Content-Type": "application/json"}
 payload = {
-    "AuthUser": "YOUR_AUTH_USER",
-    "AuthKey": "YOUR_AUTH_KEY",
-    "ServiceCode": "YOUR_SERVICE_CODE",
+    "ServiceCode": os.getenv("ODS_SERVICE_CODE"),
+    "AuthUser": os.getenv("ODS_AUTH_USER"),
+    "AuthKey": os.getenv("ODS_AUTH_KEY"),
     "Ext": "1001",
 }
-response = requests.post(
-    "{BASE_URL}/api/CloudFone/DeleteExtension",
-    json=payload,
-    headers={"Content-Type": "application/json"},
-    timeout=15,
-)
+
+response = requests.post(url, json=payload, headers=headers, timeout=15)
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -76,30 +89,39 @@ print(response.json())
   "message": "Thành công!"
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
-| `message` | string | Thông báo kết quả chi tiết từ hệ thống tổng đài. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
-- Khi xóa máy nhánh, các thiết bị IP Phone hoặc Softphone đang đăng ký SIP bằng tài khoản này sẽ lập tức mất kết nối.
-- Lịch sử cuộc gọi cũ của máy nhánh này vẫn được lưu trữ và có thể tra cứu qua API [GetCallLogs](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs).
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái xử lý yêu cầu (`"success"` hoặc `"failed"`). |
+    | `message` | string | Thông báo kết quả chi tiết từ hệ thống tổng đài (ví dụ: `"Thành công!"`). |
 
-## Lỗi thường gặp
+    ## Lưu ý quan trọng
 
-<Accordions>
-  <Accordion title="Không tìm thấy số máy nhánh cần xóa">
-    Số máy nhánh không tồn tại trong hệ thống hoặc đã được xóa trước đó.
-  </Accordion>
-  <Accordion title="Sai thông tin xác thực">
-    Kiểm tra lại `AuthUser` và `AuthKey` của gói dịch vụ.
-  </Accordion>
-</Accordions>
+    1. **Ngắt kết nối thiết bị SIP**: Toàn bộ thiết bị phần cứng (IP Phone) hoặc ứng dụng phần mềm (Softphone, WebRTC) đang đăng ký SIP bằng tài khoản này sẽ lập tức mất kết nối và không thể gửi/nhận cuộc gọi.
+    2. **Bảo toàn lịch sử cuộc gọi**: Việc xóa máy nhánh **không làm mất** dữ liệu các cuộc gọi đã phát sinh trước đó. Doanh nghiệp vẫn có thể tra cứu toàn bộ nhật ký cuộc gọi của số máy nhánh này thông qua API [GetCallLogs](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs).
+    3. **Rà soát nhóm đổ chuông (Routing)**: Trước khi xóa, quản trị viên nên kiểm tra và gỡ số máy nhánh khỏi các nhóm trực cuộc gọi (Ring Group) hoặc hàng đợi (Queue) trên Portal để tránh cuộc gọi bị định tuyến vào số nội bộ không còn hoạt động.
+    4. **Thao tác không thể hoàn tác**: Xóa máy nhánh sẽ xóa vĩnh viễn cấu hình tài khoản của số đó. Nếu muốn kích hoạt lại số này trong tương lai, cần gọi lại API [Tạo máy nhánh (AddExtension)](/docs/ai-contact-center/api/tong-dai/may-nhanh/add-extension).
 
-## Bài viết liên quan
+    ## Lỗi thường gặp và cách xử lý
 
-<Cards>
-  <Card title="Tạo máy nhánh" href="/docs/ai-contact-center/api/tong-dai/may-nhanh/add-extension" description="Thêm số nội bộ mới cho nhân viên." />
-  <Card title="API Tổng đài" href="/docs/ai-contact-center/api/tong-dai" description="Danh mục API tổng đài PBX." />
-</Cards>
+    <Accordions>
+      <Accordion title="Số máy nhánh không tồn tại trên hệ thống">
+        Kiểm tra lại giá trị trường `Ext`. Lỗi này xảy ra khi số máy nhánh chưa từng được tạo hoặc đã bị xóa trong một yêu cầu trước đó.
+      </Accordion>
+      <Accordion title="Sai thông tin xác thực hoặc sai ServiceCode">
+        Kiểm tra lại `AuthUser`, `AuthKey` và đảm bảo dùng đúng `ServiceCode` của gói dịch vụ tổng đài (endpoint này không nhận `ServiceName`).
+      </Accordion>
+    </Accordions>
+
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Tạo máy nhánh (AddExtension)" href="/docs/ai-contact-center/api/tong-dai/may-nhanh/add-extension" description="Khởi tạo tài khoản máy nhánh mới và cấp mật khẩu SIP cho nhân viên." />
+      <Card title="Tra cứu lịch sử cuộc gọi (GetCallLogs)" href="/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs" description="Xem chi tiết các cuộc gọi vào, gọi ra và thời lượng đàm thoại của từng máy nhánh." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

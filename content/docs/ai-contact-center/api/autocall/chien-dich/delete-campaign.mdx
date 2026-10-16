@@ -1,27 +1,32 @@
 ---
 title: "Xóa chiến dịch (DeleteCampaign)"
 description: "Xóa một chiến dịch gọi tự động khỏi hệ thống Autocall."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Autocall/DeleteCampaign`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Autocall/DeleteCampaign" />
 
-Xóa một chiến dịch gọi tự động không còn sử dụng hoặc hủy một chiến dịch đang chờ kích hoạt.
+    Xóa một chiến dịch gọi tự động không còn sử dụng hoặc hủy một chiến dịch đang chờ kích hoạt.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Id` | string | Có | Mã UUID định danh của chiến dịch cần xóa. |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `Id` | string | Có | Mã UUID định danh của chiến dịch cần xóa. |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/DeleteCampaign" \
+curl -X POST "https://apiai.cloudfone.vn/api/Autocall/DeleteCampaign" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -30,10 +35,11 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/DeleteCampaign" \
     "Id": "a8f192b0-4b7e-41a2-9bc3-xxxxxxxxxxxx"
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/DeleteCampaign', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Autocall/DeleteCampaign', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -46,8 +52,8 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/DeleteCampaign', 
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -58,17 +64,17 @@ payload = {
     "Id": "a8f192b0-4b7e-41a2-9bc3-xxxxxxxxxxxx",
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Autocall/DeleteCampaign",
+    "https://apiai.cloudfone.vn/api/Autocall/DeleteCampaign",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -76,31 +82,37 @@ print(response.json())
   "message": ""
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
-| `message` | string | Thông báo kết quả từ máy chủ. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
+    | `message` | string | Thông báo kết quả từ máy chủ. |
 
-<Callout type="warning">
-- **Tính bất biến**: Hành động xóa chiến dịch là không thể hoàn tác. Mọi lịch sử và cấu hình kịch bản gắn liền với chiến dịch sẽ bị xóa.
-- **Trạng thái chiến dịch**: Chỉ nên xóa các chiến dịch ở trạng thái đang chờ kích hoạt hoặc đã hoàn tất. Tránh xóa chiến dịch đang trong tiến trình quay số (`Status: 1`).
-</Callout>
+    ## Lưu ý quan trọng
 
-## Lỗi thường gặp
+    <Callout type="warning">
+    - **Tính bất biến**: Hành động xóa chiến dịch là không thể hoàn tác. Mọi lịch sử và cấu hình kịch bản gắn liền với chiến dịch sẽ bị xóa.
+    - **Trạng thái chiến dịch**: Chỉ nên xóa các chiến dịch ở trạng thái đang chờ kích hoạt hoặc đã hoàn tất. Tránh xóa chiến dịch đang trong tiến trình quay số (`Status: 1`).
+    </Callout>
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - Mã định danh `Id` không tồn tại hoặc sai định dạng UUID.
-  </Accordion>
-</Accordions>
+    ## Lỗi thường gặp
 
-## Bài viết liên quan
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - Mã định danh `Id` không tồn tại hoặc sai định dạng UUID.
+      </Accordion>
+    </Accordions>
 
-<Cards>
-  <Card title="Danh sách chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-list" description="Tra cứu các chiến dịch hiện có." />
-  <Card title="Tạo chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Khởi tạo chiến dịch mới." />
-</Cards>
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Danh sách chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-list" description="Tra cứu các chiến dịch hiện có." />
+      <Card title="Tạo chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Khởi tạo chiến dịch mới." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

@@ -34,6 +34,11 @@ const config = {
         destination: '/docs/ai-contact-center/user-guider-portal',
         permanent: true,
       },
+      {
+        source: '/docs/ai-contact-center/api/tong-dai/khoi-tao-cuoc-goi',
+        destination: '/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call',
+        permanent: true,
+      },
     ];
   },
 };

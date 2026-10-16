@@ -1,29 +1,44 @@
 ---
 title: "Khởi tạo cuộc gọi Click-to-Call V2"
 description: "Khởi tạo cuộc gọi tự động gọi tới khách hàng trước và chuyển tiếp theo Inbound Route."
+full: true
 ---
 
-<Callout type="info">`POST` `{BASE_URL}/api/CloudFone/AutoCallV2`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://api.ods.vn/api/CloudFone/AutoCallV2" />
 
-API thực thi cuộc gọi tự động đảo hướng: Hệ thống sẽ quay số gọi đến khách hàng trước. Khi khách hàng nhấc máy, cuộc gọi sẽ được chuyển tiếp vào hướng đích định tuyến trước (Inbound Route hoặc IVR/Hàng đợi) đã thiết lập trên tổng đài.
+    API thực thi cuộc gọi tự động đảo hướng: Tổng đài quay số gọi đến khách hàng trước. Khi khách hàng nhấc máy, tổng đài mới chuyển tiếp cuộc gọi vào hướng đích định tuyến trước (Inbound Route hoặc IVR/Hàng đợi) đã thiết lập trên tổng đài.
 
-## Tham số request
+    ### Cách thức hoạt động
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceName` | string | Có | Mã dịch vụ tổng đài khi mua tại ODS (ví dụ: `CF-BS0XXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng (ví dụ: `ODSXXXX`). |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Ext` | string | Có | Tên Inbound Route đã cấu hình trên trang quản trị tổng đài (ví dụ: `C2C-WebSite`). |
-| `PhoneNumber` | string | Có | Định dạng `<Tên_đầu_số_hoặc_Trunk>/<Số_điện_thoại_khách>` (ví dụ: `02873007788/0900000000`). |
-| `KeySearch` | string | Không | Mã định danh cuộc gọi (khuyến nghị GUID). Nếu không truyền, hệ thống sẽ tự sinh ngẫu nhiên. |
+    Cuộc gọi được tổng đài điều phối qua **2 chặng liên tiếp**:
 
-## Ví dụ request
+    <ClickToCallV2Flow />
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Callout type="info">
+      Điểm khác biệt quan trọng so với [Click-to-Call V1](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call): Ở V2, tổng đài **gọi khách hàng trước**. Do đó tham số `Ext` không phải số máy nhánh cá nhân mà là tên **Inbound Route** (ví dụ: `C2C-WebSite`) trỏ vào hàng đợi hoặc kịch bản chào mừng tự động.
+    </Callout>
+
+    ## Tham số request
+
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceName` | string | Có | Mã dịch vụ tổng đài khi mua tại ODS (ví dụ: `CF-BS0XXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng (ví dụ: `ODSXXXX`). |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `Ext` | string | Có | Tên Inbound Route đã cấu hình trên trang quản trị tổng đài (ví dụ: `C2C-WebSite`). |
+    | `PhoneNumber` | string | Có | Định dạng `<Tên_đầu_số_hoặc_Trunk>/<Số_điện_thoại_khách>` (ví dụ: `02873007788/0900000000`). |
+    | `KeySearch` | string | Không | Mã định danh cuộc gọi (khuyến nghị GUID). Nếu không truyền, hệ thống sẽ tự sinh ngẫu nhiên. |
+  </ApiReferenceMain>
+
+  <ApiReferenceCode>
+    ## Ví dụ request
+
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{BASE_URL}/api/CloudFone/AutoCallV2" \
+curl -X POST "https://api.ods.vn/api/CloudFone/AutoCallV2" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceName": "YOUR_SERVICE_NAME",
@@ -34,10 +49,11 @@ curl -X POST "{BASE_URL}/api/CloudFone/AutoCallV2" \
     "KeySearch": "1b38fbda-4b7e-41a2-9bc3-xxxxxxxxxxxx"
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{BASE_URL}/api/CloudFone/AutoCallV2', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://api.ods.vn/api/CloudFone/AutoCallV2', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -52,8 +68,8 @@ const response = await fetch('{BASE_URL}/api/CloudFone/AutoCallV2', {
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -66,17 +82,17 @@ payload = {
     "KeySearch": "1b38fbda-4b7e-41a2-9bc3-xxxxxxxxxxxx",
 }
 response = requests.post(
-    "{BASE_URL}/api/CloudFone/AutoCallV2",
+    "https://api.ods.vn/api/CloudFone/AutoCallV2",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -85,31 +101,37 @@ print(response.json())
   "keySearch": "1b38fbda-4b7e-41a2-9bc3-xxxxxxxxxxxx"
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
-| `message` | string | Thông báo kết quả từ tổng đài. |
-| `keySearch` | string | Mã định danh cuộc gọi trả về. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
-- Tham số `Ext` ở endpoint này là **Tên Inbound Route** đã được tạo sẵn trên Portal ODS, không phải số máy nhánh thông thường.
-- Định dạng `PhoneNumber` bắt buộc phải có dấu gạch chéo `/` phân tách giữa đầu số gọi ra và số điện thoại người nhận.
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
+    | `message` | string | Thông báo kết quả từ tổng đài. |
+    | `keySearch` | string | Mã định danh cuộc gọi trả về. |
 
-## Lỗi thường gặp
+    ## Lưu ý quan trọng
+    - Tham số `Ext` ở endpoint này là **Tên Inbound Route** đã được tạo sẵn trên Portal ODS, không phải số máy nhánh thông thường.
+    - Định dạng `PhoneNumber` bắt buộc phải có dấu gạch chéo `/` phân tách giữa đầu số gọi ra và số điện thoại người nhận.
 
-<Accordions>
-  <Accordion title="Không tìm thấy Inbound Route tương ứng">
-    Kiểm tra lại cấu hình tên Inbound Route trên giao diện quản trị tổng đài để đảm bảo khớp chính xác với giá trị `Ext`.
-  </Accordion>
-  <Accordion title="Sai định dạng đầu số / số điện thoại">
-    Đảm bảo truyền đúng cấu trúc `<Trunk_Name>/<Phone_Number>`.
-  </Accordion>
-</Accordions>
+    ## Lỗi thường gặp
 
-## Bài viết liên quan
+    <Accordions>
+      <Accordion title="Không tìm thấy Inbound Route tương ứng">
+        Kiểm tra lại cấu hình tên Inbound Route trên giao diện quản trị tổng đài để đảm bảo khớp chính xác với giá trị `Ext`.
+      </Accordion>
+      <Accordion title="Sai định dạng đầu số / số điện thoại">
+        Đảm bảo truyền đúng cấu trúc `<Trunk_Name>/<Phone_Number>`.
+      </Accordion>
+    </Accordions>
 
-<Cards>
-  <Card title="Click-to-Call V1" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call" description="Khởi tạo cuộc gọi gọi về máy nhánh nhân viên trước." />
-  <Card title="Lịch sử cuộc gọi" href="/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs" description="Tra cứu kết quả cuộc gọi sau khi kết thúc." />
-</Cards>
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Click-to-Call V1" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call" description="Khởi tạo cuộc gọi gọi về máy nhánh nhân viên trước." />
+      <Card title="Lịch sử cuộc gọi" href="/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs" description="Tra cứu kết quả cuộc gọi sau khi kết thúc." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

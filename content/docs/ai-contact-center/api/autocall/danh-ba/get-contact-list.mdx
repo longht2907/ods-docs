@@ -1,29 +1,34 @@
 ---
 title: "Danh sách liên hệ (GetContactList)"
 description: "Tra cứu toàn bộ danh bạ liên hệ khách hàng trên hệ thống Autocall."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Contact/GetContactList`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Contact/GetContactList" />
 
-Lấy toàn bộ danh sách khách hàng đã được nhập vào hệ thống Autocall (không giới hạn theo nhóm), hỗ trợ tìm kiếm theo số điện thoại, tên hoặc phân trang.
+    Lấy toàn bộ danh sách khách hàng đã được nhập vào hệ thống Autocall (không giới hạn theo nhóm), hỗ trợ tìm kiếm theo số điện thoại, tên hoặc phân trang.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Key` | string | Không | Từ khóa tìm kiếm theo tên hoặc số điện thoại. |
-| `PageIndex` | number | Không | Số thứ tự trang hiện tại (mặc định là `1`). |
-| `PageSize` | number | Không | Số lượng bản ghi trên một trang (mặc định là `20`). |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `Key` | string | Không | Từ khóa tìm kiếm theo tên hoặc số điện thoại. |
+    | `PageIndex` | number | Không | Số thứ tự trang hiện tại (mặc định là `1`). |
+    | `PageSize` | number | Không | Số lượng bản ghi trên một trang (mặc định là `20`). |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/GetContactList" \
+curl -X POST "https://apiai.cloudfone.vn/api/Contact/GetContactList" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -34,10 +39,11 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/GetContactList" \
     "PageSize": 20
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/GetContactList', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Contact/GetContactList', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -51,8 +57,8 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/GetContactList', {
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -64,17 +70,17 @@ payload = {
     "PageSize": 20,
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Contact/GetContactList",
+    "https://apiai.cloudfone.vn/api/Contact/GetContactList",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -92,40 +98,48 @@ print(response.json())
   ]
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
-| `total` | number | Tổng số lượng liên hệ tìm thấy. |
-| `data` | array | Danh sách thông tin chi tiết từng liên hệ. |
-| `data[].contactId` | number | Mã định danh duy nhất của liên hệ. |
-| `data[].phone` | string | Số điện thoại khách hàng. |
-| `data[].contactName` | string | Tên định danh của liên hệ. |
-| `data[].company` | string | Tên công ty / tổ chức. |
-| `data[].address` | string | Địa chỉ của khách hàng. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    ### Bảng mô tả trường
 
-<Callout type="info">
-- **Quản lý danh bạ tổng**: Endpoint này giúp bạn tra cứu toàn bộ danh bạ khách hàng đã từng nhập vào hệ thống Autocall, độc lập với việc liên hệ đó có được gán vào nhóm hay không.
-- **Phân trang**: Sử dụng `PageIndex` và `PageSize` để duyệt danh bạ quy mô lớn.
-</Callout>
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+    | `total` | number | Tổng số lượng liên hệ tìm thấy. |
+    | `data` | array | Danh sách thông tin chi tiết từng liên hệ. |
+    | `data[].contactId` | number | Mã định danh duy nhất của liên hệ. |
+    | `data[].phone` | string | Số điện thoại khách hàng. |
+    | `data[].contactName` | string | Tên định danh của liên hệ. |
+    | `data[].company` | string | Tên công ty / tổ chức. |
+    | `data[].address` | string | Địa chỉ của khách hàng. |
 
-## Lỗi thường gặp
+    ## Lưu ý quan trọng
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - Dịch vụ `ServiceCode` không hợp lệ.
-  </Accordion>
-  <Accordion title="Danh sách data rỗng []">
-    - Chưa có liên hệ nào được thêm vào hệ thống qua API [AddContact](/docs/ai-contact-center/api/autocall/danh-ba/add-contact).
-  </Accordion>
-</Accordions>
+    <Callout type="info">
+    - **Quản lý danh bạ tổng**: Endpoint này giúp bạn tra cứu toàn bộ danh bạ khách hàng đã từng nhập vào hệ thống Autocall, độc lập với việc liên hệ đó có được gán vào nhóm hay không.
+    - **Phân trang**: Sử dụng `PageIndex` và `PageSize` để duyệt danh bạ quy mô lớn.
+    </Callout>
 
-## Bài viết liên quan
+    ## Lỗi thường gặp
 
-<Cards>
-  <Card title="Thêm liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact" description="Tạo mới liên hệ vào danh bạ." />
-  <Card title="Xóa liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/delete-contact" description="Xóa liên hệ khỏi danh bạ." />
-</Cards>
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - Dịch vụ `ServiceCode` không hợp lệ.
+      </Accordion>
+      <Accordion title="Danh sách data rỗng []">
+        - Chưa có liên hệ nào được thêm vào hệ thống qua API [AddContact](/docs/ai-contact-center/api/autocall/danh-ba/add-contact).
+      </Accordion>
+    </Accordions>
+
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Thêm liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact" description="Tạo mới liên hệ vào danh bạ." />
+      <Card title="Xóa liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/delete-contact" description="Xóa liên hệ khỏi danh bạ." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

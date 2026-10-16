@@ -1,28 +1,33 @@
 ---
 title: "Thêm liên hệ vào nhóm (AddContactToGroup)"
 description: "Gán một hoặc nhiều liên hệ vào nhóm danh bạ Autocall."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Contact/AddContactToGroup`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Contact/AddContactToGroup" />
 
-Gán danh sách các liên hệ khách hàng vào một nhóm danh bạ cụ thể để sẵn sàng cho chiến dịch gọi tự động.
+    Gán danh sách các liên hệ khách hàng vào một nhóm danh bạ cụ thể để sẵn sàng cho chiến dịch gọi tự động.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `ContactGroupID` | number / string | Có | ID của nhóm danh bạ muốn thêm liên hệ vào. |
-| `ContactId` | array | Có | Mảng chứa danh sách các mã `ContactId` của khách hàng (ví dụ: `["1051", "1052"]`). |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `ContactGroupID` | number / string | Có | ID của nhóm danh bạ muốn thêm liên hệ vào. |
+    | `ContactId` | array | Có | Mảng chứa danh sách các mã `ContactId` của khách hàng (ví dụ: `["1051", "1052"]`). |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/AddContactToGroup" \
+curl -X POST "https://apiai.cloudfone.vn/api/Contact/AddContactToGroup" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -32,10 +37,11 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/AddContactToGroup" \
     "ContactId": ["1051", "1052"]
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/AddContactToGroup', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Contact/AddContactToGroup', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -49,8 +55,8 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/AddContactToGroup'
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -62,17 +68,17 @@ payload = {
     "ContactId": ["1051", "1052"],
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Contact/AddContactToGroup",
+    "https://apiai.cloudfone.vn/api/Contact/AddContactToGroup",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -80,32 +86,40 @@ print(response.json())
   "message": ""
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
-| `message` | string | Thông báo phản hồi từ hệ thống. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    ### Bảng mô tả trường
 
-<Callout type="info">
-- **Thêm hàng loạt**: Mảng `ContactId` hỗ trợ truyền nhiều mã liên hệ cùng lúc (ví dụ: `["1051", "1052", "1053"]`).
-- Một liên hệ có thể thuộc về nhiều nhóm danh bạ khác nhau tùy theo phân loại chiến dịch của bạn.
-</Callout>
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
+    | `message` | string | Thông báo phản hồi từ hệ thống. |
 
-## Lỗi thường gặp
+    ## Lưu ý quan trọng
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - `ContactGroupID` không tồn tại.
-    - Một hoặc nhiều `ContactId` trong mảng không hợp lệ hoặc đã bị xóa.
-  </Accordion>
-</Accordions>
+    <Callout type="info">
+    - **Thêm hàng loạt**: Mảng `ContactId` hỗ trợ truyền nhiều mã liên hệ cùng lúc (ví dụ: `["1051", "1052", "1053"]`).
+    - Một liên hệ có thể thuộc về nhiều nhóm danh bạ khác nhau tùy theo phân loại chiến dịch của bạn.
+    </Callout>
 
-## Bài viết liên quan
+    ## Lỗi thường gặp
 
-<Cards>
-  <Card title="Tạo nhóm danh bạ" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact-group" description="Tạo nhóm trước khi thêm liên hệ." />
-  <Card title="Khởi chạy chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Sử dụng nhóm để chạy chiến dịch Autocall." />
-</Cards>
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - `ContactGroupID` không tồn tại.
+        - Một hoặc nhiều `ContactId` trong mảng không hợp lệ hoặc đã bị xóa.
+      </Accordion>
+    </Accordions>
+
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Tạo nhóm danh bạ" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact-group" description="Tạo nhóm trước khi thêm liên hệ." />
+      <Card title="Khởi chạy chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/start-campaign" description="Sử dụng nhóm để chạy chiến dịch Autocall." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

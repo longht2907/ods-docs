@@ -1,27 +1,32 @@
 ---
 title: "Xóa tệp âm thanh (DeleteAudio)"
 description: "Xóa tệp âm thanh khỏi kho lưu trữ Autocall theo mã Id."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Audio/DeleteAudio`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Audio/DeleteAudio" />
 
-Xóa một tệp âm thanh ghi âm hoặc tệp TTS khỏi kho lưu trữ của doanh nghiệp khi không còn sử dụng trong chiến dịch nào.
+    Xóa một tệp âm thanh ghi âm hoặc tệp TTS khỏi kho lưu trữ của doanh nghiệp khi không còn sử dụng trong chiến dịch nào.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Id` | number | Có | Mã ID của tệp âm thanh cần xóa (ví dụ: `41`). |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `Id` | number | Có | Mã ID của tệp âm thanh cần xóa (ví dụ: `41`). |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Audio/DeleteAudio" \
+curl -X POST "https://apiai.cloudfone.vn/api/Audio/DeleteAudio" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -30,10 +35,11 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Audio/DeleteAudio" \
     "Id": 41
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Audio/DeleteAudio', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Audio/DeleteAudio', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -46,8 +52,8 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Audio/DeleteAudio', {
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -58,17 +64,17 @@ payload = {
     "Id": 41,
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Audio/DeleteAudio",
+    "https://apiai.cloudfone.vn/api/Audio/DeleteAudio",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -76,32 +82,40 @@ print(response.json())
   "message": ""
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
-| `message` | string | Thông báo phản hồi từ hệ thống. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    ### Bảng mô tả trường
 
-<Callout type="warning">
-- **Ràng buộc chiến dịch**: Không thể xóa tệp âm thanh nếu tệp này đang được sử dụng trong một chiến dịch Autocall đang chờ hoặc đang chạy. Hãy kiểm tra các chiến dịch trước khi thực hiện xóa.
-- **Tính bất biến**: Hành động xóa là vĩnh viễn và không thể phục hồi tệp âm thanh sau khi đã xóa.
-</Callout>
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
+    | `message` | string | Thông báo phản hồi từ hệ thống. |
 
-## Lỗi thường gặp
+    ## Lưu ý quan trọng
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - Mã `Id` tệp âm thanh không tồn tại.
-    - Tệp âm thanh đang bị ràng buộc bởi chiến dịch chưa hoàn tất.
-  </Accordion>
-</Accordions>
+    <Callout type="warning">
+    - **Ràng buộc chiến dịch**: Không thể xóa tệp âm thanh nếu tệp này đang được sử dụng trong một chiến dịch Autocall đang chờ hoặc đang chạy. Hãy kiểm tra các chiến dịch trước khi thực hiện xóa.
+    - **Tính bất biến**: Hành động xóa là vĩnh viễn và không thể phục hồi tệp âm thanh sau khi đã xóa.
+    </Callout>
 
-## Bài viết liên quan
+    ## Lỗi thường gặp
 
-<Cards>
-  <Card title="Danh sách âm thanh" href="/docs/ai-contact-center/api/autocall/am-thanh/get-audio-list" description="Xem các tệp âm thanh hiện có." />
-  <Card title="Tạo âm thanh TTS" href="/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio" description="Tạo thêm file âm thanh mới." />
-</Cards>
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - Mã `Id` tệp âm thanh không tồn tại.
+        - Tệp âm thanh đang bị ràng buộc bởi chiến dịch chưa hoàn tất.
+      </Accordion>
+    </Accordions>
+
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Danh sách âm thanh" href="/docs/ai-contact-center/api/autocall/am-thanh/get-audio-list" description="Xem các tệp âm thanh hiện có." />
+      <Card title="Tạo âm thanh TTS" href="/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio" description="Tạo thêm file âm thanh mới." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

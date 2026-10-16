@@ -1,47 +1,52 @@
 ---
 title: "Nhật ký cuộc gọi (GetCallLogs)"
 description: "Tra cứu lịch sử cuộc gọi chuẩn mới nhất trên tổng đài ODS kèm liên kết ghi âm và cước đàm thoại."
+full: true
 ---
 
-<Callout type="info">`POST` `{BASE_URL}/api/CloudFone/GetCallLogs`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://api.ods.vn/api/CloudFone/GetCallLogs" />
 
-API lấy danh sách nhật ký cuộc gọi (CDR) phiên bản mới nhất trên tổng đài ODS, hỗ trợ đầy đủ chi tiết thời gian đổ chuông, thời lượng đàm thoại thực tế, thông tin máy nhánh chuyển hướng và liên kết tải tệp ghi âm.
+    API lấy danh sách nhật ký cuộc gọi (CDR) phiên bản mới nhất trên tổng đài ODS, hỗ trợ đầy đủ chi tiết thời gian đổ chuông, thời lượng đàm thoại thực tế, thông tin máy nhánh chuyển hướng và liên kết tải tệp ghi âm.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceName` | string | Có | Mã dịch vụ tổng đài khi mua tại ODS (ví dụ: `CF-BSXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng (ví dụ: `ODSXXXX`). |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Direction` | string | Có | Hướng cuộc gọi: `"all"` (tất cả), `"Inbound"` (gọi vào), `"Outbound"` (gọi ra), `"Local"` (nội bộ). |
-| `DateStart` | string | Có | Thời gian bắt đầu tra cứu (định dạng `YYYY-MM-DD HH:mm:ss` hoặc `YYYY-MM-DD`). |
-| `DateEnd` | string | Có | Thời gian kết thúc tra cứu (định dạng `YYYY-MM-DD HH:mm:ss`). |
-| `PageIndex` | number | Có | Số thứ tự trang bắt đầu từ `0` hoặc `1`. |
-| `PageSize` | number | Có | Số lượng bản ghi trên một trang (tối đa `200`). |
-| `Disposition` | string | Không | Trạng thái: `"ANSWERED"` (nghe máy), `"NO ANSWER"` (không nghe), `"BUSY"` (bận), `"FAILED"` (thất bại), `"ANSWERED_ELSEWHERE"`, `"Cancel"`. |
-| `IsSort` | number | Không | Sắp xếp thời gian: `0` (tăng dần - mặc định), `1` (giảm dần). |
-| `CallNum` | string | Không | Lọc theo số gọi (Source). |
-| `ReceiveNum` | string | Không | Lọc theo số nhận (Destination). |
-| `Trunk` / `trunk` | string | Không | Lọc theo đầu số Hotline tổng đài (DID). |
-| `Key` | string | Không | Mã định danh cuộc gọi hoặc `KeySearch`. |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceName` | string | Có | Mã dịch vụ tổng đài khi mua tại ODS (ví dụ: `CF-BSXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng (ví dụ: `ODSXXXX`). |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `Direction` | string | Có | Hướng cuộc gọi: `"all"` (tất cả), `"Inbound"` (gọi vào), `"Outbound"` (gọi ra), `"Local"` (nội bộ). |
+    | `DateStart` | string | Có | Thời gian bắt đầu tra cứu (định dạng `YYYY-MM-DD HH:mm:ss` hoặc `YYYY-MM-DD`). |
+    | `DateEnd` | string | Có | Thời gian kết thúc tra cứu (định dạng `YYYY-MM-DD HH:mm:ss`). |
+    | `PageIndex` | number | Có | Số thứ tự trang bắt đầu từ `0` hoặc `1`. |
+    | `PageSize` | number | Có | Số lượng bản ghi trên một trang (tối đa `200`). |
+    | `Disposition` | string | Không | Trạng thái: `"ANSWERED"` (nghe máy), `"NO ANSWER"` (không nghe), `"BUSY"` (bận), `"FAILED"` (thất bại), `"ANSWERED_ELSEWHERE"`, `"Cancel"`. |
+    | `IsSort` | number | Không | Sắp xếp thời gian: `0` (tăng dần - mặc định), `1` (giảm dần). |
+    | `CallNum` | string | Không | Lọc theo số gọi (Source). |
+    | `ReceiveNum` | string | Không | Lọc theo số nhận (Destination). |
+    | `Trunk` / `trunk` | string | Không | Lọc theo đầu số Hotline tổng đài (DID). |
+    | `Key` | string | Không | Mã định danh cuộc gọi hoặc `KeySearch`. |
 
-<Callout type="info">
-  **Chi tiết các trạng thái `Disposition`:**
-  - `ANSWERED`: Cuộc gọi kết nối thành công, có đàm thoại.
-  - `NO ANSWER`: Đổ chuông nhưng người nhận không bắt máy.
-  - `BUSY`: Máy bận hoặc người nhận chủ động từ chối cuộc gọi.
-  - `FAILED`: Không thể thiết lập cuộc gọi (lỗi định tuyến hoặc sự cố mạng).
-  - `ANSWERED_ELSEWHERE`: Cuộc gọi đã được nghe máy ở thiết bị/máy nhánh khác. Xảy ra khi cấu hình đổ chuông nhóm theo cơ chế `ringall` (tất cả cùng reo, 1 người nhấc máy thì các máy còn lại sẽ ghi nhận trạng thái này), hoặc khi 1 tài khoản máy nhánh đăng ký trên nhiều thiết bị đồng thời (hỗ trợ tối đa 3 thiết bị).
-  - `Cancel`: Người gọi hủy cuộc gọi trước khi có người bắt máy.
-</Callout>
+    <Callout type="info">
+      **Chi tiết các trạng thái `Disposition`:**
+      - `ANSWERED`: Cuộc gọi kết nối thành công, có đàm thoại.
+      - `NO ANSWER`: Đổ chuông nhưng người nhận không bắt máy.
+      - `BUSY`: Máy bận hoặc người nhận chủ động từ chối cuộc gọi.
+      - `FAILED`: Không thể thiết lập cuộc gọi (lỗi định tuyến hoặc sự cố mạng).
+      - `ANSWERED_ELSEWHERE`: Cuộc gọi đã được nghe máy ở thiết bị/máy nhánh khác. Xảy ra khi cấu hình đổ chuông nhóm theo cơ chế `ringall` (tất cả cùng reo, 1 người nhấc máy thì các máy còn lại sẽ ghi nhận trạng thái này), hoặc khi 1 tài khoản máy nhánh đăng ký trên nhiều thiết bị đồng thời (hỗ trợ tối đa 3 thiết bị).
+      - `Cancel`: Người gọi hủy cuộc gọi trước khi có người bắt máy.
+    </Callout>
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{BASE_URL}/api/CloudFone/GetCallLogs" \
+curl -X POST "https://api.ods.vn/api/CloudFone/GetCallLogs" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceName": "YOUR_SERVICE_NAME",
@@ -60,10 +65,11 @@ curl -X POST "{BASE_URL}/api/CloudFone/GetCallLogs" \
     "PageSize": 20
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{BASE_URL}/api/CloudFone/GetCallLogs', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://api.ods.vn/api/CloudFone/GetCallLogs', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -81,8 +87,8 @@ const response = await fetch('{BASE_URL}/api/CloudFone/GetCallLogs', {
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -98,17 +104,17 @@ payload = {
     "PageSize": 20,
 }
 response = requests.post(
-    "{BASE_URL}/api/CloudFone/GetCallLogs",
+    "https://api.ods.vn/api/CloudFone/GetCallLogs",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -140,48 +146,53 @@ print(response.json())
   ]
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `linkedId` | string | Mã định danh duy nhất của cuộc gọi trên tổng đài. |
-| `timeCall` | string | Thời điểm phát sinh cuộc gọi (định dạng ISO 8601). |
-| `recordingFile` | string | Đường dẫn trực tiếp để nghe hoặc tải tệp ghi âm cuộc gọi. |
-| `direction` | string | Hướng cuộc gọi (`Inbound`, `Outbound`, `Local`). |
-| `src` | string | Số gọi đi (Source - số máy nhánh hoặc số khách hàng). |
-| `srcName` | string | Tên người gọi (lấy theo danh bạ nếu có). |
-| `dst` | string | Số nhận cuộc gọi (Destination). |
-| `did` | string | Đầu số Hotline tổng đài tiếp nhận hoặc gọi ra. |
-| `queue` | string | Tên hoặc số nhóm tiếp nhận cuộc gọi (nếu đi qua hàng đợi). |
-| `disposition` | string | Trạng thái kết nối cuộc gọi (`ANSWERED`, `NO ANSWER`, `BUSY`, v.v.). |
-| `billsecAgent` | string | Thời gian đàm thoại thực tế của nhân viên (tính bằng giây). |
-| `duration` | string | Tổng thời gian cuộc gọi từ lúc đổ chuông đến khi gác máy (giây). |
-| `billsecTelco` | string | Thời gian tính cước thực tế với nhà mạng viễn thông (giây). |
-| `transfered` | string / null | Số máy nhánh được chuyển cuộc gọi đến (đối với cuộc gọi chuyển hướng Transfer). |
-| `followmeTo` | string | Số máy nhánh hoặc số điện thoại chuyển tiếp cuộc gọi (Follow me). |
-| `pickupExt` | string | Số máy nhánh đã thực hiện rước cuộc gọi (Call Pickup). |
-| `dialUExtAnswer` | string | Thời gian chờ nghe máy của riêng số máy nhánh (giây). |
-| `hotlineUExtAnswer` | string | Tổng thời gian chờ nghe máy của cuộc gọi từ đầu đến cuối (giây). |
-| `event` | string | Sự kiện cuộc gọi (`hide` hoặc `finish`). |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `linkedId` | string | Mã định danh duy nhất của cuộc gọi trên tổng đài. |
+    | `timeCall` | string | Thời điểm phát sinh cuộc gọi (định dạng ISO 8601). |
+    | `recordingFile` | string | Đường dẫn trực tiếp để nghe hoặc tải tệp ghi âm cuộc gọi. |
+    | `direction` | string | Hướng cuộc gọi (`Inbound`, `Outbound`, `Local`). |
+    | `src` | string | Số gọi đi (Source - số máy nhánh hoặc số khách hàng). |
+    | `srcName` | string | Tên người gọi (lấy theo danh bạ nếu có). |
+    | `dst` | string | Số nhận cuộc gọi (Destination). |
+    | `did` | string | Đầu số Hotline tổng đài tiếp nhận hoặc gọi ra. |
+    | `queue` | string | Tên hoặc số nhóm tiếp nhận cuộc gọi (nếu đi qua hàng đợi). |
+    | `disposition` | string | Trạng thái kết nối cuộc gọi (`ANSWERED`, `NO ANSWER`, `BUSY`, v.v.). |
+    | `billsecAgent` | string | Thời gian đàm thoại thực tế của nhân viên (tính bằng giây). |
+    | `duration` | string | Tổng thời gian cuộc gọi từ lúc đổ chuông đến khi gác máy (giây). |
+    | `billsecTelco` | string | Thời gian tính cước thực tế với nhà mạng viễn thông (giây). |
+    | `transfered` | string / null | Số máy nhánh được chuyển cuộc gọi đến (đối với cuộc gọi chuyển hướng Transfer). |
+    | `followmeTo` | string | Số máy nhánh hoặc số điện thoại chuyển tiếp cuộc gọi (Follow me). |
+    | `pickupExt` | string | Số máy nhánh đã thực hiện rước cuộc gọi (Call Pickup). |
+    | `dialUExtAnswer` | string | Thời gian chờ nghe máy của riêng số máy nhánh (giây). |
+    | `hotlineUExtAnswer` | string | Tổng thời gian chờ nghe máy của cuộc gọi từ đầu đến cuối (giây). |
+    | `event` | string | Sự kiện cuộc gọi (`hide` hoặc `finish`). |
 
-## Lưu ý quan trọng
-- Khuyến nghị sử dụng API này thay cho các API lịch sử cũ (`GetCallHistory`) để nhận đầy đủ link ghi âm và dữ liệu đàm thoại chi tiết.
-- Giới hạn `PageSize` tối đa là 200 bản ghi mỗi lần gọi.
+    ## Lưu ý quan trọng
+    - Khuyến nghị sử dụng API này thay cho các API lịch sử cũ (`GetCallHistory`) để nhận đầy đủ link ghi âm và dữ liệu đàm thoại chi tiết.
+    - Giới hạn `PageSize` tối đa là 200 bản ghi mỗi lần gọi.
 
-## Lỗi thường gặp
+    ## Lỗi thường gặp
 
-<Accordions>
-  <Accordion title="Khoảng thời gian tra cứu quá dài">
-    Để tối ưu hiệu năng cơ sở dữ liệu, nên giới hạn khoảng cách giữa `DateStart` và `DateEnd` trong vòng 31 ngày.
-  </Accordion>
-  <Accordion title="Link ghi âm rỗng">
-    Trường hợp cuộc gọi không có người nhấc máy (`NO ANSWER`, `BUSY`) hoặc cuộc gọi chưa hoàn tất xử lý lưu file trên máy chủ ghi âm.
-  </Accordion>
-</Accordions>
+    <Accordions>
+      <Accordion title="Khoảng thời gian tra cứu quá dài">
+        Để tối ưu hiệu năng cơ sở dữ liệu, nên giới hạn khoảng cách giữa `DateStart` và `DateEnd` trong vòng 31 ngày.
+      </Accordion>
+      <Accordion title="Link ghi âm rỗng">
+        Trường hợp cuộc gọi không có người nhấc máy (`NO ANSWER`, `BUSY`) hoặc cuộc gọi chưa hoàn tất xử lý lưu file trên máy chủ ghi âm.
+      </Accordion>
+    </Accordions>
 
-## Bài viết liên quan
+    ## Bài viết liên quan
 
-<Cards>
-  <Card title="Lịch sử cuộc gọi V2" href="/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-history-v2" description="Phiên bản hỗ trợ cho hệ thống tích hợp trước đó." />
-  <Card title="Báo cáo đánh giá cuộc gọi" href="/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-report" description="Thống kê sao đánh giá chất lượng qua phím bấm." />
-</Cards>
+    <Cards>
+      <Card title="Lịch sử cuộc gọi V2" href="/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-history-v2" description="Phiên bản hỗ trợ cho hệ thống tích hợp trước đó." />
+      <Card title="API Tổng đài PBX" href="/docs/ai-contact-center/api/tong-dai" description="Danh mục các API điều khiển cuộc gọi và quản lý máy nhánh." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

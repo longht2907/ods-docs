@@ -1,46 +1,69 @@
 ---
 title: "API Tổng đài PBX"
-description: "Tổng quan các API quản lý số nội bộ, khởi tạo cuộc gọi và truy xuất lịch sử tổng đài ODS."
+description: "Tổng quan các API điều khiển cuộc gọi Click-to-Call, quản lý máy nhánh, danh bạ, luật khách quen và tra cứu lịch sử cuộc gọi."
 ---
 
-Nhóm API Tổng đài PBX cho phép các hệ thống phần mềm doanh nghiệp (CRM, ERP, HRM, thương mại điện tử) tương tác trực tiếp với tổng đài điện thoại ODS: quản trị máy nhánh nhân viên, điều khiển cuộc gọi ra, quản lý danh bạ khách hàng, thiết lập định tuyến thông minh và tra cứu nhật ký đàm thoại.
+Nhóm **API Tổng đài PBX** cung cấp các giao diện lập trình trực tiếp vào lõi tổng đài ODS, cho phép hệ thống quản trị của doanh nghiệp (CRM, ERP, HRM, Helpdesk) tự động hóa toàn bộ vòng đời liên lạc: từ cấp phát máy nhánh, kích hoạt cuộc gọi ra, định tuyến cuộc gọi vào thông minh, đến đồng bộ lịch sử và trích xuất file ghi âm.
 
 <Callout type="info">
-  **Base URL chính thức:** `https://api.ods.vn`
-  Mọi request đều sử dụng phương thức `POST` với phần thân `application/json`.
+  **Thông tin kết nối chuẩn:**
+  - **Base URL chính thức**: `https://api.ods.vn`
+  - **Giao thức**: HTTP `POST` với dữ liệu đóng gói dạng `application/json; charset=utf-8`.
+  - **Xác thực**: Gửi kèm `AuthUser`, `AuthKey` và `ServiceName` (hoặc `ServiceCode`) trong phần thân JSON.
 </Callout>
 
-## Các phân hệ chức năng
+---
+
+## 1. Phân loại: Thao tác điều khiển vs Tra cứu dữ liệu
+
+Để thiết kế kiến trúc tích hợp tối ưu, lập trình viên cần phân biệt rõ hai nhóm tác vụ chính:
+
+| Đặc tính | Nhóm Thao tác điều khiển (Execution / Control) | Nhóm Tra cứu dữ liệu (Query / Analytics) |
+| :-- | :-- | :-- |
+| **Bản chất** | Tác động trực tiếp vào trạng thái viễn thông hoặc thay đổi cấu hình dữ liệu trên tổng đài. | Đọc dữ liệu lịch sử cuộc gọi, file ghi âm và báo cáo tổng hợp từ database tổng đài. |
+| **Các API tiêu biểu** | `AutoCall` (Click-to-Call V1), `AutoCallV2` (Click-to-Call V2), `AddExtension`, `DeleteExtension`, `AddPhoneBook`, `CreateAndUpdateFamiliar`. | `GetCallLogs`, `GetCallHistory`, `GetCallHistoryV2`. |
+| **Đặc điểm phản hồi** | Thường trả về ngay trạng thái tiếp nhận (`result: "success"`) kèm mã đối chiếu `keySearch` hoặc ID bản ghi vừa tạo. | Trả về mảng danh sách bản ghi `data` kèm tổng số lượng `total`, hỗ trợ phân trang qua `PageIndex` và `PageSize`. |
+| **Lưu ý triển khai** | Tuyệt đối **không gọi lặp lại (Retry) thiếu kiểm soát** khi mạng chập chờn để tránh phát sinh nhiều cuộc gọi ra cùng lúc. | Nên giới hạn khoảng thời gian lọc (`DateStart`, `DateEnd`) để tối ưu tốc độ truy vấn và dung lượng băng thông. |
+
+---
+
+## 2. Bảng tra cứu API theo nhu cầu nghiệp vụ
+
+| Nhu cầu của doanh nghiệp | API tương ứng | Mã dịch vụ | Endpoint chi tiết |
+| :-- | :-- | :--:| :-- |
+| **Cấp số nội bộ mới** cho nhân viên tư vấn | `AddExtension` | `ServiceCode` | [Tạo máy nhánh](/docs/ai-contact-center/api/tong-dai/may-nhanh/add-extension) |
+| **Thu hồi số nội bộ** khi nhân sự nghỉ việc | `DeleteExtension` | `ServiceCode` | [Xóa máy nhánh](/docs/ai-contact-center/api/tong-dai/may-nhanh/delete-extension) |
+| Bấm gọi từ CRM: **Máy nhánh nhân viên nghe chuông trước** rồi mới gọi khách | `AutoCall` (V1) | `ServiceName` | [Click-to-Call V1](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call) |
+| Bấm gọi từ web: **Gọi khách trước**, khách nghe máy mới chuyển vào nhóm trực/IVR | `AutoCallV2` (V2) | `ServiceName` | [Click-to-Call V2](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call-v2) |
+| Thêm tên khách hàng vào danh bạ để hiển thị tên khi chuông reo | `AddPhoneBook` | `ServiceName` | [Thêm danh bạ](/docs/ai-contact-center/api/tong-dai/danh-ba/add-phonebook) |
+| Khách VIP gọi vào tự động chuyển thẳng về nhân viên phụ trách | `CreateAndUpdateFamiliar` | `ServiceName` | [Cấu hình Luật khách quen](/docs/ai-contact-center/api/tong-dai/luat-khach-quen) |
+| **Tra cứu nhật ký cuộc gọi đầy đủ nhất** (thời lượng, cước phí, ghi âm) — **Khuyến nghị** | `GetCallLogs` | `ServiceName` | [Tra cứu nhật ký cuộc gọi](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs) |
+| Tra cứu lịch sử cuộc gọi V1 (API cũ — cấu trúc tiếng Việt legacy) | `GetCallHistory` | `ServiceName` | [Lấy lịch sử cuộc gọi V1](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-history) |
+| Tra cứu lịch sử cuộc gọi V2 (API cũ — chuẩn camelCase) | `GetCallHistoryV2` | `ServiceName` | [Lấy lịch sử cuộc gọi V2](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-history-v2) |
+
+---
+
+## 3. Khám phá các phân hệ chi tiết
 
 <Cards className="grid-cols-1 md:grid-cols-2">
   <Card
-    title="Máy nhánh (Extensions)"
-    description="Tự động tạo mới và thu hồi số nội bộ khi có nhân sự mới hoặc nhân viên nghỉ việc."
-    href="/docs/ai-contact-center/api/tong-dai/may-nhanh/add-extension"
-  />
-  <Card
     title="Khởi tạo cuộc gọi (Click-to-Call)"
-    description="Kích hoạt cuộc gọi trực tiếp từ phần mềm CRM tới máy nhánh nhân viên hoặc qua kịch bản tự động."
+    description="So sánh và tích hợp Click-to-Call V1 (gọi nhân viên trước) và Click-to-Call V2 (gọi khách hàng trước)."
     href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call"
   />
   <Card
-    title="Danh bạ tổng đài"
-    description="Thêm mới và cập nhật danh bạ khách hàng đồng bộ với hệ thống CSKH."
-    href="/docs/ai-contact-center/api/tong-dai/danh-ba/add-phonebook"
+    title="Quản lý máy nhánh (Extensions)"
+    description="Tự động tạo mới và thu hồi số nội bộ, đồng bộ tài khoản thoại với hệ thống nhân sự nội bộ."
+    href="/docs/ai-contact-center/api/tong-dai/may-nhanh/add-extension"
   />
   <Card
-    title="Luật khách quen"
-    description="Tự động ghi nhớ và ưu tiên đổ chuông khách hàng về đúng nhân viên phụ trách."
-    href="/docs/ai-contact-center/api/tong-dai/luat-khach-quen"
-  />
-  <Card
-    title="Lịch sử & Báo cáo cuộc gọi"
-    description="Tra cứu chi tiết nhật ký cuộc gọi (GetCallLogs), link file ghi âm và báo cáo đánh giá chất lượng cuộc gọi."
+    title="Nhật ký cuộc gọi & File ghi âm"
+    description="Truy xuất CDR chi tiết với GetCallLogs, tải file ghi âm cuộc gọi, đối soát cước và mã KeySearch."
     href="/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs"
   />
   <Card
-    title="Xác thực & Quy ước"
-    description="Xem hướng dẫn lấy AuthKey và quy chuẩn định dạng dữ liệu."
-    href="/docs/ai-contact-center/api/bat-dau/xac-thuc"
+    title="Định tuyến & Luật khách quen"
+    description="Đồng bộ danh bạ khách hàng và thiết lập luật ưu tiên kết nối khách quen về đúng nhân viên phụ trách."
+    href="/docs/ai-contact-center/api/tong-dai/luat-khach-quen"
   />
 </Cards>

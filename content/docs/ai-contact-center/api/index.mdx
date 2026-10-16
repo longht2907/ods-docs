@@ -1,72 +1,133 @@
 ---
 title: "Tổng quan API Reference"
-description: "Tài liệu kỹ thuật REST API, Webhook và WebSocket RTC tích hợp ODS AI Contact Center."
+description: "Điểm bắt đầu tích hợp kỹ thuật: Phân biệt REST API, Webhook, WebRTC và hướng dẫn kết nối CRM/ERP với ODS AI Contact Center."
 ---
 
-Chào mừng bạn đến với tài liệu kỹ thuật tích hợp **ODS AI Contact Center**. Hệ thống cung cấp nền tảng API toàn diện giúp doanh nghiệp kết nối tổng đài thoại thông minh vào các ứng dụng nội bộ như CRM, ERP, Helpdesk, hệ thống quản lý bán hàng hoặc website.
+Chào mừng bạn đến với trung tâm tài liệu kỹ thuật tích hợp **ODS AI Contact Center**. Trang này đóng vai trò là kim chỉ nam kiến trúc dành cho kỹ sư phần mềm (Backend, Frontend, DevOps) khi kết nối hệ thống CRM, ERP, Helpdesk hoặc website doanh nghiệp với tổng đài ODS.
 
-<Callout type="info">
-  **Domain tích hợp chính thức:**
-  - API Tổng đài PBX: `https://api.ods.vn`
-  - API Chiến dịch Autocall: `https://apiai.cloudfone.vn`
-  - *Lưu ý tương thích:* Hệ thống vẫn hỗ trợ các domain cũ (`api.cloudfone.vn`, `api.matbao.one`) cho các đối tác đã tích hợp trước đó, nhưng khuyến nghị chuyển đổi sang `https://api.ods.vn`.
+---
+
+## 1. Kiến trúc phân tầng & Ranh giới hệ thống
+
+Để tích hợp chính xác và bảo mật, lập trình viên cần phân biệt rõ vai trò giữa Frontend, Backend và Tổng đài đám mây:
+
+<ApiArchitectureOverview />
+
+<Callout type="warn">
+  **Lưu ý kỹ thuật quan trọng:**
+  - **REST API chỉ gửi lệnh điều khiển**: Các API như Click-to-Call hoặc StartCampaign chỉ ra lệnh cho tổng đài bắt đầu cuộc gọi, **không truyền dữ liệu âm thanh giọng nói** về code ứng dụng của bạn.
+  - **Bảo mật tuyệt đối `AuthKey`**: Chỉ gọi REST API từ máy chủ Backend (Node.js, Python, PHP, Java, Go). Tuyệt đối **không gọi trực tiếp từ trình duyệt web** (React, Vue, Angular) để tránh lộ khóa bí mật API.
+  - **Muốn nghe/gọi trên trình duyệt**: Bắt buộc phải sử dụng giao thức truyền thông thời gian thực [WebRTC qua JsSIP](/docs/ai-contact-center/api/websocket-rtc/ket-noi-webrtc), không dùng REST API.
 </Callout>
 
-## Các nhóm API chính
+---
 
-Hệ thống được chia thành 4 trụ cột tích hợp chính tùy theo nhu cầu nghiệp vụ của doanh nghiệp:
+## 2. Phân biệt 4 phương thức tích hợp
+
+Hệ thống cung cấp 4 kênh giao tiếp riêng biệt phục vụ từng bài toán cụ thể:
+
+| Phương thức | Bản chất kỹ thuật | Chiều truyền tin | Dùng khi nào |
+| :-- | :-- | :-- | :-- |
+| **API Tổng đài PBX** | REST API (JSON qua HTTPS) | CRM Backend ➔ ODS PBX | Bấm để gọi (Click-to-Call), quản lý máy nhánh, đồng bộ danh bạ, lấy file ghi âm và lịch sử cuộc gọi (CDR). |
+| **Webhook Popup** | HTTP POST Callback | ODS PBX ➔ CRM Backend | Tự động bắn dữ liệu khi chuông reo (Ringing) hoặc nhấc máy (Up) để CRM hiển thị màn hình thông tin khách hàng realtime. |
+| **WebSocket RTC (WebRTC)** | SIP over WSS + SRTP | Trình duyệt ⟷ ODS PBX | Biến trình duyệt web thành máy nhánh thoại trực tiếp (nghe/nói qua micro & tai nghe). |
+| **API Gọi tự động (Autocall)** | REST API (JSON qua HTTPS) | CRM Backend ➔ ODS Autocall | Tự động phát âm thanh thông báo, khảo sát, nhắc nợ hàng loạt kèm kịch bản phím bấm IVR. |
+
+<Callout type="info">
+  **Về Widget ODSPhone:** Hiện tại ODS đang hoàn thiện đặc tả chính thức cho bộ nhúng Widget (SDK). Trong thời gian này, các doanh nghiệp muốn tích hợp thoại trực tiếp trên trình duyệt vui lòng sử dụng giải pháp chuẩn mở [WebRTC qua JsSIP](/docs/ai-contact-center/api/websocket-rtc/ket-noi-webrtc).
+</Callout>
+
+---
+
+## 3. Bảng tra cứu: Nhu cầu ➔ Giải pháp ➔ Bài nên đọc
+
+| Bài toán nghiệp vụ cần giải quyết | Giải pháp kỹ thuật | Tài liệu hướng dẫn |
+| :-- | :-- | :-- |
+| Bấm nút "Gọi" trên CRM, tổng đài gọi về máy nhánh nhân viên trước rồi mới gọi khách | **Click-to-Call V1** (AutoCall) | [Khởi tạo cuộc gọi V1](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call) |
+| Bấm nút "Gọi", tổng đài quay số gọi khách trước; khách nghe mới chuyển vào nhóm trực/IVR | **Click-to-Call V2** (AutoCallV2) | [Khởi tạo cuộc gọi V2](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call-v2) |
+| Khách gọi đến, màn hình CRM tự động bật tab thông tin khách hàng đang gọi | **Popup Webhook** | [Tích hợp Webhook Popup](/docs/ai-contact-center/api/webhook/popup) |
+| Nhân viên chăm sóc khách hàng nghe/gọi trực tiếp trên trình duyệt web, không cần IP Phone | **WebRTC (SIP over WSS)** | [Kết nối WebRTC qua JsSIP](/docs/ai-contact-center/api/websocket-rtc/ket-noi-webrtc) |
+| Lấy file ghi âm cuộc gọi, thời lượng đàm thoại và cước phí sau khi kết thúc | **GetCallHistory / GetCallLogs** | [Lấy lịch sử cuộc gọi](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-history) |
+| Đồng bộ số điện thoại VIP để khi khách gọi vào tự động chuyển thẳng cho nhân viên phụ trách | **Luật khách quen** | [Cấu hình Luật khách quen](/docs/ai-contact-center/api/tong-dai/luat-khach-quen) |
+| Tự động gọi điện nhắc lịch hẹn, thông báo cước hoặc gửi mã OTP thoại theo danh sách | **Chiến dịch Autocall** | [Khởi tạo chiến dịch Autocall](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign) |
+
+---
+
+## 4. Domain tích hợp chính thức
+
+Mỗi cụm dịch vụ được vận hành trên hạ tầng độc lập:
+
+- **Tổng đài PBX (Click-to-Call, Lịch sử, Máy nhánh, Danh bạ)**:
+  `https://api.ods.vn`
+- **Dịch vụ Gọi tự động (Autocall, Âm thanh TTS, Danh bạ chiến dịch)**:
+  `https://apiai.cloudfone.vn`
+- **Webhook Receiver (Phía khách hàng triển khai)**:
+  `https://your-crm-backend.com/webhook/ods` (URL do doanh nghiệp tự cấu hình trên Portal)
+
+---
+
+## 5. Thông tin cần chuẩn bị trước khi tích hợp
+
+Trước khi bắt đầu viết code, hãy liên hệ Quản trị viên hệ thống hoặc đăng nhập Portal ODS để nhận các thông số sau:
+
+1. **Bộ khóa xác thực API**:
+   - `ServiceName` (hoặc `ServiceCode`): Mã gói dịch vụ tổng đài khi mua tại ODS (ví dụ: `CF-BS00XXXXX`).
+   - `AuthUser`: Mã định danh tài khoản khách hàng (ví dụ: `CF000XXX`).
+   - `AuthKey`: Chuỗi khóa bí mật API (Secret Key) do ODS cấp.
+2. **Số máy nhánh (`Ext`)**: Danh sách máy nhánh của nhân viên (ví dụ: `101`, `9119`) đã được kích hoạt online trên IP Phone, Softphone hoặc Webphone.
+3. **Đầu số Trunk**: Đầu số hotline doanh nghiệp dùng để quay số gọi ra bên ngoài.
+
+---
+
+## 6. Lộ trình đọc tài liệu cho Developer
+
+<Steps>
+  <Step>
+    ### Bước 1: Nắm vững cơ chế xác thực & Quy ước chung
+    Đọc kỹ quy định về bộ 3 khóa xác thực, format JSON và cách bảo vệ API Key:
+    - [Xác thực tài khoản & API Key](/docs/ai-contact-center/api/bat-dau/xac-thuc)
+    - [Quy ước chung về request/response](/docs/ai-contact-center/api/bat-dau/quy-uoc-chung)
+  </Step>
+
+  <Step>
+    ### Bước 2: Tích hợp kênh điều khiển cuộc gọi
+    Lựa chọn luồng cuộc gọi phù hợp với quy trình vận hành của doanh nghiệp:
+    - [Tích hợp Click-to-Call V1](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call): Nhân viên nghe chuông trước.
+    - [Tích hợp Click-to-Call V2](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call-v2): Khách hàng nghe chuông trước.
+    - [Chiến dịch gọi tự động Autocall](/docs/ai-contact-center/api/autocall): Phát thông báo danh sách hàng loạt.
+  </Step>
+
+  <Step>
+    ### Bước 3: Đồng bộ dữ liệu & Tiếp nhận sự kiện thời gian thực
+    Cấu hình hệ thống để tự động lưu vết và tương tác với người dùng:
+    - [Đón sự kiện qua Webhook Popup](/docs/ai-contact-center/api/webhook/popup): Bật Popup CRM khi chuông reo.
+    - [Tra cứu Lịch sử & Tải file ghi âm](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-history): Đối soát sau cuộc gọi bằng `KeySearch`.
+  </Step>
+</Steps>
+
+---
+
+## Khám phá theo phân hệ
 
 <Cards className="grid-cols-1 md:grid-cols-2">
   <Card
-    title="Bắt đầu tích hợp"
-    description="Tìm hiểu cơ chế xác thực ServiceName / AuthUser / AuthKey và các quy ước chung về Base URL, Envelope JSON."
-    href="/docs/ai-contact-center/api/bat-dau/xac-thuc"
-  />
-  <Card
     title="API Tổng đài PBX"
-    description="Quản lý máy nhánh, khởi tạo cuộc gọi Click-to-Call, đồng bộ danh bạ, thiết lập luật khách quen và tra cứu lịch sử cuộc gọi."
+    description="Khởi tạo cuộc gọi Click-to-Call, quản lý máy nhánh, danh bạ và tra cứu lịch sử cuộc gọi."
     href="/docs/ai-contact-center/api/tong-dai"
   />
   <Card
     title="Webhook sự kiện"
-    description="Tiếp nhận thông báo cuộc gọi thời gian thực (Popup) về hệ thống CRM khi có cuộc gọi vào hoặc ra."
+    description="Nhận thông báo cuộc gọi thời gian thực đẩy về CRM khi có chuông reo hoặc nhấc máy."
     href="/docs/ai-contact-center/api/webhook"
   />
   <Card
-    title="WebSocket RTC (WebRTC)"
-    description="Tích hợp thoại trực tiếp trên trình duyệt web thông qua SIP over WSS (JsSIP) hoặc nhúng Widget ODSPhone."
+    title="WebSocket RTC"
+    description="Kiến trúc đàm thoại qua trình duyệt web bằng giao thức WebRTC (SIP over WSS)."
     href="/docs/ai-contact-center/api/websocket-rtc"
   />
   <Card
     title="API Gọi tự động (Autocall)"
-    description="Tự động hóa chiến dịch phát âm thanh hàng loạt: quản lý file TTS, nhóm liên hệ, khởi chạy chiến dịch và trích xuất báo cáo."
+    description="Tự động hóa phát âm thanh hàng loạt: quản lý file TTS, nhóm số và báo cáo chiến dịch."
     href="/docs/ai-contact-center/api/autocall"
   />
-  <Card
-    title="Hướng dẫn sử dụng Portal"
-    description="Xem hướng dẫn thao tác trực quan trên giao diện quản trị tổng đài ODS Portal."
-    href="/docs/ai-contact-center/user-guider-portal"
-  />
 </Cards>
-
-## Quy trình tích hợp nhanh
-
-Để kết nối ứng dụng của bạn với ODS AI Contact Center, hãy thực hiện theo 3 bước cơ bản:
-
-<Steps>
-  <Step>
-    ### Lấy thông tin xác thực API
-    Đăng nhập vào Portal quản trị tổng đài, truy cập mục **Cấu hình API** để lấy bộ 3 khóa: `ServiceName` (Mã dịch vụ), `AuthUser` (Mã khách hàng) và `AuthKey` (API Key bí mật).
-  </Step>
-  <Step>
-    ### Lựa chọn giao thức kết nối
-    - **Gọi ra nhanh từ CRM**: Sử dụng [Click-to-Call](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call) để kích hoạt cuộc gọi tới máy nhánh nhân viên.
-    - **Hiển thị thông tin khách gọi đến**: Cấu hình URL nhận [Popup Webhook](/docs/ai-contact-center/api/webhook/popup).
-    - **Thoại trực tiếp không cần cài app**: Tích hợp [WebRTC qua WSS](/docs/ai-contact-center/api/websocket-rtc/ket-noi-webrtc).
-    - **CSKH / Nhắc nợ tự động**: Sử dụng [Chiến dịch Autocall](/docs/ai-contact-center/api/autocall).
-  </Step>
-  <Step>
-    ### Kiểm thử và triển khai
-    Thực thi request với các ví dụ code mẫu cURL, JavaScript hoặc Python đi kèm trong từng trang tài liệu endpoint.
-  </Step>
-</Steps>

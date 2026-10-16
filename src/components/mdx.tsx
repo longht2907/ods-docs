@@ -32,10 +32,16 @@ import {
 import type { ComponentProps } from 'react';
 import type { MDXComponents } from 'mdx/types';
 import {
+  ApiReferenceBottom,
   ApiReferenceCode,
   ApiReferenceLayout,
   ApiReferenceMain,
+  ApiReferenceResponse,
 } from '@/components/docs/api-reference-layout';
+import { ApiEndpoint } from '@/components/docs/api-endpoint';
+import { ClickToCallFlow } from '@/components/docs/click-to-call-flow';
+import { ClickToCallV2Flow } from '@/components/docs/click-to-call-v2-flow';
+import { ApiArchitectureOverview } from '@/components/docs/api-architecture-overview';
 import { CustomerFlowDiagram } from '@/components/docs/customer-flow-diagram';
 import { DocsProductDirectory } from '@/components/docs/docs-product-directory';
 
@@ -85,11 +91,17 @@ export function getMDXComponents(components?: MDXComponents) {
     img: (props) => <ImageZoom {...(props as any)} />,
     Callout,
     Card,
+    ApiEndpoint,
     ApiReferenceLayout,
     ApiReferenceMain,
     ApiReferenceCode,
+    ApiReferenceResponse,
+    ApiReferenceBottom,
     DocsProductDirectory,
     CustomerFlowDiagram,
+    ClickToCallFlow,
+    ClickToCallV2Flow,
+    ApiArchitectureOverview,
     ...components,
   } satisfies MDXComponents;
 }

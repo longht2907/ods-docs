@@ -1,30 +1,35 @@
 ---
 title: "Danh sách chiến dịch (GetCampaignList)"
 description: "Tra cứu danh sách các chiến dịch gọi tự động Autocall theo trạng thái và từ khóa."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignList`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Autocall/GetCampaignList" />
 
-Lấy danh sách các chiến dịch gọi tự động đã tạo trên hệ thống, lọc theo trạng thái tiến độ hoặc từ khóa tìm kiếm.
+    Lấy danh sách các chiến dịch gọi tự động đã tạo trên hệ thống, lọc theo trạng thái tiến độ hoặc từ khóa tìm kiếm.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Status` | number | Có | Trạng thái chiến dịch cần lấy: `0` (đang chờ), `1` (đang chạy), `2` (đã chạy xong), `3` (lấy tất cả). |
-| `PageIndex` | number | Không | Số thứ tự trang cần lấy (mặc định là `1`). |
-| `PageSize` | number | Không | Số lượng bản ghi trên một trang (ví dụ: `20`). |
-| `Key` | string | Không | Từ khóa tìm kiếm theo tên chiến dịch. |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `Status` | number | Có | Trạng thái chiến dịch cần lấy: `0` (đang chờ), `1` (đang chạy), `2` (đã chạy xong), `3` (lấy tất cả). |
+    | `PageIndex` | number | Không | Số thứ tự trang cần lấy (mặc định là `1`). |
+    | `PageSize` | number | Không | Số lượng bản ghi trên một trang (ví dụ: `20`). |
+    | `Key` | string | Không | Từ khóa tìm kiếm theo tên chiến dịch. |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignList" \
+curl -X POST "https://apiai.cloudfone.vn/api/Autocall/GetCampaignList" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -36,10 +41,11 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignList" \
     "Key": ""
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignList', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Autocall/GetCampaignList', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -54,8 +60,8 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignList',
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -68,17 +74,17 @@ payload = {
     "PageSize": 20,
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Autocall/GetCampaignList",
+    "https://apiai.cloudfone.vn/api/Autocall/GetCampaignList",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -96,40 +102,46 @@ print(response.json())
   ]
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
-| `total` | number | Tổng số lượng chiến dịch tìm thấy theo điều kiện lọc. |
-| `data` | array | Danh sách thông tin chi tiết các chiến dịch. |
-| `data[].campaignId` | string | Mã định danh duy nhất của chiến dịch. |
-| `data[].campaignName` | string | Tên chiến dịch. |
-| `data[].status` | number | Trạng thái hiện tại: `0` (đang chờ), `1` (đang chạy), `2` (đã chạy xong). |
-| `data[].totalContact` | number | Tổng số lượng số điện thoại trong danh bạ chiến dịch. |
-| `data[].timeStartCall` | string | Thời gian lên lịch kích hoạt gọi. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+    | `total` | number | Tổng số lượng chiến dịch tìm thấy theo điều kiện lọc. |
+    | `data` | array | Danh sách thông tin chi tiết các chiến dịch. |
+    | `data[].campaignId` | string | Mã định danh duy nhất của chiến dịch. |
+    | `data[].campaignName` | string | Tên chiến dịch. |
+    | `data[].status` | number | Trạng thái hiện tại: `0` (đang chờ), `1` (đang chạy), `2` (đã chạy xong). |
+    | `data[].totalContact` | number | Tổng số lượng số điện thoại trong danh bạ chiến dịch. |
+    | `data[].timeStartCall` | string | Thời gian lên lịch kích hoạt gọi. |
 
-<Callout type="info">
-- **Bộ lọc Status**: Truyền `3` để lấy danh sách toàn bộ chiến dịch bất kể trạng thái. Khi muốn theo dõi các chiến dịch đang thực hiện cuộc gọi, truyền `Status: 1`.
-- **Phân trang**: `PageIndex` bắt đầu từ `1`. Khuyến nghị đặt `PageSize` từ `20` đến `50` bản ghi trên mỗi trang để đảm bảo thời gian phản hồi nhanh nhất.
-</Callout>
+    ## Lưu ý quan trọng
 
-## Lỗi thường gặp
+    <Callout type="info">
+    - **Bộ lọc Status**: Truyền `3` để lấy danh sách toàn bộ chiến dịch bất kể trạng thái. Khi muốn theo dõi các chiến dịch đang thực hiện cuộc gọi, truyền `Status: 1`.
+    - **Phân trang**: `PageIndex` bắt đầu từ `1`. Khuyến nghị đặt `PageSize` từ `20` đến `50` bản ghi trên mỗi trang để đảm bảo thời gian phản hồi nhanh nhất.
+    </Callout>
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - `ServiceCode` không hợp lệ hoặc tài khoản không có quyền truy cập gói Autocall.
-  </Accordion>
-  <Accordion title="Danh sách data rỗng [] mặc dù total = 0">
-    - Chưa có chiến dịch nào được tạo trên tài khoản, hoặc từ khóa tìm kiếm `Key` không khớp với tên chiến dịch nào.
-  </Accordion>
-</Accordions>
+    ## Lỗi thường gặp
 
-## Bài viết liên quan
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - `ServiceCode` không hợp lệ hoặc tài khoản không có quyền truy cập gói Autocall.
+      </Accordion>
+      <Accordion title="Danh sách data rỗng [] mặc dù total = 0">
+        - Chưa có chiến dịch nào được tạo trên tài khoản, hoặc từ khóa tìm kiếm `Key` không khớp với tên chiến dịch nào.
+      </Accordion>
+    </Accordions>
 
-<Cards>
-  <Card title="Chi tiết chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-detail" description="Xem thông số cấu hình cụ thể của một chiến dịch." />
-  <Card title="Xóa chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/delete-campaign" description="Hủy bỏ hoặc xóa một chiến dịch khỏi hệ thống." />
-</Cards>
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Chi tiết chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-detail" description="Xem thông số cấu hình cụ thể của một chiến dịch." />
+      <Card title="Xóa chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/delete-campaign" description="Hủy bỏ hoặc xóa một chiến dịch khỏi hệ thống." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

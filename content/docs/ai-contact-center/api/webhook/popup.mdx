@@ -1,206 +1,424 @@
 ---
-title: "Webhook Popup"
-description: "Cấu trúc dữ liệu và hướng dẫn tiếp nhận sự kiện cuộc gọi Popup thời gian thực từ tổng đài ODS."
+title: "Tích hợp Webhook và Popup cuộc gọi"
+description: "Đặc tả kỹ thuật payload Webhook cuộc gọi ODS, từ điển tham số, chuỗi JSON mẫu thực tế và cơ chế đồng bộ Popup CRM."
 ---
 
-<Callout type="info">`POST` `{CUSTOMER_WEBHOOK_URL}`</Callout>
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-Khi có cuộc gọi phát sinh (gọi vào hoặc gọi ra từ số máy nhánh), tổng đài ODS sẽ tự động gửi một HTTP POST request chứa thông tin chi tiết cuộc gọi đến địa chỉ URL Webhook do doanh nghiệp cấu hình trên Portal.
+Tài liệu này cung cấp đặc tả kỹ thuật chi tiết về cấu trúc dữ liệu JSON Webhook do tổng đài ODS gửi đến, từ điển tham số theo nhóm nghiệp vụ, chuỗi sự kiện JSON mẫu thực tế và kiến trúc đồng bộ cửa sổ cuộc gọi (Popup) trên phần mềm CRM/ERP.
 
-## Cấu hình Webhook trên Portal tổng đài
+---
 
-<Steps>
-  <Step>
-    Vào mục **Cấu hình API** ➔ **Thông báo - PopUp**.
-  </Step>
-  <Step>
-    Bật chức năng **Popup**, nhập URL tiếp nhận webhook của hệ thống bạn và tick chọn các Số nội bộ cần đẩy thông báo.
-  </Step>
-  <Step>
-    Vào mục **Hiện thông báo PopUp** để bật các sự kiện tương ứng (Đổ chuông, Nghe máy, Gác máy).
-  </Step>
-</Steps>
+## Hợp đồng HTTP tiếp nhận
 
-## Cấu trúc Payload
+Hệ thống tổng đài ODS đóng vai trò là bên gửi (**Sender**), chủ động phát request HTTP POST đến địa chỉ endpoint do doanh nghiệp thiết lập (**Receiver**):
 
-### 1. Khi đang đổ chuông (`Status: Ringing` hoặc `Ringing_Out`)
+- **Địa chỉ tiếp nhận**: Endpoint URL công khai thuộc máy chủ của doanh nghiệp (ví dụ: `https://crm.example.com/api/webhook/ods-call`).
+- **Giao thức và Phương thức**: `HTTP POST`, `Content-Type: application/json`.
+- **Trường định danh sự kiện**: Trường **`Event`** (chữ cái đầu viết hoa, mang một trong 5 giá trị: `register`, `show`, `answer`, `hide`, `finish`). Tuyệt đối không dùng trường `Status`.
+- **Tiêu chuẩn phản hồi từ Receiver**:
+  - Máy chủ backend của khách hàng cần xử lý nhanh và phản hồi mã trạng thái HTTP thuộc dải **`2xx`** (khuyến nghị `200 OK`).
+  - Phía tổng đài ODS coi mọi mã phản hồi `200 <= statusCode < 300` là chuyển phát thành công.
+  - Phía ODS không áp đặt cấu trúc JSON body bắt buộc đối với phản hồi xác nhận của Receiver.
+  - *Lưu ý*: Mã `200 OK` của endpoint tiếp nhận chỉ mang ý nghĩa **đã nhận được gói tin Webhook thành công**, không phản ánh kết quả cuộc gọi (nhấc máy hay cuộc gọi nhỡ).
 
+---
+
+## Bảng từ điển tham số Payload
+
+Để thuận tiện tra cứu theo đúng nghiệp vụ phát triển, toàn bộ 25 tham số trong gói tin Webhook ODS được phân chia thành 4 nhóm chức năng bên dưới.
+
+### Nhận diện cuộc gọi và máy nhánh
+
+Nhóm tham số cốt lõi phục vụ điều phối và đồng bộ cửa sổ cuộc gọi (Popup CRM):
+
+| Tên trường | Kiểu dữ liệu | Ý nghĩa nghiệp vụ | Sự kiện xuất hiện | Lưu ý kỹ thuật |
+| :-- | :-- | :-- | :-- | :-- |
+| **`Event`** | string | Tên sự kiện vòng đời | Mọi sự kiện | Giá trị: `register`, `show`, `answer`, `hide`, `finish`. Không dùng trường `Status`. |
+| **`LID`** | string | Mã phiên tổng thể (Linked ID) | Mọi sự kiện | Khóa liên kết xuyên suốt toàn bộ cuộc gọi. Mọi sự kiện cùng một cuộc gọi đều chung `LID`. |
+| **`Uid`** | string | Mã định danh kênh máy nhánh (Unique ID) | `show`, `answer`, `hide`, `finish` | Khác với `LID`. Mỗi máy nhánh trong nhóm đổ chuông sở hữu một `Uid` riêng biệt. |
+| **`Dir`** | string | Hướng cuộc gọi | Mọi sự kiện | Nhận giá trị: `Inbound` (gọi vào), `Outbound` (gọi ra), hoặc `Local` (gọi nội bộ). |
+| **`CID`** | string | Số điện thoại khách hàng | Mọi sự kiện | Luôn đại diện cho số khách hàng ở cả 2 chiều gọi (gọi vào là số người gọi, gọi ra là số người nhận). |
+| **`DID`** | string | Đầu số Hotline doanh nghiệp | Hầu hết sự kiện | Đầu số tổng đài đại diện của doanh nghiệp. |
+| **`Ext`** | string | Số máy nhánh nội bộ | `show`, `answer`, `hide`, `finish` | Số máy lẻ nhân viên tiếp nhận/thực hiện cuộc gọi (ví dụ: `101`, `102`). |
+| **`srcName`** | string | Tên hiển thị người gọi/nhân viên | Tùy kịch bản | Tên nhân viên (gọi ra) hoặc tên nhận diện theo danh bạ tổng đài (gọi vào). |
+
+### Mốc thời gian và tính cước
+
+Nhóm tham số phục vụ đo lường thời lượng đàm thoại, kiểm tra SLA và đối soát cước viễn thông:
+
+| Tên trường | Kiểu dữ liệu | Ý nghĩa nghiệp vụ | Sự kiện xuất hiện | Lưu ý kỹ thuật |
+| :-- | :-- | :-- | :-- | :-- |
+| **`TimeCall`** | string | Thời điểm khởi tạo cuộc gọi | Mọi sự kiện | Định dạng `YYYY-MM-DD HH:mm:ss` theo giờ máy chủ tổng đài. |
+| **`TimeDial`** | string \| false | Thời điểm máy nhánh bắt đầu đổ chuông | `show`, `hide`, `finish` | Định dạng `YYYY-MM-DD HH:mm:ss`. Có thể mang giá trị `false` nếu nhánh chưa kịp kích hoạt chuông. |
+| **`TimeAnswer`** | string | Thời điểm bắt đầu đàm thoại | `answer`, `finish` | Chỉ xuất hiện khi có người nhấc máy. Dùng làm mốc bắt đầu tính thời gian đàm thoại. |
+| **`TimeStopDial`** | string | Thời điểm máy nhánh dừng đổ chuông | `hide` | Định dạng `YYYY-MM-DD HH:mm:ss`. Ghi nhận chính xác lúc máy nhánh tắt chuông. |
+| **`TimeEnd`** | string | Thời điểm kết thúc cuộc gọi | `finish` | Định dạng `YYYY-MM-DD HH:mm:ss`. Đánh dấu thời điểm hai bên ngắt kết nối hoàn toàn. |
+| **`TimeBillSec`** | string | Thời điểm bắt đầu tính cước viễn thông | Inbound qua IVR/Queue | **Chú ý: Là mốc thời gian timestamp (`YYYY-MM-DD HH:mm:ss`), không phải số giây thời lượng.** |
+| **`BillSecBy`** | string | Nguyên nhân bắt đầu tính cước | Inbound qua IVR/Queue | Kịch bản kích hoạt tính cước viễn thông (ví dụ: `IVR` khi nghe lời chào, hoặc `Queue`). |
+
+### Kịch bản tổng đài và kênh viễn thông
+
+Nhóm tham số kỹ thuật phục vụ phân tích luồng điều hướng VoIP và hàng đợi:
+
+| Tên trường | Kiểu dữ liệu | Ý nghĩa nghiệp vụ | Sự kiện xuất hiện | Lưu ý kỹ thuật |
+| :-- | :-- | :-- | :-- | :-- |
+| **`IVR`** | string | Tên kịch bản tương tác phím | Inbound qua IVR | Tên kịch bản lời chào tương tác (ví dụ: `ivr-14`). |
+| **`Queue`** | string | Số định danh hàng đợi | Inbound qua Queue | Số nhóm tiếp nhận cuộc gọi tập trung (ví dụ: `7800`). |
+| **`Ch`** | string | Kênh nguồn Asterisk (Source Channel) | Hầu hết sự kiện | Định danh kênh viễn thông gốc (ví dụ: `PJSIP/MOBI...` hoặc `PJSIP/7877...`). |
+| **`ChDest`** | string | Kênh đích Asterisk (Destination Channel) | `answer`, `finish`, Outbound | Định danh kênh viễn thông kết nối đến đầu cuối đối phương. |
+| **`Call-ID`** | string | Khóa SIP Call-ID | Tùy sự kiện | Định danh bản tin SIP cấp thấp. Có thể là chuỗi rỗng `""`. |
+| **`DialExist`** | boolean | Đánh dấu nhánh từng được quay số | Inbound theo nhóm | Mang giá trị `true` khi tổng đài đã từng phát lệnh đổ chuông đến máy nhánh này. |
+
+### Kết quả xử lý, file ghi âm và bảo mật
+
+Nhóm tham số phục vụ lưu trữ nhật ký CDR, tải file ghi âm và xác thực nguồn gửi:
+
+| Tên trường | Kiểu dữ liệu | Ý nghĩa nghiệp vụ | Sự kiện xuất hiện | Lưu ý kỹ thuật |
+| :-- | :-- | :-- | :-- | :-- |
+| **`Disposition`** | string | Kết quả cuộc gọi / trạng thái nhánh | `hide`, `finish` | Nhận các giá trị: `ANSWERED`, `ANSWERED_ELSEWHERE`, `BUSY`, `NO ANSWER`, `FAILED`. |
+| **`recordingfile`** | string | Tên file ghi âm gốc | `answer`, `finish`, Outbound | Tên file âm thanh trên máy chủ (ví dụ: `in-089616...wav`). Chưa đồng nghĩa file đã sẵn sàng tải. |
+| **`recordingfileURL`** | string | URL tải/nghe file ghi âm | `finish` (khi có nghe máy) | Đường dẫn HTTPS chính thức có mã bảo mật để tải hoặc nghe lại tệp ghi âm từ ODS. |
+| **`apikey`** | string \| null | Khóa xác thực nguồn gửi Webhook | Mọi sự kiện trong body | Do doanh nghiệp cấu hình trên tổng đài. Mặc định là `null` nếu chưa thiết lập. |
+
+---
+
+## Dữ liệu JSON mẫu thực tế
+
+Dưới đây là các chuỗi sự kiện JSON hoàn chỉnh dựa trên dữ liệu log thực tế từ hệ thống ODS (thông tin số thuê bao và định danh đã được ẩn danh):
+
+<Tabs items={['Cuộc gọi đến (Inbound)', 'Cuộc gọi đi (Outbound)']} groupId="call-direction-samples">
+  <Tab value="Cuộc gọi đến (Inbound)">
+    ### 1. Sự kiện `register` (Khách hàng kết nối vào tổng đài)
 ```json
 {
-  "ApiKey": "YOUR_WEBHOOK_API_KEY",
-  "CallNumber": "0900000000",
-  "CallName": "Nguyen Van A",
-  "QueueNumber": "1000",
-  "ReceiptNumber": "101",
-  "Key": "1610523779.7006",
-  "Status": "Ringing",
-  "Direction": "Inbound",
-  "NumberPBX": "02873007788",
-  "Message": "101-0900000000-Nguyen Van A"
+  "Event": "register",
+  "LID": "1710000001.1001",
+  "Dir": "Inbound",
+  "CID": "0901234567",
+  "DID": "02873007788",
+  "TimeCall": "2026-10-15 14:57:30",
+  "Ch": "PJSIP/MOBI02873007788-00003968",
+  "apikey": null
 }
 ```
 
-### 2. Khi cuộc gọi kết thúc (`Status: Down` hoặc `Down_Out`)
-
-Khi gác máy, payload sẽ có thêm đối tượng `Data` chứa thời gian đàm thoại và liên kết file ghi âm:
-
+    ### 2. Sự kiện `show` (Đổ chuông máy nhánh 101 trong nhóm)
 ```json
 {
-  "ApiKey": "YOUR_WEBHOOK_API_KEY",
-  "CallNumber": "0900000000",
-  "CallName": "Nguyen Van A",
-  "QueueNumber": "1000",
-  "ReceiptNumber": "101",
-  "Key": "1610523779.7006",
-  "Status": "Down",
-  "Direction": "Inbound",
-  "NumberPBX": "02873007788",
-  "Message": "101-0900000000-Nguyen Van A",
-  "Data": {
-    "TotalTimeCall": "02:04",
-    "RealTimeCall": "124",
-    "LinkFile": "https://recording.ods.vn/recordings/audio.mp3"
-  }
+  "Event": "show",
+  "LID": "1710000001.1001",
+  "Dir": "Inbound",
+  "CID": "0901234567",
+  "DID": "02873007788",
+  "TimeCall": "2026-10-15 14:57:30",
+  "TimeBillSec": "2026-10-15 14:57:31",
+  "BillSecBy": "IVR",
+  "IVR": "ivr-14",
+  "Queue": "7800",
+  "DialExist": true,
+  "TimeDial": "2026-10-15 14:57:39",
+  "Ext": "101",
+  "Uid": "1710000001.1002",
+  "srcName": "Nguyen Van A",
+  "Ch": "PJSIP/MOBI02873007788-00003968",
+  "apikey": null
 }
 ```
 
-## Bảng mô tả tham số
+    ### 3. Sự kiện `show` (Đổ chuông máy nhánh 102 trong nhóm)
+```json
+{
+  "Event": "show",
+  "LID": "1710000001.1001",
+  "Dir": "Inbound",
+  "CID": "0901234567",
+  "DID": "02873007788",
+  "TimeCall": "2026-10-15 14:57:30",
+  "TimeBillSec": "2026-10-15 14:57:31",
+  "BillSecBy": "IVR",
+  "IVR": "ivr-14",
+  "Queue": "7800",
+  "DialExist": true,
+  "TimeDial": "2026-10-15 14:57:39",
+  "Ext": "102",
+  "Uid": "1710000001.1003",
+  "srcName": "Nguyen Van A",
+  "Ch": "PJSIP/MOBI02873007788-00003968",
+  "apikey": null
+}
+```
 
-| Tham số | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `ApiKey` | string | Chuỗi khóa bảo mật do doanh nghiệp cấu hình trên Portal để xác thực nguồn gửi đến server của bạn. |
-| `CallNumber` | string | Số điện thoại gọi đi (Source - với cuộc gọi ra là số máy nhánh nhân viên). |
-| `CallName` | string | Tên người gọi (lấy theo danh bạ tổng đài nếu số đã được lưu). |
-| `ReceiptNumber` | string | Số nhận cuộc gọi (Destination - với cuộc gọi vào là số máy nhánh, với cuộc gọi ra là SĐT khách hàng). |
-| `QueueNumber` | string | Số nhóm máy nhánh tiếp nhận cuộc gọi (Queue / Ring Group). |
-| `Key` | string | Mã định danh duy nhất của phiên cuộc gọi (dùng để tra cứu trong nhật ký cuộc gọi). |
-| `KeyRinging` | string | Tham số định danh phiên chuông cũ (hiện đã deprecated, khuyến nghị dùng `Key`). |
-| `Status` | string | Trạng thái cuộc gọi tại thời điểm bắn webhook (xem bảng trạng thái bên dưới). |
-| `Direction` | string | Hướng cuộc gọi: `Inbound` (Gọi vào) hoặc `Outbound` (Gọi ra). |
-| `NumberPBX` | string | Đầu số tổng đài: có thể là tên cấu hình Inbound (cuộc gọi vào), Trunk đầu số (cuộc gọi ra) hoặc `TRANSFERRED` (khi cuộc gọi được chuyển tiếp). |
-| `Message` | string | Chuỗi tóm tắt thông tin: `{ReceiptNumber}-{CallNumber}-{CallName}`. |
-| `Data` | object | Dữ liệu mở rộng sau khi kết thúc đàm thoại (chỉ xuất hiện khi `Status` là `Down` hoặc `Down_Out`). |
-| `Data.TotalTimeCall` | string | Tổng thời gian cuộc gọi tính từ khi đổ chuông (`mm:ss`). |
-| `Data.RealTimeCall` | string | Thời gian đàm thoại thực tế (tính bằng giây). |
-| `Data.LinkFile` | string | Đường dẫn URL tải file ghi âm cuộc gọi. |
+    ### 4. Sự kiện `answer` (Máy nhánh 101 nhấc máy tiếp nhận)
+```json
+{
+  "Event": "answer",
+  "LID": "1710000001.1001",
+  "Dir": "Inbound",
+  "CID": "0901234567",
+  "DID": "02873007788",
+  "TimeCall": "2026-10-15 14:57:30",
+  "TimeBillSec": "2026-10-15 14:57:31",
+  "BillSecBy": "IVR",
+  "IVR": "ivr-14",
+  "Queue": "7800",
+  "DialExist": true,
+  "TimeAnswer": "2026-10-15 14:57:45",
+  "Ch": "PJSIP/MOBI02873007788-00003968",
+  "ChDest": "PJSIP/101-0000396a",
+  "Ext": "101",
+  "Uid": "1710000001.1002",
+  "recordingfile": "in-02873007788-0901234567-20261015-145730-1710000001.1001.wav",
+  "apikey": null
+}
+```
 
-## Bảng trạng thái cuộc gọi (`Status`)
+    ### 5. Sự kiện `hide` (Máy nhánh 102 dừng chuông do máy khác đã nghe)
+```json
+{
+  "Event": "hide",
+  "LID": "1710000001.1001",
+  "Dir": "Inbound",
+  "CID": "0901234567",
+  "DID": "02873007788",
+  "TimeCall": "2026-10-15 14:57:30",
+  "TimeBillSec": "2026-10-15 14:57:31",
+  "BillSecBy": "IVR",
+  "IVR": "ivr-14",
+  "Queue": "7800",
+  "DialExist": true,
+  "Ext": "102",
+  "TimeDial": "2026-10-15 14:57:39",
+  "TimeStopDial": "2026-10-15 14:57:45",
+  "Uid": "1710000001.1003",
+  "srcName": "Nguyen Van A",
+  "Disposition": "ANSWERED_ELSEWHERE",
+  "Ch": "PJSIP/MOBI02873007788-00003968",
+  "apikey": null
+}
+```
 
-| Trạng thái | Hướng áp dụng | Ý nghĩa nghiệp vụ |
-| :-- | :-- | :-- |
-| `Ringing` | Inbound (Gọi vào) | Máy nhánh nhân viên đang đổ chuông, khách hàng đang chờ. Thích hợp để bật Popup CRM hiển thị thông tin khách hàng. |
-| `Up` | Inbound (Gọi vào) | Nhân viên đã nhấc máy, bắt đầu đàm thoại. |
-| `Down` | Inbound (Gọi vào) | Cuộc gọi đã kết thúc (gác máy). Lúc này payload có thêm trường `Data` chứa thời gian đàm thoại và link ghi âm. |
-| `Ringing_Out` | Outbound (Gọi ra) | Tổng đài đang đổ chuông số điện thoại khách hàng. |
-| `Up_Out` | Outbound (Gọi ra) | Khách hàng đã nhấc máy, nhân viên và khách hàng bắt đầu đàm thoại. |
-| `Down_Out` | Outbound (Gọi ra) | Cuộc gọi ra đã kết thúc, payload đính kèm trường `Data` và link ghi âm. |
-
-## Vòng đời sự kiện cuộc gọi (Call Events)
-
-Một cuộc gọi hoàn chỉnh trên tổng đài sẽ tuần tự phát sinh các sự kiện tương ứng:
-
-1. **register**: Phát sinh khi tổng đài bắt đầu tiếp nhận hoặc khởi tạo cuộc gọi.
-2. **show** (tương ứng `Ringing` / `Ringing_Out`): Máy nhánh bắt đầu đổ chuông.
-3. **answer** (tương ứng `Up` / `Up_Out`): Một bên nhấc máy nghe điện thoại.
-4. **hide**: Máy nhánh dừng đổ chuông (chuyển máy hoặc hết thời gian chờ).
-5. **finish** (tương ứng `Down` / `Down_Out`): Cuộc gọi kết thúc hoàn toàn.
-
-## Ví dụ Webhook Receiver
-
-<Tabs items={['Node.js (Express)', 'PHP']}>
-  <Tab value="Node.js (Express)">
-```javascript
-import express from 'express';
-
-const app = express();
-app.use(express.json());
-
-app.post('/webhook/ods-popup', (req, res) => {
-  const { ApiKey, CallNumber, ReceiptNumber, Status, Direction, Data } = req.body;
-
-  // 1. Xác thực ApiKey bí mật của bạn
-  if (ApiKey !== process.env.ODS_WEBHOOK_KEY) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  console.log(`[ODS Webhook] ${Direction} | Status: ${Status} | ${CallNumber} -> ${ReceiptNumber}`);
-
-  // 2. Xử lý nghiệp vụ theo từng trạng thái
-  if (Status === 'Ringing') {
-    // Bắn WebSocket / SSE để bật Popup CRM màn hình máy nhánh ReceiptNumber
-  } else if (Status === 'Down' && Data) {
-    // Lưu link ghi âm Data.LinkFile và thời lượng Data.RealTimeCall vào CRM
-  }
-
-  // 3. Phản hồi HTTP 200 ngay lập tức (dưới 3s)
-  return res.status(200).json({ status: 'ok' });
-});
-
-app.listen(3000, () => console.log('Webhook server running on port 3000'));
+    ### 6. Sự kiện `finish` (Cuộc gọi kết thúc, tổng kết cước và file ghi âm)
+```json
+{
+  "Event": "finish",
+  "LID": "1710000001.1001",
+  "Dir": "Inbound",
+  "CID": "0901234567",
+  "DID": "02873007788",
+  "TimeCall": "2026-10-15 14:57:30",
+  "TimeBillSec": "2026-10-15 14:57:31",
+  "BillSecBy": "IVR",
+  "IVR": "ivr-14",
+  "Queue": "7800",
+  "DialExist": true,
+  "Ext": "101",
+  "TimeDial": "2026-10-15 14:57:39",
+  "TimeAnswer": "2026-10-15 14:57:45",
+  "TimeEnd": "2026-10-15 14:57:51",
+  "Uid": "1710000001.1002",
+  "srcName": "Nguyen Van A",
+  "Disposition": "ANSWERED",
+  "Ch": "PJSIP/MOBI02873007788-00003968",
+  "recordingfile": "in-02873007788-0901234567-20261015-145730-1710000001.1001.wav",
+  "recordingfileURL": "https://recording.example.com/Home?ID=encrypt_hash_token_string",
+  "apikey": null
+}
 ```
   </Tab>
-  <Tab value="PHP">
-```php
-<?php
-header('Content-Type: application/json');
 
-$payload = file_get_contents('php://input');
-$data = json_decode($payload, true);
-
-if (!$data) {
-    http_response_code(400);
-    exit(json_encode(['error' => 'Invalid JSON']));
+  <Tab value="Cuộc gọi đi (Outbound)">
+    ### 1. Sự kiện `register` (Máy nhánh bắt đầu bấm gọi ra)
+```json
+{
+  "Event": "register",
+  "LID": "1710000002.2001",
+  "Dir": "Outbound",
+  "CID": "0987654321",
+  "DID": "02873007788",
+  "TimeCall": "2026-10-15 14:44:01",
+  "TimeDial": "2026-10-15 14:44:01",
+  "Ch": "PJSIP/101-00003942",
+  "ChDest": "PJSIP/MOBI02873007788-00003943",
+  "Ext": "101",
+  "srcName": "Tran Van B",
+  "Uid": "1710000002.2001",
+  "Call-ID": "",
+  "recordingfile": "out-0987654321-101-20261015-144401-1710000002.2001.wav",
+  "apikey": null
 }
+```
 
-// 1. Kiểm tra ApiKey
-if (($data['ApiKey'] ?? '') !== 'YOUR_WEBHOOK_API_KEY') {
-    http_response_code(401);
-    exit(json_encode(['error' => 'Unauthorized']));
+    ### 2. Sự kiện `show` (Đang đổ chuông máy khách hàng)
+```json
+{
+  "Event": "show",
+  "LID": "1710000002.2001",
+  "Dir": "Outbound",
+  "CID": "0987654321",
+  "DID": "02873007788",
+  "TimeCall": "2026-10-15 14:44:01",
+  "TimeDial": "2026-10-15 14:44:01",
+  "Ch": "PJSIP/101-00003942",
+  "ChDest": "PJSIP/MOBI02873007788-00003943",
+  "Ext": "101",
+  "srcName": "Tran Van B",
+  "Uid": "1710000002.2001",
+  "Call-ID": "",
+  "recordingfile": "out-0987654321-101-20261015-144401-1710000002.2001.wav",
+  "apikey": null
 }
+```
 
-$status = $data['Status'] ?? '';
-$callNumber = $data['CallNumber'] ?? '';
-
-// 2. Xử lý nghiệp vụ
-if ($status === 'Ringing') {
-    // Xử lý bật popup CRM
-} elseif ($status === 'Down' && isset($data['Data'])) {
-    $recordingUrl = $data['Data']['LinkFile'] ?? '';
-    // Lưu link ghi âm vào database
+    ### 3. Sự kiện `answer` (Khách hàng nhấc máy đàm thoại)
+```json
+{
+  "Event": "answer",
+  "LID": "1710000002.2001",
+  "Dir": "Outbound",
+  "CID": "0987654321",
+  "DID": "02873007788",
+  "TimeCall": "2026-10-15 14:44:01",
+  "TimeDial": "2026-10-15 14:44:01",
+  "TimeAnswer": "2026-10-15 14:44:08",
+  "Ch": "PJSIP/101-00003942",
+  "ChDest": "PJSIP/MOBI02873007788-00003943",
+  "Ext": "101",
+  "srcName": "Tran Van B",
+  "Uid": "1710000002.2001",
+  "Call-ID": "",
+  "recordingfile": "out-0987654321-101-20261015-144401-1710000002.2001.wav",
+  "apikey": null
 }
+```
 
-// 3. Luôn phản hồi HTTP 200
-http_response_code(200);
-echo json_encode(['result' => 'success']);
+    ### 4. Sự kiện `finish` (Gác máy, trả link ghi âm)
+```json
+{
+  "Event": "finish",
+  "LID": "1710000002.2001",
+  "Dir": "Outbound",
+  "CID": "0987654321",
+  "DID": "02873007788",
+  "TimeCall": "2026-10-15 14:44:01",
+  "TimeDial": "2026-10-15 14:44:01",
+  "TimeAnswer": "2026-10-15 14:44:08",
+  "TimeEnd": "2026-10-15 14:44:13",
+  "Ext": "101",
+  "srcName": "Tran Van B",
+  "Uid": "1710000002.2001",
+  "Call-ID": "",
+  "Disposition": "ANSWERED",
+  "Ch": "PJSIP/101-00003942",
+  "ChDest": "PJSIP/MOBI02873007788-00003943",
+  "recordingfile": "out-0987654321-101-20261015-144401-1710000002.2001.wav",
+  "recordingfileURL": "https://recording.example.com/Home?ID=encrypt_hash_token_string",
+  "apikey": null
+}
 ```
   </Tab>
 </Tabs>
 
-## Lưu ý quan trọng & Khuyến nghị
+---
 
-<Callout type="warning">
-- **Xử lý bất đồng bộ (Asynchronous)**: Endpoint tiếp nhận webhook của bạn phải phản hồi HTTP `200 OK` trong vòng **dưới 3 giây**. Các tác vụ nặng (như ghi database phức tạp, gọi API bên thứ ba, tải file ghi âm) nên được đưa vào Message Queue (RabbitMQ, Redis Queue) để xử lý nền.
-- **Tránh trùng lặp sự kiện**: Sử dụng trường `Key` kết hợp `Status` làm khóa định danh duy nhất (Idempotency Key) để tránh xử lý trùng nếu tổng đài retry gửi webhook.
-- **Bảo mật**: Luôn thiết lập `ApiKey` trong Portal và xác thực lại ở đầu nhận để đảm bảo request xuất phát từ hệ thống ODS.
-</Callout>
+## Kiến trúc đồng bộ Popup thời gian thực trên CRM
 
-## Lỗi thường gặp
+Để biến dữ liệu Webhook thành cửa sổ Popup bật tự động trên màn hình làm việc của nhân viên, hệ thống CRM cần triển khai theo mô hình kiến trúc phân tầng:
 
-<Accordions>
-  <Accordion title="Tổng đài báo gửi Webhook thất bại / Timeout">
-    - Server tiếp nhận webhook của bạn không phản hồi HTTP 200 trong vòng 3 giây.
-    - URL Webhook bị chặn bởi Firewall / Cloudflare / WAF chặn IP tổng đài.
-    - Chứng chỉ SSL của Webhook URL bị hết hạn hoặc không hợp lệ.
-  </Accordion>
-  <Accordion title="Không nhận được dữ liệu ghi âm LinkFile">
-    - Sự kiện nhận được có `Status` là `Ringing` hoặc `Up`. Dữ liệu ghi âm chỉ có trong payload khi cuộc gọi đã kết thúc (`Status: Down` hoặc `Down_Out`).
-    - Máy nhánh không được cấu hình ghi âm cuộc gọi trên Portal tổng đài.
-  </Accordion>
-</Accordions>
+```
+[Tổng đài ODS] ──── 1. HTTP POST Webhook ────► [CRM Backend Receiver]
+                                                       │
+                                            2. Ánh xạ Ext ➔ User ID
+                                                       │
+                                            3. WebSocket / SSE Server
+                                                       │
+                         ┌─────────────────────────────┴─────────────────────────────┐
+                         ▼                                                           ▼
+         [Trình duyệt Nhân viên A (Ext 101)]                         [Trình duyệt Nhân viên B (Ext 102)]
+               (Bật Popup cuộc gọi)                                         (Tắt chuông khi hide)
+```
+
+### Quy tắc điều phối trạng thái giao diện:
+1. **Khi nhận sự kiện `show`**:
+   - Backend tra cứu trong cơ sở dữ liệu CRM để ánh xạ số máy lẻ `Ext` với tài khoản người dùng tương ứng đang đăng nhập.
+   - Bắn thông điệp qua kênh Socket/SSE đến **duy nhất máy tính của nhân viên sở hữu `Ext`** để mở cửa sổ Popup kèm thông tin khách hàng (tìm kiếm theo số điện thoại `CID`).
+   - *Lưu ý an toàn*: Tuyệt đối không phát sóng (broadcast) sự kiện cuộc gọi của một nhân viên đến toàn bộ người dùng khác trong hệ thống.
+2. **Khi nhận sự kiện `answer`**:
+   - Chuyển giao diện Popup của nhân viên nhấc máy sang trạng thái "Đang đàm thoại", bắt đầu bấm giờ đàm thoại cục bộ.
+3. **Khi nhận sự kiện `hide`**:
+   - Dừng hiệu ứng đổ chuông trên cửa sổ Popup của đúng máy nhánh mang số `Ext` đó.
+   - **Tuyệt đối không đóng toàn bộ phiên cuộc gọi theo `LID`**: Trong cuộc gọi nhóm, sự kiện `hide` của máy nhánh phụ (mang trạng thái `ANSWERED_ELSEWHERE`) chỉ có nghĩa là máy nhánh đó ngừng reo chuông do đồng nghiệp đã nhấc máy, cuộc gọi chính vẫn đang diễn ra bình thường.
+4. **Khi nhận sự kiện `finish`**:
+   - Đóng cửa sổ Popup hoặc chuyển sang giao diện nhập ghi chú sau cuộc gọi (Call Wrap-up).
+   - Cập nhật thời lượng đàm thoại thực tế và lưu trữ liên kết ghi âm `recordingfileURL`.
+
+---
+
+## Xử lý sự kiện trùng lặp, độ trễ và lệch thứ tự
+
+Trên môi trường mạng Internet công cộng, việc tiếp nhận Webhook có thể gặp hiện tượng gửi lặp (Duplicate) hoặc nhận lệch thứ tự (Out-of-order). Hệ thống tiếp nhận cần áp dụng các chiến lược sau:
+
+### 1. Chiến lược chống trùng lặp (Deduplication)
+- **Không dùng `LID` làm khóa chống trùng duy nhất**: Một cuộc gọi luôn phát sinh ít nhất 3 đến 5 sự kiện mang cùng một `LID`. Nếu coi cùng `LID` là trùng, bạn sẽ đánh rơi toàn bộ các sự kiện `show`, `answer` và `finish`.
+- **Không dùng `LID + Ext` làm khóa duy nhất**: Sẽ làm mất tiến trình vòng đời của máy nhánh đó (không phân biệt được giữa lúc bắt đầu đổ chuông `show`, lúc nghe `answer` và lúc gác máy `finish`).
+- **Khóa phân biệt sự kiện khuyến nghị**:  
+  Tạo khóa nghiệp vụ dựa trên tổ hợp: **`LID + Event + (Uid || Ext || 'root')`**.  
+  Lưu khóa này vào bộ nhớ đệm (như Redis với thời gian hết hạn TTL 30–60 giây). Nếu gặp gói tin có cùng khóa trong khoảng thời gian này, backend có thể bỏ qua hoặc chỉ cập nhật nhẹ.
+
+### 2. Xử lý sự kiện đến lệch thứ tự
+- Do độ trễ mạng khác nhau giữa các request, đôi khi sự kiện `show` của một máy nhánh phụ có thể đến backend **sau khi** sự kiện `finish` của cuộc gọi đã kết thúc.
+- **Quy tắc an toàn**: Khi nhận sự kiện `show`, backend cần kiểm tra trạng thái của `LID` trong cơ sở dữ liệu/cache. Nếu cuộc gọi đã chuyển sang trạng thái `finish`, **tuyệt đối không kích hoạt lại trạng thái đổ chuông** trên giao diện người dùng.
+
+---
+
+## Ý nghĩa các giá trị kết quả cuộc gọi (Disposition)
+
+Trường `Disposition` phản ánh kết quả xử lý của một nhánh hoặc của toàn bộ cuộc gọi:
+
+| Giá trị | Ý nghĩa thực tế | Ngữ cảnh xuất hiện |
+| :-- | :-- | :-- |
+| **`ANSWERED`** | Cuộc gọi đã được tiếp nhận và đàm thoại thành công. | Xuất hiện trong sự kiện `finish` khi có ít nhất một bên bắt máy. |
+| **`ANSWERED_ELSEWHERE`** | Cuộc gọi đã được một máy nhánh khác trong nhóm nhấc máy trả lời. | Xuất hiện trong sự kiện `hide` của các máy nhánh không kịp nhấc máy. **Không phải cuộc gọi nhỡ của khách hàng.** |
+| **`BUSY`** | Máy bận (người nhận từ chối cuộc gọi hoặc đang có cuộc gọi khác). | Xuất hiện trong `hide` hoặc `finish`. |
+| **`NO ANSWER`** | Hết thời gian đổ chuông nhưng không có người nhấc máy. | Xuất hiện trong `hide` hoặc `finish` của cuộc gọi nhỡ. |
+| **`FAILED`** | Cuộc gọi thất bại do lỗi kỹ thuật mạng hoặc thuê bao không liên lạc được. | Xuất hiện trong `finish`. |
+
+> [!NOTE]
+> **Phân định thời gian đàm thoại và cước viễn thông:**  
+> - Thời lượng đàm thoại thực tế của nhân viên tính bằng: `TimeEnd - TimeAnswer` (tính theo giây).  
+> - Không lấy `TimeEnd - TimeCall` làm thời gian đàm thoại vì khoảng cách này bao gồm cả thời gian nghe lời chào IVR và thời gian chờ đổ chuông.
+
+---
+
+## Xử lý sự cố thường gặp (Troubleshooting)
+
+| Hiện tượng lỗi | Nguyên nhân gốc rễ | Hướng xử lý |
+| :-- | :-- | :-- |
+| **Endpoint không nhận được request nào** | 1. URL cấu hình sai hoặc server bị chặn firewall.<br/>2. Chưa gửi thông tin cho ODS cấu hình kích hoạt. | - Kiểm tra server có nhận được request từ Internet qua công cụ kiểm thử (như Webhook.site).<br/>- Liên hệ bộ phận kỹ thuật ODS xác nhận trạng thái kích hoạt Webhook. |
+| **Lỗi HTTP 401 Unauthorized** | Khóa `apikey` trong body JSON không khớp với giá trị backend kỳ vọng. | Kiểm tra lại giá trị biến môi trường `ODS_WEBHOOK_KEY`. Đảm bảo backend chấp nhận giá trị `null` nếu hệ thống chưa bật tính năng xác thực key. |
+| **Một cuộc gọi phát nhiều sự kiện `show`** | Cuộc gọi đến nhóm máy nhánh (Queue / Ring Group) làm nhiều máy đổ chuông cùng lúc. | Đây là hành vi bình thường. Backend cần trích xuất trường `Ext` để chỉ mở popup trên máy tính của đúng nhân viên sở hữu máy lẻ đó. |
+| **Không có trường `Ext` trong sự kiện `register`** | Cuộc gọi vào mới tiếp nhận ở tầng đầu số/IVR, chưa định tuyến đến máy lẻ nào. | Kiểm tra mã nguồn receiver: không đặt ràng buộc bắt buộc phải có `Ext` trong mọi sự kiện. |
+| **Không có trường `recordingfileURL`** | Cuộc gọi nhỡ (không có người bắt máy) hoặc cuộc gọi chưa kết thúc. | Link ghi âm chỉ được máy chủ ODS sinh ra duy nhất tại sự kiện `finish` đối với các cuộc gọi có trạng thái `ANSWERED`. |
+| **Popup hiển thị sai nhân viên** | Hệ thống broadcast nhầm sự kiện cho tất cả người dùng hoặc ánh xạ sai máy nhánh. | Kiểm tra bảng phân quyền người dùng trong CRM; chỉ đẩy sự kiện tới kênh WebSocket riêng của nhân viên có `user.extension === payload.Ext`. |
+
+---
 
 ## Bài viết liên quan
 
 <Cards>
-  <Card title="Khởi tạo cuộc gọi Click-to-Call" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call" description="Tạo cuộc gọi từ CRM kết hợp Webhook Popup." />
-  <Card title="Nhật ký cuộc gọi" href="/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs" description="Tra cứu toàn bộ lịch sử cuộc gọi." />
+  <Card
+    title="Tổng quan Webhook"
+    description="Khái niệm nền tảng, mô hình định danh và vòng đời 5 sự kiện cuộc gọi của tổng đài ODS."
+    href="/docs/ai-contact-center/api/webhook"
+  />
+  <Card
+    title="Tích hợp ODSPhone Widget SDK"
+    description="Giải pháp nhúng nhanh bàn phím gọi WebRTC có sẵn giao diện vào CRM."
+    href="/docs/ai-contact-center/api/websocket-rtc/widget-odsphone"
+  />
+  <Card
+    title="Khởi tạo cuộc gọi Click-to-Call"
+    description="API kích hoạt cuộc gọi ra từ hệ thống CRM/ERP."
+    href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call"
+  />
 </Cards>

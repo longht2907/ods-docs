@@ -1,33 +1,147 @@
 ---
-title: "Tích hợp thoại WebRTC"
-description: "So sánh giải pháp tích hợp Softphone và WebRTC trực tiếp trên trình duyệt web cho CRM và ERP."
+title: "Tổng quan tích hợp WebRTC"
+description: "Tìm hiểu cơ chế đàm thoại trực tiếp trên trình duyệt web, phân biệt WebRTC với WebSocket và lựa chọn phương án tích hợp phù hợp cho CRM/ERP."
 ---
 
-Khi tích hợp tính năng thoại của ODS AI Contact Center vào phần mềm quản lý quan hệ khách hàng (CRM) hoặc ERP, doanh nghiệp có thể lựa chọn một trong hai kiến trúc triển khai chính:
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-## So sánh hai phương thức tích hợp
+Trong các giải pháp Contact Center truyền thống, nhân viên bắt buộc phải sử dụng điện thoại bàn phần cứng (IP Phone) hoặc cài đặt các ứng dụng gọi thoại độc lập (Softphone như Zoiper, MicroSIP) trên máy tính. Với sự phát triển của công nghệ WebRTC, tổng đài ODS cho phép biến chính tab trình duyệt web của hệ thống CRM/ERP thành một thiết bị đầu cuối thoại hoàn chỉnh, giúp nhân viên nghe/gọi trực tiếp bằng tai nghe máy tính mà không cần cài thêm phần mềm ngoài.
 
-| Tiêu chí | 1. Softphone / IP Phone + API | 2. WebRTC trên trình duyệt |
+Tài liệu này cung cấp bức tranh toàn cảnh về kiến trúc WebRTC trong hệ thống tổng đài ODS, phân định rõ vai trò của từng công nghệ và hướng dẫn doanh nghiệp lựa chọn phương án triển khai phù hợp nhất.
+
+---
+
+## 1. WebRTC là gì?
+
+**WebRTC (Web Real-Time Communication)** là bộ chuẩn công nghệ mở do W3C và IETF xây dựng, cho phép các trình duyệt web hiện đại (Chrome, Edge, Firefox, Safari) và ứng dụng di động thiết lập kênh giao tiếp âm thanh, video và dữ liệu theo thời gian thực (Real-Time Communication - RTC) mà không cần cài đặt plugin hay phần mềm hỗ trợ.
+
+Trong ngữ cảnh thoại doanh nghiệp:
+- Trình duyệt đóng vai trò thu âm thanh từ microphone của nhân viên, mã hóa thành các gói tin thoại và giải mã âm thanh từ đối phương phát ra loa/tai nghe.
+- **Vai trò trong hệ thống ODS**: Trình duyệt hoạt động như một **SIP client trên web (Webphone)** tham gia vào mạng tổng đài.
+- **Lưu ý cốt lõi**: WebRTC **không phải là giao thức đăng ký tài khoản SIP**. Bản thân WebRTC chỉ xử lý việc truyền nhận luồng âm thanh/hình ảnh (Media). Để một máy nhánh có thể đăng ký số nội bộ, bấm số gọi đi hay nhận cuộc gọi đến, hệ thống bắt buộc phải sử dụng một giao thức báo hiệu (Signaling), cụ thể ở đây là giao thức SIP vận chuyển qua Secure WebSocket (SIP over WSS).
+
+---
+
+## 2. WebRTC được ứng dụng trong tổng đài ảo như thế nào?
+
+Một cuộc gọi thoại qua trình duyệt web không hoạt động đơn lẻ mà là sự phối hợp chặt chẽ giữa 5 thành phần kiến trúc:
+
+```
++-----------------------------------------------------------------------------------+
+| TRÌNH DUYỆT CỦA NHÂN VIÊN (CRM / ERP Frontend)                                    |
+|                                                                                   |
+|  +--------------------+    (1) Báo hiệu SIP qua WSS       +--------------------+  |
+|  | SIP Client (Web)   | ================================> | SIP Proxy / SBC    |  |
+|  | (JsSIP / Widget)   | <================================ | (Cổng WSS: 4433)   |  |
+|  +--------------------+                                   +--------------------+  |
+|            ||                                                       ||            |
+|            || (2) Luồng thoại âm thanh hai chiều (RTP Media)        ||            |
+|            =========================================================++            |
+|                                                                     ||            |
++---------------------------------------------------------------------||------------+
+                                                                      ||
+                                                    +----------------------------------+
+                                                    | HẠ TẦNG TỔNG ĐÀI PBX ODS         |
+                                                    | - Định tuyến cuộc gọi & ghi âm   |
+                                                    | - Kết nối mạng viễn thông (PSTN) |
+                                                    +----------------------------------+
+                                                                      ||
+                                                    +----------------------------------+
+                                                    | ĐẦU CUỐI CUỘC GỌI                |
+                                                    | - Khách hàng (Di động / Cố định) |
+                                                    | - Máy nhánh nội bộ khác          |
+                                                    +----------------------------------+
+```
+
+### Vai trò của từng thành phần:
+
+1. **SIP Client (Webphone)**: Khối xử lý chạy trên trình duyệt (sử dụng thư viện JsSIP, SIP.js hoặc ODSPhone Widget), quản lý việc xác thực tài khoản máy nhánh (`Register`), khởi tạo cuộc gọi đi (`Invite`), thông báo chuông đến (`Ringing`) và ngắt kết nối (`Bye`).
+2. **SIP over WSS (Secure WebSocket)**: Kênh truyền thông bảo mật hai chiều (kết nối tới `wss://rtc.cloudfone.vn:4433`) chuyên vận chuyển các bức điện báo hiệu SIP dạng văn bản giữa client và tổng đài ODS.
+3. **WebRTC Media Stream (SRTP/RTP)**: Sau khi kênh báo hiệu SIP đàm phán thành công thông số phiên (qua giao thức SDP), trình duyệt và tổng đài thiết lập kênh truyền âm thanh trực tiếp (Direct Audio Media Stream). Toàn bộ dữ liệu thoại được mã hóa bảo mật.
+4. **Hạ tầng tổng đài ODS (Cloud PBX)**: Tiếp nhận đăng ký của máy nhánh, quản lý trạng thái trực tuyến/bận, định tuyến cuộc gọi vào các nhóm trực (Ring Group / Queue) và kết nối xuyên suốt tới mạng viễn thông (PSTN).
+5. **Hệ thống CRM / ERP**: Ứng dụng nghiệp vụ của doanh nghiệp, thực hiện ánh xạ tài khoản người dùng đăng nhập với số máy lẻ tương ứng, lưu trữ dữ liệu khách hàng và kích hoạt giao diện gọi thoại.
+
+<Callout type="info">
+  **Đăng ký máy nhánh trên Webphone:**  
+  Việc đăng ký máy nhánh trên webphone là phương thức biến trình duyệt thành một **thiết bị đầu cuối thoại (terminal)**, tương đương với một máy điện thoại bàn IP Phone hoặc ứng dụng Softphone. Việc đăng ký này không đồng nghĩa sẽ tự động ngắt kết nối các thiết bị SIP đang chạy khác; chính sách cho phép một hay nhiều thiết bị cùng online trên một số máy nhánh phụ thuộc vào cấu hình gói cước tổng đài của doanh nghiệp.
+</Callout>
+
+---
+
+## 3. So sánh hai phương thức tích hợp thoại
+
+Khi đưa tính năng tổng đài vào CRM/ERP, doanh nghiệp thường cân nhắc giữa hai mô hình: **Dùng Softphone/IP Phone ngoài kết hợp REST API/Webhook** hoặc **Dùng WebRTC trực tiếp trên trình duyệt**.
+
+| Tiêu chí | 1. Softphone / IP Phone + REST API | 2. Webphone WebRTC trên trình duyệt |
 | :-- | :-- | :-- |
-| **Cơ chế hoạt động** | Sử dụng [Click-to-Call](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call) để kích hoạt cuộc gọi về thiết bị ngoài và nhận sự kiện qua [Popup Webhook](/docs/ai-contact-center/api/webhook/popup). | Đăng ký trực tiếp tài khoản SIP vào tổng đài thông qua giao thức SIP over Secure WebSocket (WSS). |
-| **Thiết bị client** | Bắt buộc nhân viên phải cài Softphone (Zoiper, MicroSIP) hoặc dùng máy điện thoại IP Phone vật lý. | Hoạt động trực tiếp trên trình duyệt web (Chrome, Edge, Firefox, Safari) thông qua mic/tai nghe của máy tính. |
-| **Trải nghiệm người dùng** | Khi click "Gọi", thiết bị Softphone đổ chuông trước, nhân viên nhấc máy rồi hệ thống mới quay số khách hàng. | Nhấn "Gọi" là hệ thống quay số ngay lập tức trên giao diện web, giao diện bàn phím quay số hiển thị trực tiếp trong CRM. |
-| **Độ phức tạp tích hợp** | **Thấp**: Chỉ cần gửi HTTP POST request và nhận Webhook. | **Trung bình - Cao**: Cần xây dựng module SIP client trên Frontend (hoặc nhúng Widget có sẵn). |
-| **Độ ổn định** | Rất cao, phụ thuộc vào chất lượng phần cứng và mạng chuyên dụng. | Rất tốt trên các trình duyệt hiện đại hỗ trợ đầy đủ WebRTC. |
+| **Nơi nhân viên nghe & nói** | Trên máy điện thoại IP Phone vật lý hoặc ứng dụng Softphone cài riêng trên máy tính/điện thoại. | Trực tiếp trên tab trình duyệt web đang mở CRM (dùng tai nghe/micro máy tính). |
+| **Yêu cầu phần mềm / thiết bị** | Bắt buộc phải có thiết bị điện thoại bàn hoặc cài đặt phần mềm ngoài (Zoiper, MicroSIP, CloudFone App). | **Không cần phần mềm ngoài**. Chỉ cần trình duyệt web hiện đại có hỗ trợ WebRTC. |
+| **Cách CRM khởi tạo cuộc gọi đi** | Backend CRM gửi yêu cầu qua REST API [Click-to-Call V1](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call). **Tổng đài sẽ gọi về máy nhánh nhân viên trước**, nhân viên nhấc máy thì tổng đài mới quay số gọi khách hàng. | Nhân viên bấm số trên bàn phím web hoặc bấm biểu tượng gọi trong CRM. Cuộc gọi kết nối thẳng từ trình duyệt ra khách hàng. |
+| **Cách tiếp nhận cuộc gọi đến** | Thiết bị IP Phone/Softphone đổ chuông. CRM có thể nhận sự kiện qua [Popup Webhook](/docs/ai-contact-center/api/webhook/popup) để tự động bật cửa sổ thông tin khách hàng. | Bàn phím thoại trên web tự đổ chuông và hiện thông báo cuộc gọi đến ngay trên màn hình CRM để nhân viên bấm Trả lời. |
+| **Vai trò của REST API & Webhook** | Là cầu nối bắt buộc để ra lệnh gọi và đồng bộ dữ liệu. | Được dùng bổ trợ để tra cứu nhật ký ([GetCallLogs](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs)), tạo máy nhánh hoặc nhận webhook mở popup CRM. |
+| **Công việc đội DEV phải làm** | Lập trình backend để gọi REST API và tiếp nhận HTTP Webhook. Khá đơn giản và nhanh chóng. | Tích hợp module WebRTC vào Frontend (xử lý quyền micro, vòng đời kết nối WebSocket, sự kiện cuộc gọi) hoặc nhúng Widget có sẵn. |
+| **Phụ thuộc môi trường web** | **Không phụ thuộc**. Cuộc gọi vẫn hoạt động bình thường ngay cả khi nhân viên tắt hoặc tải lại trang web CRM. | **Phụ thuộc vào tab trình duyệt**. Nếu nhân viên tắt tab CRM hoặc máy tính rơi vào chế độ ngủ (sleep), kết nối thoại sẽ bị ngắt. Bắt buộc phải chạy trên HTTPS để cấp quyền micro. |
+| **Trường hợp phù hợp nhất** | Đội ngũ telesales chuyên nghiệp ngồi cố định có trang bị điện thoại bàn IP Phone chuyên dụng, hoặc nhân viên thường xuyên di chuyển ngoài hiện trường. | Đội ngũ tư vấn viên, chăm sóc khách hàng làm việc liên tục trên web CRM, doanh nghiệp muốn triển khai nhanh cho nhân sự mà không phải cài đặt cấu hình từng máy. |
 
-## Lựa chọn phương thức triển khai WebRTC
+<Callout type="warn">
+  **Những hiểu lầm kỹ thuật phổ biến:**
+  - **REST API / Webhook không tự truyền âm thanh**: REST API chỉ gửi lệnh điều khiển nghiệp vụ (bảo tổng đài gọi số nào), Webhook chỉ gửi thông tin sự kiện dạng JSON. Cả hai kênh này **không thể tự đưa âm thanh thoại vào loa trình duyệt**.
+  - **WebRTC không thay thế REST API**: WebRTC chỉ phụ trách nghe/nói thời gian thực. Các tác vụ như truy xuất nhật ký cuộc gọi đầy đủ, tải file ghi âm hay tự động tạo máy nhánh từ hệ thống HRM vẫn cần sử dụng các REST API của ODS. Hai giải pháp này thường được kết hợp nhịp nhàng trong một hệ thống CRM hoàn chỉnh.
+  - **Chất lượng thoại**: Không thể khẳng định giải pháp nào luôn có chất lượng âm thanh tốt hơn. Chất lượng cuộc gọi thực tế phụ thuộc lớn vào đường truyền mạng internet, chất lượng tai nghe/micro của nhân viên và mức độ tối ưu phần cứng.
+</Callout>
 
-Nếu bạn chọn hướng đi WebRTC để nhân viên thoại trực tiếp trên giao diện CRM, ODS hỗ trợ 2 hướng tiếp cận:
+---
+
+## 4. Lựa chọn phương thức triển khai WebRTC
+
+Nếu doanh nghiệp lựa chọn hướng đi WebRTC để đàm thoại trực tiếp trên trình duyệt, ODS hỗ trợ 2 phương thức triển khai tùy thuộc vào nguồn lực và mức độ tùy biến mong muốn:
+
+### Phương án A: Tự xây dựng Webphone bằng thư viện mở (JsSIP / SIP.js)
+- **Bản chất**: [JsSIP](https://jssip.net/) và [SIP.js](https://sipjs.com/) là các thư viện lập trình giao thức SIP Client thuần túy cho JavaScript. Chúng **không phải là sản phẩm webphone có sẵn giao diện**, mà chỉ cung cấp các hàm API để kết nối WebSocket, xử lý bản tin SIP và tương tác với WebRTC.
+- **Ưu điểm**: Doanh nghiệp có toàn quyền làm chủ mã nguồn, tự do thiết kế giao diện bàn phím gọi thoại (UI/UX) theo phong cách riêng của CRM, nhúng sâu trạng thái cuộc gọi vào các quy trình nghiệp vụ phức tạp.
+- **Thách thức**: Đội ngũ lập trình viên phải tự chịu trách nhiệm toàn bộ về việc quản lý vòng đời phiên gọi, xử lý luồng `MediaStream`, cấp phát thiết bị thu âm, xử lý lỗi mạng khi ngắt kết nối và bảo trì cập nhật khi các trình duyệt thay đổi chính sách bảo mật WebRTC.
+
+### Phương án B: Nhúng module ODSPhone Widget có sẵn
+- **Bản chất**: ODS đóng gói sẵn một bàn phím thoại hoàn chỉnh (bao gồm cả giao diện quay số, nút bấm, bảng điều khiển cuộc gọi và lõi xử lý WebRTC) thành một tệp thư viện duy nhất (`odsphone.js`).
+- **Ưu điểm**: Tích hợp cực kỳ nhanh chóng (chỉ cần nhúng script và khai báo cấu hình), không cần kiến thức chuyên sâu về SIP hay WebRTC, tự động nhận các bản cập nhật và tối ưu âm thanh từ ODS.
+- **Thách thức**: Giao diện và các nút chức năng hoạt động theo thiết kế tiêu chuẩn của ODS; doanh nghiệp chỉ có thể tùy chỉnh trong phạm vi các tham số cấu hình mà SDK hỗ trợ (như vị trí, kích thước, màu chủ đạo).
+
+---
+
+## 5. Thông tin kết nối cần chuẩn bị
+
+Khi triển khai kết nối WebRTC tới tổng đài ODS (dù tự lập trình qua thư viện hay sử dụng Widget), doanh nghiệp cần chuẩn bị bộ thông số kết nối sau:
+
+| Thông số kết nối | Giá trị quy chuẩn | Ý nghĩa kỹ thuật |
+| :-- | :-- | :-- |
+| **WebSocket URL** | `wss://rtc.cloudfone.vn:4433` | Địa chỉ máy chủ WebSocket bảo mật tiếp nhận báo hiệu SIP. *(Lưu ý: Không thêm `/ws` và không tự ý thay đổi cổng kết nối).* |
+| **SIP URI** | `sip:<MAY_LE>@<TENANT_DOMAIN>` | Định danh duy nhất của máy nhánh trên tổng đài (ví dụ: `sip:101@vtp000xxxx.cfvn.cloud`). |
+| **Username** | `<MAY_LE>` | Số máy nhánh nội bộ của nhân viên (ví dụ: `101`, `102`). Lấy tại mục **Nhân viên** trên Portal quản trị tổng đài. |
+| **Password** | `<MAT_KHAU_MAY_LE>` | Mật khẩu xác thực SIP tương ứng của máy nhánh đó. |
+| **Realm / Domain** | `<TENANT_DOMAIN>` | Tên miền định danh tổng đài do ODS cấp, có dạng `vtp000xxxx.cfvn.cloud`. |
+| **ICE Servers** | *Không cần cấu hình bổ sung* | Theo cấu hình máy chủ chuẩn của ODS, client không cần khai báo danh sách STUN/TURN server bên ngoài. |
+
+<Callout type="warn">
+  **Phân định thông tin kết nối:**
+  Các thông số trên là **tài khoản SIP của máy nhánh**, phục vụ cho việc đăng ký và thoại trực tiếp. Chúng hoàn toàn tách biệt với bộ thông tin quản trị REST API (`ServiceCode`, `AuthUser`, `AuthKey`). Tuyệt đối không dùng `AuthKey` của quản trị viên làm mật khẩu kết nối SIP trên Webphone.
+</Callout>
+
+---
+
+## 6. Đọc tiếp & Hướng dẫn chi tiết
+
+Dựa trên định hướng phát triển của dự án, bạn có thể lựa chọn xem tiếp hướng dẫn kỹ thuật chi tiết theo 2 bài viết sau:
 
 <Cards className="grid-cols-1 md:grid-cols-2">
   <Card
-    title="Tự xây dựng SIP Client (JsSIP)"
-    description="Tích hợp thư viện mã nguồn mở JsSIP hoặc SIP.js để tùy biến hoàn toàn giao diện và trải nghiệm gọi thoại theo thiết kế riêng."
+    title="Kết nối WebRTC qua WSS (Tự phát triển)"
+    description="Hướng dẫn chi tiết từng bước kết nối WebSocket, đăng ký máy nhánh và điều khiển luồng âm thanh bằng thư viện chuẩn JsSIP."
     href="/docs/ai-contact-center/api/websocket-rtc/ket-noi-webrtc"
   />
   <Card
-    title="Nhúng Widget ODSPhone"
-    description="Nhúng nhanh component bàn phím và bảng điều khiển cuộc gọi có sẵn do ODS phát triển vào CRM chỉ với một vài dòng code."
+    title="Tích hợp ODSPhone Widget SDK (Nhúng sẵn)"
+    description="Hướng dẫn nhúng bàn phím thoại đóng gói sẵn vào CRM chỉ với vài dòng mã cấu hình, hỗ trợ đăng nhập tự động."
     href="/docs/ai-contact-center/api/websocket-rtc/widget-odsphone"
   />
 </Cards>

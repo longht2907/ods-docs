@@ -3,8 +3,6 @@
   "pages": [
     "get-call-logs",
     "get-call-history",
-    "get-call-history-v2",
-    "get-call-report",
-    "get-call-report-detail"
+    "get-call-history-v2"
   ]
 }

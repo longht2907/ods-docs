@@ -1,119 +1,212 @@
 ---
 title: "Quy ước chung"
-description: "Quy chuẩn kỹ thuật về Base URL, định dạng dữ liệu, cấu trúc response envelope, phân trang và mã lỗi."
+description: "Quy chuẩn kỹ thuật về Base URL, phương thức HTTP, quy ước casing, phân trang, định dạng ngày tháng và xử lý lỗi."
 ---
 
-Để việc tích hợp diễn ra nhất quán và ổn định, toàn bộ các API trong hệ thống ODS AI Contact Center tuân theo các quy chuẩn kỹ thuật dưới đây.
+Trang này tổng hợp các quy chuẩn kỹ thuật bắt buộc khi làm việc với API của **ODS AI Contact Center**, giúp kỹ sư tích hợp xây dựng ứng dụng đồng bộ, chính xác và tránh các lỗi phổ biến.
 
-## Base URL
+---
 
-| Nhóm dịch vụ | Base URL chính thức | Mô tả |
+## 1. Base URL & Môi trường
+
+Hệ thống phân tách domain chính thức theo từng cụm dịch vụ:
+
+| Cụm dịch vụ | Base URL chính thức | Phạm vi áp dụng |
 | :-- | :-- | :-- |
-| **Tổng đài PBX** | `https://api.ods.vn` | Máy nhánh, Click-to-Call, Lịch sử cuộc gọi, Danh bạ, Luật khách quen. |
-| **Chiến dịch Autocall** | `https://apiai.cloudfone.vn` | Chiến dịch gọi tự động hàng loạt, Audio TTS, Quản lý nhóm liên hệ. |
+| **Tổng đài PBX** | `https://api.ods.vn` | Máy nhánh, Click-to-Call V1/V2, Lịch sử cuộc gọi, Danh bạ, Luật khách quen. |
+| **Dịch vụ Autocall** | `https://apiai.cloudfone.vn` | Chiến dịch gọi tự động, File âm thanh TTS, Nhóm danh bạ Autocall. |
 
 <Callout type="info">
-  **Khả năng tương thích ngược (Backward Compatibility):**  
-  Hệ thống ODS vẫn duy trì hỗ trợ song song các domain cũ như `https://api.cloudfone.vn` hoặc `https://api.matbao.one` cho các ứng dụng đã kết nối trước đây. Tuy nhiên, mọi dự án mới và các bản nâng cấp được khuyến nghị chuyển sang sử dụng `https://api.ods.vn`.
+  **Khả năng tương thích ngược:** Hệ thống ODS vẫn duy trì hỗ trợ các domain cũ (`https://api.cloudfone.vn`, `https://api.matbao.one`) cho các đối tác đã kết nối trước đây. Tuy nhiên, mọi dự án mới và phiên bản nâng cấp bắt buộc sử dụng `https://api.ods.vn`.
 </Callout>
 
-## Giao thức & Headers
+---
 
-Tất cả các endpoint trong hệ thống đều sử dụng phương thức **`POST`** với dữ liệu đóng gói trong phần thân (Request Body) dạng JSON:
+## 2. Giao thức, Phương thức & Headers
+
+- **Phương thức HTTP**: **100% endpoint của ODS đều sử dụng `POST`**, kể cả các tác vụ tra cứu danh sách (`GetCallHistory`, `GetAudioList`) hoặc tác vụ xóa (`DeleteExtension`, `DeleteCampaign`, `DeleteAudio`). Không sử dụng `GET`, `PUT` hay `DELETE`.
+- **Định dạng dữ liệu**: Toàn bộ tham số gửi lên được đóng gói trong **JSON Body**.
+- **Request Headers bắt buộc**:
 
 ```http
-POST /api/CloudFone/GetCallLogs HTTP/1.1
+POST /api/CloudFone/AutoCall HTTP/1.1
 Host: api.ods.vn
 Content-Type: application/json; charset=utf-8
 ```
 
-## Cấu trúc phản hồi (Response Envelope)
+---
 
-Hệ thống trả về dữ liệu chuẩn JSON với cấu trúc bao gói (envelope) tiêu chuẩn:
+## 3. Quy ước đặt tên trường (Casing) & Kiểu dữ liệu
 
-### 1. Phản hồi danh sách (List Response)
+### Casing không đồng nhất giữa các nhóm API
+Do hệ thống được phát triển qua nhiều giai đoạn, quy ước đặt tên thuộc tính JSON có sự khác biệt giữa các nhóm endpoint:
+- **Request Parameters**: Hầu hết sử dụng **PascalCase** (ví dụ: `ServiceName`, `ServiceCode`, `AuthUser`, `AuthKey`, `PhoneNumber`, `DateStart`, `DateEnd`, `PageIndex`, `PageSize`). Tuy nhiên, một số endpoint sử dụng chữ thường (ví dụ: `password`, `name` trong API `AddExtension`).
+- **Response Properties**:
+  - Nhóm khởi tạo/CRUD: Thường trả về `result`, `message`, `keySearch`, `idPhoneBook`.
+  - Mảng dữ liệu lịch sử cuộc gọi (`GetCallHistory`): Thuộc tính bản ghi bên trong dùng **camelCase** hoặc không dấu tiếng Việt (ví dụ: `stt`, `key`, `ngayGoi`, `soGoiDen`, `dauSo`, `soNhan`, `trangThai`, `tongThoiGianGoi`, `thoiGianThucGoi`, `linkFile`, `typecall`).
 
-```json
-{
-  "result": "success",
-  "message": "Lấy dữ liệu thành công!",
-  "total": 415,
-  "data": [
-    { ... }
-  ]
-}
-```
+<Callout type="warn">
+  Bộ giải mã JSON trên hệ thống ODS **có phân biệt chữ hoa/chữ thường**. Lập trình viên bắt buộc đối chiếu bảng tham số chi tiết của từng endpoint cụ thể, không tự động chuyển đổi định dạng camelCase hay snake_case.
+</Callout>
 
-- `result`: Trạng thái xử lý (`success` hoặc `failed`).
-- `message`: Thông điệp diễn giải chi tiết từ hệ thống.
-- `total`: Tổng số lượng bản ghi thỏa mãn điều kiện lọc (dùng để tính toán phân trang phía client).
-- `data`: Mảng danh sách các bản ghi kết quả trả về.
+---
 
-### 2. Phản hồi thực thi lệnh (Action Response)
+## 4. Cấu trúc phản hồi (Response Envelope)
 
-Đối với các API tạo cuộc gọi hoặc thêm dữ liệu, hệ thống trả về mã định danh kết quả:
+Hệ thống không dùng chung một schema cho toàn bộ các API mà phân thành 2 dạng envelope chính có bằng chứng trong tài liệu nguồn:
+
+### Dạng 1: Phản hồi thực thi tác vụ (Action Response)
+Áp dụng cho Click-to-Call, thêm/xóa máy nhánh, khởi tạo chiến dịch:
 
 ```json
 {
   "result": "success",
   "message": "GỌI TỰ ĐỘNG THÀNH CÔNG",
-  "keySearch": "1b38fbda-4b7e-4f12-9c99-xxxxxxxxxxxx"
+  "keySearch": "1b38fbda-4b7e-41a2-9bc3-7a28e9324a1b"
 }
 ```
 
-Hoặc trả về ID bản ghi vừa tạo:
+Hoặc trả về ID bản ghi mới tạo:
 
 ```json
 {
   "result": "success",
-  "message": "Lưu thành công!",
+  "message": "Thành công!",
   "idPhoneBook": 12
 }
 ```
 
-## Quy tắc phân trang (Pagination)
+### Dạng 2: Phản hồi danh sách phân trang (List Response)
+Áp dụng cho tra cứu lịch sử cuộc gọi (`GetCallHistory`, `GetCallLogs`) và danh sách nhóm liên hệ:
 
-Đối với các API tra cứu lịch sử cuộc gọi và danh sách chiến dịch:
+```json
+{
+  "result": "success",
+  "message": "",
+  "total": 415,
+  "data": [
+    {
+      "stt": 1,
+      "key": "1610039549.118173-9100(Nhóm)",
+      "ngayGoi": "2026-10-15T08:30:00",
+      "soGoiDen": "0900000000",
+      "dauSo": "02873007788",
+      "soNhan": "101",
+      "trangThai": "ANSWERED",
+      "tongThoiGianGoi": "02:15",
+      "thoiGianThucGoi": "135",
+      "linkFile": "https://api.ods.vn/recordings/call-123.mp3"
+    }
+  ]
+}
+```
 
-- `PageIndex` *(int, bắt buộc)*: Số thứ tự trang cần lấy, bắt đầu từ `1`.
-- `PageSize` *(int, bắt buộc)*: Số lượng bản ghi trên một trang. **Giá trị tối đa là `200`**. Nếu truyền lớn hơn 200, hệ thống có thể giới hạn về ngưỡng mặc định hoặc từ chối request.
+- `result`: Trạng thái xử lý (`"success"` hoặc `"failed"`).
+- `total`: Tổng số bản ghi thỏa điều kiện lọc trong database (dùng để tính toán tổng số trang phía client).
+- `data`: Mảng danh sách bản ghi thuộc trang hiện tại.
 
-## Định dạng ngày tháng (Date/Time Format)
+---
 
-- Định dạng chuẩn đầy đủ: `YYYY-MM-DD HH:mm:ss` (ví dụ: `2026-10-13 08:30:00`).
-- Định dạng rút gọn: `YYYY-MM-DD` (ví dụ: `2026-10-13`). Khi truyền chỉ ngày, hệ thống sẽ tự động gán mốc giờ bắt đầu là `00:00:00`.
-- Thời gian trả về trong kết quả cuộc gọi thường ở chuẩn ISO 8601: `YYYY-MM-DDTHH:mm:ss`.
+## 5. Quy tắc phân trang (Pagination)
 
-## Khóa tìm kiếm cuộc gọi `KeySearch`
+Áp dụng cho các endpoint tra cứu dữ liệu (`GetCallHistory`, `GetCallLogs`, danh sách danh bạ):
 
-Trong các API Click-to-Call ([AutoCall](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call) và [AutoCallV2](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call-v2)), tham số `KeySearch` đóng vai trò liên kết dữ liệu quan trọng:
+| Tham số | Kiểu | Bắt buộc | Mặc định | Mô tả & Lưu ý |
+| :-- | :-- | :-: | :-: | :-- |
+| `PageIndex` | integer | Có | `1` | Số thứ tự trang cần lấy. Mặc định tính từ `1` (1-indexed). |
+| `PageSize` | integer | Có | — | Số lượng bản ghi trên một trang. **Tối đa là `200`** theo quy định của tổng đài. |
 
-- Khuyến nghị truyền vào một chuỗi mã định danh chuẩn **UUID / GUID** đại diện cho đơn hàng, khách hàng hoặc ticket trên CRM (ví dụ: `1b38fbda-4b7e-4a12-89cd-xxxxxxxxxxxx`).
-- Nếu client không truyền `KeySearch`, hệ thống tổng đài sẽ tự động sinh ngẫu nhiên một chuỗi key và trả về trong response.
-- Sau khi cuộc gọi hoàn tất, bạn có thể dùng `KeySearch` này để tra cứu chính xác bản ghi nhật ký qua API [GetCallLogs](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs) hoặc nhận lại qua Webhook [Popup](/docs/ai-contact-center/api/webhook/popup).
+<Callout type="warn">
+  **Điểm kỹ thuật chưa chốt:** Tài liệu nguồn không định nghĩa hành vi khi `PageSize > 200` (hệ thống có thể tự giới hạn về 200 hoặc trả về lỗi). Khuyến nghị luôn đặt `PageSize` trong khoảng `10` đến `200`.
+</Callout>
 
-## Xử lý lỗi (Error Handling)
+---
 
-Khi request không thành công, thuộc tính `result` sẽ mang giá trị `"failed"` kèm theo nguyên nhân cụ thể trong `message`:
+## 6. Định dạng ngày tháng & Bẫy biên thời gian (`DateEnd`)
 
-<Accordions>
-  <Accordion title="Lỗi xác thực (Authentication Failure)">
-    Xảy ra khi `AuthUser`, `AuthKey` hoặc `ServiceName` không khớp với gói dịch vụ đang hoạt động. Kiểm tra lại thông tin trong Portal.
-  </Accordion>
-  <Accordion title="Thiếu tham số bắt buộc">
-    Một số trường bắt buộc (như số điện thoại, máy nhánh, ngày bắt đầu/kết thúc) bị bỏ trống hoặc mang giá trị rỗng `""`.
-  </Accordion>
-  <Accordion title="Máy nhánh không online hoặc không tồn tại">
-    Số máy nhánh được chỉ định trong cuộc gọi chưa đăng ký thành công SIP client hoặc đang bận.
-  </Accordion>
-  <Accordion title="Khoảng thời gian tra cứu không hợp lệ">
-    `DateStart` lớn hơn `DateEnd` hoặc khoảng cách thời gian vượt quá giới hạn tra cứu cho phép.
-  </Accordion>
-</Accordions>
+Trong các API lọc theo thời gian (`DateStart`, `DateEnd`):
 
-## Bài viết liên quan
+- **Định dạng nhận diện**: Chuỗi `YYYY-MM-DD` hoặc `YYYY-MM-DD HH:mm:ss` (ví dụ: `"2026-10-15 08:30:00"`).
+- **Múi giờ (Timezone)**: Mặc định tính theo giờ Việt Nam **ICT (UTC+7)**. Tránh gửi chuỗi ISO có hậu tố `Z` (UTC) nếu chưa chuyển đổi giờ địa phương.
+
+<Callout type="error">
+  **Cảnh báo bẫy biên thời gian (`DateEnd`):**  
+  Theo tài liệu nguồn ODS: *Nếu chỉ truyền ngày dạng `YYYY-MM-DD` (ví dụ `"2026-10-15"`), hệ thống sẽ tự động gán mốc thời gian là `00:00:00`.*  
+  
+  Do đó, nếu bạn truyền:
+  - `DateStart`: `"2026-10-15"` ➔ hiểu là `2026-10-15 00:00:00`
+  - `DateEnd`: `"2026-10-15"` ➔ hiểu là `2026-10-15 00:00:00`  
+  
+  **Kết quả:** Hệ thống sẽ không trả về bất kỳ cuộc gọi nào phát sinh trong ngày 15/10!  
+  **Giải pháp chuẩn:** Khi lọc trong ngày hoặc khoảng ngày, hãy luôn truyền đủ giờ phút giây:  
+  `DateStart: "2026-10-15 00:00:00"` và `DateEnd: "2026-10-15 23:59:59"`.
+</Callout>
+
+---
+
+## 7. Phân biệt `KeySearch` với `Idempotency Key`
+
+Trong các API khởi tạo cuộc gọi ([Click-to-Call V1](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call), [Click-to-Call V2](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call-v2)), tham số `KeySearch` có vai trò quan trọng nhưng thường bị hiểu nhầm:
+
+| Đặc tính | `KeySearch` của ODS | `Idempotency Key` (Khóa chống trùng lặp) |
+| :-- | :-- | :-- |
+| **Bản chất** | **Mã đối chiếu tham chiếu (Correlation ID)** do CRM tự đặt hoặc tổng đài tự sinh ngẫu nhiên. | Khóa giao dịch kỹ thuật ngăn chặn thực thi trùng lặp khi request bị gửi lại nhiều lần (Retry). |
+| **Mục đích** | Dùng để tìm kiếm bản ghi cuộc gọi trong `GetCallLogs` hoặc đối chiếu khi nhận Webhook Popup. | Đảm bảo 1 thao tác duy nhất chỉ được trừ tiền hoặc tạo 1 cuộc gọi dù mạng chập chờn. |
+| **Hành vi tổng đài** | **KHÔNG có cơ chế chống trùng lặp**: Nếu CRM gửi 2 request với cùng một chuỗi `KeySearch`, tổng đài **vẫn tạo ra 2 cuộc gọi riêng biệt**. | Nếu gửi lại cùng key, hệ thống trả về kết quả cũ mà không thực hiện gọi lại. |
+
+<Callout type="warn">
+  **Khuyến nghị triển khai:** Lập trình viên phải tự quản lý cơ chế chống bấm đúp (Debounce / Throttle) tại giao diện CRM/ERP để tránh tình trạng người dùng bấm liên tục tạo ra nhiều cuộc gọi đồng thời tới cùng một khách hàng.
+</Callout>
+
+---
+
+## 8. Đối chiếu lỗi HTTP với lỗi nghiệp vụ
+
+Khi tích hợp với ODS, lập trình viên cần xử lý 2 tầng lỗi riêng biệt:
+
+### Tầng 1: Lỗi giao thức HTTP (Network & Transport)
+- `400 Bad Request`: Payload JSON bị lỗi cú pháp hoặc thiếu tham số bắt buộc.
+- `404 Not Found`: Sai đường dẫn URL endpoint.
+- `500 / 502 / 504`: Máy chủ ODS gặp sự cố hoặc gateway timeout.
+
+### Tầng 2: Lỗi nghiệp vụ (Business Logic Failure)
+<Callout type="info">
+  **Đặc thù nghiệp vụ:** Phần lớn các lỗi nghiệp vụ (sai mật khẩu máy nhánh, sai AuthKey, máy nhánh không online, số điện thoại không hợp lệ) vẫn trả về **`HTTP 200 OK`**.
+</Callout>
+
+Lập trình viên bắt buộc phải kiểm tra thuộc tính `result` bên trong thân JSON phản hồi:
+
+```json title="Ví dụ phản hồi lỗi nghiệp vụ (HTTP 200 OK)"
+{
+  "result": "failed",
+  "message": "Sai thông tin AuthUser hoặc AuthKey!"
+}
+```
+
+```javascript title="Mẫu xử lý kết quả đúng chuẩn (JavaScript)"
+const response = await fetch('https://api.ods.vn/api/CloudFone/AutoCall', { ... });
+
+// 1. Kiểm tra tầng HTTP
+if (!response.ok) {
+  throw new Error(`Lỗi HTTP: ${response.status} ${response.statusText}`);
+}
+
+const data = await response.json();
+
+// 2. Bắt buộc kiểm tra tầng nghiệp vụ
+if (data.result !== 'success') {
+  throw new Error(`Tổng đài từ chối: ${data.message}`);
+}
+
+// 3. Xử lý thành công
+console.log('Khởi tạo cuộc gọi thành công, KeySearch:', data.keySearch);
+```
+
+---
+
+## Bài viết tiếp theo
 
 <Cards>
-  <Card title="Xác thực API" href="/docs/ai-contact-center/api/bat-dau/xac-thuc" description="Tìm hiểu bộ khóa ServiceName, AuthUser và AuthKey." />
-  <Card title="API Tổng đài PBX" href="/docs/ai-contact-center/api/tong-dai" description="Danh mục API quản lý tổng đài và cuộc gọi." />
+  <Card title="Xác thực API" href="/docs/ai-contact-center/api/bat-dau/xac-thuc" description="Chi tiết về bộ khóa ServiceName, AuthUser, AuthKey." />
+  <Card title="Khởi tạo cuộc gọi Click-to-Call V1" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call" description="Áp dụng quy ước để thực hiện cuộc gọi đầu tiên." />
 </Cards>

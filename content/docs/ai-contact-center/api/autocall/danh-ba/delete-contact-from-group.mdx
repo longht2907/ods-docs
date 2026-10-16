@@ -1,28 +1,33 @@
 ---
 title: "Xóa liên hệ khỏi nhóm (DeleteContactFromGroup)"
 description: "Gỡ bỏ một khách hàng khỏi một nhóm danh bạ Autocall cụ thể."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Contact/DeleteContactFromGroup`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Contact/DeleteContactFromGroup" />
 
-Gỡ bỏ một liên hệ khách hàng ra khỏi một nhóm danh bạ chiến dịch nhất định mà không xóa liên hệ đó khỏi hệ thống tổng thể.
+    Gỡ bỏ một liên hệ khách hàng ra khỏi một nhóm danh bạ chiến dịch nhất định mà không xóa liên hệ đó khỏi hệ thống tổng thể.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Contact_Id` | string / number | Có | Mã định danh `ContactId` của khách hàng cần gỡ. |
-| `Group_Id` | string / number | Có | Mã `ContactGroupID` của nhóm danh bạ tương ứng. |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `Contact_Id` | string / number | Có | Mã định danh `ContactId` của khách hàng cần gỡ. |
+    | `Group_Id` | string / number | Có | Mã `ContactGroupID` của nhóm danh bạ tương ứng. |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/DeleteContactFromGroup" \
+curl -X POST "https://apiai.cloudfone.vn/api/Contact/DeleteContactFromGroup" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -32,10 +37,11 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/DeleteContactFromGroup" \
     "Group_Id": "1006"
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/DeleteContactFromGroup', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Contact/DeleteContactFromGroup', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -49,8 +55,8 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/DeleteContactFromG
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -62,17 +68,17 @@ payload = {
     "Group_Id": "1006",
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Contact/DeleteContactFromGroup",
+    "https://apiai.cloudfone.vn/api/Contact/DeleteContactFromGroup",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -80,31 +86,39 @@ print(response.json())
   "message": ""
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
-| `message` | string | Thông báo phản hồi từ hệ thống. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    ### Bảng mô tả trường
 
-<Callout type="info">
-- **Gỡ bỏ có chọn lọc**: API này chỉ tách liên hệ `Contact_Id` ra khỏi nhóm `Group_Id`. Dữ liệu liên hệ gốc trong hệ thống Autocall không bị ảnh hưởng và vẫn có thể được gán vào các nhóm khác.
-</Callout>
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
+    | `message` | string | Thông báo phản hồi từ hệ thống. |
 
-## Lỗi thường gặp
+    ## Lưu ý quan trọng
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - `Group_Id` hoặc `Contact_Id` không tồn tại.
-    - Liên hệ không thuộc về nhóm đã chỉ định.
-  </Accordion>
-</Accordions>
+    <Callout type="info">
+    - **Gỡ bỏ có chọn lọc**: API này chỉ tách liên hệ `Contact_Id` ra khỏi nhóm `Group_Id`. Dữ liệu liên hệ gốc trong hệ thống Autocall không bị ảnh hưởng và vẫn có thể được gán vào các nhóm khác.
+    </Callout>
 
-## Bài viết liên quan
+    ## Lỗi thường gặp
 
-<Cards>
-  <Card title="Thêm liên hệ vào nhóm" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact-to-group" description="Gán liên hệ vào nhóm." />
-  <Card title="Chi tiết nhóm danh bạ" href="/docs/ai-contact-center/api/autocall/danh-ba/get-contact-group-detail-list" description="Xem các liên hệ trong nhóm." />
-</Cards>
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - `Group_Id` hoặc `Contact_Id` không tồn tại.
+        - Liên hệ không thuộc về nhóm đã chỉ định.
+      </Accordion>
+    </Accordions>
+
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Thêm liên hệ vào nhóm" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact-to-group" description="Gán liên hệ vào nhóm." />
+      <Card title="Chi tiết nhóm danh bạ" href="/docs/ai-contact-center/api/autocall/danh-ba/get-contact-group-detail-list" description="Xem các liên hệ trong nhóm." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

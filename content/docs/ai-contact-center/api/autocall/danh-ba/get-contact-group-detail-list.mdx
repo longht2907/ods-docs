@@ -1,30 +1,35 @@
 ---
 title: "Chi tiết nhóm danh bạ (GetContactGroupDetailList)"
 description: "Tra cứu danh sách các khách hàng nằm trong một nhóm danh bạ Autocall cụ thể."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Contact/GetContactGroupDetailList`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Contact/GetContactGroupDetailList" />
 
-Lấy danh sách các liên hệ (số điện thoại, tên khách hàng) đang thuộc về một nhóm danh bạ nhất định, hỗ trợ tìm kiếm và phân trang.
+    Lấy danh sách các liên hệ (số điện thoại, tên khách hàng) đang thuộc về một nhóm danh bạ nhất định, hỗ trợ tìm kiếm và phân trang.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `ContactGroupID` | number / string | Có | Mã ID của nhóm danh bạ cần xem chi tiết. |
-| `Key` | string | Không | Từ khóa tìm kiếm theo tên hoặc số điện thoại. |
-| `PageIndex` | number | Không | Số thứ tự trang hiện tại (mặc định là `1`). |
-| `PageSize` | number | Không | Số lượng bản ghi trên một trang (mặc định là `20`). |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `ContactGroupID` | number / string | Có | Mã ID của nhóm danh bạ cần xem chi tiết. |
+    | `Key` | string | Không | Từ khóa tìm kiếm theo tên hoặc số điện thoại. |
+    | `PageIndex` | number | Không | Số thứ tự trang hiện tại (mặc định là `1`). |
+    | `PageSize` | number | Không | Số lượng bản ghi trên một trang (mặc định là `20`). |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/GetContactGroupDetailList" \
+curl -X POST "https://apiai.cloudfone.vn/api/Contact/GetContactGroupDetailList" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -36,10 +41,11 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/GetContactGroupDetailList" \
     "PageSize": 20
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/GetContactGroupDetailList', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Contact/GetContactGroupDetailList', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -54,8 +60,8 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/GetContactGroupDet
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -68,17 +74,17 @@ payload = {
     "PageSize": 20,
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Contact/GetContactGroupDetailList",
+    "https://apiai.cloudfone.vn/api/Contact/GetContactGroupDetailList",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -96,40 +102,48 @@ print(response.json())
   ]
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
-| `total` | number | Tổng số lượng liên hệ trong nhóm. |
-| `data` | array | Danh sách thông tin chi tiết từng khách hàng trong nhóm. |
-| `data[].contactId` | number | Mã định danh duy nhất của liên hệ. |
-| `data[].phone` | string | Số điện thoại khách hàng. |
-| `data[].contactName` | string | Tên định danh của liên hệ. |
-| `data[].company` | string | Tên công ty / tổ chức. |
-| `data[].email` | string | Địa chỉ email của liên hệ. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    ### Bảng mô tả trường
 
-<Callout type="info">
-- **Kiểm tra danh bạ trước khi chạy chiến dịch**: Sử dụng endpoint này để rà soát danh sách số điện thoại trong nhóm, loại bỏ các số không hợp lệ trước khi kích hoạt gọi tự động.
-- **Phân trang**: `PageIndex` và `PageSize` giúp duyệt các nhóm có số lượng liên hệ lớn (hàng nghìn số).
-</Callout>
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+    | `total` | number | Tổng số lượng liên hệ trong nhóm. |
+    | `data` | array | Danh sách thông tin chi tiết từng khách hàng trong nhóm. |
+    | `data[].contactId` | number | Mã định danh duy nhất của liên hệ. |
+    | `data[].phone` | string | Số điện thoại khách hàng. |
+    | `data[].contactName` | string | Tên định danh của liên hệ. |
+    | `data[].company` | string | Tên công ty / tổ chức. |
+    | `data[].email` | string | Địa chỉ email của liên hệ. |
 
-## Lỗi thường gặp
+    ## Lưu ý quan trọng
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - `ContactGroupID` không tồn tại.
-  </Accordion>
-  <Accordion title="Nhóm rỗng data []">
-    - Nhóm mới được tạo qua [AddContactGroup](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-group) và chưa được gán liên hệ nào qua [AddContactToGroup](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-to-group).
-  </Accordion>
-</Accordions>
+    <Callout type="info">
+    - **Kiểm tra danh bạ trước khi chạy chiến dịch**: Sử dụng endpoint này để rà soát danh sách số điện thoại trong nhóm, loại bỏ các số không hợp lệ trước khi kích hoạt gọi tự động.
+    - **Phân trang**: `PageIndex` và `PageSize` giúp duyệt các nhóm có số lượng liên hệ lớn (hàng nghìn số).
+    </Callout>
 
-## Bài viết liên quan
+    ## Lỗi thường gặp
 
-<Cards>
-  <Card title="Xóa liên hệ khỏi nhóm" href="/docs/ai-contact-center/api/autocall/danh-ba/delete-contact-from-group" description="Loại bỏ một số điện thoại khỏi nhóm này." />
-  <Card title="Danh sách nhóm danh bạ" href="/docs/ai-contact-center/api/autocall/danh-ba/get-contact-group-list" description="Xem tất cả các nhóm." />
-</Cards>
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - `ContactGroupID` không tồn tại.
+      </Accordion>
+      <Accordion title="Nhóm rỗng data []">
+        - Nhóm mới được tạo qua [AddContactGroup](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-group) và chưa được gán liên hệ nào qua [AddContactToGroup](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-to-group).
+      </Accordion>
+    </Accordions>
+
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Xóa liên hệ khỏi nhóm" href="/docs/ai-contact-center/api/autocall/danh-ba/delete-contact-from-group" description="Loại bỏ một số điện thoại khỏi nhóm này." />
+      <Card title="Danh sách nhóm danh bạ" href="/docs/ai-contact-center/api/autocall/danh-ba/get-contact-group-list" description="Xem tất cả các nhóm." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

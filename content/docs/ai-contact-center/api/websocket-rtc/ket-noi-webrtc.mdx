@@ -1,133 +1,96 @@
 ---
 title: "Kết nối WebRTC qua WSS"
-description: "Hướng dẫn đăng ký tài khoản SIP máy nhánh và điều khiển cuộc gọi trực tiếp trên trình duyệt bằng JsSIP."
+description: "Thông số kết nối, cơ chế hoạt động và tài liệu tham khảo tích hợp tính năng nghe/gọi trực tiếp trên trình duyệt qua WebRTC."
 ---
 
-WebRTC (Web Real-Time Communication) cho phép trình duyệt web thiết lập kênh truyền âm thanh hai chiều trực tiếp với tổng đài ODS thông qua giao thức SIP over Secure WebSocket (WSS).
+Tài liệu này cung cấp thông số cấu hình và cơ chế kỹ thuật để lập trình viên tích hợp module thoại trực tiếp trên trình duyệt (CRM/ERP) thông qua **SIP over Secure WebSocket (WSS)** và **WebRTC**.
 
-<Callout type="info">
-  **Thông số kết nối máy chủ WSS:**
-  - WebSocket Server: `wss://rtc.ods.vn:8089/ws` **(Cần bổ sung: [Q5])**
-  - SIP Domain / Realm: `sip.ods.vn` **(Cần bổ sung: [Q5])**
-  - Giao thức âm thanh hỗ trợ: Opus, PCMA (G.711a), PCMU (G.711u)
+<Callout type="warn">
+  **Định hướng tích hợp:**  
+  Đây là tài liệu thông số và cơ chế nền tảng để DEV tự phát triển module Softphone tùy biến theo hệ thống của doanh nghiệp; **không phải là bộ webphone UI hoàn chỉnh sẵn sàng cho Production**.
 </Callout>
 
-## Quy trình tích hợp bằng JsSIP
+---
 
-[JsSIP](https://jssip.net/) là thư viện JavaScript SIP Client chuẩn mực và phổ biến nhất hiện nay để kết nối WebRTC với tổng đài Asterisk / FreePBX.
+## Ứng dụng và phạm vi triển khai
 
-### 1. Cài đặt thư viện
+Tích hợp WebRTC cho phép ứng dụng web giao tiếp trực tiếp với tổng đài ODS mà không cần cài đặt phần mềm ngoài (như MicroSIP, Zoiper):
 
-Cài đặt thông qua npm hoặc tải từ CDN:
+- **Click-to-Call**: Bấm gọi trực tiếp từ hồ sơ khách hàng hoặc ticket trên CRM.
+- **Tiếp nhận cuộc gọi (Screen Pop-up)**: Bắt sự kiện cuộc gọi đến để hiển thị thông tin người gọi ngay khi chuông reo.
+- **Giao diện tùy biến**: Tự thiết kế bàn phím số và trải nghiệm gọi đồng bộ theo Design System của doanh nghiệp.
 
-```bash
-npm install jssip
+### Phân định trách nhiệm
+- **ODS cung cấp**: Cổng báo hiệu WSS, tổng đài SIP, hạ tầng Media Gateway chuyển đổi âm thanh và định tuyến viễn thông.
+- **Doanh nghiệp phát triển (DEV)**: Quản lý thư viện SIP client (JsSIP / SIP.js), thiết kế giao diện bàn phím, xin quyền Microphone và xử lý thẻ âm thanh trên trình duyệt.
+
+---
+
+## Thông số kết nối
+
+Sử dụng chính xác các giá trị cấu hình sau khi khởi tạo kết nối:
+
+| Thông số | Giá trị quy chuẩn | Ghi chú kỹ thuật |
+| :-- | :-- | :-- |
+| **WebSocket URL** | `wss://rtc.cloudfone.vn:4433` | Điểm kết nối báo hiệu WSS. **Không thêm `/ws` và không đổi cổng `4433`.** |
+| **SipURI** | `sip:<MAY_LE>@<TENANT_DOMAIN>` | Định danh máy nhánh (ví dụ: `sip:101@vtp000xxxx.cfvn.cloud`). |
+| **Username** | `<MAY_LE>` | Số máy lẻ nội bộ (lấy tại mục **Nhân viên** trên Portal tổng đài). |
+| **Password** | `<MAT_KHAU_MAY_LE>` | Mật khẩu SIP của máy lẻ (không dùng mật khẩu đăng nhập CRM). |
+| **Realm** | `<TENANT_DOMAIN>` | Tên miền tổng đài do ODS cấp. **Không tự suy từ REST `ServiceName`.** |
+| **ICE Servers** | *Không cần khai báo thêm* | Cấu hình ODS hỗ trợ sẵn định tuyến media thông thường. |
+
+<Callout type="info">
+  **Lưu ý về ICE và tường lửa:** Việc không cần khai báo thêm STUN/TURN server không đảm bảo 100% mọi mạng doanh nghiệp đều thông suốt. Nếu mạng nội bộ chặn các dải cổng UDP, âm thanh WebRTC vẫn có thể bị gián đoạn.
+</Callout>
+
+---
+
+## Cơ chế hoạt động và luồng kết nối
+
+Hệ thống hoạt động dựa trên 2 kênh độc lập: **Kênh báo hiệu (WSS)** và **Kênh âm thanh (WebRTC Media)**.
+
+### Các mốc trạng thái kết nối
+
+```
+[1. WSS Handshake]          [2. SIP REGISTER]           [3. INVITE & Ringing]         [4. Đàm thoại Audio]
+ Trình duyệt mở kết nối  ──►  Đăng ký tài khoản SIP   ──►  Quay số & Đổ chuông    ──►  Truyền âm thanh 2 chiều
+ tới rtc.cloudfone.vn:4433    Xác thực máy lẻ + Pass       Thỏa thuận SDP (Codec)       (SRTP qua UDP / WebRTC)
 ```
 
-Hoặc nhúng qua thẻ `<script>`:
+1. **WSS connected**: Mở thành công kênh WebSocket tới máy chủ ODS (chứng minh mạng thông suốt tới cổng `4433`).
+2. **SIP registered**: Tổng đài xác thực thành công máy nhánh (`200 OK`). Máy lẻ chính thức trực tuyến.
+3. **Thiết lập cuộc gọi**: Trao đổi bản tin SIP `INVITE`, `180 Ringing` và đàm phán mô tả phiên qua SDP (Codec âm thanh).
+4. **Truyền nhận Media**: Khi người nhận nhấc máy (`200 OK`), luồng âm thanh truyền trực tiếp qua giao thức bảo mật **SRTP/UDP** giữa trình duyệt và ODS Media Gateway.
+5. **Kết thúc cuộc gọi**: Gửi bản tin `BYE`, ngắt luồng âm thanh và dọn dẹp phiên.
 
-```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jssip/3.10.1/jssip.min.js"></script>
-```
+<Callout type="warn">
+  **2 nguyên tắc cốt lõi:**  
+  - **WSS connected $\neq$ SIP registered**: Mở socket thành công chưa chứng minh thông tin tài khoản hợp lệ.  
+  - **SIP registered $\neq$ Đã thông âm thanh**: Báo hiệu thành công nhưng nếu mạng chặn UDP hoặc micro bị từ chối, cuộc gọi vẫn bị câm tiếng. Âm thanh **không đi qua kênh WebSocket**.
+</Callout>
 
-### 2. Khởi tạo SIP User Agent (UA)
+---
 
-```javascript
-import JsSIP from 'jssip';
+## Tài liệu tham khảo
 
-// Cấu hình thông tin máy nhánh nhân viên
-const socket = new JsSIP.WebSocketInterface('wss://rtc.ods.vn:8089/ws');
+Để bắt đầu phát triển client, bạn có thể lựa chọn một trong các thư viện SIP mã nguồn mở phổ biến và tra cứu tài liệu chính thức:
 
-const configuration = {
-  sockets: [socket],
-  uri: 'sip:101@sip.ods.vn',
-  password: 'YOUR_EXTENSION_PASSWORD',
-  display_name: 'Nguyen Van A',
-};
+- [JsSIP Documentation (v3.10.x)](https://jssip.net/documentation/3.10.x/): Thư viện SIP client nhẹ, chuẩn RFC 3261, phổ biến trên Asterisk.
+- [SIP.js Documentation](https://sipjs.com/guides/): Thư viện SIP client hiện đại hỗ trợ TypeScript đầy đủ.
+- [MDN WebRTC API](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API): Tài liệu chuẩn của Mozilla về xử lý luồng `MediaStream`, `RTCPeerConnection` và bắt quyền Microphone.
+- [Autoplay Policy Guide (Chrome/MDN)](https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide): Hướng dẫn xử lý chính sách chặn âm thanh tự động của trình duyệt khi nhận cuộc gọi đến.
 
-const ua = new JsSIP.UA(configuration);
+<Callout type="info">
+  **Ghi chú kiểm chứng:**  
+  Tài liệu này được biên soạn dựa trên thông số kỹ thuật chuẩn của hệ thống ODS. Trong quá trình viết tài liệu, hệ thống **chưa kiểm thử đăng ký SIP / thực hiện cuộc gọi thực tế** nhằm tuân thủ quy tắc an toàn, không tự ý phát sinh cước viễn thông khi chưa có môi trường thử nghiệm chuyên dụng.
+</Callout>
 
-// Bắt các sự kiện vòng đời kết nối
-ua.on('connected', () => console.log('WSS Connected'));
-ua.on('disconnected', () => console.warn('WSS Disconnected'));
-ua.on('registered', () => console.log('SIP Registered thành công!'));
-ua.on('registrationFailed', (e) => console.error('SIP Register thất bại:', e.cause));
-
-// Lắng nghe cuộc gọi đến
-ua.on('newRTCSession', (data) => {
-  const session = data.session;
-
-  if (session.direction === 'incoming') {
-    console.log('Cuộc gọi đến từ:', session.remote_identity.uri.user);
-
-    // Bắt sự kiện khi cuộc gọi được kết nối để gắn audio stream
-    session.on('peerconnection', (e) => {
-      e.peerconnection.addEventListener('track', (trackEvent) => {
-        const remoteAudio = document.getElementById('remoteAudio');
-        remoteAudio.srcObject = trackEvent.streams[0];
-        remoteAudio.play();
-      });
-    });
-
-    // Chấp nhận nghe máy khi người dùng nhấn nút Nghe
-    // session.answer({ mediaConstraints: { audio: true, video: false } });
-  }
-});
-
-// Bắt đầu đăng ký
-ua.start();
-```
-
-### 3. Thực hiện cuộc gọi ra (Outgoing Call)
-
-```javascript
-// Gọi ra đến số điện thoại khách hàng
-const targetNumber = '0900000000';
-
-const eventHandlers = {
-  progress: () => console.log('Đang đổ chuông...'),
-  failed: (e) => console.error('Cuộc gọi thất bại:', e.cause),
-  ended: () => console.log('Cuộc gọi kết thúc'),
-  confirmed: () => console.log('Khách hàng đã nhấc máy!'),
-};
-
-const options = {
-  eventHandlers: eventHandlers,
-  mediaConstraints: { audio: true, video: false },
-};
-
-const session = ua.call(`sip:${targetNumber}@sip.ods.vn`, options);
-
-// Gắn luồng âm thanh nghe tiếng khách hàng
-session.on('peerconnection', (e) => {
-  e.peerconnection.addEventListener('track', (trackEvent) => {
-    const remoteAudio = document.getElementById('remoteAudio');
-    remoteAudio.srcObject = trackEvent.streams[0];
-    remoteAudio.play();
-  });
-});
-```
-
-## Yêu cầu môi trường & Quyền trình duyệt
-
-- **HTTPS Bắt buộc**: Trình duyệt chỉ cho phép truy cập Micro (`getUserMedia`) trên các website chạy giao thức `https://` (hoặc `http://localhost` khi thử nghiệm nội bộ).
-- Cần có thẻ HTML audio để phát âm thanh ra loa/tai nghe:
-  ```html
-  <audio id="remoteAudio" autoplay></audio>
-  ```
-
-## Thư viện & Demo tham khảo
-
-ODS hỗ trợ kết nối SIP qua WSS theo chuẩn Asterisk WebRTC. Bạn có thể tham khảo thêm các thư viện mã nguồn mở và giao diện mẫu:
-
-- [JsSIP Documentation](https://jssip.net/): Tài liệu hướng dẫn chính thức của thư viện JsSIP.
-- [SIP.js](https://sipjs.com/): Thư viện JavaScript SIP phổ biến cho WebRTC.
-- [Browser-Phone Asterisk WebRTC](https://github.com/InnovateAsterisk/Browser-Phone): Giao diện Softphone WebRTC mẫu chạy trên nền Asterisk.
-- [ctxSip Client](https://collecttix.github.io/ctxSip/): Bộ giao diện web phone hoàn chỉnh viết bằng HTML/JS.
+---
 
 ## Bài viết liên quan
 
 <Cards>
-  <Card title="Widget ODSPhone" href="/docs/ai-contact-center/api/websocket-rtc/widget-odsphone" description="Giải pháp nhúng nhanh bàn phím quay số vào CRM." />
-  <Card title="Khởi tạo cuộc gọi Click-to-Call" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call" description="Giải pháp gọi qua máy nhánh Softphone thông thường." />
+  <Card title="Tổng quan tích hợp WebRTC" href="/docs/ai-contact-center/api/websocket-rtc" description="Hiểu về kiến trúc WebRTC và so sánh với giải pháp Softphone truyền thống." />
+  <Card title="Tích hợp ODSPhone Widget SDK" href="/docs/ai-contact-center/api/websocket-rtc/widget-odsphone" description="Giải pháp nhúng nhanh module bàn phím gọi có sẵn của ODS vào CRM." />
+  <Card title="Xác thực & Ranh giới tin cậy" href="/docs/ai-contact-center/api/bat-dau/xac-thuc" description="Phân định AuthKey quản trị trên Backend và mật khẩu máy nhánh trên Frontend." />
 </Cards>

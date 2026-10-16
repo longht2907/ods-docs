@@ -1,29 +1,34 @@
 ---
 title: "Danh sách tệp âm thanh (GetAudioList)"
 description: "Tra cứu danh sách các tệp âm thanh TTS và file ghi âm đã tạo trên hệ thống Autocall."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Audio/GetAudioList`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Audio/GetAudioList" />
 
-Lấy danh sách các tệp âm thanh hiện có trong kho dữ liệu của doanh nghiệp, hỗ trợ phân trang và tìm kiếm theo tên tệp để lấy mã `AudioId` cấu hình cho chiến dịch.
+    Lấy danh sách các tệp âm thanh hiện có trong kho dữ liệu của doanh nghiệp, hỗ trợ phân trang và tìm kiếm theo tên tệp để lấy mã `AudioId` cấu hình cho chiến dịch.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Key` | string | Không | Từ khóa tìm kiếm theo tên tệp âm thanh. |
-| `PageIndex` | number | Không | Số thứ tự trang hiện tại (mặc định là `1`). |
-| `PageSize` | number | Không | Số lượng bản ghi trên một trang (mặc định là `20`). |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `Key` | string | Không | Từ khóa tìm kiếm theo tên tệp âm thanh. |
+    | `PageIndex` | number | Không | Số thứ tự trang hiện tại (mặc định là `1`). |
+    | `PageSize` | number | Không | Số lượng bản ghi trên một trang (mặc định là `20`). |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Audio/GetAudioList" \
+curl -X POST "https://apiai.cloudfone.vn/api/Audio/GetAudioList" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -34,10 +39,11 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Audio/GetAudioList" \
     "PageSize": 20
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Audio/GetAudioList', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Audio/GetAudioList', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -51,8 +57,8 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Audio/GetAudioList', {
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -64,17 +70,17 @@ payload = {
     "PageSize": 20,
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Audio/GetAudioList",
+    "https://apiai.cloudfone.vn/api/Audio/GetAudioList",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -92,40 +98,48 @@ print(response.json())
   ]
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
-| `total` | number | Tổng số lượng file âm thanh tìm thấy. |
-| `data` | array | Danh sách thông tin chi tiết từng tệp âm thanh. |
-| `data[].id` | number | Mã ID tệp âm thanh (dùng trong chiến dịch Autocall). |
-| `data[].audioName` | string | Tên định danh của tệp âm thanh. |
-| `data[].type` | string | Loại âm thanh (`Google`, `FPT`, `VBEE`, `VTCC`, `File`). |
-| `data[].voiceType` | string | Mã kiểu giọng đọc đã cấu hình. |
-| `data[].createdDate` | string | Thời điểm tạo file âm thanh. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    ### Bảng mô tả trường
 
-<Callout type="info">
-- **Lấy danh sách mã tệp**: Sử dụng trường `data[].id` để gán vào thuộc tính `ActionParam` trong mảng `Audios` khi thiết lập kịch bản cuộc gọi qua API [StartCampaign](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign).
-- **Phân trang**: Sử dụng `PageIndex` và `PageSize` để duyệt toàn bộ danh sách khi kho âm thanh có nhiều tệp.
-</Callout>
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái xử lý (`success` hoặc `failed`). |
+    | `total` | number | Tổng số lượng file âm thanh tìm thấy. |
+    | `data` | array | Danh sách thông tin chi tiết từng tệp âm thanh. |
+    | `data[].id` | number | Mã ID tệp âm thanh (dùng trong chiến dịch Autocall). |
+    | `data[].audioName` | string | Tên định danh của tệp âm thanh. |
+    | `data[].type` | string | Loại âm thanh (`Google`, `FPT`, `VBEE`, `VTCC`, `File`). |
+    | `data[].voiceType` | string | Mã kiểu giọng đọc đã cấu hình. |
+    | `data[].createdDate` | string | Thời điểm tạo file âm thanh. |
 
-## Lỗi thường gặp
+    ## Lưu ý quan trọng
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - Dịch vụ `ServiceCode` không hợp lệ.
-  </Accordion>
-  <Accordion title="Danh sách data rỗng []">
-    - Doanh nghiệp chưa tạo tệp âm thanh nào, hoặc từ khóa tìm kiếm `Key` không khớp với tên tệp nào.
-  </Accordion>
-</Accordions>
+    <Callout type="info">
+    - **Lấy danh sách mã tệp**: Sử dụng trường `data[].id` để gán vào thuộc tính `ActionParam` trong mảng `Audios` khi thiết lập kịch bản cuộc gọi qua API [StartCampaign](/docs/ai-contact-center/api/autocall/chien-dich/start-campaign).
+    - **Phân trang**: Sử dụng `PageIndex` và `PageSize` để duyệt toàn bộ danh sách khi kho âm thanh có nhiều tệp.
+    </Callout>
 
-## Bài viết liên quan
+    ## Lỗi thường gặp
 
-<Cards>
-  <Card title="Tạo âm thanh TTS" href="/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio" description="Tạo thêm tệp âm thanh mới." />
-  <Card title="Xóa tệp âm thanh" href="/docs/ai-contact-center/api/autocall/am-thanh/delete-audio" description="Xóa tệp âm thanh khỏi kho dữ liệu." />
-</Cards>
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - Dịch vụ `ServiceCode` không hợp lệ.
+      </Accordion>
+      <Accordion title="Danh sách data rỗng []">
+        - Doanh nghiệp chưa tạo tệp âm thanh nào, hoặc từ khóa tìm kiếm `Key` không khớp với tên tệp nào.
+      </Accordion>
+    </Accordions>
+
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Tạo âm thanh TTS" href="/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio" description="Tạo thêm tệp âm thanh mới." />
+      <Card title="Xóa tệp âm thanh" href="/docs/ai-contact-center/api/autocall/am-thanh/delete-audio" description="Xóa tệp âm thanh khỏi kho dữ liệu." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

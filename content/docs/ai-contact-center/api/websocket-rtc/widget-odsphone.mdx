@@ -1,60 +1,335 @@
 ---
-title: "Widget ODSPhone"
-description: "Nhúng bàn phím gọi thoại WebRTC dựng sẵn vào ứng dụng web của doanh nghiệp."
+title: "Tích hợp Widget ODSPhone"
+description: "Hướng dẫn nhúng bàn phím gọi thoại (ODSPhone Widget SDK) vào hệ thống CRM/ERP, cấu hình giao diện, cơ chế đăng nhập và giới hạn điều khiển."
 ---
 
-Widget ODSPhone là module giao diện nhúng (Embeddable Softphone Widget) do ODS phát triển, giúp doanh nghiệp tích hợp toàn bộ bàn phím quay số, bảng điều khiển cuộc gọi và hiển thị trạng thái máy nhánh vào phần mềm CRM/ERP mà không cần tự phát triển giao diện WebRTC từ đầu.
+Tài liệu này hướng dẫn lập trình viên nhúng bàn phím gọi thoại đóng gói sẵn (**ODSPhone Widget SDK**) vào ứng dụng web của doanh nghiệp (CRM/ERP), cấu hình hiển thị và tự động hóa kết nối máy nhánh.
 
 <Callout type="info">
-  **Trạng thái tài liệu:** Đang hoàn thiện đặc tả SDK chính thức **(Cần bổ sung: [Q6])**. Dưới đây là kiến trúc nhúng dự kiến.
+  **Định vị giải pháp:**  
+  Widget ODSPhone là giải pháp nhúng nhanh bàn phím gọi có sẵn giao diện và engine thoại do ODS vận hành. Nếu doanh nghiệp cần tự thiết kế giao diện 100% hoặc can thiệp trực tiếp vào luồng tín hiệu WebRTC cấp thấp, vui lòng tham khảo bài [Kết nối WebRTC qua WSS](/docs/ai-contact-center/api/websocket-rtc/ket-noi-webrtc).
 </Callout>
 
-## Cách thức tích hợp dự kiến
+---
 
-### 1. Nhúng script SDK vào website
+## Giới thiệu Widget ODSPhone
 
-Thêm thẻ script vào phần `<head>` hoặc trước thẻ đóng `</body>` của website:
+**ODSPhone Widget SDK** là module điện thoại trên nền web được đóng gói hoàn chỉnh, cung cấp sẵn bàn phím quay số, cửa sổ hiển thị cuộc gọi đến/đi và bộ điều khiển âm thanh.
+
+### Phân định trách nhiệm kỹ thuật
+- **ODS cung cấp và đảm nhiệm**:
+  - Giao diện bàn phím gọi chuẩn, cửa sổ cuộc gọi và điều khiển âm thanh (Mute, Hold, Transfer).
+  - Lõi WebRTC/SIP client, xử lý mã hóa âm thanh, kết nối máy chủ WSS và chuyển tiếp cuộc gọi viễn thông.
+  - Phân phối và duy trì tệp JavaScript chính thức tại `https://webphone.ods.vn/odsphone.js`.
+- **Đội ngũ phát triển CRM cần làm**:
+  - Khai báo cấu hình `window.ODS_CONFIG` và nhúng tệp script vào giao diện dùng chung của CRM.
+  - Cung cấp thông tin máy nhánh của nhân viên đang đăng nhập để thực hiện kết nối.
+  - Cấu hình hạ tầng mạng, chính sách bảo mật (CSP, Permissions-Policy) và xin quyền Microphone trên trình duyệt.
+
+---
+
+## Điều kiện trước khi tích hợp
+
+Trước khi đưa Widget vào ứng dụng, doanh nghiệp cần chuẩn bị đầy đủ các điều kiện tiên quyết sau:
+
+1. **Khóa công khai (Widget API Key)**: Được ODS cấp riêng cho doanh nghiệp (có tiền tố `pk_live_...` hoặc `pk_test_...`).
+2. **Whitelist tên miền**: Gửi toàn bộ tên miền staging và production (ví dụ: `https://crm.doanhnghiep.vn`) cho ODS để hệ thống cấp phép nhúng theo API Key.
+3. **Môi trường bảo mật HTTPS**: WebRTC bắt buộc chạy trên giao thức `https://` (hoặc `http://localhost` khi kiểm thử nội bộ) để trình duyệt cấp quyền truy cập Microphone.
+4. **Tài khoản máy nhánh hợp lệ**: Máy lẻ (`extension`) và mật khẩu máy lẻ (`password`) đã được tạo và kích hoạt trong mục **Nhân viên** trên Portal tổng đài ODS.
+5. **Quyền đăng nhập qua code (Programmatic Login)**: Nếu muốn tự động đăng nhập máy nhánh từ code CRM mà không bắt nhân viên tự gõ tài khoản, API Key của doanh nghiệp phải được ODS kích hoạt quyền `programmaticLogin: true`.
+
+<Callout type="warn">
+  **Phân biệt ba loại thông tin định danh (Tuyệt đối không dùng lẫn):**
+  - **Widget Public Key (`ODS_CONFIG.key`)**: Khóa công khai dùng trên trình duyệt để tải và kích hoạt giao diện widget theo domain đã whitelist.
+  - **Tài khoản máy nhánh SIP**: Gồm số máy lẻ (`extension`) và mật khẩu máy lẻ (`password`), dùng để đăng ký phiên đàm thoại cho từng nhân viên.
+  - **Khóa quản trị REST API**: Gồm `ServiceName` / `ServiceCode`, `AuthUser` và `AuthKey`, dùng độc quyền cho máy chủ backend gọi API quản trị. **Tuyệt đối không đưa `AuthKey` xuống trình duyệt hay dùng thay cho mật khẩu SIP.**
+</Callout>
+
+---
+
+## Hướng dẫn nhúng tối thiểu
+
+Tích hợp Widget vào layout dùng chung của CRM theo hai khối mã lệnh tuần tự:
 
 ```html
-<script src="https://cdn.ods.vn/sdk/odsphone-widget.v1.js" async></script>
-```
-
-### 2. Khởi tạo Widget
-
-```html
-<div id="ods-phone-container"></div>
-
+<!-- 1. Khai báo cấu hình toàn cục TRƯỚC KHI nạp script SDK -->
 <script>
-  window.addEventListener('load', function () {
-    if (window.ODSPhone) {
-      window.ODSPhone.init({
-        container: '#ods-phone-container',
-        apiKey: 'YOUR_WIDGET_KEY',
-        extension: '101',
-        password: 'YOUR_EXTENSION_PASSWORD',
-        theme: 'light', // 'light' hoặc 'dark'
-        autoAnswer: false,
-        onCallStateChange: function (state) {
-          console.log('Trạng thái cuộc gọi:', state);
-        },
-      });
-    }
-  });
+  window.ODS_CONFIG = {
+    // Khóa API do ODS cấp (sử dụng placeholder, không hardcode khóa thật)
+    key: 'pk_live_odsc_xxxxxxxxxxxxxxxx',
+
+    // Điểm kết nối hạ tầng thoại chính thức (bắt buộc)
+    embedOrigin: 'https://webphone.ods.vn',
+
+    // Tùy biến hiển thị
+    ui: {
+      position: {
+        bottom: '50px',
+        right: '5%',
+      },
+      width: '420px',
+      height: '640px',
+      locale: 'vi',
+      theme: {
+        primaryColor: '#542873',
+        borderRadius: '16px',
+        draggable: true,
+      },
+    },
+  };
 </script>
+
+<!-- 2. Nạp tệp SDK chính thức bất đồng bộ từ máy chủ ODS -->
+<script src="https://webphone.ods.vn/odsphone.js" async></script>
 ```
 
-## Các phương thức điều khiển chính (API Methods)
+### Yêu cầu kỹ thuật khi nhúng
+- **Thứ tự khai báo**: `window.ODS_CONFIG` bắt buộc phải được định nghĩa trước khi tệp `odsphone.js` tải xong.
+- **Vị trí nhúng**: Nhúng một lần duy nhất tại layout dùng chung (Master Layout, App Root Component) sau khi người dùng đã đăng nhập CRM. Không nạp lại script khi người dùng điều hướng qua các trang con.
+- **Nguồn tệp SDK**: Luôn nạp trực tiếp từ `https://webphone.ods.vn/odsphone.js`. **Không tự tải tệp về lưu trên server riêng (self-host)** và không sử dụng các đường dẫn CDN không chính thức.
+- **Xác nhận widget hiển thị**: Khi nạp thành công, một nút bong bóng tròn màu tím sẽ xuất hiện ở góc màn hình.  
+  *(Lưu ý: Nút widget xuất hiện mới chỉ chứng minh script tải thành công; máy nhánh chưa thể gọi hay nhận cuộc gọi cho đến khi hoàn tất bước đăng nhập SIP).*
 
-| Phương thức | Tham số | Mô tả |
+---
+
+## Cấu hình giao diện Widget
+
+Đối tượng `ui` trong `window.ODS_CONFIG` hỗ trợ các tham số tùy chỉnh giao diện sau:
+
+| Thuộc tính | Kiểu dữ liệu | Giá trị ví dụ | Ý nghĩa và mô tả |
+| :-- | :-- | :-- | :-- |
+| `ui.position` | object \| string | `{ bottom: '50px', right: '5%' }` | Tọa độ đặt nút gọi. Nhận object khoảng cách (`bottom`, `right`, `top`, `left`) hoặc chuỗi định sẵn (`'bottom-right'`). |
+| `ui.width` | string | `'420px'` | Chiều rộng cửa sổ bàn phím gọi khi mở ra. |
+| `ui.height` | string | `'640px'` | Chiều cao cửa sổ bàn phím gọi khi mở ra. |
+| `ui.locale` | string | `'vi'` | Ngôn ngữ hiển thị trên bàn phím (`'vi'` hoặc `'en'`). |
+| `ui.theme.primaryColor` | string | `'#542873'` | Mã màu HEX chủ đạo của thương hiệu. |
+| `ui.theme.borderRadius` | string | `'16px'` | Độ bo góc của khung cửa sổ điện thoại. |
+| `ui.theme.draggable` | boolean | `true` | Cho phép nhân viên bấm giữ chuột để kéo di chuyển widget trên màn hình. |
+
+<Callout type="info">
+  **Cơ chế giải phóng không gian (panel-shell):**  
+  Trong các phiên bản trước, khung bao quanh widget khi thu gọn có thể chiếm diện tích bấm chuột. Phiên bản SDK hiện tại trên máy chủ ODS đã tích hợp quy tắc CSS `:has` trực tiếp:  
+  `.panel-shell:has(.panel[hidden]) { display: none; }`  
+  Khi nhân viên thu gọn bàn phím, toàn bộ khung viền xung quanh sẽ tự động biến mất hoàn toàn. Đội ngũ phát triển CRM **không cần viết thêm CSS can thiệp vào DOM nội bộ của widget**.
+</Callout>
+
+---
+
+## Cơ chế đăng nhập máy nhánh
+
+Để có thể gọi và nhận cuộc gọi, máy nhánh phải được đăng ký thành công lên hệ thống SIP ODS. Doanh nghiệp lựa chọn một trong hai phương án sau:
+
+### Phương án A: Nhân viên tự đăng nhập trên giao diện Widget
+- **Cách thức hoạt động**: Nhân viên bấm mở widget và nhập thông tin trực tiếp:
+  - **Máy lẻ**: Số máy nhánh nội bộ được cấp (ví dụ: `101`).
+  - **Mật khẩu**: Mật khẩu máy nhánh SIP (lấy trên Portal tổng đài ODS).
+  - **Tổng đài**: Mã máy chủ tổng đài do ODS cấp (`serverName`).
+- **Ghi nhớ thông tin**: Nhân viên tích chọn **"Ghi nhớ thông tin và mật khẩu"** để widget lưu phiên đăng nhập trên trình duyệt cho những lần làm việc tiếp theo.
+
+### Phương án B: Tự động đăng nhập từ mã nguồn CRM (Programmatic Login)
+- **Điều kiện bắt buộc**: API Key của doanh nghiệp đã được ODS cấu hình cờ **`programmaticLogin: true`** trên máy chủ. Nếu chưa được cấp quyền, hàm đăng nhập sẽ trả về lỗi `AUTH_FAILED`.
+- **Cơ chế triển khai**: Lắng nghe sự kiện `odsphone:ready` và kích hoạt phương thức `phone.login()`:
+
+```javascript
+// 1. Gắn bộ lắng nghe sự kiện TRƯỚC HOẶC SONG SONG khi tải SDK
+window.addEventListener('odsphone:ready', async (event) => {
+  // Lấy đối tượng điều khiển điện thoại từ event.detail
+  const phone = event.detail.phone;
+
+  // 2. Lấy dữ liệu máy nhánh của nhân viên từ CRM (State / Store / Context)
+  // Lưu ý: currentUser là dữ liệu do CRM quản lý, không phải biến của SDK
+  const userExtension = currentUser.extension;
+  const userPassword = currentUser.sipPassword;
+
+  // Mã máy chủ tổng đài do ODS cấp, chuẩn hóa dạng chữ thường (ví dụ: 'vtp000xxxx')
+  const pbxServer = currentUser.serverName.toLowerCase();
+
+  try {
+    // 3. Thực hiện đăng nhập ngầm trong nền
+    await phone.login({
+      extension: userExtension,
+      password: userPassword,
+      serverName: pbxServer, // Tên tham số chính xác là serverName
+    });
+    console.log('ODSPhone: Đăng nhập máy nhánh thành công.');
+  } catch (error) {
+    console.error('ODSPhone: Lỗi kết nối máy nhánh:', error);
+  }
+});
+```
+
+<Callout type="warn">
+  **Lưu ý quan trọng về tham số `serverName`:**  
+  - Tên thuộc tính trong hàm `phone.login()` là **`serverName`** (viết chữ thường).
+  - Giá trị `serverName` phải là mã định danh máy chủ do ODS xác nhận (ví dụ định dạng chữ thường: `vtp000xxxx`).
+  - **Không tự ý cắt ghép hoặc suy đoán `serverName`** từ tên miền SIP Realm (`vtp000xxxx.cfvn.cloud`) hay mã `ServiceName` của REST API.
+</Callout>
+
+---
+
+## Luồng hoạt động và bảo mật của hai phương án
+
+### Luồng khởi tạo và đăng nhập có điều kiện:
+
+```
+[1. Khai báo ODS_CONFIG] ──► [2. Nạp odsphone.js] ──► [3. Sự kiện odsphone:ready]
+                                                                  │
+                                       ┌──────────────────────────┴──────────────────────────┐
+                                       ▼                                                     ▼
+                           [Phương án A: Nhập tay]                                [Phương án B: Auto-Login]
+                            Nhân viên gõ Ext/Pass                                  Kiểm tra quyền programmaticLogin
+                            trực tiếp trong iframe                                 Gọi phone.login({ ext, pass, serverName })
+                                       │                                                     │
+                                       └──────────────────────────┬──────────────────────────┘
+                                                                  ▼
+                                                      [SIP Registered thành công]
+                                                      Bàn phím chuyển trạng thái Trực tuyến
+```
+
+### Ranh giới an toàn thông tin
+- **Đối với Phương án A**: Nhân viên nhập mật khẩu trực tiếp vào khung iframe được phục vụ từ `https://webphone.ods.vn` (khác origin với CRM). Mã JavaScript trên CRM không thể tiếp cận hay đọc được mật khẩu này.
+- **Đối với Phương án B**: Do CRM truyền mật khẩu SIP vào hàm `phone.login()`, **mã nguồn frontend của CRM có quyền truy cập mật khẩu này trong bộ nhớ phiên**. Doanh nghiệp cần hiểu rõ ranh giới này:
+  - Máy chủ Backend của CRM phải kiểm tra quyền trước khi gửi mật khẩu SIP của nhân viên xuống client.
+  - Không hardcode mật khẩu trong tệp HTML/JS tĩnh.
+  - Không lưu mật khẩu máy nhánh vào `localStorage` không mã hóa và không ghi thông tin xác thực vào `console.log`.
+- **Ranh giới khóa công khai**: Widget API Key (`key`) là khóa công khai. Việc sở hữu public key chỉ cho phép nạp giao diện widget, **không đồng nghĩa có thể tự ý đăng nhập vào bất kỳ máy nhánh nào** nếu không có mật khẩu máy nhánh hợp lệ hoặc chưa được cấp quyền `programmaticLogin`.
+
+---
+
+## Gọi điện sau khi đăng ký
+
+Sau khi máy nhánh hoàn tất đăng ký SIP, nhân viên có thể sử dụng các chức năng thoại:
+
+- **Gọi ra và nhận cuộc gọi trên giao diện Widget**: Nhân viên bấm số trên bàn phím của widget để gọi đi hoặc nhấn nút trả lời khi có cuộc gọi đến.
+- **Kích hoạt gọi từ CRM (Click-to-Call qua Backend REST API)**:
+  - Khi nhân viên bấm nút gọi trên hồ sơ khách hàng tại giao diện CRM, quy trình được thực hiện gián tiếp thông qua máy chủ backend:  
+    `CRM Frontend` $\rightarrow$ `CRM Backend` $\rightarrow$ `ODS REST API (/api/CloudFone/AutoCall)` $\rightarrow$ `Tổng đài đổ chuông máy nhánh ODSPhone` $\rightarrow$ `Kết nối khách hàng`.
+  - Chi tiết hợp đồng API gọi ra được mô tả riêng tại bài [Khởi tạo cuộc gọi Click-to-Call](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call).
+
+<Callout type="warn">
+  **Giới hạn điều khiển từ ứng dụng chủ:**  
+  ODSPhone Widget SDK public hiện tại **chỉ công bố phương thức `phone.login(...)`**. SDK **không cung cấp** các phương thức công khai như `phone.call()`, `phone.hangup()`, `phone.mute()`, hay hệ thống event bus theo dõi trạng thái cuộc gọi. Toàn bộ thao tác đàm thoại được thực hiện trực tiếp trên giao diện của widget.
+</Callout>
+
+---
+
+## Xử lý tải lại trang, ứng dụng SPA và vòng đời
+
+- **Hành vi khi tải lại trang (`F5` / Reload)**:  
+  Khi người dùng tải lại trang, toàn bộ bộ nhớ JavaScript của trình duyệt bị xóa, kết nối WebSocket báo hiệu thoại bị ngắt tạm thời. Ứng dụng cần dựa vào việc lắng nghe lại sự kiện `odsphone:ready` để kết nối lại máy nhánh.
+- **Không phải Persistent Login vĩnh viễn**: Việc kết nối thoại phụ thuộc hoàn toàn vào tab trình duyệt đang mở. Nếu tab bị đóng hoặc máy tính sleep, máy nhánh sẽ rời mạng.
+- **Không bảo lưu cuộc gọi qua Reload**: Nếu người dùng tải lại trang trong khi đang đàm thoại, cuộc gọi thoại sẽ bị ngắt kết nối ngay lập tức.
+- **Ứng dụng đơn trang (SPA - React, Vue, Next.js)**:
+  - Khởi tạo `ODS_CONFIG` và nhúng script tại component layout cấp cao nhất (Root Provider).
+  - Tránh nhúng lại script khi chuyển route nội bộ để ngăn chặn việc tạo ra nhiều widget trùng lặp trên cùng một trang.
+
+---
+
+## Cấu hình bảo mật CSP và quyền Microphone
+
+Nếu ứng dụng CRM áp dụng chính sách Content Security Policy (CSP), cần bổ sung các nguồn sau vào policy hiện có (không ghi đè toàn bộ):
+
+```http
+Content-Security-Policy: 
+  script-src 'self' https://webphone.ods.vn;
+  frame-src 'self' https://webphone.ods.vn;
+  connect-src 'self' https://webphone.ods.vn wss://rtc.cloudfone.vn:4433;
+```
+
+### Quyền truy cập thiết bị thu âm (Microphone)
+- **Permissions-Policy**: Nếu máy chủ CRM cấu hình header phân quyền tính năng trình duyệt, cần khai báo rõ quyền microphone cho iframe của ODS:
+  ```http
+  Permissions-Policy: microphone=(self "https://webphone.ods.vn")
+  ```
+- **Hành vi cấp quyền của trình duyệt**: Khi có cuộc gọi đầu tiên, trình duyệt sẽ nhắc người dùng cấp quyền Microphone. Quyền này được lưu theo domain của CRM, nhưng có thể bị hỏi lại nếu người dùng xóa cache, truy cập chế độ ẩn danh hoặc đổi domain.
+
+---
+
+## Prompt mẫu tích hợp cho AI Coding Agent
+
+Nếu doanh nghiệp phát triển CRM/ERP sử dụng các công cụ AI Coding Agent (như Cursor, Windsurf, Claude Code, GitHub Copilot), lập trình viên có thể sao chép đoạn prompt mẫu chuẩn hóa dưới đây để yêu cầu agent tự động phân tích cấu trúc dự án và nhúng ODSPhone Widget:
+
+<Callout type="tip">
+  **Lưu ý trước khi gửi cho Agent:**  
+  - Thay thế giá trị `pk_live_odsc_xxxxxxxxxxxxxxxx` bằng API Key thật do ODS cấp.
+  - Đảm bảo API Key đã được ODS kích hoạt quyền `programmaticLogin: true` trên máy chủ nếu sử dụng tính năng tự động kết nối máy nhánh.
+</Callout>
+
+````markdown
+### NHIỆM VỤ: TÍCH HỢP ODSPHONE WIDGET SDK VÀO HỆ THỐNG CRM VỚI TỰ ĐỘNG ĐĂNG NHẬP (AUTO-LOGIN)
+
+Hãy hỗ trợ tôi tích hợp ODSPhone Widget SDK vào dự án web CRM này với các yêu cầu kỹ thuật chi tiết như sau:
+
+---
+
+#### 1. YÊU CẦU CẤU HÌNH GIAO DIỆN (UI CONFIGURATION)
+Khởi tạo cấu hình toàn cục `window.ODS_CONFIG` trước khi tải SDK:
+- **Key:** 'pk_live_odsc_xxxxxxxxxxxxxxxx' (Thay bằng API Key thật do ODS cấp)
+- **Embed Origin:** 'https://webphone.ods.vn'
+- **Vị trí (Position):** Đặt widget cách đáy '50px' và cách mép phải '5%' bằng cấu hình Object:
+  `position: { bottom: '50px', right: '5%' }`
+- **Kích thước cửa sổ gọi điện (Size):**
+  `width: '420px', height: '640px'`
+- **Ngôn ngữ & Theme:**
+  `locale: 'vi', theme: { primaryColor: '#542873', borderRadius: '16px', draggable: true }`
+
+---
+
+#### 2. TỰ ĐỘNG ĐĂNG NHẬP MÁY NHÁNH (AUTO-LOGIN KHI VÀO TRANG HOẶC F5 RELOAD)
+Hệ thống CRM quản lý thông tin máy nhánh của nhân viên đang đăng nhập (gồm: số máy lẻ, mật khẩu SIP và mã máy chủ tổng đài ODS):
+- Lắng nghe sự kiện: `window.addEventListener('odsphone:ready', async (event) => { ... })`
+- Trích xuất đối tượng điều khiển `phone` từ `event.detail.phone`.
+- Lấy thông tin máy nhánh của nhân viên hiện tại từ Session / State / Store / Context của dự án.
+- Gọi hàm tự động kết nối:
+  ```javascript
+  const phone = event.detail.phone;
+
+  try {
+    // Gọi hàm đăng nhập tự động (Lưu ý: tham số tổng đài là 'serverName' viết chữ thường)
+    await phone.login({
+      extension: currentUser.extension,              // Số máy lẻ (ví dụ: '101')
+      password: currentUser.sipPassword,             // Mật khẩu máy lẻ SIP
+      serverName: currentUser.serverName.toLowerCase() // Mã tổng đài do ODS cấp (ví dụ: 'vtp000xxxx')
+    });
+    console.log('✅ Đăng nhập WebPhone thành công');
+  } catch (error) {
+    console.error('❌ Không thể đăng nhập WebPhone:', error);
+  }
+  ```
+
+---
+
+#### 3. TẢI SCRIPT SDK
+Nhúng thẻ script của ODS SDK (tải bất đồng bộ):
+`<script src="https://webphone.ods.vn/odsphone.js" async></script>`
+
+---
+
+#### 4. QUY TẮC TRIỂN KHAI CHO DỰ ÁN
+- Tìm file layout chính / component layout của CRM nơi các trang sau đăng nhập đều có thể truy cập Widget.
+- Đảm bảo widget chỉ khởi tạo khi người dùng đã xác thực (đã đăng nhập vào CRM).
+- Tích hợp không làm vỡ layout hiện tại và đảm bảo biến thông tin máy lẻ được truyền an toàn, chính xác.
+````
+
+---
+
+## Xử lý sự cố thường gặp
+
+| Hiện tượng | Nguyên nhân có thể | Hướng kiểm tra và xử lý |
 | :-- | :-- | :-- |
-| `ODSPhone.makeCall(phoneNumber)` | `string` | Kích hoạt quay số trực tiếp đến một số điện thoại từ giao diện CRM. |
-| `ODSPhone.hangup()` | - | Kết thúc cuộc gọi hiện tại. |
-| `ODSPhone.mute()` | - | Bật/tắt micro của nhân viên. |
-| `ODSPhone.hold()` | - | Tạm giữ (Hold) cuộc gọi. |
+| **Widget không hiển thị** | Domain chưa được whitelist hoặc khóa API sai. | Kiểm tra console xem có thông báo lỗi domain không. Gửi lại domain chính xác cho ODS để whitelist. |
+| **Lỗi tải script hoặc CSP** | Header CSP của CRM chặn script/iframe từ `webphone.ods.vn`. | Bổ sung `https://webphone.ods.vn` vào `script-src` và `frame-src`. |
+| **Không thể auto-login (`AUTH_FAILED`)** | 1. API Key chưa bật `programmaticLogin`.<br/>2. Sai `serverName`, `extension` hoặc `password`. | - Liên hệ ODS xác nhận trạng thái cờ `programmaticLogin: true`.<br/>- Kiểm tra `serverName` phải viết thường (ví dụ: `vtp000xxxx`).<br/>- Kiểm tra mật khẩu máy nhánh trên Portal. |
+| **Widget hiển thị nhưng không gọi được** | Widget đã ready nhưng máy nhánh chưa đăng nhập thành công. | Phân biệt sự kiện `odsphone:ready` với trạng thái đăng ký SIP. Kiểm tra xem biểu tượng trạng thái trên widget đã chuyển sang màu xanh chưa. |
+| **Không nghe thấy tiếng hoặc mất âm thanh** | 1. Chưa cấp quyền Microphone.<br/>2. Tường lửa chặn cổng UDP của WebRTC. | - Bấm vào biểu tượng ổ khóa trên thanh địa chỉ, chuyển Microphone sang **Allow**.<br/>- Kiểm tra mạng nội bộ có chặn các gói tin âm thanh UDP/RTP hay không. |
+| **Xuất hiện nhiều widget sau khi chuyển trang** | Nạp lại thẻ script khi chuyển route trong ứng dụng SPA. | Chuyển mã nhúng widget ra Master Layout để chỉ khởi tạo một lần duy nhất. |
+
+---
 
 ## Bài viết liên quan
 
 <Cards>
-  <Card title="Kết nối WebRTC qua JsSIP" href="/docs/ai-contact-center/api/websocket-rtc/ket-noi-webrtc" description="Tự xây dựng giao diện gọi thoại riêng." />
-  <Card title="Click-to-Call API" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call" description="Phương thức gọi ra kết hợp thiết bị ngoài." />
+  <Card title="Kết nối WebRTC qua WSS" href="/docs/ai-contact-center/api/websocket-rtc/ket-noi-webrtc" description="Tự phát triển giao diện và điều khiển luồng SIP/WebRTC tùy biến hoàn toàn." />
+  <Card title="Khởi tạo cuộc gọi Click-to-Call" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call" description="API kích hoạt cuộc gọi ra từ hệ thống quản trị CRM/ERP." />
+  <Card title="Quy ước bảo mật và ranh giới tin cậy" href="/docs/ai-contact-center/api/bat-dau/xac-thuc" description="Nguyên tắc phân định AuthKey trên backend và máy nhánh thoại trên web." />
 </Cards>

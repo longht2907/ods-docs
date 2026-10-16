@@ -1,128 +1,156 @@
 ---
 title: "Khởi tạo cuộc gọi Click-to-Call"
-description: "Thực hiện cuộc gọi ra cho máy nhánh nhân viên thông qua API AutoCall."
+description: "Thực hiện cuộc gọi từ phần mềm (CRM, ERP) đến khách hàng thông qua máy nhánh nhân viên với API AutoCall."
+full: true
 ---
 
-<Callout type="info">`POST` `{BASE_URL}/api/CloudFone/AutoCall`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://api.ods.vn/api/CloudFone/AutoCall" />
 
-API thực thi cuộc gọi từ phần mềm (CRM, ERP, Web) đến khách hàng thông qua máy nhánh của tổng đài viên.
+    API này dùng để làm tính năng **"Bấm để gọi" (Click-to-Call)** trên phần mềm CRM, ERP hoặc website: Nhân viên bấm nút "Gọi" trên màn hình, tổng đài sẽ tự động kết nối máy nhánh của nhân viên với số điện thoại của khách hàng mà không cần bấm số thủ công.
 
-**Cơ chế hoạt động (2 chặng):**
-1. Ứng dụng gửi request POST API tới tổng đài.
-2. Tổng đài đổ chuông máy nhánh (`Ext`) của nhân viên trước.
-3. Khi nhân viên nhấc máy, tổng đài lập tức quay số đến khách hàng (`PhoneNumber`) và kết nối đàm thoại.
+    ### Cách thức hoạt động
 
-## Tham số request
+    Cuộc gọi được tổng đài điều phối tự động qua **2 chặng liên tiếp**:
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceName` | string | Có | Mã dịch vụ tổng đài khi mua tại ODS (ví dụ: `CF-BS00XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng (ví dụ: `ODSXXXX`). |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Ext` | string | Có | Số máy nhánh của nhân viên thực hiện cuộc gọi (ví dụ: `101`). |
-| `PhoneNumber` | string | Có | Số điện thoại khách hàng cần gọi đến (ví dụ: `0900000000`). |
-| `Prefix` | string | Không | Tiền tố đầu số gọi ra (mặc định là `"0"` hoặc lấy theo cấu hình Outbound Route). |
-| `PhoneName` | string | Không | Tên hiển thị của khách hàng. Nếu để trống, màn hình máy nhánh sẽ hiển thị `"tongdaitudong"`. |
-| `KeySearch` | string | Không | Mã định danh cuộc gọi (khuyến nghị định dạng GUID). Nếu không truyền, hệ thống sẽ tự sinh ngẫu nhiên. |
+    <ClickToCallFlow />
 
-## Ví dụ request
+    <Callout type="info">
+      Máy nhánh nhân viên (`Ext`) bắt buộc phải đang đăng ký online trên IP Phone, Softphone hoặc Webphone để nhận chuông ở chặng 1. Nếu bạn cần tổng đài **gọi khách hàng trước** rồi mới chuyển tiếp vào nhóm trực hoặc kịch bản IVR, hãy sử dụng [Click-to-Call V2](/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call-v2).
+    </Callout>
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    ## Tham số request
+
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mặc định | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-: | :-- |
+    | `ServiceName` | string | Có | — | Mã dịch vụ tổng đài khi mua tại ODS (ví dụ: `CF-BS00XXXXX`). |
+    | `AuthUser` | string | Có | — | Mã tài khoản khách hàng khi mua tổng đài (ví dụ: `CF000XXX`). |
+    | `AuthKey` | string | Có | — | Khóa bí mật API do ODS cấp (chỉ gọi từ backend, không để lộ ở client). |
+    | `Ext` | string | Có | — | Số máy nhánh của nhân viên nhận cuộc gọi (ví dụ: `101`, `9119`). |
+    | `PhoneNumber` | string | Có | — | Số điện thoại của khách hàng cần gọi đến (ví dụ: `0900000000`). |
+    | `Prefix` | string | Không | `"0"` | Tiền tố gọi ra theo cấu hình tổng đài (thường giữ mặc định `"0"`). |
+    | `PhoneName` | string | Không | `""` | Tên khách hàng hiển thị trên máy nhánh khi chuông reo (để trống sẽ hiện `"tongdaitudong"`). |
+    | `KeySearch` | string | Không | `""` | Mã tham chiếu tự đặt (khuyến nghị UUID) để đối chiếu lịch sử cuộc gọi sau này. |
+  </ApiReferenceMain>
+
+  <ApiReferenceCode>
+    ## Ví dụ request
+
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{BASE_URL}/api/CloudFone/AutoCall" \
+curl -X POST "https://api.ods.vn/api/CloudFone/AutoCall" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceName": "YOUR_SERVICE_NAME",
     "AuthUser": "YOUR_AUTH_USER",
     "AuthKey": "YOUR_AUTH_KEY",
-    "Ext": "101",
+    "Ext": "9119",
     "PhoneNumber": "0900000000",
     "PhoneName": "Nguyen Van A",
     "Prefix": "0",
-    "KeySearch": "1b38fbda-4b7e-41a2-9bc3-xxxxxxxxxxxx"
+    "KeySearch": "1b38fbda-4b7e-41a2-9bc3-7a28e9324a1b"
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{BASE_URL}/api/CloudFone/AutoCall', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://api.ods.vn/api/CloudFone/AutoCall', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    ServiceName: 'YOUR_SERVICE_NAME',
-    AuthUser: 'YOUR_AUTH_USER',
-    AuthKey: 'YOUR_AUTH_KEY',
-    Ext: '101',
+    ServiceName: process.env.ODS_SERVICE_NAME,
+    AuthUser: process.env.ODS_AUTH_USER,
+    AuthKey: process.env.ODS_AUTH_KEY,
+    Ext: '9119',
     PhoneNumber: '0900000000',
     PhoneName: 'Nguyen Van A',
     Prefix: '0',
-    KeySearch: '1b38fbda-4b7e-41a2-9bc3-xxxxxxxxxxxx',
+    KeySearch: '1b38fbda-4b7e-41a2-9bc3-7a28e9324a1b',
   }),
 });
+
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
+import os
 import requests
 
 payload = {
-    "ServiceName": "YOUR_SERVICE_NAME",
-    "AuthUser": "YOUR_AUTH_USER",
-    "AuthKey": "YOUR_AUTH_KEY",
-    "Ext": "101",
+    "ServiceName": os.environ.get("ODS_SERVICE_NAME", "YOUR_SERVICE_NAME"),
+    "AuthUser": os.environ.get("ODS_AUTH_USER", "YOUR_AUTH_USER"),
+    "AuthKey": os.environ.get("ODS_AUTH_KEY", "YOUR_AUTH_KEY"),
+    "Ext": "9119",
     "PhoneNumber": "0900000000",
     "PhoneName": "Nguyen Van A",
     "Prefix": "0",
-    "KeySearch": "1b38fbda-4b7e-41a2-9bc3-xxxxxxxxxxxx",
+    "KeySearch": "1b38fbda-4b7e-41a2-9bc3-7a28e9324a1b",
 }
+
 response = requests.post(
-    "{BASE_URL}/api/CloudFone/AutoCall",
+    "https://api.ods.vn/api/CloudFone/AutoCall",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
+
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu (Ví dụ)
 
 ```json
 {
   "result": "success",
   "message": "GỌI TỰ ĐỘNG THÀNH CÔNG",
-  "keySearch": "1b38fbda-4b7e-41a2-9bc3-xxxxxxxxxxxx"
+  "keySearch": "1b38fbda-4b7e-41a2-9bc3-7a28e9324a1b"
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
-| `message` | string | Thông báo chi tiết từ hệ thống. |
-| `keySearch` | string | Mã định danh cuộc gọi trả về (dùng để tra cứu CDR hoặc nhận webhook). |
+  <ApiReferenceResponse>
+    ## Cấu trúc và ý nghĩa phản hồi
 
-## Lưu ý quan trọng
-- Máy nhánh nhân viên (`Ext`) bắt buộc phải đang online (đã đăng ký trên IP Phone hoặc Softphone) thì mới có thể nhận chuông.
-- Để theo dõi trạng thái cuộc gọi kết nối thành công hay không, hãy kết hợp với [Popup Webhook](/docs/ai-contact-center/api/webhook/popup).
+    | Trường | Kiểu dữ liệu | Mô tả chi tiết |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái xử lý lệnh: `"success"` hoặc `"failed"`. |
+    | `message` | string | Thông báo phản hồi từ hệ thống tổng đài. |
+    | `keySearch` | string | Mã định danh cuộc gọi trả về (dùng tra cứu CDR hoặc nhận webhook). |
 
-## Lỗi thường gặp
+    <Callout type="info">
+    **Ý nghĩa của `result: "success"`:** Chỉ xác nhận tổng đài đã tiếp nhận lệnh và bắt đầu đổ chuông máy nhánh nhân viên. Để biết khách hàng có nhấc máy hay không (`ANSWERED`), xem qua [Webhook Popup](/docs/ai-contact-center/api/webhook/popup) hoặc [Lịch sử cuộc gọi](/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs).
+    </Callout>
 
-<Accordions>
-  <Accordion title="Máy nhánh không online hoặc bận">
-    Tổng đài không thể đổ chuông về `Ext`. Hãy kiểm tra trạng thái máy nhánh trên thiết bị hoặc Portal.
-  </Accordion>
-  <Accordion title="Số điện thoại khách hàng không đúng định dạng">
-    Đảm bảo `PhoneNumber` là số điện thoại hợp lệ (10 chữ số, không chứa khoảng trắng hoặc dấu gạch nối).
-  </Accordion>
-</Accordions>
+    ## Xử lý sự cố thường gặp
 
-## Bài viết liên quan
+    <Accordions>
+      <Accordion title="API trả về success nhưng điện thoại nhân viên không reo chuông">
+        Kiểm tra số máy nhánh `Ext` có đang đăng nhập/online trên phần mềm Softphone hoặc điện thoại bàn IP Phone hay không, hoặc thiết bị có đang bật chế độ DND (Không làm phiền) không.
+      </Accordion>
 
-<Cards>
-  <Card title="Click-to-Call V2" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call-v2" description="Khởi tạo cuộc gọi tự động theo kịch bản Inbound Route." />
-  <Card title="Webhook Popup" href="/docs/ai-contact-center/api/webhook/popup" description="Nhận thông báo cuộc gọi thời gian thực." />
-</Cards>
+      <Accordion title="Nhân viên nhấc máy nhưng khách hàng không nhận được cuộc gọi">
+        Kiểm tra định dạng số điện thoại `PhoneNumber` có hợp lệ không, tiền tố `Prefix` (thường là `"0"`), và kiểm tra đầu số tổng đài có còn hoạt động hay bị chặn chiều gọi ra không.
+      </Accordion>
+
+      <Accordion title="Request gặp timeout — Không rõ tổng đài đã xử lý chưa">
+        **Không nên tự động gửi lại request ngay.** Nếu tổng đài đang xử lý, việc gọi lại sẽ gây ra cuộc gọi trùng lặp (khách hàng bị reo chuông 2 lần). Hãy kiểm tra điện thoại nhân viên có reo hay không trước khi bấm gọi lại.
+      </Accordion>
+    </Accordions>
+
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Click-to-Call V2" href="/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call-v2" description="Khởi tạo cuộc gọi gọi khách hàng trước theo Inbound Route." />
+      <Card title="Webhook Popup" href="/docs/ai-contact-center/api/webhook/popup" description="Nhận sự kiện cuộc gọi thời gian thực (đổ chuông, nghe máy, cúp máy)." />
+      <Card title="Lịch sử cuộc gọi (GetCallLogs)" href="/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-logs" description="Tra cứu cước gọi, thời lượng đàm thoại và file ghi âm." />
+      <Card title="Xác thực API" href="/docs/ai-contact-center/api/bat-dau/xac-thuc" description="Tìm hiểu cách lấy thông tin ServiceName, AuthUser, AuthKey." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

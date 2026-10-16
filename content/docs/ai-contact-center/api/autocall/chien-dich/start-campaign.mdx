@@ -1,49 +1,54 @@
 ---
 title: "Tạo và cập nhật chiến dịch (StartCampaign)"
 description: "Khởi tạo chiến dịch gọi tự động Autocall hoặc cập nhật chiến dịch hiện có."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Autocall/StartCampaign`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Autocall/StartCampaign" />
 
-Tạo mới một chiến dịch gọi tự động hàng loạt tới danh sách khách hàng hoặc cập nhật thông tin cấu hình của chiến dịch hiện có khi truyền `CampaignId`.
+    Tạo mới một chiến dịch gọi tự động hàng loạt tới danh sách khách hàng hoặc cập nhật thông tin cấu hình của chiến dịch hiện có khi truyền `CampaignId`.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ khi mua gói Autocall tại ODS (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng (ví dụ: `ODSXXXX`). |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `CampaignName` | string | Có | Tên chiến dịch (ví dụ: `Chiến dịch CSKH Tháng 10`). |
-| `ContactID` | number | Có | ID của nhóm danh bạ khách hàng cần gọi (tạo từ API [AddContactGroup](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-group)). |
-| `Trunk` | string | Có | Tên đầu số Trunk dùng để thực hiện cuộc gọi ra (lấy từ API [GetTrunkList](/docs/ai-contact-center/api/autocall/chien-dich/get-trunk-list)). |
-| `TimeStartCall` | string | Có | Thời gian kích hoạt chiến dịch bắt đầu gọi (ví dụ: `2026-10-19 08:30:00.000`). |
-| `CampaignId` | string | Không | Mã UUID của chiến dịch. Nếu truyền vào, hệ thống sẽ **cập nhật** chiến dịch; nếu để trống, hệ thống sẽ **tạo mới**. |
-| `Audios` | array | Có | Danh sách tệp âm thanh áp dụng cho chiến dịch. |
-| `Keypress` | array | Không | Danh sách cấu hình phím bấm rẽ nhánh (IVR). |
-| `APIURL` | string | Không | URL API máy chủ khách hàng để nhận thông báo kết quả cuộc gọi. |
-| `APIKEY` | string | Không | Khóa API bảo mật của khách hàng đi kèm với `APIURL`. |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ khi mua gói Autocall tại ODS (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng (ví dụ: `ODSXXXX`). |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `CampaignName` | string | Có | Tên chiến dịch (ví dụ: `Chiến dịch CSKH Tháng 10`). |
+    | `ContactID` | number | Có | ID của nhóm danh bạ khách hàng cần gọi (tạo từ API [AddContactGroup](/docs/ai-contact-center/api/autocall/danh-ba/add-contact-group)). |
+    | `Trunk` | string | Có | Tên đầu số Trunk dùng để thực hiện cuộc gọi ra (lấy từ API [GetTrunkList](/docs/ai-contact-center/api/autocall/chien-dich/get-trunk-list)). |
+    | `TimeStartCall` | string | Có | Thời gian kích hoạt chiến dịch bắt đầu gọi (ví dụ: `2026-10-19 08:30:00.000`). |
+    | `CampaignId` | string | Không | Mã UUID của chiến dịch. Nếu truyền vào, hệ thống sẽ **cập nhật** chiến dịch; nếu để trống, hệ thống sẽ **tạo mới**. |
+    | `Audios` | array | Có | Danh sách tệp âm thanh áp dụng cho chiến dịch. |
+    | `Keypress` | array | Không | Danh sách cấu hình phím bấm rẽ nhánh (IVR). |
+    | `APIURL` | string | Không | URL API máy chủ khách hàng để nhận thông báo kết quả cuộc gọi. |
+    | `APIKEY` | string | Không | Khóa API bảo mật của khách hàng đi kèm với `APIURL`. |
 
-### Cấu trúc mảng `Audios`
+    ### Cấu trúc mảng `Audios`
 
-| Thuộc tính | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `DTMF` | string | Ký hiệu ngữ cảnh âm thanh: `"s"` (Start - âm thanh chào mừng bắt đầu), `"i"` (Invalid - âm thanh phát khi khách hàng bấm sai phím). |
-| `ActionParam` | string | Mã ID của tệp âm thanh tương ứng (tạo từ API [CreateTTSAudio](/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio)). |
+    | Thuộc tính | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `DTMF` | string | Ký hiệu ngữ cảnh âm thanh: `"s"` (Start - âm thanh chào mừng bắt đầu), `"i"` (Invalid - âm thanh phát khi khách hàng bấm sai phím). |
+    | `ActionParam` | string | Mã ID của tệp âm thanh tương ứng (tạo từ API [CreateTTSAudio](/docs/ai-contact-center/api/autocall/am-thanh/create-tts-audio)). |
 
-### Cấu trúc mảng `Keypress`
+    ### Cấu trúc mảng `Keypress`
 
-| Thuộc tính | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `Key` | string | Ký tự phím bấm của khách hàng (`"1"`, `"2"`, v.v.). |
-| `Action` | string | Mã số hành động khi phím được bấm (tra cứu danh sách qua [GetListAction](/docs/ai-contact-center/api/autocall/chien-dich/get-list-action)). |
+    | Thuộc tính | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `Key` | string | Ký tự phím bấm của khách hàng (`"1"`, `"2"`, v.v.). |
+    | `Action` | string | Mã số hành động khi phím được bấm (tra cứu danh sách qua [GetListAction](/docs/ai-contact-center/api/autocall/chien-dich/get-list-action)). |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/StartCampaign" \
+curl -X POST "https://apiai.cloudfone.vn/api/Autocall/StartCampaign" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -61,14 +66,15 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Autocall/StartCampaign" \
       { "Key": "1", "Action": "5" },
       { "Key": "2", "Action": "6" }
     ],
-    "APIURL": "https://crm.yourcompany.com/api/autocall-callback",
+    "APIURL": "https://example.com/api/autocall-callback",
     "APIKEY": "YOUR_CALLBACK_KEY"
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/StartCampaign', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Autocall/StartCampaign', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -87,13 +93,15 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Autocall/StartCampaign', {
       { Key: '1', Action: '5' },
       { Key: '2', Action: '6' },
     ],
+    APIURL: 'https://example.com/api/autocall-callback',
+    APIKEY: 'YOUR_CALLBACK_KEY',
   }),
 });
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -113,19 +121,21 @@ payload = {
         {"Key": "1", "Action": "5"},
         {"Key": "2", "Action": "6"},
     ],
+    "APIURL": "https://example.com/api/autocall-callback",
+    "APIKEY": "YOUR_CALLBACK_KEY",
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Autocall/StartCampaign",
+    "https://apiai.cloudfone.vn/api/Autocall/StartCampaign",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -134,39 +144,45 @@ print(response.json())
   "data": "a8f192b0-4b7e-41a2-9bc3-xxxxxxxxxxxx"
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
-| `message` | string | Thông báo kết quả từ máy chủ Autocall. |
-| `data` | string | Mã `CampaignId` của chiến dịch vừa được tạo hoặc cập nhật. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
+    | `message` | string | Thông báo kết quả từ máy chủ Autocall. |
+    | `data` | string | Mã `CampaignId` của chiến dịch vừa được tạo hoặc cập nhật. |
 
-<Callout type="warning">
-- **Định dạng thời gian**: Tham số `TimeStartCall` phải có đầy đủ phần mili-giây: `YYYY-MM-DD HH:mm:ss.000` (ví dụ: `2026-10-19 08:30:00.000`). Nếu đặt thời gian trong quá khứ, chiến dịch sẽ được kích hoạt gọi ngay lập tức.
-- **Yêu cầu tệp âm thanh**: Mảng `Audios` bắt buộc phải có ít nhất một phần tử với `DTMF: "s"` (âm thanh bắt đầu phát khi khách hàng nhấc máy). Nếu chiến dịch có tương tác phím bấm, nên bổ sung `DTMF: "i"` (âm thanh phát khi bấm sai phím).
-- **Trunk gọi ra**: Phải sử dụng đúng tên Trunk được trả về từ API [GetTrunkList](/docs/ai-contact-center/api/autocall/chien-dich/get-trunk-list).
-- **Callback Webhook**: Nếu điền `APIURL`, máy chủ ODS sẽ tự động bắn HTTP POST về URL này sau mỗi cuộc gọi kết thúc để cập nhật trạng thái cho hệ thống của bạn.
-</Callout>
+    ## Lưu ý quan trọng
 
-## Lỗi thường gặp
+    <Callout type="warning">
+    - **Định dạng thời gian**: Tham số `TimeStartCall` phải có đầy đủ phần mili-giây: `YYYY-MM-DD HH:mm:ss.000` (ví dụ: `2026-10-19 08:30:00.000`). Nếu đặt thời gian trong quá khứ, chiến dịch sẽ được kích hoạt gọi ngay lập tức.
+    - **Yêu cầu tệp âm thanh**: Mảng `Audios` bắt buộc phải có ít nhất một phần tử với `DTMF: "s"` (âm thanh bắt đầu phát khi khách hàng nhấc máy). Nếu chiến dịch có tương tác phím bấm, nên bổ sung `DTMF: "i"` (âm thanh phát khi bấm sai phím).
+    - **Trunk gọi ra**: Phải sử dụng đúng tên Trunk được trả về từ API [GetTrunkList](/docs/ai-contact-center/api/autocall/chien-dich/get-trunk-list).
+    - **Callback Webhook**: Nếu điền `APIURL`, máy chủ ODS sẽ tự động bắn HTTP POST về URL này sau mỗi cuộc gọi kết thúc để cập nhật trạng thái cho hệ thống của bạn (sử dụng URL máy chủ của bạn thay cho `example.com`).
+    </Callout>
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed (Dữ liệu không hợp lệ)">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - `ContactID` không tồn tại hoặc nhóm danh bạ chưa có số điện thoại nào.
-    - Sai định dạng chuỗi thời gian `TimeStartCall`.
-  </Accordion>
-  <Accordion title="Âm thanh không phát hoặc cuộc gọi ngắt ngay khi nhấc máy">
-    - `ActionParam` trong mảng `Audios` trỏ tới `AudioId` không tồn tại hoặc đã bị xóa.
-    - File âm thanh chưa được render hoàn tất từ nhà cung cấp TTS.
-  </Accordion>
-</Accordions>
+    ## Lỗi thường gặp
 
-## Bài viết liên quan
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed (Dữ liệu không hợp lệ)">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - `ContactID` không tồn tại hoặc nhóm danh bạ chưa có số điện thoại nào.
+        - Sai định dạng chuỗi thời gian `TimeStartCall`.
+      </Accordion>
+      <Accordion title="Âm thanh không phát hoặc cuộc gọi ngắt ngay khi nhấc máy">
+        - `ActionParam` trong mảng `Audios` trỏ tới `AudioId` không tồn tại hoặc đã bị xóa.
+        - File âm thanh chưa được render hoàn tất từ nhà cung cấp TTS.
+      </Accordion>
+    </Accordions>
 
-<Cards>
-  <Card title="Danh sách chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-list" description="Tra cứu trạng thái chiến dịch đang chạy." />
-  <Card title="Báo cáo chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-report" description="Xem tỷ lệ kết nối thành công và chi tiết từng số gọi." />
-</Cards>
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Danh sách chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-list" description="Tra cứu trạng thái chiến dịch đang chạy." />
+      <Card title="Báo cáo chiến dịch" href="/docs/ai-contact-center/api/autocall/chien-dich/get-campaign-report" description="Xem tỷ lệ kết nối thành công và chi tiết từng số gọi." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

@@ -1,27 +1,32 @@
 ---
 title: "Xóa liên hệ (DeleteContact)"
 description: "Xóa một khách hàng khỏi toàn bộ danh bạ hệ thống Autocall."
+full: true
 ---
 
-<Callout type="info">`POST` `{AUTOCALL_BASE_URL}/api/Contact/DeleteContact`</Callout>
+<ApiReferenceLayout>
+  <ApiReferenceMain>
+    <ApiEndpoint method="POST" url="https://apiai.cloudfone.vn/api/Contact/DeleteContact" />
 
-Xóa vĩnh viễn thông tin một liên hệ khách hàng khỏi hệ thống Autocall theo mã `Contact_Id`.
+    Xóa vĩnh viễn thông tin một liên hệ khách hàng khỏi hệ thống Autocall theo mã `Contact_Id`.
 
-## Tham số request
+    ## Tham số request
 
-| Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
-| :-- | :-- | :-: | :-- |
-| `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
-| `AuthUser` | string | Có | Mã tài khoản khách hàng. |
-| `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
-| `Contact_Id` | string / number | Có | Mã định danh `ContactId` của liên hệ cần xóa. |
+    | Tham số | Kiểu dữ liệu | Bắt buộc | Mô tả chi tiết |
+    | :-- | :-- | :-: | :-- |
+    | `ServiceCode` | string | Có | Mã dịch vụ Autocall (ví dụ: `CF-XXXXX`). |
+    | `AuthUser` | string | Có | Mã tài khoản khách hàng. |
+    | `AuthKey` | string | Có | Khóa bí mật API do ODS cấp. |
+    | `Contact_Id` | string / number | Có | Mã định danh `ContactId` của liên hệ cần xóa. |
+  </ApiReferenceMain>
 
-## Ví dụ request
+  <ApiReferenceCode>
+    ## Ví dụ request
 
-<Tabs items={['cURL', 'JavaScript', 'Python']}>
-  <Tab value="cURL">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
 ```bash
-curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/DeleteContact" \
+curl -X POST "https://apiai.cloudfone.vn/api/Contact/DeleteContact" \
   -H "Content-Type: application/json" \
   -d '{
     "ServiceCode": "YOUR_SERVICE_CODE",
@@ -30,10 +35,11 @@ curl -X POST "{AUTOCALL_BASE_URL}/api/Contact/DeleteContact" \
     "Contact_Id": "1052"
   }'
 ```
-  </Tab>
-  <Tab value="JavaScript">
+      </Tab>
+      <Tab value="Node.js">
 ```javascript
-const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/DeleteContact', {
+// Node.js (Backend / Server-side)
+const response = await fetch('https://apiai.cloudfone.vn/api/Contact/DeleteContact', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -46,8 +52,8 @@ const response = await fetch('{AUTOCALL_BASE_URL}/api/Contact/DeleteContact', {
 const data = await response.json();
 console.log(data);
 ```
-  </Tab>
-  <Tab value="Python">
+      </Tab>
+      <Tab value="Python">
 ```python
 import requests
 
@@ -58,17 +64,17 @@ payload = {
     "Contact_Id": "1052",
 }
 response = requests.post(
-    "{AUTOCALL_BASE_URL}/api/Contact/DeleteContact",
+    "https://apiai.cloudfone.vn/api/Contact/DeleteContact",
     json=payload,
     headers={"Content-Type": "application/json"},
     timeout=15,
 )
 print(response.json())
 ```
-  </Tab>
-</Tabs>
+      </Tab>
+    </Tabs>
 
-## Response mẫu
+    ## Response mẫu
 
 ```json
 {
@@ -76,31 +82,39 @@ print(response.json())
   "message": ""
 }
 ```
+  </ApiReferenceCode>
 
-| Trường | Kiểu dữ liệu | Mô tả |
-| :-- | :-- | :-- |
-| `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
-| `message` | string | Thông báo kết quả từ máy chủ. |
+  <ApiReferenceResponse>
+    ## Cấu trúc phản hồi
 
-## Lưu ý quan trọng
+    ### Bảng mô tả trường
 
-<Callout type="warning">
-- **Phạm vi tác động toàn diện**: Xóa liên hệ bằng API này sẽ xóa hoàn toàn thông tin khách hàng khỏi toàn bộ hệ thống Autocall và đồng thời gỡ khách hàng này ra khỏi tất cả các nhóm danh bạ đang chứa họ.
-- Nếu chỉ muốn gỡ khách hàng khỏi một nhóm cụ thể mà vẫn giữ lại thông tin trong danh bạ, hãy sử dụng API [DeleteContactFromGroup](/docs/ai-contact-center/api/autocall/danh-ba/delete-contact-from-group).
-</Callout>
+    | Trường | Kiểu dữ liệu | Mô tả |
+    | :-- | :-- | :-- |
+    | `result` | string | Trạng thái thực thi (`success` hoặc `failed`). |
+    | `message` | string | Thông báo kết quả từ máy chủ. |
 
-## Lỗi thường gặp
+    ## Lưu ý quan trọng
 
-<Accordions>
-  <Accordion title="400 Bad Request / result: failed">
-    - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
-    - `Contact_Id` không tồn tại hoặc đã bị xóa trước đó.
-  </Accordion>
-</Accordions>
+    <Callout type="warning">
+    - **Phạm vi tác động toàn diện**: Xóa liên hệ bằng API này sẽ xóa hoàn toàn thông tin khách hàng khỏi toàn bộ hệ thống Autocall và đồng thời gỡ khách hàng này ra khỏi tất cả các nhóm danh bạ đang chứa họ.
+    - Nếu chỉ muốn gỡ khách hàng khỏi một nhóm cụ thể mà vẫn giữ lại thông tin trong danh bạ, hãy sử dụng API [DeleteContactFromGroup](/docs/ai-contact-center/api/autocall/danh-ba/delete-contact-from-group).
+    </Callout>
 
-## Bài viết liên quan
+    ## Lỗi thường gặp
 
-<Cards>
-  <Card title="Danh sách liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/get-contact-list" description="Tra cứu các liên hệ hiện có." />
-  <Card title="Thêm liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact" description="Thêm mới liên hệ vào danh bạ." />
-</Cards>
+    <Accordions>
+      <Accordion title="400 Bad Request / result: failed">
+        - Sai thông tin xác thực `AuthUser` hoặc `AuthKey`.
+        - `Contact_Id` không tồn tại hoặc đã bị xóa trước đó.
+      </Accordion>
+    </Accordions>
+
+    ## Bài viết liên quan
+
+    <Cards>
+      <Card title="Danh sách liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/get-contact-list" description="Tra cứu các liên hệ hiện có." />
+      <Card title="Thêm liên hệ" href="/docs/ai-contact-center/api/autocall/danh-ba/add-contact" description="Thêm mới liên hệ vào danh bạ." />
+    </Cards>
+  </ApiReferenceResponse>
+</ApiReferenceLayout>

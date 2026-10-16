@@ -1,31 +1,184 @@
 ---
 title: "Tổng quan Webhook"
-description: "Cơ chế tiếp nhận thông báo sự kiện cuộc gọi thời gian thực từ tổng đài ODS."
+description: "Cơ chế tiếp nhận thông báo sự kiện cuộc gọi thời gian thực từ tổng đài ODS, mô hình định danh và vòng đời 5 sự kiện."
 ---
 
-Webhook là cơ chế thông báo chủ động từ tổng đài ODS đến hệ thống máy chủ của khách hàng (CRM, ERP, Helpdesk) qua giao thức HTTP POST mỗi khi phát sinh các sự kiện trong vòng đời cuộc gọi.
+Webhook là cơ chế thông báo chủ động theo thời gian thực (Event-driven) từ tổng đài ODS đến hệ thống máy chủ của doanh nghiệp (CRM, ERP, Helpdesk) qua giao thức HTTP POST mỗi khi phát sinh các sự kiện trong vòng đời cuộc gọi.
 
-## Các sự kiện cuộc gọi
+---
 
-Một cuộc gọi thoại trên tổng đài phát sinh các sự kiện (event) chính:
+## Khái niệm và cơ chế hoạt động
 
-- `register`: Bắt đầu khởi tạo cuộc gọi.
-- `show`: Máy nhánh đang đổ chuông (cuộc gọi đến hoặc gọi ra).
-- `answer`: Cuộc gọi được nhân viên hoặc khách hàng nhấc máy.
-- `hide`: Máy nhánh dừng đổ chuông.
-- `finish`: Cuộc gọi kết thúc hoàn toàn (gác máy).
+Để thiết kế hệ thống backend tiếp nhận chính xác, lập trình viên cần phân biệt rõ Webhook với các thành phần công nghệ khác trong hệ sinh thái tổng đài ODS:
 
-## Tính năng Popup Webhook
+```
+[Tổng đài ODS] ───────── HTTP POST (JSON Event) ─────────► [Backend Khách hàng]
+                                                                    │
+                                                        Kênh Realtime nội bộ (WebSocket / SSE)
+                                                                    │
+                                                                    ▼
+                                                       [Giao diện CRM Nhân viên]
+                                                       (Hiển thị Popup cuộc gọi)
+```
 
-Trong thực tế tích hợp CRM, tính năng **Popup Webhook** là giải pháp phổ biến nhất giúp:
-1. Bật cửa sổ thông tin khách hàng (Customer Pop-up) trên màn hình máy tính của nhân viên ngay khi chuông điện thoại reo (`Status: Ringing`).
-2. Cập nhật thời điểm bắt đầu đàm thoại (`Status: Up`).
-3. Gửi thông tin tổng kết cuộc gọi, thời lượng thoại và liên kết tệp ghi âm ngay khi gác máy (`Status: Down`).
+- **Khác biệt với REST API**:
+  - REST API hoạt động theo cơ chế kéo (Pull/Command): Máy chủ CRM chủ động gửi yêu cầu lên ODS khi cần lấy dữ liệu hoặc thực thi hành động (như tạo máy nhánh, kích hoạt cuộc gọi).
+  - Webhook hoạt động theo cơ chế đẩy (Push/Notification): Tổng đài ODS chủ động gửi dữ liệu về máy chủ CRM ngay khi sự kiện diễn ra.
+- **Webhook chỉ truyền dữ liệu, không truyền âm thanh**:
+  - Webhook chỉ mang các gói tin JSON chứa siêu dữ liệu (Metadata) của cuộc gọi như số điện thoại, máy nhánh, mốc thời gian và trạng thái kết nối.
+  - Webhook **không phải là WebSocket hay WebRTC** và không truyền dẫn luồng âm thanh thoại. Luồng đàm thoại được xử lý độc lập qua kênh SIP/WebRTC hoặc thiết bị đầu cuối IP Phone.
+- **Bản chất của tính năng Popup cuộc gọi**:
+  - Popup hiển thị thông tin khách hàng trên màn hình CRM là **kết quả ứng dụng của dữ liệu Webhook**, không phải là một giao thức viễn thông riêng biệt. Backend của CRM nhận Webhook từ ODS, sau đó tự điều phối dữ liệu qua kênh realtime nội bộ (như WebSocket, Server-Sent Events hoặc SignalR) tới trình duyệt của đúng nhân viên.
+
+---
+
+## Điều kiện chuẩn bị tích hợp
+
+Trước khi tiếp nhận dữ liệu Webhook từ tổng đài, doanh nghiệp cần chuẩn bị:
+
+1. **Endpoint URL tiếp nhận**:
+   - Một đường dẫn API công khai trên máy chủ của doanh nghiệp có khả năng nhận request HTTP POST với body JSON (ví dụ: `https://crm.example.com/api/webhook/ods-call`).
+   - *Lưu ý*: Đây là URL thuộc hạ tầng của khách hàng, không sử dụng domain của ODS.
+2. **Giao thức bảo mật HTTPS**:
+   - Khuyến nghị sử dụng HTTPS để mã hóa dữ liệu cuộc gọi và thông tin khách hàng trên đường truyền Internet.
+3. **Khóa xác thực Webhook (`apikey`) — Tùy chọn**:
+   - Doanh nghiệp có thể cấu hình một chuỗi khóa bí mật để tổng đài gửi kèm trong trường `apikey` của body JSON, giúp backend xác thực nguồn gửi.
+4. **Hạ tầng xử lý backend**:
+   - Máy chủ backend cần phản hồi HTTP Status `2xx` nhanh chóng sau khi tiếp nhận để tránh tổng đài ghi nhận lỗi kết nối, sau đó lưu trữ hoặc đẩy vào hàng đợi xử lý.
+5. **Cấu hình trên tổng đài ODS**:
+   - Doanh nghiệp cung cấp Endpoint URL và `apikey` (nếu có) cho đội ngũ hỗ trợ kỹ thuật ODS để cấu hình kích hoạt trên hệ thống máy chủ.
+
+---
+
+## Vòng đời năm sự kiện cuộc gọi
+
+Tổng đài ODS phân loại tiến trình cuộc gọi thành 5 sự kiện chính thông qua trường **`Event`**:
+
+| Sự kiện (`Event`) | Thời điểm phát sinh | Ý nghĩa kỹ thuật |
+| :-- | :-- | :-- |
+| **`register`** | Ngay khi cuộc gọi bắt đầu khởi tạo | Tổng đài tiếp nhận cuộc gọi vào đầu số Hotline hoặc nhân viên vừa bấm phím quay số gọi ra. *(Lưu ý: Đây là sự kiện tạo phiên gọi trên tổng đài, không phải bản tin SIP REGISTER của thiết bị).* |
+| **`show`** | Nhánh cuộc gọi bắt đầu đổ chuông | Nhánh máy nhánh nội bộ đang đổ chuông (cuộc gọi đến) hoặc số điện thoại khách hàng đang đổ chuông (cuộc gọi đi). |
+| **`answer`** | Cuộc gọi được tiếp nhận | Một bên tham gia đã nhấc máy (khách hàng hoặc nhân viên trả lời). |
+| **`hide`** | Nhánh máy nhánh ngừng đổ chuông | Máy nhánh dừng reo chuông do hết thời gian chờ, nhân viên từ chối, hoặc đã có máy nhánh khác trong nhóm nhấc máy. |
+| **`finish`** | Cuộc gọi kết thúc hoàn toàn | Hai bên gác máy. Tổng đài chốt thời gian đàm thoại và trả về liên kết file ghi âm (nếu có). |
+
+<Callout type="info">
+  **Lưu ý về số lượng sự kiện:**
+  Không phải mọi cuộc gọi đều phát sinh đầy đủ cả 5 sự kiện. Tùy thuộc vào kịch bản (gọi ra, gọi vào trực tiếp hay gọi vào nhóm máy nhánh), số lượng sự kiện và thứ tự gửi có thể khác nhau (ví dụ: cuộc gọi ra trong thực tế không phát sinh sự kiện `hide`).
+</Callout>
+
+---
+
+## Mô hình định danh cuộc gọi đa nhánh
+
+Trong môi trường tổng đài doanh nghiệp, một cuộc gọi có thể đổ chuông nhiều máy nhánh hoặc chuyển tiếp qua nhiều bộ phận. Hệ thống phân định bằng 3 tham số cốt lõi:
+
+```
+[Cuộc gọi tổng thể: LID = 1792051050.26559]
+  ├── Nhánh 1: Ext = 7875, Uid = 1792051059.26568 (Đổ chuông ➔ Dừng chuông)
+  ├── Nhánh 2: Ext = 7877, Uid = 1792051059.26564 (Đổ chuông ➔ Nhấc máy ➔ Gác máy)
+  ├── Nhánh 3: Ext = 7874, Uid = 1792051059.26562 (Đổ chuông ➔ Dừng chuông)
+  └── Nhánh 4: Ext = 7873, Uid = 1792051059.26566 (Đổ chuông ➔ Dừng chuông)
+```
+
+- **`LID` (Linked ID)**:
+  - Mã định danh cấp cao nhất của toàn bộ phiên cuộc gọi (Session ID).
+  - Tất cả các sự kiện thuộc cùng một cuộc gọi (dù qua IVR, chuyển máy hay đổ chuông nhiều người) đều mang chung một giá trị `LID`.
+- **`Ext` (Extension)**:
+  - Số máy nhánh nội bộ của nhân viên liên quan trực tiếp đến sự kiện hiện tại (ví dụ: `7877`).
+- **`Uid` (Unique ID)**:
+  - Mã định danh của từng nhánh kênh thoại viễn thông cụ thể (Channel Unique ID).
+  - Khi một cuộc gọi đổ chuông đồng thời 4 máy nhánh, tổng đài sẽ tạo ra 4 nhánh kênh với 4 `Uid` khác nhau nhưng dùng chung 1 `LID`.
+  - **Không bao giờ đồng nhất `Uid` với `LID`**.
+
+### Lưu ý cho hệ thống quản lý nhiều tổng đài:
+- Nếu doanh nghiệp vận hành nhiều tổng đài ODS cùng lúc và trỏ về chung một backend endpoint, cần phân vùng dữ liệu theo **`Nguồn tổng đài + LID`** để tránh xung đột mã định danh.
+- Trường `apikey` chỉ giúp phân biệt nguồn khi doanh nghiệp đã cấu hình các khóa riêng biệt cho từng tổng đài. Nếu để giá trị mặc định (`apikey: null`), backend không thể dựa vào trường này để phân định nguồn gửi.
+
+---
+
+## Hai luồng sự kiện minh họa từ thực tế
+
+Dựa trên dữ liệu log thực tế từ hệ thống ODS, dưới đây là tiến trình diễn ra trong 2 tình huống phổ biến:
+
+### Kịch bản A: Cuộc gọi ra (Outbound) được trả lời
+
+Khi nhân viên gọi ra cho khách hàng và khách hàng nhấc máy:
+
+```
+[register] ──────────► [show] ──────────► [answer] ──────────► [finish]
+Khởi tạo gọi ra        Khách đổ chuông    Khách nhấc máy       Gác máy & có file ghi âm
+(Chưa có TimeAnswer)   (TimeDial)         (TimeAnswer)         (TimeEnd, recordingfileURL)
+```
+
+1. **`register`**: Ghi nhận máy nhánh bắt đầu khởi tạo kết nối gọi ra. `LID` và `Uid` được tạo.
+2. **`show`**: Bắt đầu quay số đến khách hàng (`TimeDial`).
+3. **`answer`**: Khách hàng nhấc máy, ghi nhận thời điểm bắt đầu đàm thoại (`TimeAnswer`).
+4. **`finish`**: Một trong hai bên gác máy. Ghi nhận thời điểm kết thúc (`TimeEnd`), kết quả `Disposition: ANSWERED` và đường dẫn nghe file ghi âm `recordingfileURL`.
+*(Lưu ý: Trong kịch bản gọi ra thành công này, hệ thống không phát sinh sự kiện `hide`).*
+
+### Kịch bản B: Cuộc gọi vào (Inbound) đổ chuông nhóm máy nhánh
+
+Khi khách hàng gọi vào Hotline, nghe lời chào IVR và cuộc gọi được phân phối đổ chuông đồng thời đến 4 máy nhánh (Ring Group / Queue):
+
+```
+[register] ──► Tổng đài tiếp nhận cuộc gọi vào Hotline
+    │
+    ├──► [show] (Ext 7875, Uid .26568) ── đổ chuông
+    ├──► [show] (Ext 7877, Uid .26564) ── đổ chuông
+    ├──► [show] (Ext 7874, Uid .26562) ── đổ chuông
+    └──► [show] (Ext 7873, Uid .26566) ── đổ chuông
+             │
+             ├──► [answer] (Ext 7877 nhấc máy nghe)
+             │
+             ├──► [hide] (Ext 7875 dừng chuông - ANSWERED_ELSEWHERE)
+             ├──► [hide] (Ext 7874 dừng chuông - ANSWERED_ELSEWHERE)
+             └──► [hide] (Ext 7873 dừng chuông - ANSWERED_ELSEWHERE)
+             │
+             └──► [finish] (Ext 7877 và khách gác máy - Kết thúc toàn bộ cuộc gọi)
+```
+
+1. **`register`**: Khách hàng kết nối vào tổng đài. Sự kiện lúc này chưa có thông tin `Ext` hay `Uid` vì cuộc gọi đang nằm ở tầng Trunk/IVR.
+2. **Nhiều sự kiện `show`**: Tổng đài phát nhiều webhook `show` tương ứng với từng máy lẻ đang đổ chuông (`Ext: 7875`, `7877`, `7874`, `7873`).
+3. **`answer`**: Nhân viên tại máy lẻ `7877` bấm nghe máy.
+4. **Các sự kiện `hide`**: Các máy lẻ còn lại (`7875`, `7874`, `7873`) ngừng đổ chuông và nhận sự kiện `hide` với trạng thái `Disposition: ANSWERED_ELSEWHERE`.
+5. **`finish`**: Khi cuộc đàm thoại giữa máy lẻ `7877` và khách hàng kết thúc, tổng đài gửi sự kiện `finish` kèm thông tin tổng kết và liên kết file ghi âm.
+
+<Callout type="warn">
+  **Đặc tính bất đồng bộ trên đường truyền mạng:**
+  Tổng đài gửi các webhook qua các HTTP request độc lập. Do độ trễ mạng Internet, backend khách hàng có thể nhận sự kiện `hide` của các máy phụ trước hoặc sau sự kiện `answer` vài mili-giây. Hệ thống tiếp nhận cần thiết kế để xử lý linh hoạt thay vì giả định một thứ tự nhận HTTP cứng nhắc.
+</Callout>
+
+---
+
+## Ứng dụng thực tế của dữ liệu Webhook
+
+Dữ liệu sự kiện từ Webhook cho phép doanh nghiệp hiện thực hóa các chức năng:
+
+- **Bật cửa sổ thông tin khách hàng (Screen Pop-up)**:
+  Khi nhận sự kiện `show`, trích xuất số điện thoại `CID` để mở sẵn hồ sơ khách hàng, lịch sử mua hàng hoặc ticket đang xử lý trên màn hình của nhân viên sở hữu `Ext`.
+- **Cập nhật trạng thái bàn làm việc (Agent Presence)**:
+  Hiển thị trạng thái nhân viên đang bận đàm thoại (`answer`) hoặc đã sẵn sàng nhận cuộc gọi mới (`finish`).
+- **Tự động lưu nhật ký và đối soát cước thoại**:
+  Lưu trữ toàn bộ lịch sử cuộc gọi (`LID`, thời lượng đàm thoại thực tế `TimeEnd - TimeAnswer`) vào cơ sở dữ liệu CRM ngay khi cuộc gọi kết thúc mà không cần quét API định kỳ.
+- **Đồng bộ tệp ghi âm tự động**:
+  Lấy liên kết `recordingfileURL` từ sự kiện `finish` để gắn vào hồ sơ khách hàng phục vụ quản lý chất lượng cuộc gọi.
+
+---
+
+## Bài viết tiếp theo
+
+Để xem chi tiết cấu trúc JSON payload của từng sự kiện, từ điển toàn bộ các trường dữ liệu và mã nguồn máy chủ tiếp nhận mẫu, vui lòng xem:
 
 <Cards>
   <Card
-    title="Đặc tả Webhook Popup"
-    description="Cấu trúc payload, bảng trạng thái cuộc gọi và code mẫu receiver bằng Node.js / PHP."
+    title="Tích hợp Webhook và Popup cuộc gọi"
+    description="Cấu trúc payload chi tiết, ma trận tham số, mẫu JSON thực tế và code mẫu backend tiếp nhận an toàn."
     href="/docs/ai-contact-center/api/webhook/popup"
+  />
+  <Card
+    title="Xác thực và ranh giới tin cậy"
+    description="Phân định giữa apikey của Webhook, AuthKey của REST API và mật khẩu máy nhánh."
+    href="/docs/ai-contact-center/api/bat-dau/xac-thuc"
   />
 </Cards>

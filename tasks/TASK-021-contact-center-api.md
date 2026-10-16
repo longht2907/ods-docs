@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: done
 branch: task/TASK-021-contact-center-api
-commit: e3e6109
+commit: 489cd97
 verified-by: npm run verify:task
 ---
 
@@ -102,3 +102,13 @@ Dừng lại và xin ý kiến Human ngay lập tức nếu:
 1. Hoàn thành xong từng Lô công việc theo kế hoạch.
 2. Gặp mâu thuẫn ranh giới bảo mật hoặc cần đổi cấu hình hệ thống/dependency.
 3. Cần quyết định về việc xóa hoặc đổi slug của trang hiện có `khoi-tao-cuoc-goi.mdx`.
+
+## Báo cáo và vòng đời
+
+- **Trạng thái đóng hồ sơ**: `status: done` (đóng đợt triển khai hiện tại theo xác nhận của Human).
+- **Commit hash hoàn thành trên branch**: `489cd97` (`489cd97784e4713dd32059847565d330e5b956fa`).
+- **PR & Merge Git**: PR [#21 (Task/task 021 contact center api)](https://github.com/longht2907/ods-docs/pull/21) đã merge vào `main` tại commit `67d8e6b` (`67d8e6bc6cb96f4d71f3525a25c5931dd88c1770`).
+- **Bằng chứng CI**: GitHub Actions check run `verify` (run ID: `38344900353`, job ID: `115123906020`) hoàn thành `success`.
+- **Phạm vi nghiệm thu & Cảnh báo**:
+  - Human xác nhận đóng đợt triển khai hiện tại sau khi hoàn thành IA, structure, skeleton và các endpoints ban đầu.
+  - **KHÔNG coi API đã nghiệm thu toàn bộ**. Toàn bộ 6 finding review kỹ thuật chưa đạt đã được chuyển sang backlog tại [.harness/reports/TASK-021-follow-up.md](../.harness/reports/TASK-021-follow-up.md) để xử lý trong đợt tiếp theo.

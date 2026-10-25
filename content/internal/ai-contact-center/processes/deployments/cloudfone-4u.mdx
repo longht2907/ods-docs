@@ -1,0 +1,171 @@
+---
+title: CloudFone 4U (VoIP trường học)
+description: Hướng dẫn kỹ thuật triển khai giải pháp tổng đài 4U cho khối trường học trên hạ tầng Share ODS.
+---
+
+Quy trình kỹ thuật hướng dẫn triển khai giải pháp tổng đài **4U** (tổng đài VoIP chuyên dụng cho trường học tích hợp kiểm tra thẻ cước học sinh `cardnumber`) cho đối tác Công ty Cổ phần Vật tư Bưu điện (Mã KH: `ODS000801`).
+
+---
+
+## Lưu đồ quy trình
+
+<ProcessFlowchart flowId="deploy-cloudfone-4u" />
+
+---
+
+## Các bước triển khai
+
+### Bước 1: Tiếp nhận & Kiểm tra thông số triển khai
+
+Mở Ticket yêu cầu triển khai từ Sales trên hệ thống Support Desk và kiểm tra đầy đủ các thông số kỹ thuật trước khi cấu hình:
+
+| Thông số | Giá trị chuẩn / Định dạng | Mục đích sử dụng |
+| :--- | :--- | :--- |
+| **Mã dịch vụ (MDV)** | `CF-4Uxxxxxx` (Ví dụ: `CF-4U0000012`) | Định danh dịch vụ trên ERP Odoo và Portal |
+| **Kịch bản cuộc gọi** | Sơ đồ luồng thoại vào và cơ chế thẻ cước gọi ra | Cấu hình định tuyến và Dialplan |
+| **Danh sách máy nhánh** | Dải số nội bộ (Ví dụ: `1000329`, `1000330`,...) | Cấp phát tài khoản SIP cho trường học |
+| **Đầu số kết nối (DID)** | Số Hotline trường học (VNPT, Viettel, FPT, CMC,...) | Cấu hình Inbound / Outbound Trunk |
+| **Máy chủ Core PBX** | IP Server PBX Core: `172.16.123.239` | Nền tảng vận hành CloudFone Share |
+
+- **Quy tắc kiểm tra**:
+  - Mã dịch vụ bắt buộc phải có tiền tố `CF-4U`. Nếu sai mã hoặc thuộc nhóm dịch vụ khác → Phản hồi trên Ticket yêu cầu Sales làm rõ.
+  - Phải có kịch bản phân bổ máy nhánh và đầu số Hotline được duyệt. Nếu thiếu thông tin → Tạm dừng, yêu cầu Sales bổ sung.
+
+---
+
+### Bước 2: Kích hoạt dịch vụ Odoo & Khởi tạo tổng đài trên Portal
+
+#### 2.1. Cập nhật thông số kỹ thuật trên ERP Online (Odoo)
+1. Đăng nhập hệ thống [ERP Online ODS](https://erponline.ods.vn) → Truy cập phân hệ **Services** (`sale.service`).
+2. Tìm kiếm theo **Mã dịch vụ** (Ví dụ: `CF-4U0000012`).
+
+![Danh sách dịch vụ trên ERP Online Odoo](/media/ai-contact-center/cloudfone-4u/odoo_services_list.png)
+
+3. Mở chi tiết dịch vụ và điền các trường kỹ thuật:
+   - **IP**: Nhập IP máy chủ Core tổng đài: `172.16.123.239`.
+   - **Sub IP**: Nhập danh sách đầu số Hotline gắn với dịch vụ.
+4. Chuyển trạng thái dịch vụ sang **Active** (Kích hoạt).
+
+![Chi tiết thông tin cấu hình dịch vụ trên Odoo](/media/ai-contact-center/cloudfone-4u/odoo_service_detail.png)
+
+#### 2.2. Khởi tạo tổng đài trên Portal Support
+1. Đăng nhập hệ thống [Support Portal ODS](https://supportportal.matbao.one/) (hoặc `http://supportsoftphone.cloudfone.vn/`).
+2. Vào menu **CloudFone** → Chọn **CloudFone Share**.
+
+![Danh sách CloudFone Share trên Portal Quản trị](/media/ai-contact-center/cloudfone-4u/portal_cloudfone_share_list.png)
+
+3. Nhấp nút **+ Thêm dịch vụ**:
+   - Nhập **Mã dịch vụ** (Ví dụ: `CF-4U0000012`) vào ô từ khóa tra cứu.
+   - Chọn Core tổng đài tương ứng và nhấn nút **Kiểm tra** để hệ thống truy vấn thông tin gói cước.
+   - Sau khi hệ thống xác thực dữ liệu thành công, nhấn **Lưu** để khởi tạo máy nhánh và cơ sở dữ liệu tổng đài.
+
+![Form thêm mới dịch vụ CloudFone Share trên Portal](/media/ai-contact-center/cloudfone-4u/portal_cloudfone_add_form.png)
+
+---
+
+### Bước 3: Đổi Context máy nhánh & Cấu hình Dialplan FreePBX
+
+Học sinh gọi ra ngoài bằng thẻ cước cá nhân (`cardnumber`), do đó máy nhánh phải được chuyển sang context kiểm tra thẻ trước khi đẩy vào luồng cước tổng đài.
+
+#### 3.1. Đổi Context trên giao diện FreePBX
+1. Truy cập Web GUI FreePBX Core tại địa chỉ `http://172.16.123.239/admin/`.
+2. Vào mục **Applications** → **Extensions**.
+3. Chọn số máy nhánh nội bộ của dịch vụ (Ví dụ: `1000329`).
+4. Tại tab **Advanced**, đổi giá trị trường **Context** từ `from-internal` thành:
+   ```text
+   context = from-school
+   ```
+5. Nhấn **Submit** và **Apply Config**.
+
+#### 3.2. Cấu hình Dialplan kiểm tra thẻ cước trong Asterisk
+1. SSH vào máy chủ tổng đài Core `172.16.123.239` bằng quyền root.
+2. Mở file cấu hình Dialplan tùy biến `/etc/asterisk/extensions_override_private.conf`:
+   ```bash
+   nano /etc/asterisk/extensions_override_private.conf
+   ```
+3. Trong ngữ cảnh `[from-school]`, thêm đoạn cấu hình kiểm tra mã thẻ học sinh:
+   ```ini
+   ; Cấu hình kiểm tra thẻ học sinh cho dịch vụ CF-4U
+   ; Cú pháp chuẩn:
+   ; exten => _[0-9a-zA-Z*#]./<So_may_nhanh>,1,ExecIf($["${cardnumber}"=""]?Hangup:Goto(${mdv},${EXTEN},1))
+
+   ; Ví dụ triển khai cho dịch vụ CF-4U0000012 với máy nhánh 1000329:
+   ; CF-4U0000012
+   exten => _[0-9a-zA-Z*#]./1000329,1,ExecIf($["${cardnumber}"=""]?Hangup:Goto(${mdv},${EXTEN},1))
+   ```
+
+<Callout title="Nguyên lý hoạt động của lệnh ExecIf" type="info">
+  - Khi máy nhánh `1000329` nhấc máy quay số, tổng đài kiểm tra biến `${cardnumber}`.
+  - Nếu `${cardnumber}` rỗng (`""` - chưa quét thẻ hoặc mã cước không hợp lệ) → Hệ thống tự động `Hangup` ngắt cuộc gọi ngay.
+  - Nếu `${cardnumber}` có dữ liệu hợp lệ → Cuộc gọi được chuyển tiếp (`Goto`) vào context cước `${mdv}` để thực hiện gọi ra ngoài.
+</Callout>
+
+4. Lưu file và reload lại Dialplan:
+   ```bash
+   asterisk -rx 'dialplan reload'
+   ```
+
+---
+
+### Bước 4: Tạo Domain & Đấu nối Trunk đầu số
+
+#### 4.1. Tạo Domain dịch vụ
+1. Yêu cầu bộ phận System khởi tạo bản ghi DNS theo định dạng:
+   - **Tên miền**: `cf-4uxxxxxx.cloudfone.vn` (Ví dụ: `cf-4u0000012.cloudfone.vn`).
+   - Bản ghi `A` trỏ về IP PBX Core: `172.16.123.239`.
+2. Kiểm tra phản hồi DNS:
+   ```bash
+   ping cf-4u0000012.cloudfone.vn
+   ```
+   *Yêu cầu kết quả phân giải chính xác về địa chỉ IP máy chủ Core.*
+
+#### 4.2. Đấu nối đầu số (Trunk) trên FreePBX & Portal
+1. Truy cập FreePBX `172.16.123.239` → mục **Connectivity** → **Trunks**:
+   - Xác định **Trunk Name** của đầu số tương ứng.
+   - Xác định tham số thứ tự Trunk (**Parameter Trunk** / ID đầu số).
+2. Đăng nhập Portal Support (`supportportal.matbao.one` hoặc `supportsoftphone.cloudfone.vn`):
+   - Vào menu **CloudFone Share** → Chọn **Quản Lý Đầu Số** → Nhấp **Thêm mới**.
+   - Nhập thông tin:
+     - **Mã dịch vụ**: `CF-4Uxxxxxx`
+     - **Đầu số**: Số Hotline trường học
+     - **ID đầu số**: Tham số thứ tự Trunk đã lấy trên FreePBX
+   - Nhấn **Update** / **Lưu** để hoàn tất gán số Hotline cho tổng đài.
+
+---
+
+### Bước 5: Bàn giao API & Cấu hình IP Phone trường học
+
+#### 5.1. Bàn giao API cho đối tác
+Gửi tài liệu kết nối API, danh sách SIP Extension và Domain dịch vụ cho bộ phận kỹ thuật của Công ty CP Vật tư Bưu điện (`ODS000801`).
+
+#### 5.2. Cấu hình thiết bị IP Phone tại trường học
+Hỗ trợ kỹ thuật cấu hình điện thoại IP Phone (Grandstream, Yealink, Flyingvoice,...):
+1. Khai báo thông tin SIP Account:
+   - **SIP Server / Registrar**: `cf-4uxxxxxx.cloudfone.vn` (hoặc IP PBX Core).
+   - **SIP User ID / Authenticate ID**: Số máy nhánh nội bộ (Ví dụ: `1000329`).
+   - **Password**: Mật khẩu máy nhánh được sinh trên Portal.
+
+<Callout title="Bắt buộc: Khóa các phím Dsskey / Memory Key" type="warn">
+  Khi cấu hình điện thoại IP Phone đặt tại khu vực trường học, **bắt buộc phải vô hiệu hóa toàn bộ các nút Dsskey (phím quay số nhanh, phím nhớ Line)**.
+
+  *Mục đích*: Ngăn chặn học sinh hiếu động bấm nhầm vào các phím chức năng gây phát sinh cuộc gọi rác, nghẽn đường truyền và phát sinh cước ngoài ý muốn.
+</Callout>
+
+#### 5.3. Kiểm tra nghiệm thu 2 chiều
+1. **Kiểm tra cuộc gọi vào (Inbound)**: Dùng số di động gọi vào Hotline trường học → Cuộc gọi đổ chuông chính xác vào máy nhánh nội bộ theo kịch bản.
+2. **Kiểm tra cuộc gọi ra (Outbound)**:
+   - Nhấc máy gọi ra không có mã thẻ → Tổng đài tự động ngắt (`Hangup`).
+   - Gọi ra kèm mã thẻ cước học sinh hợp lệ → Cuộc gọi kết nối thông suốt ra số ngoài.
+3. Phản hồi kết quả bàn giao lên Ticket và chuyển trạng thái Ticket sang **Closed**.
+
+---
+
+## Xử lý sự cố thường gặp (Troubleshooting)
+
+| Tình huống lỗi | Nguyên nhân | Hướng khắc phục |
+| :--- | :--- | :--- |
+| **Mã dịch vụ không tồn tại trên Odoo** | Sales chưa tạo dịch vụ hoặc hợp đồng chưa được duyệt. | Phản hồi Ticket yêu cầu Sales kiểm tra trạng thái duyệt hợp đồng trên Odoo. |
+| **Không tìm thấy gói khi nhấn "Kiểm tra" trên Portal** | Chưa nhập đúng mã dịch vụ hoặc chưa chọn đúng Core máy chủ. | Rà soát lại mã dịch vụ, kiểm tra trạng thái Active và IP Core trên Odoo. |
+| **Cuộc gọi ra bị ngắt dù đã quét thẻ hợp lệ** | Dialplan chưa nhận đúng biến `${cardnumber}` hoặc sai số nội bộ trong config. | Kiểm tra log Asterisk (`asterisk -rvvv`) xem biến `${cardnumber}` có được truyền sang không; rà soát lại file `extensions_override_private.conf`. |
+| **Ping domain không phân giải ra IP Core** | Chưa tạo bản ghi DNS hoặc DNS chưa đồng bộ toàn mạng. | Liên hệ bộ phận Quản trị Hệ thống kiểm tra bản ghi DNS của tên miền `cf-4uxxxxxx.cloudfone.vn`. |
+| **Học sinh liên tục bấm nhầm phím gọi ngoài ý muốn** | Chưa khóa tính năng Dsskey / Memory Key trên điện thoại IP Phone. | Truy cập giao diện quản trị IP Phone, vào mục `Dsskey / Line Key` và chuyển toàn bộ về trạng thái `Disabled` / `No Function`. |

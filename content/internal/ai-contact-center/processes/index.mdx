@@ -1,22 +1,44 @@
 ---
 title: Quy trình vận hành
-description: Danh mục quy trình tiếp nhận, xử lý và hoàn tất công việc hoặc yêu cầu dịch vụ Tổng đài.
+description: Hướng dẫn lựa chọn quy trình, nguyên tắc tiếp nhận, phối hợp xử lý và hoàn tất các yêu cầu nghiệp vụ Tổng đài ODS.
 ---
 
-## Xử lý case
+Quy trình vận hành (SOP) là tài liệu chuẩn hóa hướng dẫn nhân viên Support thực hiện chính xác các yêu cầu kỹ thuật và nghiệp vụ xuyên suốt vòng đời dịch vụ của khách hàng: từ tiếp nhận, khởi tạo, cấu hình, thay đổi đến bàn giao và đóng yêu cầu.
 
-- [Tiếp nhận & phân loại case](/internal/ai-contact-center/processes/intake)
-- [Luồng xử lý sự cố](/internal/ai-contact-center/processes/incident-flow)
-- [Chuyển cấp hỗ trợ](/internal/ai-contact-center/processes/escalation)
-- [Đóng case](/internal/ai-contact-center/processes/case-closure)
+## Cách chọn quy trình theo yêu cầu nghiệp vụ
 
-## Yêu cầu dịch vụ
+Khi tiếp nhận một ticket hoặc yêu cầu từ khách hàng/kinh doanh, nhân viên Support xác định nhóm công việc theo bảng sau để mở đúng quy trình:
 
-- [Tạo / xóa máy nhánh](/internal/ai-contact-center/processes/service-requests/extension-setup)
-- [Cấu hình IVR](/internal/ai-contact-center/processes/service-requests/ivr-setup)
-- [Đổi đầu số](/internal/ai-contact-center/processes/service-requests/number-change)
-- [Xuất ghi âm](/internal/ai-contact-center/processes/service-requests/recording-export)
+| Tính chất yêu cầu | Mục tiêu công việc | Nhóm quy trình áp dụng |
+|---|---|---|
+| **Triển khai mới** | Khởi tạo hệ thống tổng đài mới, cấp domain, cấu hình dải máy nhánh và đấu nối đầu số lần đầu. | [Triển khai dịch vụ](/internal/ai-contact-center/processes/deployments) |
+| **Thay đổi cấu hình** | Thêm/xóa máy nhánh, đổi kịch bản IVR, đổi đầu số hiển thị, xuất file ghi âm cuộc gọi. | [Tiếp nhận & phân loại yêu cầu](/internal/ai-contact-center/processes/intake) |
+| **Báo lỗi / gián đoạn** | Khách hàng không gọi được, rớt cuộc gọi, máy nhánh mất đăng ký, âm thanh rè/mất chiều. | Chuyển sang [Xử lý sự cố (Runbooks)](/internal/ai-contact-center/runbooks) |
+| **Hủy / đóng yêu cầu** | Nghiệp vụ hoàn tất hoặc khách hàng yêu cầu đóng dịch vụ, giải phóng tài nguyên. | [Đóng case & hoàn tất](/internal/ai-contact-center/processes/case-closure) |
 
-## Tra cứu sự cố
+## Nguyên tắc tiếp nhận & phối hợp xử lý
 
-Khi case là sự cố, mở [Xử lý sự cố](/internal/ai-contact-center/runbooks) để chọn runbook phù hợp.
+Mọi kỹ sư Support khi tiếp nhận và xử lý yêu cầu cần tuân thủ các nguyên tắc cốt lõi:
+
+1. **Xác thực quyền hạn yêu cầu**:
+   - Chỉ xử lý các yêu cầu thay đổi cấu hình hoặc xuất dữ liệu khi được gửi từ đầu mối liên hệ kỹ thuật/người đại diện hợp lệ của khách hàng.
+   - Đối với yêu cầu xuất file ghi âm hoặc thay đổi thông tin định tuyến nhạy cảm, phải kiểm tra kênh yêu cầu chính thức.
+
+2. **Ghi nhận & kiểm tra tính đầy đủ**:
+   - Thu thập đầy đủ thông tin: mã khách hàng, đầu số liên quan, số máy nhánh, dải IP hoặc tài khoản bị ảnh hưởng.
+   - Không thực hiện thay đổi khi yêu cầu chưa rõ ràng hoặc thiếu thông tin định danh.
+
+3. **Phối hợp & Chuyển cấp (Escalation)**:
+   - Khi yêu cầu vượt thẩm quyền cấu hình cấp 1 (L1) hoặc liên quan đến can thiệp dialplan core, định tuyến nhà mạng hoặc máy chủ vật lý, thực hiện chuyển cấp theo [Quy trình chuyển cấp hỗ trợ](/internal/ai-contact-center/processes/escalation).
+   - Khi chuyển cấp, phải đính kèm đầy đủ log kiểm tra, thông tin đã xác minh và mô tả rõ hiện trạng để cấp tiếp theo tiếp quản nhanh chóng.
+
+4. **Kiểm tra hoàn tất & Bàn giao**:
+   - Trước khi thông báo cho khách hàng, kỹ sư phải tự thực hiện test kiểm chứng (test call, test đăng ký SIP, test flow IVR).
+   - Ghi chú đầy đủ các thay đổi kỹ thuật đã áp dụng vào hệ thống ticket/quản lý trước khi cập nhật trạng thái đóng yêu cầu.
+
+## Danh mục quy trình vận hành
+
+<AutoIndex />
+
+
+

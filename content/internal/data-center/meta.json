@@ -1,0 +1,7 @@
+{
+  "title": "Data Center",
+  "description": "Support Wiki cho dịch vụ Trung tâm dữ liệu (Colocation, Dedicated Server, Rack).",
+  "root": true,
+  "defaultOpen": false,
+  "pages": ["index", "processes"]
+}

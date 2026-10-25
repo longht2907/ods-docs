@@ -1,4 +1,16 @@
 {
   "title": "Quy trình vận hành",
-  "pages": ["index", "intake", "incident-flow", "escalation", "case-closure", "service-requests"]
+  "pages": [
+    "index",
+    "intake",
+    "deployments",
+    "service-requests",
+    "suspend-service",
+    "cancellations",
+    "incident-flow",
+    "escalation",
+    "case-closure"
+  ]
 }
+
+

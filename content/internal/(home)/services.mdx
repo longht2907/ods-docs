@@ -1,0 +1,166 @@
+---
+title: Tổng quan dịch vụ ODS
+description: Danh mục các nhóm dịch vụ do ODS cung cấp, thành phần kỹ thuật cần nhận diện và thông tin Support cần tra cứu khi tiếp nhận yêu cầu.
+---
+
+Trang này cung cấp cái nhìn tổng quan về các nhóm dịch vụ do ODS cung cấp. Việc phân nhóm dưới đây phục vụ cho mục đích tra cứu và định hướng xử lý công việc của đội ngũ Support, không đại diện cho cấu trúc danh mục kinh doanh hoặc phân cấp hợp đồng chính thức trên hệ thống ERP Odoo.
+
+Khi tiếp nhận yêu cầu từ khách hàng, nhân viên Support cần xác định dịch vụ thuộc nhóm nào để thu thập đúng thông số kỹ thuật và tra cứu đúng quy trình vận hành.
+
+---
+
+## 1. Dịch vụ Trung tâm dữ liệu (Data Center / IDC)
+
+Dịch vụ cung cấp không gian đặt máy chủ, tủ rack và hạ tầng vận hành tại các Trung tâm dữ liệu (Data Center) đạt tiêu chuẩn Tier 3 tại Việt Nam (Viettel, VNPT, FPT...).
+
+### Nhu cầu sử dụng
+- Doanh nghiệp sở hữu thiết bị phần cứng máy chủ riêng nhưng cần môi trường vận hành chuyên nghiệp (nguồn điện ổn định, UPS dự phòng, máy phát điện, điều hòa làm mát công nghiệp, bảo mật vật lý 24/7).
+- Doanh nghiệp cần thuê nguyên tủ rack hoặc thuê máy chủ vật lý chuyên dụng phục vụ khối lượng công việc lớn, dữ liệu nhạy cảm.
+
+### Các thành phần Support cần nhận diện
+- **Thuê chỗ đặt máy chủ (Colocation)**: Phân theo không gian lắp đặt (1U, 2U, 4U...) hoặc dạng tháp (Tower). Mỗi vị trí được cấp nguồn điện cơ bản, cổng mạng switch và địa chỉ IPv4 WAN.
+- **Thuê tủ Rack (Rack Colocation)**: Thuê trọn gói nửa tủ (21U) hoặc nguyên tủ (42U) kèm tổng công suất điện (PDU, Ampe) và dải IP riêng.
+- **Máy chủ dùng riêng (Dedicated Server)**: ODS cung cấp cả phần cứng máy chủ (CPU, RAM, Ổ cứng SAS/SSD/NVMe, RAID card, iDRAC/iLO) đặt tại Data Center.
+
+### Thông tin cần tra cứu khi tiếp nhận yêu cầu
+- Vị trí vật lý: Tên Data Center, số Rack, vị trí Unit (U).
+- Cổng mạng (Switch Port) và VLAN mạng đấu nối.
+- Dải IP WAN gán cho thiết bị, Gateway và Netmask.
+- Thông tin quản trị từ xa (iDRAC / iLO / KVM over IP) nếu có yêu cầu can thiệp phần cứng.
+
+---
+
+## 2. Dịch vụ Kết nối & Truyền dẫn (Network & Connectivity)
+
+Dịch vụ cung cấp đường truyền internet, kênh truyền số liệu bảo mật và tài nguyên định danh mạng cho máy chủ và văn phòng khách hàng.
+
+### Nhu cầu sử dụng
+- Cung cấp băng thông truy cập mạng cho máy chủ đặt tại Data Center.
+- Kết nối bảo mật điểm - điểm hoặc đa điểm giữa các chi nhánh công ty về trung tâm dữ liệu.
+
+### Các thành phần Support cần nhận diện
+- **Internet Shared**: Băng thông chia sẻ dùng chung cho máy chủ đặt tại Data Center (cổng 100Mbps / 1Gbps / 10Gbps, cam kết băng thông quốc tế và trong nước).
+- **Internet Dedicated / Leased Line**: Kênh truyền internet chuyên dụng với băng thông cố định đối xứng (1:1), cam kết chất lượng dịch vụ SLA cao.
+- **MPLS / VPN / Metronet**: Kênh truyền số liệu bảo mật nội bộ kết nối trực tiếp các văn phòng của khách hàng về Data Center.
+- **Địa chỉ IP tĩnh (Static IP Address)**: Các block dải IP công cộng (/32, /30, /29, /28...) cấp phát cho máy chủ hoặc hạ tầng mạng.
+
+### Thông tin cần tra cứu khi tiếp nhận yêu cầu
+- Băng thông hợp đồng (trong nước / quốc tế).
+- Thông số cổng mạng (Switch Port ID, Duplex, VLAN ID).
+- Dải IP công cộng được cấp và địa chỉ Next-hop Gateway.
+- Điểm đầu - điểm cuối của kênh truyền nếu là dịch vụ Leased Line / MPLS.
+
+---
+
+## 3. Dịch vụ Điện toán đám mây (Cloud Services)
+
+Cung cấp tài nguyên tính toán, lưu trữ và hạ tầng ảo hóa linh hoạt dựa trên nền tảng Cloud của ODS.
+
+### Nhu cầu sử dụng
+- Khách hàng cần khởi tạo máy chủ ảo nhanh chóng, không tốn chi phí đầu tư phần cứng ban đầu.
+- Nhu cầu mở rộng hoặc thu hẹp tài nguyên tính toán (vCPU, RAM, Disk) linh hoạt theo mùa vụ.
+- Lưu trữ dữ liệu sao lưu (backup) và đồng bộ tệp tin đám mây.
+
+### Các thành phần Support cần nhận diện
+- **Cloud Server / VPS**: Máy chủ ảo hóa phân vùng từ cụm máy chủ vật lý, độc lập hệ điều hành, hỗ trợ cấu hình tùy biến vCPU, RAM và dung lượng ổ cứng (SSD/NVMe).
+- **Private Cloud**: Cụm hạ tầng ảo hóa dành riêng cho một doanh nghiệp, cô lập tài nguyên phần cứng và mạng ảo hóa.
+- **Cloud Storage / Cloud Files**: Dịch vụ lưu trữ dữ liệu dung lượng lớn, hỗ trợ giao thức S3-compatible hoặc chia sẻ tệp tin trực tuyến.
+
+### Thông tin cần tra cứu khi tiếp nhận yêu cầu
+- Thông số gói: Số lượng vCPU, dung lượng RAM, dung lượng và loại Disk (OS / Data).
+- Hệ điều hành (Linux/Windows) và bản phân phối kèm phiên bản.
+- Địa chỉ IP WAN / IP LAN của máy chủ ảo.
+- Node hoặc Cluster ảo hóa đang quản lý máy chủ.
+
+---
+
+## 4. Dịch vụ Bản quyền phần mềm (Software Licensing)
+
+ODS là đối tác phân phối và cung cấp bản quyền phần mềm chính hãng dạng cho thuê theo tháng (SPLA / Service Provider License).
+
+### Nhu cầu sử dụng
+- Doanh nghiệp sử dụng phần mềm bản quyền theo chu kỳ kinh doanh linh hoạt, không cần bỏ chi phí lớn mua bản quyền vĩnh viễn (Perpetual).
+- Tích hợp sẵn license vào hệ thống máy chủ Cloud hoặc Dedicated thuê tại ODS.
+
+### Các thành phần Support cần nhận diện
+- **Bảng điều khiển máy chủ (Control Panel)**:
+  - **cPanel**: Bảng điều khiển hosting Linux phổ biến (bản Admin, Pro, Premier).
+  - **Plesk**: Bảng điều khiển hỗ trợ cả Windows và Linux (Web Admin Edition, Web Pro Edition, Web Host Edition).
+  - **DirectAdmin**: Bảng điều khiển quản trị web hosting gọn nhẹ.
+- **Microsoft SPLA License**:
+  - **Windows Server**: Bản quyền hệ điều hành tính theo lõi CPU (Cores).
+  - **Microsoft SQL Server**: Bản quyền cơ sở dữ liệu (Standard / Enterprise) tính theo Cores.
+  - **Remote Desktop Services (RDS SAL)**: Bản quyền truy cập máy tính từ xa tính theo số lượng người dùng (User CAL / SAL).
+
+### Thông tin cần tra cứu khi tiếp nhận yêu cầu
+- Loại license và phiên bản phần mềm.
+- Mã License Key / Activation Code trên hệ thống quản lý ODS.
+- Địa chỉ IP máy chủ được gán gắn với License (với các hệ thống xác thực bản quyền theo IP như cPanel, DirectAdmin).
+- Chu kỳ và hạn bản quyền đang ghi nhận trên hợp đồng Odoo.
+
+---
+
+## 5. Dịch vụ Tổng đài doanh nghiệp (AI Contact Center)
+
+Giải pháp tổng đài thoại thông minh trên nền tảng đám mây, phục vụ công tác chăm sóc khách hàng, bán hàng và vận hành thoại đa kênh của doanh nghiệp.
+
+### Nhu cầu sử dụng
+- Doanh nghiệp cần hệ thống tổng đài tiếp nhận và thực hiện cuộc gọi chuyên nghiệp mà không cần lắp đặt phần cứng tổng đài vật lý tại văn phòng.
+- Kết nối nhân viên làm việc linh hoạt từ xa qua điện thoại bàn IP (IP Phone), phần mềm máy tính (PC Softphone) hoặc ứng dụng di động (Mobile App).
+- Tích hợp thoại vào hệ thống CRM, ERP, Helpdesk để tự động hóa cuộc gọi và hiển thị thông tin khách hàng.
+
+### Các thành phần Support cần nhận diện
+- **Máy nhánh (Extension / SIP Account)**: Tài khoản định danh cho từng nhân viên, gồm số máy nhánh (101, 102...), mật khẩu SIP và máy chủ SIP Domain.
+- **Đầu số tiếp nhận & Gọi ra (Trunking / Caller ID)**: Các loại đầu số tích hợp qua SIP Trunk (Đầu số cố định vùng, di động SIP Trunk, đầu số 1800/1900, Brandname Voice).
+- **Kịch bản thoại & Phân phối cuộc gọi**:
+  - **IVR (Interactive Voice Response)**: Lời chào tự động và menu phím bấm điều hướng (ví dụ: "Bấm phím 1 gặp Kỹ thuật, phím 2 gặp Kinh doanh").
+  - **Nhóm nhận cuộc gọi (Ring Group) & Hàng đợi (Queue)**: Nhóm máy nhánh đổ chuông theo các chiến lược (đổ chuông đồng thời, tuần tự, ngẫu nhiên, ít nhận cuộc gọi nhất).
+  - **Khung giờ làm việc (Time Conditions)**: Kịch bản rẽ hướng cuộc gọi trong và ngoài giờ hành chính.
+- **Khả năng tích hợp nâng cao**:
+  - **API & Webhook**: Tích hợp gửi dữ liệu lịch sử cuộc gọi (CDR), trạng thái cuộc gọi theo thời gian thực về CRM/ERP của khách hàng.
+  - **WebRTC / ODSPhone Widget**: Công cụ gọi thoại trực tiếp nhúng trên trình duyệt web, không cần cài đặt phần mềm ngoài.
+  - **Gọi tự động (Autocall Campaign)**: Hệ thống phát chiến dịch gọi thông báo tự động theo danh sách kịch bản định trước.
+
+<Callout title="Lưu ý về tính năng Contact Center" type="info">
+  Các tính năng nâng cao như API, Webhook, WebRTC hoặc Autocall chỉ được kích hoạt tùy thuộc vào gói dịch vụ khách hàng đăng ký. Không mặc định mọi khách hàng dùng Tổng đài đều có đầy đủ các tính năng này.
+</Callout>
+
+### Thông tin cần tra cứu khi tiếp nhận yêu cầu
+- Tên miền tổng đài (PBX Domain / Tenant).
+- Số máy nhánh (Extension) gặp vấn đề.
+- Đầu số hiển thị khi gọi ra hoặc đầu số tiếp nhận cuộc gọi vào.
+- Kịch bản định tuyến cuộc gọi (IVR / Queue / Time Group) đang áp dụng.
+
+<Cards>
+  <Card href="/internal/ai-contact-center" title="Tài liệu chuyên môn Tổng đài">
+    Tra cứu chi tiết quy trình vận hành, runbook xử lý sự cố và kiến thức kỹ thuật của CloudFone / AI Contact Center.
+  </Card>
+</Cards>
+
+---
+
+## 6. Dịch vụ Bổ sung & Giá trị gia tăng (Extra Services)
+
+Các dịch vụ hạ tầng bổ trợ giúp tối ưu hóa an toàn, hiệu năng và tính liên tục cho hệ thống chính của khách hàng.
+
+### Nhu cầu sử dụng
+- Nâng cấp phụ tải điện hoặc cổng mạng dự phòng cho máy chủ.
+- Bảo vệ máy chủ trước các cuộc tấn công mạng, quét mã độc và lỗ hổng bảo mật.
+- Sao lưu dự phòng dữ liệu định kỳ phòng ngừa thảm họa.
+- Ủy thác công tác quản trị, bảo trì hệ điều hành và dịch vụ máy chủ cho đội ngũ kỹ thuật ODS.
+
+### Các thành phần Support cần nhận diện
+- **Hạ tầng nguồn & mạng phụ trợ**:
+  - **Power Extra / Power Port**: Cấp thêm ổ cắm nguồn (PDU port) hoặc nâng mức công suất Ampe cho máy chủ đặt tại Data Center.
+  - **Network Port Upgrade**: Nâng cấp cổng mạng từ 100Mbps lên 1Gbps, 10Gbps hoặc gán cổng mạng riêng biệt (Secondary Port).
+  - **KVM over IP**: Thiết bị điều khiển bàn phím, chuột và màn hình máy chủ từ xa khi máy chủ mất kết nối mạng.
+- **Bảo mật & Sao lưu**:
+  - **Firewall phần cứng / phần mềm**: Thiết bị tường lửa lọc gói tin độc hại, ngăn chặn tấn công DDoS, bảo vệ cổng dịch vụ.
+  - **Dịch vụ Sao lưu (Backup R1Soft / Veeam)**: Cơ chế sao lưu tự động theo chu kỳ (hằng ngày, hằng tuần), hỗ trợ khôi phục từng tệp hoặc toàn bộ máy chủ.
+  - **Chứng chỉ số SSL**: Khởi tạo và cài đặt chứng thư số mã hóa cho tên miền website.
+- **Dịch vụ Quản trị hệ thống (System Management / Wadmin)**: Đội ngũ kỹ sư ODS hỗ trợ cài đặt, cấu hình, tối ưu hóa OS, cập nhật bản vá bảo mật và theo dõi sức khỏe máy chủ theo yêu cầu của khách hàng.
+
+### Thông tin cần tra cứu khi tiếp nhận yêu cầu
+- Mã dịch vụ chính mà dịch vụ bổ sung này đang gắn kèm (ví dụ: máy chủ nào cần mở thêm port, IP nào cần backup).
+- Phạm vi công việc hỗ trợ (đối với dịch vụ quản trị hệ thống).
+- Trạng thái giấy phép và thời hạn dịch vụ bổ sung trên hợp đồng Odoo.

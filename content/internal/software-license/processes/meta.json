@@ -1,0 +1,5 @@
+{
+  "title": "Quy trình vận hành",
+  "description": "Các quy trình đăng ký, kích hoạt và bàn giao bản quyền phần mềm.",
+  "pages": ["index", "license-registration"]
+}

@@ -1,0 +1,114 @@
+---
+title: Quy trình gắn KVM over IP cho khách hàng
+description: Hướng dẫn các bước xác thực người yêu cầu, đấu nối thiết bị KVM over IP tại tủ rack, kiểm tra tín hiệu và quy định thu hồi sau 10 tiếng.
+---
+
+Quy trình này hướng dẫn nhân viên Support thực hiện đấu nối thiết bị KVM over IP (Bàn phím, Chuột và Màn hình từ xa qua mạng) vào máy chủ của khách hàng đặt tại Trung tâm dữ liệu (Data Center), giúp khách hàng chủ động xử lý sự cố hệ điều hành hoặc cấu hình BIOS từ xa.
+
+---
+
+## 1. Mục đích & Phạm vi áp dụng
+
+- **Mục đích**: Cung cấp công cụ điều khiển từ xa cấp độ phần cứng (out-of-band management) an toàn và nhanh chóng cho khách hàng; quản lý thời gian sử dụng và thu hồi thiết bị KVM theo đúng định mức.
+- **Phạm vi áp dụng**: Áp dụng cho các máy chủ Colocation và Dedicated Server không tích hợp sẵn card quản trị từ xa (iDRAC/iLO) hoặc bị mất kết nối mạng quản trị.
+- **Đối tượng thực hiện**: Nhân viên Support Onsite tại phòng máy Data Center.
+
+---
+
+## 2. Điều kiện & Thông tin đầu vào
+
+Trước khi lấy thiết bị KVM đi cắm cho máy chủ, Support phải có các thông tin sau:
+
+| Thông tin cần có | Mô tả chi tiết | Kênh xác thực |
+| :--- | :--- | :--- |
+| **Thông tin người yêu cầu** | Họ tên, email, số điện thoại người yêu cầu gắn KVM. | Đối chiếu với danh bạ đăng ký trên Odoo. |
+| **Mã dịch vụ** | Mã dịch vụ của máy chủ cần gắn KVM (`CO1U_...`, `DedSer_...`). | Tra cứu trên hệ thống Odoo. |
+| **Định vị máy chủ** | Địa chỉ IP, Tên Data Center, Số tủ Rack và Số Unit (U). | Tra cứu sơ đồ tủ rack phòng máy DC. |
+| **Thiết bị KVM khả dụng** | Thiết bị KVM Over IP đang rảnh rỗi trong kho kỹ thuật, đã cấu hình sẵn IP quản trị. | Kho thiết bị Support DC. |
+
+---
+
+## 3. Checklist tổng thể
+
+- [ ] Người yêu cầu trùng khớp với thông tin đã đăng ký trên hệ thống.
+- [ ] Ticket đã được tạo và ghi nhận đầy đủ Mã DV, IP, Vị trí Rack/U.
+- [ ] Thiết bị KVM đã được cắm nguồn, cắm cáp mạng switch và cáp nối máy chủ (VGA/HDMI + USB).
+- [ ] Support đã kiểm tra đăng nhập thử vào giao diện Web KVM thành công từ mạng nội bộ.
+- [ ] Email bàn giao thông tin truy cập KVM kèm tài liệu hướng dẫn đã gửi cho khách hàng.
+- [ ] Đặt lịch theo dõi thu hồi KVM: **Tối đa 10 tiếng kể từ thời điểm bàn giao**.
+- [ ] Thu hồi thiết bị KVM về tủ thiết bị sau khi khách hàng xong việc hoặc hết thời hạn 10 tiếng.
+
+---
+
+## 4. Lưu đồ quyết định
+
+<ProcessFlowchart flowId="attach-kvm" />
+
+---
+
+## 5. Các bước thực hiện chi tiết
+
+### Bước 1: Tiếp nhận & Xác thực khách hàng
+- **Hành động của SP**: Kiểm tra thông tin người gửi yêu cầu.
+  - **Nếu Không trùng khớp**: Yêu cầu khách hàng gửi email từ hòm thư chính thức đã đăng ký hoặc gọi điện thoại đến số đã đăng ký trên hợp đồng để xác minh quyền sở hữu máy chủ.
+  - **Nếu Trùng khớp**: Chuyển sang Bước 2.
+
+### Bước 2: Tạo Ticket & Chuẩn bị thiết bị KVM
+- **Hành động của SP**:
+  1. Tạo Ticket với danh mục `Yêu Cầu Gắn KVM`.
+  2. Ghi nhận Mã dịch vụ, Địa chỉ IP máy chủ, Số tủ Rack và Số U.
+  3. Lấy bộ thiết bị KVM Over IP tại tủ kỹ thuật. Kiểm tra tình trạng dây cáp (dây nguồn, dây mạng LAN, cáp VGA/USB chuyên dụng cho KVM).
+
+### Bước 3: Đấu nối KVM vào máy chủ tại tủ Rack
+- **Hành động của SP**:
+  1. Di chuyển vào phòng máy đến đúng tủ Rack của khách hàng.
+  2. Đặt thiết bị KVM tạm thời ở vị trí an toàn trong tủ.
+  3. Cắm cáp nguồn KVM vào PDU.
+  4. Cắm cáp mạng LAN của KVM vào cổng switch dành riêng cho thiết bị phụ trợ (Management VLAN).
+  5. Cắm đầu nối VGA (hoặc HDMI) và đầu cắm USB chuột/phím của KVM vào mặt sau máy chủ của khách hàng.
+
+### Bước 4: Kiểm tra khả năng truy cập KVM
+- **Hành động của SP**:
+  - Dùng laptop kỹ thuật hoặc máy tính phòng trực truy cập vào địa chỉ IP của thiết bị KVM qua trình duyệt.
+  - Đăng nhập kiểm tra màn hình máy chủ: đảm bảo hình ảnh màn hình hiển thị rõ nét, bàn phím và chuột điều khiển bình thường.
+  - **Nếu không thành công**: Kiểm tra lại dây cáp hoặc đổi sang một thiết bị KVM khác trong kho.
+
+### Bước 5: Bàn giao thông tin KVM cho khách hàng
+- **Hành động của SP**:
+  - Gửi email từ hệ thống Ticket đến khách hàng với nội dung mẫu:
+    > *"Kính gửi Quý khách hàng,*
+    > 
+    > *Support ODS đã hoàn tất đấu nối thiết bị KVM Over IP cho máy chủ [Mã DV] - [Địa chỉ IP].*
+    > *- Đường dẫn truy cập: [URL truy cập KVM]*
+    > *- Tài khoản đăng nhập: [Username]*
+    > *- Mật khẩu tạm thời: [Password]*
+    > *(Đính kèm file hướng dẫn sử dụng KVM).*
+    > 
+    > *Lưu ý: Thời gian hỗ trợ mượn KVM tiêu chuẩn là **10 tiếng**. Sau khi hoàn tất thao tác, Quý khách vui lòng phản hồi email này để Support thu hồi thiết bị. Nếu không có phản hồi gia hạn, hệ thống sẽ tự động thu hồi KVM sau 10 tiếng.*
+    > 
+    > *Trân trọng,"*
+
+### Bước 6: Theo dõi, Thu hồi thiết bị & Đóng ticket
+- **Hành động của SP**:
+  1. Theo dõi phản hồi từ khách hàng hoặc thu hồi KVM sau **10 tiếng** kể từ lúc gửi thông tin.
+  2. Khi thu hồi: Đến tủ rack tháo dỡ cáp nối, tắt nguồn KVM, vệ sinh và đưa thiết bị về vị trí cất giữ trong phòng kỹ thuật.
+  3. Đổi lại mật khẩu quản trị KVM về mặc định an toàn.
+  4. Cập nhật ghi chú trên Ticket và chuyển trạng thái sang `Closed`.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Khách hàng xin gia hạn thêm thời gian sử dụng KVM** | Nếu khách hàng có lý do chính đáng (đang restore dữ liệu dở dang) và kho còn dư KVM dự phòng, Support có thể gia hạn thêm tối đa 1 ca trực (8-12 tiếng) và ghi chú rõ vào Ticket. |
+| **Cổng VGA/USB trên máy chủ của khách hàng bị hỏng** | Thông báo khách hàng kiểm tra lại cổng cắm phần cứng; đề xuất phương án hỗ trợ gắn Console tại chỗ hoặc cắm trực tiếp màn hình kiểm tra. |
+| **KVM bị treo trong quá trình khách hàng đang thao tác** | Kỹ sư trực ca hỗ trợ rút cắm lại nguồn KVM tại tủ rack để khởi động lại thiết bị KVM mà không làm ảnh hưởng đến máy chủ của khách hàng. |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Quy trình gắn Console kiểm tra Server](/internal/data-center/processes/attach-console)
+- [Hỗ trợ thao tác Server & Cài lại OS](/internal/data-center/processes/server-assistance)
+- [Công cụ làm việc Support](/internal/tools)

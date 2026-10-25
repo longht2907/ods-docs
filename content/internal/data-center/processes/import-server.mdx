@@ -1,0 +1,108 @@
+---
+title: Quy trình nhập mới Server (Colocation & Local)
+description: Hướng dẫn các bước tiếp nhận từ Sales, lắp đặt server tại tủ rack, cấu hình switchport, cấp IP và bàn giao đưa vào giám sát PRTG.
+---
+
+Quy trình này hướng dẫn nhân viên Support thực hiện tiếp nhận, lắp đặt phần cứng tại phòng máy Data Center và kích hoạt dịch vụ cho máy chủ nhập mới của khách hàng (bao gồm dịch vụ Thuê chỗ đặt Colocation và Máy chủ dùng riêng Local/Dedicated).
+
+---
+
+## 1. Mục đích & Phạm vi áp dụng
+
+- **Mục đích**: Chuẩn hóa luồng phối hợp giữa bộ phận Kinh doanh (Sales) và đội ngũ Kỹ thuật Support tại Data Center; đảm bảo máy chủ được định vị đúng tủ rack, cắm đúng cổng switch/VLAN, cấu hình IP chính xác và đưa vào hệ thống giám sát.
+- **Phạm vi áp dụng**: Áp dụng cho toàn bộ máy chủ khách hàng mới nhập vào Trung tâm dữ liệu của ODS.
+- **Bên phối hợp**: Khách hàng, Nhân viên Sales phụ trách hợp đồng, Support Onsite tại Data Center.
+
+---
+
+## 2. Điều kiện & Thông tin đầu vào
+
+Trước khi tiến hành lắp đặt, Support cần nhận được các thông tin sau từ Sales:
+
+| Thông tin đầu vào | Mô tả chi tiết | Ghi chú |
+| :--- | :--- | :--- |
+| **Thông tin khách hàng** | Tên doanh nghiệp/cá nhân, người đại diện kỹ thuật, số điện thoại, email liên hệ. | Sales cung cấp qua ticket/email. |
+| **Loại dịch vụ** | Colocation (khách tự mang máy chủ đến) hoặc Local/Dedicated (ODS cấp máy chủ vật lý). | Quyết định nhánh thực hiện. |
+| **Thông số lắp đặt** | Kích thước Unit (1U, 2U...), số lượng nguồn điện (1 nguồn / 2 nguồn A+B), công suất Ampe. | Căn cứ định vị tủ rack. |
+| **Thông số mạng** | Băng thông cổng mạng (100Mbps / 1Gbps), số lượng IP cần cấp phát. | Colocation mặc định cấp 2 IP. |
+
+---
+
+## 3. Checklist tổng thể
+
+- [ ] Tiếp nhận yêu cầu chính thức từ Sales và mở Ticket theo dõi.
+- [ ] Xác minh thông tin khách hàng trên hệ thống.
+- [ ] Đối với Colocation: Đã thực hiện quy trình cấp IP (cấp 2 IP) và xác định tủ rack còn trống đúng kích thước U.
+- [ ] Thiết bị được gắn thanh ray (rail kit) chắc chắn, đấu nối 2 dây nguồn (nếu có nguồn dự phòng) và cắm dây mạng switch.
+- [ ] SwitchPort được cấu hình đúng Access VLAN, cổng đã mở (no shutdown).
+- [ ] Máy chủ đã Online (ping thông IP WAN từ mạng ngoài).
+- [ ] Đã thêm thiết bị vào hệ thống giám sát PRTG và tạo hồ sơ OnlineTicket.
+- [ ] Sales đã bổ sung Mã dịch vụ chính thức từ Odoo $\rightarrow$ cập nhật hoàn tất PRTG/Ticket và đóng case.
+
+---
+
+## 4. Lưu đồ quyết định
+
+<ProcessFlowchart flowId="import-server" />
+
+---
+
+## 5. Các bước thực hiện chi tiết
+
+### Bước 1: Tiếp nhận yêu cầu & Mở ticket
+- **Hành động của SP**:
+  1. Tiếp nhận phiếu yêu cầu nhập mới từ Sales.
+  2. Mở Ticket trên hệ thống quản lý nội bộ.
+  3. Xác định rõ loại dịch vụ:
+     - **Nếu là Dịch vụ Colocation**: Kích hoạt [Quy trình cấp IP](/internal/network/processes/ip-allocation) để cấp 2 IP công cộng cho khách hàng; xác định tủ rack và vị trí Unit (U) còn trống trong DC.
+     - **Nếu là Dịch vụ Local/Dedicated**: Chuẩn bị cấu hình máy chủ vật lý theo phiếu xuất kho nội bộ.
+
+### Bước 2: Lắp đặt thiết bị & Đấu nối mạng
+- **Hành động của SP**:
+  1. Lắp đặt máy chủ vào vị trí U đã chỉ định bằng thanh ray chuyên dụng, siết ốc cố định.
+  2. Đấu nối dây nguồn vào thanh phân phối nguồn (PDU) của tủ rack.
+  3. Cắm dây nhảy mạng (patch cord) từ card mạng server vào cổng switch của tủ rack.
+  4. Cấu hình cổng Switch: Gán đúng VLAN của khách hàng, đặt tốc độ (Speed/Duplex) tương ứng và mở cổng (`no shutdown`).
+  5. Ghi nhận thông tin đấu nối vào sổ trực: `Số Tủ` - `Số U` - `Cổng Switch` - `Địa chỉ IP`.
+
+### Bước 3: Kiểm tra trạng thái máy chủ Online
+- **Hành động của SP**:
+  - Bật nguồn máy chủ và tiến hành ping kiểm tra địa chỉ IP từ ngoài Internet vào server.
+- **Xử lý theo nhánh kết quả**:
+  - **Nhánh Chưa Online**:
+    1. Kiểm tra lại cấu hình cổng Switch: đã cấu hình đúng VLAN chưa, trạng thái cổng có đang `Up` hay `Down`.
+    2. Cắm Console kiểm tra trực tiếp máy chủ xem hệ điều hành đã khởi động xong chưa.
+    3. Nếu là Colocation của khách hàng: Liên hệ khách hàng nhờ kiểm tra lại cấu hình IP tĩnh, Subnet Mask, Gateway trên card mạng máy chủ.
+  - **Nhánh Đã Online**: Chuyển sang Bước 4.
+
+### Bước 4: Khởi tạo giám sát & Gửi thông báo nhập mới
+- **Hành động của SP**:
+  1. Thêm địa chỉ IP máy chủ vào hệ thống giám sát PRTG Network Monitor (giám sát ping, uptime).
+  2. Khởi tạo đối tượng theo dõi trên OnlineTicket.
+  3. Gửi email thông báo nhập mới:
+     - Đối với Colocation: Gửi email cho Sales và các bên liên quan thông báo server đã lên mạng ổn định, yêu cầu Sales cung cấp **Mã dịch vụ chính thức trên Odoo**.
+     - Đối với Local: Gửi email bàn giao thông tin IP và thông số truy cập ban đầu.
+
+### Bước 5: Cập nhật thông tin mã dịch vụ & Đóng case
+- **Hành động của SP**:
+  1. Khi Sales phản hồi Mã dịch vụ (Service ID) từ Odoo: Cập nhật chuẩn hóa tên đối tượng trên PRTG và mã dịch vụ trên OnlineTicket.
+  2. Kiểm tra lại lần cuối tính liên tục của dữ liệu giám sát.
+  3. Chuyển trạng thái Ticket sang `Closed`.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Tủ rack hết cổng switch hoặc hết nguồn điện** | Báo cáo ngay cho Trưởng ca DC và thông báo Sales để điều chuyển vị trí sang tủ rack dự phòng khác. |
+| **Khách hàng mang server không đúng kích thước U đã ký** | Tạm dừng lắp đặt, lập biên bản ghi nhận kích thước thực tế và báo Sales làm phụ lục hợp đồng điều chỉnh trước khi lắp. |
+| **Sales chậm tạo Mã dịch vụ trên Odoo** | Lưu ticket ở trạng thái chờ mã dịch vụ (Pending Sales), giữ hệ thống giám sát tạm thời theo IP và nhắc nhở Sales bổ sung. |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Mã dịch vụ & tra cứu trên Odoo](/internal/service-codes)
+- [Cấp phát IP & Range IP](/internal/network/processes/ip-allocation)
+- [Hỗ trợ thao tác Server & Cài lại OS](/internal/data-center/processes/server-assistance)

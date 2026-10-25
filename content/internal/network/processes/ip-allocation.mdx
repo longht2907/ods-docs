@@ -1,0 +1,105 @@
+---
+title: Quy trình cấp phát IP & Range IP
+description: Hướng dẫn cấp phát IP Colocation, dải IP dưới 13 IP và phối hợp NOC cho dải từ 13 IP trở lên, kiểm tra IPAM và kiểm tra danh sách đen Blacklist.
+---
+
+Quy trình này hướng dẫn nhân viên Support thực hiện tra cứu tài nguyên trên hệ thống quản lý địa chỉ IP (IPAM), kiểm tra tính khả dụng, rà soát danh sách đen (Blacklist) và thực hiện cấp phát địa chỉ IPv4 tĩnh / Range IP cho khách hàng.
+
+---
+
+## 1. Mục đích & Phạm vi áp dụng
+
+- **Mục đích**: Đảm bảo địa chỉ IP cấp phát cho khách hàng là IP "sạch" (không dính blacklist thư rác/mã độc), không bị trùng lặp trên hạ tầng mạng, được ghi nhận chính xác trên IPAM và có sự phối hợp kỹ thuật với NOC đối với các dải IP lớn.
+- **Phạm vi áp dụng**: Áp dụng cho các yêu cầu cấp phát IP mới, cấp IP bổ sung cho dịch vụ Colocation, Dedicated Server và Kênh truyền tại ODS.
+- **Bên phối hợp**: Khách hàng / Sales, Support Team, NOC Team (với dải $\ge 13$ IP).
+
+---
+
+## 2. Điều kiện & Thông tin đầu vào
+
+| Thông tin cần có | Mô tả chi tiết | Kênh xác thực |
+| :--- | :--- | :--- |
+| **Phân loại cấp phát** | Cấp IP đơn lẻ Colocation (KH mới hoặc KH cũ) hay Cấp cả dải (Range IP). | Phiếu yêu cầu từ Sales / Ticket. |
+| **Số lượng IP yêu cầu** | Số lượng IP cần cấp (ví dụ: 1 IP, 2 IP, block /29 (8 IP), block /28 (16 IP)...). | Hợp đồng dịch vụ / Mã DV Odoo. |
+| **Hệ thống IPAM** | Tài khoản truy cập hệ thống quản lý IPAM để tra cứu dải mạng và trạng thái sử dụng. | Công cụ IPAM nội bộ. |
+| **Công cụ kiểm tra Blacklist** | Hệ thống kiểm tra danh sách đen công cộng (Spamhaus, Barracuda, MXToolbox...). | Kênh kiểm tra trực tuyến. |
+
+---
+
+## 3. Checklist tổng thể
+
+- [ ] Xác định đúng loại cấp phát: IP Colocation hay Range IP.
+- [ ] Tra cứu IPAM: Ưu tiên cấp IP trong cùng Range mạng với các IP hiện có của khách hàng cũ.
+- [ ] Kiểm tra thực tế: Ping thử IP để đảm bảo không có thiết bị khác đang sử dụng ngầm.
+- [ ] Nếu phát hiện IP đang bị dùng trái phép: Lập biên bản thông báo khách hàng vi phạm.
+- [ ] **BẮT BUỘC**: Kiểm tra Blacklist toàn bộ các IP dự kiến cấp. Nếu dính Blacklist $\rightarrow$ thực hiện gỡ trước khi bàn giao.
+- [ ] Nếu Range IP $\ge 13$ IP: Đã gửi yêu cầu và nhận được xác nhận cấu hình phân tuyến/VLAN từ NOC Team.
+- [ ] Ghi chú đầy đủ Mã dịch vụ, Tên khách hàng và ngày cấp lên IPAM.
+- [ ] Gửi email thông báo cấp IP chính thức cho Sales hoặc Khách hàng $\rightarrow$ Đóng ticket.
+
+---
+
+## 4. Lưu đồ quyết định
+
+<ProcessFlowchart flowId="ip-allocation" />
+
+---
+
+## 5. Các bước thực hiện chi tiết
+
+### Nhánh 1: Cấp phát IP đơn lẻ (Dịch vụ Colocation)
+1. **Xác định dải IP**:
+   - Đối với khách hàng mới: Lấy IP còn trống thuộc dải quy hoạch cho cụm `Colocation`.
+   - Đối với khách hàng cũ (đã có máy chủ tại ODS): Tra cứu dải IP khách hàng đang dùng và ưu tiên chọn IP còn trống trong cùng Subnet/Range đó để thuận tiện cho việc định tuyến của khách hàng.
+2. **Kiểm tra trạng thái IP trên IPAM & Thực tế**:
+   - Mở hệ thống IPAM, tìm IP đang ở trạng thái `Available`.
+   - Ping thử IP từ mạng ngoài:
+     - **Nếu IP có phản hồi (Đang bị sử dụng ngầm)**:
+       - Kiểm tra MAC Address và cổng switch của tủ rack để tìm máy chủ đang cắm IP này.
+       - *Trường hợp 1*: IPAM chưa ghi chú nhưng máy chủ đó có Mã dịch vụ hợp lệ $\rightarrow$ Cập nhật bổ sung ghi chú chính xác trên IPAM, sau đó chọn một IP khác chưa dùng để cấp cho yêu cầu hiện tại.
+       - *Trường hợp 2*: Máy chủ không có mã dịch vụ hợp lệ hoặc cắm nhầm IP $\rightarrow$ Lập ticket gửi email thông báo khách hàng về việc sử dụng trái phép tài nguyên IP, yêu cầu gỡ bỏ ngay lập tức.
+     - **Nếu IP không phản hồi (Chưa sử dụng)**: Chuyển sang bước kiểm tra Blacklist.
+
+### Nhánh 2: Cấp phát Range IP (Dải IP)
+- **Nếu Range IP $< 13$ IP (Block /29, /28 nhỏ)**:
+  - Support tự tra cứu và phân bổ block IP còn trống trên IPAM.
+- **Nếu Range IP $\ge 13$ IP (Block /28 lớn, /27, /26...)**:
+  - Tạo ticket phối hợp gửi **NOC Team**.
+  - NOC Team thực hiện định tuyến Subnet, tạo VLAN riêng và cấu hình Default Gateway trên Router Core.
+  - Sau khi nhận được thông báo hoàn tất từ NOC, Support tiếp nhận dải IP để thực hiện thủ tục cấp phát.
+
+### Bước kiểm tra Blacklist (Bắt buộc cho mọi trường hợp)
+- **Hành động của SP**:
+  1. Nhập toàn bộ danh sách địa chỉ IP dự kiến cấp vào công cụ kiểm tra Blacklist công cộng (Spamhaus, Barracuda Reputation, SORBS...).
+  2. **Nếu IP dính Blacklist**: Kích hoạt thủ tục gửi yêu cầu gỡ bỏ (Delist request) trên trang chủ của tổ chức báo danh sách đen, chờ xác nhận đã gỡ sạch hoàn toàn mới được bàn giao.
+  3. **Nếu IP sạch (Clean)**: Tiến hành bàn giao.
+
+### Thủ tục bàn giao & Cập nhật IPAM
+- **Hành động của SP**:
+  1. Đăng nhập IPAM, chuyển trạng thái IP từ `Available` sang `Used`.
+  2. Ghi chú đầy đủ: `Tên Khách Hàng` - `Mã Dịch Vụ Odoo` - `Vị trí Tủ Rack/U` - `Ngày Cấp`.
+  3. Soạn email thông báo thông số mạng theo mẫu chuẩn:
+     - Danh sách địa chỉ IP được cấp.
+     - Subnet Mask và Prefix length.
+     - Default Gateway.
+     - DNS Server ODS (DNS chính, DNS phụ).
+  4. Gửi email cho bộ phận Sales (hoặc trực tiếp khách hàng theo ticket).
+  5. Đóng ticket.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Hết IP sạch trong Range Colocation** | Báo cáo Trưởng nhóm Support để đề xuất NOC quy hoạch mở rộng thêm Pool IP mới cho cụm tủ rack. |
+| **IP bị Blacklist vĩnh viễn không thể gỡ** | Loại bỏ IP này ra khỏi nhóm khả dụng, ghi chú cảnh báo trên IPAM và chọn IP khác thay thế cho khách hàng. |
+| **Khách hàng yêu cầu dải IP đặc thù (ngược PTR / rDNS)** | Sau khi cấp IP, hướng dẫn khách hàng gửi yêu cầu bản ghi rDNS kèm domain chính thức để Support hoặc NOC hỗ trợ cấu hình. |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Quy trình thu hồi IP & Range IP](/internal/network/processes/ip-reclaim)
+- [Xử lý IP bị Blacklist](/internal/network/runbooks/ip-blacklist)
+- [Mã dịch vụ & tra cứu trên Odoo](/internal/service-codes)

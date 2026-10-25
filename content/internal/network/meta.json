@@ -1,0 +1,7 @@
+{
+  "title": "Network",
+  "description": "Support Wiki cho dịch vụ Kết nối mạng, IP, Switch, Leased-line và An toàn mạng.",
+  "root": true,
+  "defaultOpen": false,
+  "pages": ["index", "processes", "runbooks", "knowledge-base"]
+}

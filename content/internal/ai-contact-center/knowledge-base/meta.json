@@ -1,4 +1,11 @@
 {
   "title": "Kiến thức kỹ thuật",
-  "pages": ["index", "outbound-rules", "number-ranges", "core-infrastructure", "carriers", "sip-codes", "glossary"]
+  "pages": [
+    "index",
+    "outbound-rules",
+    "core-infrastructure",
+    "carrier-limitations",
+    "technical-standards",
+    "feature-codes"
+  ]
 }

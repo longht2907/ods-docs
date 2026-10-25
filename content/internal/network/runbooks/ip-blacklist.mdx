@@ -1,0 +1,103 @@
+---
+title: Xử lý địa chỉ IP bị dính Blacklist
+description: Hướng dẫn quy trình gỡ bỏ IP khỏi danh sách đen Barracuda, Spamhaus, thông báo khách hàng xử lý mã nguồn và chính sách khóa vĩnh viễn khi tái phạm lần 2.
+---
+
+Runbook này hướng dẫn quy trình tiêu chuẩn dành cho nhân viên Support khi nhận được cảnh báo hoặc phát hiện địa chỉ IP / Range IP của khách hàng đặt tại ODS bị các tổ chức an ninh mạng quốc tế (Spamhaus, Barracuda Reputation...) đưa vào danh sách đen (Blacklist) do phát tán thư rác (spam mail), mã độc hoặc tấn công mạng.
+
+---
+
+## 1. Triệu chứng sự cố
+
+- Khách hàng gửi email ra bên ngoài bị trả lời lỗi (Bounce message): `554 5.7.1 Service unavailable; Client host [...] blocked using Spamhaus / Barracuda`.
+- Hệ thống quét định kỳ của ODS hoặc thông báo từ ISP phát hiện địa chỉ IP của máy chủ bị liệt vào cơ sở dữ liệu Blacklist (RBL / DNSBL).
+
+---
+
+## 2. Phạm vi ảnh hưởng
+
+- **Uy tín dải IP của ODS**: Nếu một IP bị Blacklist kéo dài mà không được xử lý, tổ chức an ninh mạng có thể nâng mức phạt lên toàn bộ Subnet (/24), làm ảnh hưởng đến hàng loạt khách hàng chân chính khác đang dùng chung dải IP.
+- **Hoạt động gửi nhận thư điện tử**: Giao dịch gửi email công ty của khách hàng bị chặn hoàn toàn tại các máy chủ nhận quốc tế (Gmail, Microsoft 365, Yahoo...).
+
+---
+
+## 3. Thông tin & Bằng chứng cần thu thập
+
+| Thông tin cần có | Mô tả chi tiết | Kênh thu thập |
+| :--- | :--- | :--- |
+| **Địa chỉ IP / Subnet dính Blacklist** | IP cụ thể hoặc toàn bộ dải IP bị cảnh báo. | Email thông báo / Kết quả quét định kỳ. |
+| **Tổ chức Blacklist ghi nhận** | Tổ chức phát hiện (chủ yếu là **SPAMHAUS** hoặc **BARRACUDA**). | Kết quả tra cứu trực tuyến. |
+| **Lý do bị liệt kê (Listing Reason)** | Hành vi vi phạm: Phát tán spam email (CBL/SBL), nhiễm botnet (XBL) hay lỗi cấu hình mở cổng relay (Open Relay). | Trang tra cứu của Spamhaus/Barracuda. |
+| **Thông tin chủ sở hữu IP** | Tên khách hàng, Mã dịch vụ Odoo sở hữu IP bị dính Blacklist. | Hệ thống quản lý IPAM / Odoo. |
+
+---
+
+## 4. Lưu đồ xử lý sự cố Blacklist
+
+<ProcessFlowchart flowId="ip-blacklist" />
+
+---
+
+## 5. Các bước xử lý chi tiết
+
+### Bước 1: Tiếp nhận, Định vị khách hàng & Mở ticket
+- **Hành động của SP**:
+  1. Tra cứu IP bị cảnh báo trên hệ thống IPAM để tìm chính xác Mã khách hàng, Tên doanh nghiệp và Mã dịch vụ Odoo.
+  2. Mở Ticket ghi rõ: `[Cảnh báo Blacklist] - <Tên Khách Hàng> - <Địa chỉ IP>`.
+  3. Chụp lại màn hình kết quả tra cứu thể hiện rõ lý do bị đưa vào Blacklist.
+
+### Bước 2: Thực hiện thủ tục gỡ bỏ Blacklist (Delist)
+Tùy theo tổ chức ghi nhận, Support tiến hành thủ tục gỡ bỏ ban đầu:
+
+#### Nhánh A: Tổ chức BARRACUDA
+- Truy cập trang web gỡ bỏ chính thức: `barracudacentral.org/rbl/removal-request`.
+- Nhập địa chỉ IP, địa chỉ email kỹ thuật của ODS và giải trình ngắn gọn: hệ thống đang tiến hành cô lập và rà soát bảo mật.
+
+#### Nhánh B: Tổ chức SPAMHAUS
+- Truy cập cổng kiểm tra: `check.spamhaus.org`.
+- Nhập địa chỉ IP, đọc kỹ mã danh mục vi phạm (SBL, CSS, XBL, DBL).
+- Làm theo hướng dẫn trên web hoặc gửi email yêu cầu gỡ bỏ (Delist request) kèm bằng chứng ODS đã áp dụng biện pháp cô lập nguồn phát tán.
+
+### Bước 3: Gửi email cảnh báo khẩn cấp cho khách hàng
+- **Hành động của SP**:
+  - Soạn email gửi khách hàng với mức độ ưu tiên cao:
+    > *"Kính gửi Quý khách hàng,*
+    > 
+    > *Support ODS xin thông báo: Địa chỉ IP [Địa chỉ IP] của máy chủ [Mã DV] hiện đang bị tổ chức an ninh mạng [Spamhaus / Barracuda] đưa vào danh sách đen (Blacklist) với lý do: [Mô tả hành vi: Phát tán spam / Dính mã độc botnet].*
+    > 
+    > *Support ODS đã hỗ trợ gửi yêu cầu gỡ bỏ ban đầu. Tuy nhiên, để tránh bị tái khóa toàn bộ dải mạng, Quý khách **bắt buộc phải rà soát và xử lý gấp** trong vòng **3 ngày**:*
+    > *1. Quét mã độc, virus trên toàn bộ mã nguồn website và máy chủ.*
+    > *2. Đổi mật khẩu toàn bộ hộp thư điện tử và mật khẩu quản trị.*
+    > *3. Kiểm tra cổng dịch vụ gửi mail (Port 25/587), đóng các lỗ hổng Open Relay.*
+    > 
+    > *Lưu ý: Nếu sau **3 ngày** kể từ thông báo này Quý khách không phản hồi xử lý, ODS sẽ buộc phải **khóa hướng truy cập Quốc tế** của địa chỉ IP này để bảo vệ an toàn cho hệ thống.*
+    > 
+    > *Trân trọng,"*
+
+### Bước 4: Theo dõi & Áp dụng chế tài theo chính sách ODS
+<Callout title="CHÍNH SÁCH CHẾ TÀI BLACKLIST BẮT BUỘC" type="warn">
+  1. **Khóa Quốc tế sau 3 ngày**: Nếu sau 3 ngày kể từ khi gửi thông báo mà khách hàng không phản hồi hoặc không xử lý triệt để nguyên nhân phát tán $\rightarrow$ Support thực hiện cấu hình **chặn kết nối hướng Quốc tế** của địa chỉ IP đó.
+  2. **KHÓA VĨNH VIỄN KHI TÁI PHẠM LẦN 2**: Đối với các địa chỉ IP bị dính Blacklist lần thứ 2 sau khi đã được hỗ trợ xử lý và mở lại trước đó $\rightarrow$ **Áp dụng biện pháp KHÓA VĨNH VIỄN** tài nguyên IP này, không hỗ trợ gỡ thêm và chuyển thông tin cho Sales làm việc thu hồi IP.
+</Callout>
+
+### Bước 5: Đóng ticket & Cập nhật nhật ký
+- **Hành động của SP**:
+  - Ghi chú lịch sử vi phạm Blacklist của IP vào hồ sơ khách hàng trên Odoo.
+  - Sau khi kiểm tra IP đã được tổ chức an ninh mạng gỡ bỏ thành công và khách hàng đã khắc phục: Chuyển trạng thái Ticket sang `Closed`.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Cả dải IP lớn (/24) bị Spamhaus đưa vào dải SBL** | Đây là sự cố an toàn thông tin cấp độ công ty. Báo cáo khẩn cấp cho Trưởng bộ phận NOC và Ban giám đốc để làm việc trực tiếp với đại diện Spamhaus. |
+| **Khách hàng kinh doanh dịch vụ Email Marketing gửi mail hợp pháp** | Hướng dẫn khách hàng đăng ký xác thực tên miền đầy đủ (SPF, DKIM, DMARC), quản lý danh sách opt-in người nhận và đề xuất khách hàng thuê dải IP riêng biệt. |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Quy trình cấp phát IP & Range IP](/internal/network/processes/ip-allocation)
+- [Quy trình thu hồi IP & Range IP](/internal/network/processes/ip-reclaim)
+- [Xử lý mã độc, phishing site & lạm dụng mạng](/internal/network/runbooks/abuse-malware)

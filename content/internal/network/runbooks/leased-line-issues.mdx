@@ -1,0 +1,103 @@
+---
+title: Xử lý sự cố kênh truyền Leased-Line
+description: Hướng dẫn giám sát kênh Leased-Line qua PRTG, xử lý mất ping kéo dài, nguyên tắc liên hệ ngoài giờ hành chính và phối hợp đối tác hạ tầng.
+---
+
+Runbook này hướng dẫn quy trình điều phối và khắc phục sự cố gián đoạn kênh truyền số liệu / Internet chuyên dụng (Leased-Line) dành cho doanh nghiệp kết nối về Trung tâm dữ liệu của ODS.
+
+---
+
+## 1. Triệu chứng sự cố
+
+- Cảm biến trên hệ thống giám sát **PRTG Network Monitor** cảnh báo đỏ tại nhóm `Monitor Leased-Line / Core-NIX`: Báo mất ping (Ping Loss 100%) hoặc suy giảm băng thông đột ngột.
+- Khách hàng doanh nghiệp liên hệ khẩn cấp báo toàn bộ văn phòng bị mất kết nối kênh truyền về Data Center.
+
+---
+
+## 2. Phạm vi ảnh hưởng
+
+- Kênh truyền Leased-Line là dịch vụ doanh nghiệp cao cấp có cam kết chất lượng dịch vụ (SLA) nghiêm ngặt về thời gian hoạt động và thời gian phục hồi.
+- Mọi sự cố gián đoạn cần được ghi nhận chính xác mốc thời gian mất kết nối và mốc thời gian phục hồi để phục vụ đối soát SLA.
+
+---
+
+## 3. Thông tin & Bằng chứng cần thu thập
+
+| Thông tin cần có | Mô tả chi tiết | Kênh thu thập |
+| :--- | :--- | :--- |
+| **Mã tuyến truyền dẫn** | Mã nhận diện kênh truyền (Circuit ID) giữa ODS và khách hàng. | Hồ sơ kỹ thuật Leased-Line / Odoo. |
+| **Đối tác thi công tuyến** | Đơn vị cung cấp hạ tầng cáp quang (VNPT, Viettel, FPT Telecom, CMC, HTC...). | Hồ sơ hợp đồng / File danh mục tuyến. |
+| **Dữ liệu giám sát PRTG** | Biểu đồ Traffic (In/Out) và biểu đồ Ping/Uptime của tuyến trên Core-NIX. | PRTG Network Monitor. |
+| **Thông tin liên hệ kỹ thuật** | Số điện thoại trực ca 24/7 của khách hàng và đường dây nóng NOC của đối tác viễn thông. | Danh bạ kỹ thuật đối tác. |
+
+---
+
+## 4. Lưu đồ xử lý sự cố Leased-Line
+
+<ProcessFlowchart flowId="leased-line-issues" />
+
+---
+
+## 5. Các bước xử lý chi tiết
+
+### Bước 1: Tiếp nhận cảnh báo & Khởi tạo Ticket
+- **Hành động của SP**:
+  1. Khi nhận cảnh báo từ PRTG: Xác định chính xác tên khách hàng và mã tuyến kênh truyền.
+  2. Mở Ticket ghi rõ: `[Sự cố Leased-Line] - <Tên Khách Hàng> - <Mã Tuyến>`.
+  3. Ghi nhận chính xác mốc thời gian (Giờ:Phút) bắt đầu mất tín hiệu.
+
+### Bước 2: Kiểm tra biểu đồ Traffic trên PRTG
+- **Hành động của SP**: Truy cập cảm biến của tuyến Leased-Line trên cụm `Core-NIX` / `Monitor Leased-Line`:
+  - **Tình huống 1: Vẫn có lưu lượng Traffic chạy nhưng mất Ping**:
+    - Máy chủ hoặc router đầu cuối của khách hàng vẫn truyền dữ liệu nhưng thiết bị chặn gói tin ICMP Ping.
+    - Ghi nhận thời gian mất ping. **Nếu thời gian mất ping kéo dài trên 4 tiếng**: Gọi điện cho quản trị mạng của khách hàng hỏi xem họ có thay đổi địa chỉ IP đấu nối hoặc đổi thiết bị router không. Phối hợp NOC Team cập nhật lại IP giám sát nếu có thay đổi.
+  - **Tình huống 2: Cả Ping và Traffic đều về 0 (Mất kết nối hoàn toàn)**: Chuyển sang Bước 3.
+
+### Bước 3: Liên hệ khách hàng (Nguyên tắc ứng xử giờ khuya)
+<Callout title="QUY TẮC LIÊN HỆ ĐÊM KHUYA VỚI KHÁCH HÀNG" type="warn">
+  Nếu sự cố xảy ra vào khoảng thời gian đêm khuya (sau 22h00 đến trước 07h00 sáng hôm sau):
+  **Tuyệt đối không gọi điện thoại làm phiền người quản lý của khách hàng** (trừ khi hợp đồng có cam kết hỗ trợ khẩn cấp 24/7 chỉ định rõ).
+  Thay vào đó: **Gửi email thông báo cho khách hàng và lập tức gọi điện thoại cho NOC đối tác viễn thông** để kiểm tra tuyến cáp ngầm.
+</Callout>
+
+- **Hành động của SP**:
+  - Trong giờ làm việc: Gọi điện trực tiếp cho đầu mối kỹ thuật của khách hàng để hỏi xem văn phòng có đang bảo trì nguồn điện, di dời thiết bị hoặc thao tác router hay không.
+  - **Nếu do khách hàng chủ động thao tác**: Đề nghị khách hàng thông báo khi hoàn tất; tiếp tục theo dõi trên PRTG cho đến khi kênh thông tuyến trở lại.
+  - **Nếu không phải do khách hàng**: Xác định đây là sự cố đứt cáp hoặc lỗi thiết bị chuyển đổi quang (Converter) $\rightarrow$ Chuyển sang Bước 4.
+
+### Bước 4: Điều phối đối tác hạ tầng & Thông báo các bên
+- **Hành động của SP**:
+  1. Tra cứu danh bạ đối tác viễn thông thi công tuyến (VNPT/Viettel/FPT/CMC/HTC).
+  2. Gọi điện đến đường dây nóng hỗ trợ hạ tầng của đối tác, cung cấp Mã tuyến (Circuit ID) và địa chỉ điểm đầu/điểm cuối, yêu cầu đo kiểm độ suy hao quang (OTDR) và cử kỹ sư đi xử lý gấp.
+  3. Soạn email thông báo sự cố kênh truyền gửi cho:
+     - **To**: Đại diện kỹ thuật khách hàng.
+     - **CC**: Hòm thư Support chung, Trưởng bộ phận NOC / Team Lead, Nhân viên Kinh doanh (Sales) phụ trách.
+     - **Nội dung**: Thông báo thời điểm ghi nhận mất tín hiệu, ODS đang phối hợp với nhà mạng đo kiểm tuyến cáp và sẽ liên tục cập nhật tiến độ.
+
+### Bước 5: Theo dõi phục hồi & Ghi nhận nguyên nhân đóng case
+- **Hành động của SP**:
+  1. Theo dõi sát sao biểu đồ PRTG cho đến khi tuyến Leased-Line có tín hiệu trở lại.
+  2. Yêu cầu đối tác hạ tầng cung cấp nguyên nhân sự cố chính thức (ví dụ: đứt cáp quang trên tuyến đường X, lỗi module converter trạm viễn thông...).
+  3. Gửi email xác nhận phục hồi cho khách hàng và các bên liên quan:
+     - Thời điểm mất kết nối: `[Giờ:Phút, Ngày]`.
+     - Thời điểm phục hồi: `[Giờ:Phút, Ngày]`.
+     - Tổng thời gian gián đoạn (Downtime).
+     - Nguyên nhân sự cố từ báo cáo của đối tác hạ tầng.
+  4. Đóng ticket sự cố.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Đối tác hạ tầng chậm xử lý hoặc không có người trực ca đêm** | Chuyển cấp báo cáo ngay cho Trưởng bộ phận NOC / Team Lead để kích hoạt kênh liên hệ cấp quản lý với nhà mạng đối tác. |
+| **Mất thông tin hồ sơ tuyến cáp (không rõ do nhà mạng nào thi công)** | Tra cứu hợp đồng gốc trên Odoo hoặc kiểm tra nhãn dán trên ODF quang tại phòng Core của ODS để xác định cổng quang của nhà mạng nào. |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Kiểm tra & Chẩn đoán kết nối mạng](/internal/network/runbooks/network-troubleshooting)
+- [Tiếp nhận & điều hướng xử lý yêu cầu](/internal/request-routing)
+- [Sơ đồ hệ thống Network](/internal/network/knowledge-base/topology)

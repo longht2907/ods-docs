@@ -1,0 +1,48 @@
+---
+title: Tiêu chuẩn mạng, Codec & File âm thanh
+description: Thông số tiêu chuẩn băng thông cho cuộc gọi thoại, chuẩn Codec CloudFone và định dạng file âm thanh hệ thống tổng đài.
+---
+
+Tài liệu này quy định các tiêu chuẩn kỹ thuật về hạ tầng mạng, dung lượng băng thông, chuẩn codec thoại và định dạng âm thanh bắt buộc trên hệ thống tổng đài CloudFone.
+
+---
+
+## 1. Tiêu chuẩn băng thông cuộc gọi
+
+Để đảm bảo chất lượng thoại ổn định, không bị méo tiếng, giật tiếng hoặc trễ tín hiệu (jitter), đường truyền mạng của khách hàng phải đáp ứng các định mức sau:
+
+| Thông số | Tiêu chuẩn kỹ thuật | Ghi chú |
+|---|---|---|
+| **Dung lượng cho 1 cuộc gọi** | **~80 Kbps** (Cả chiều Up & Down) | Chế độ truyền song công toàn phần (Full Duplex) |
+| **Định mức tối thiểu (15 cuộc)** | **Tối thiểu 2 Mbps** | Băng thông khả dụng thực tế dành riêng cho thoại |
+| **Độ trễ (Latency / Ping)** | `< 150 ms` tới máy chủ SIP | Khuyến nghị `< 50 ms` để chất lượng tốt nhất |
+| **Tỷ lệ mất gói (Packet Loss)** | `< 1%` | Mất gói `> 3%` sẽ gây gián đoạn câu từ rõ rệt |
+
+> **Khuyến nghị cho khách hàng**:
+> - Đối với văn phòng có từ 15 cuộc gọi đồng thời trở lên, khuyến nghị cấu hình QoS (Quality of Service) trên Router để ưu tiên băng thông cho luồng VoIP (SIP & RTP) so với lưu lượng truy cập web/tải file thông thường.
+
+---
+
+## 2. Tiêu chuẩn Codec thoại (CloudFone)
+
+- **Codec mặc định**: **`G.711`** (bao gồm `G.711u` / PCMU và `G.711a` / PCMA).
+- **Đặc tính kỹ thuật**:
+  - Không nén mất dữ liệu (lossless voice profile).
+  - Băng thông tiêu chuẩn: ~64 Kbps (payload) + header IP/UDP/RTP đạt tổng ~80 Kbps mỗi luồng.
+  - Tương thích tốt nhất với tất cả SIP Trunk nhà mạng viễn thông tại Việt Nam.
+
+---
+
+## 3. Tiêu chuẩn file âm thanh hệ thống (IVR / Lời chào)
+
+Mọi file âm thanh tải lên hệ thống tổng đài (lời chào IVR, thông báo ngoài giờ, nhạc chờ, thông báo hàng đợi) bắt buộc phải xuất đúng định dạng kỹ thuật sau:
+
+| Thuộc tính | Giá trị tiêu chuẩn | Lưu ý quan trọng |
+|---|---|---|
+| **Định dạng file (Format)** | **`.wav`** | Không sử dụng file `.mp3`, `.m4a`, `.aac` |
+| **Tần số lấy mẫu (Sample Rate)** | **`8000 Hz`** (8 kHz) | Không sử dụng `44100 Hz` hay `48000 Hz` |
+| **Độ sâu bit (Bit Depth)** | **`16-bit`** | Chuẩn 16-bit PCM |
+| **Kênh âm thanh (Channels)** | **`Mono`** (1 kênh duy nhất) | **Tuyệt đối không dùng Stereo** (2 kênh) vì sẽ gây rè hoặc không phát được |
+| **Chuẩn mã hóa (Codec)** | **`PCM uncompressed`** | Linear PCM |
+
+> **Hướng dẫn hỗ trợ khách hàng**: Nếu khách hàng gửi file `.mp3` hoặc file stereo, SP sử dụng các công cụ như Audacity hoặc công cụ chuyển đổi âm thanh trực tuyến để convert về đúng chuẩn **WAV 8000Hz 16-bit Mono** trước khi upload lên tổng đài.

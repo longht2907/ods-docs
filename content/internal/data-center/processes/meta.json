@@ -1,0 +1,13 @@
+{
+  "title": "Quy trình vận hành",
+  "description": "Các quy trình vận hành và thao tác thiết bị tại Data Center ODS.",
+  "pages": [
+    "index",
+    "import-server",
+    "export-server",
+    "attach-kvm",
+    "attach-console",
+    "reboot-server",
+    "server-assistance"
+  ]
+}

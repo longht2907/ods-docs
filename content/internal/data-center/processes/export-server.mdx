@@ -1,0 +1,113 @@
+---
+title: Quy trình xuất Server & Thiết bị khỏi Data Center
+description: Hướng dẫn các bước xác minh bàn giao, kiểm tra tắt máy an toàn, tháo dỡ thiết bị, lập biên bản xuất kho và thu hồi tài nguyên mạng.
+---
+
+Quy trình này hướng dẫn nhân viên Support thực hiện thủ tục xuất máy chủ và thiết bị phần cứng của khách hàng ra khỏi Trung tâm dữ liệu (Data Center) của ODS khi kết thúc hợp đồng hoặc tạm mang về bảo hành.
+
+---
+
+## 1. Mục đích & Phạm vi áp dụng
+
+- **Mục đích**: Đảm bảo thiết bị xuất kho đúng chủ sở hữu hợp pháp, hoàn thành các nghĩa vụ hợp đồng, ngắt kết nối an toàn tránh ảnh hưởng hạ tầng mạng và thu hồi đầy đủ tài nguyên IP/giám sát.
+- **Phạm vi áp dụng**: Áp dụng cho toàn bộ máy chủ Colocation, thiết bị mạng, linh kiện của khách hàng đang đặt tại các Data Center của ODS.
+- **Bên phối hợp**: Khách hàng, Nhân viên Sales phụ trách hợp đồng, Support Onsite và Bảo vệ tòa nhà Data Center.
+
+---
+
+## 2. Điều kiện & Thông tin đầu vào
+
+Trước khi tháo dỡ thiết bị, Support phải có đầy đủ các thông tin và xác nhận sau:
+
+| Thông tin cần có | Mô tả chi tiết | Kênh xác thực |
+| :--- | :--- | :--- |
+| **Xác nhận từ Sales** | Xác nhận khách hàng đã hoàn tất nghĩa vụ tài chính và được phép xuất thiết bị. | Email hoặc Ticket xác nhận chính thức từ Sales. |
+| **Thông tin người nhận thiết bị** | Họ tên, CMND/CCCD, số điện thoại người đại diện đến nhận máy chủ. | Sales cung cấp và đối chiếu tại cổng DC. |
+| **Thông tin dịch vụ** | Mã dịch vụ Odoo (`CO1U_...`), Địa chỉ IP, Vị trí Tủ Rack và Số Unit (U). | Tra cứu trên Odoo và sổ trực DC. |
+| **Trạng thái máy chủ** | Bắt buộc máy chủ phải ở trạng thái **Đã tắt nguồn (Shutdown)**. | Kiểm tra đèn tín hiệu phần cứng. |
+
+---
+
+## 3. Checklist tổng thể
+
+- [ ] Nhận được xác nhận cho phép xuất thiết bị từ Sales.
+- [ ] Mở Ticket ghi nhận yêu cầu xuất thiết bị.
+- [ ] Xác định chính xác Mã DV, IP, Vị trí Tủ Rack và U của máy chủ.
+- [ ] Máy chủ đã được khách hàng chủ động Shutdown hoàn toàn (đèn nguồn tắt).
+- [ ] Rút dây nguồn, dây mạng, tháo ốc ray và chuyển thiết bị ra bàn thao tác.
+- [ ] Lập Phiếu xuất kho / Biên bản bàn giao thiết bị có chữ ký xác nhận của 2 bên.
+- [ ] Xóa đối tượng giám sát trên PRTG Network Monitor và vô hiệu hóa OnlineTicket.
+- [ ] Thu hồi địa chỉ IP đã cấp (đối với dịch vụ Colocation) và cập nhật IPAM.
+- [ ] Gửi email thông báo xuất thiết bị hoàn tất và đóng ticket.
+
+---
+
+## 4. Lưu đồ quyết định
+
+<ProcessFlowchart flowId="export-server" />
+
+---
+
+## 5. Các bước thực hiện chi tiết
+
+### Bước 1: Tiếp nhận xác nhận từ Sales & Mở ticket
+- **Hành động của SP**:
+  1. Kiểm tra xác nhận chính thức từ bộ phận Kinh doanh (Sales). Nếu Sales chưa xác nhận hoặc không đồng ý $\rightarrow$ từ chối thao tác, yêu cầu Sales làm việc lại với khách hàng.
+  2. Tạo Ticket với danh mục `Xuất Thiết Bị / Server`.
+  3. Định vị chính xác máy chủ cần xuất: Mã dịch vụ, Địa chỉ IP, Tủ Rack và vị trí U.
+
+### Bước 2: Kiểm tra trạng thái máy chủ (Bắt buộc Shutdown)
+<Callout title="Quy tắc an toàn phần cứng & Dữ liệu" type="warn">
+  Tuyệt đối không rút nguồn hoặc tháo dỡ máy chủ khi hệ điều hành đang chạy. Việc ngắt nguồn đột ngột có thể làm hỏng hệ điều hành, lỗi mảng RAID hoặc hỏng phần cứng của khách hàng.
+</Callout>
+
+- **Hành động của SP**:
+  - Di chuyển đến tủ rack, quan sát đèn nguồn (Power LED) và đèn ổ đĩa của máy chủ.
+  - **Nếu máy chủ Chưa Shutdown**:
+    1. Không được tự ý bấm nút tắt nguồn cứng.
+    2. Liên hệ ngay với khách hàng qua số điện thoại kỹ thuật yêu cầu khách hàng thực hiện lệnh shutdown an toàn từ xa.
+    3. Chỉ tiến hành bước tiếp theo khi toàn bộ đèn tín hiệu đã tắt hẳn.
+  - **Nếu máy chủ Đã Shutdown**: Chuyển sang Bước 3.
+
+### Bước 3: Tháo dỡ thiết bị ra bàn thao tác
+- **Hành động của SP**:
+  1. Rút cáp nguồn và cáp mạng kết nối vào máy chủ. Đánh dấu hoặc quấn gọn đầu dây trên tủ rack.
+  2. Tháo ốc cố định thanh ray, cẩn thận kéo máy chủ ra khỏi tủ rack (cần 2 kỹ sư phối hợp đối với server từ 2U trở lên hoặc thiết bị nặng).
+  3. Đưa máy chủ ra khu vực bàn thao tác/bàn bàn giao kỹ thuật của phòng máy DC.
+  4. Tháo thanh ray (rail kit) đi kèm server (nếu khách hàng có mang ray đến).
+
+### Bước 4: Lập thủ tục xuất kho & Bàn giao
+- **Hành động của SP**:
+  1. Đối chiếu số Serial Number (Service Tag / Serial) trên vỏ máy với thông tin đăng ký hợp đồng.
+  2. Lập **Biên bản xuất thiết bị / Phiếu xuất kho**: ghi rõ số lượng, chủng loại, số serial, phụ kiện đi kèm (dây nguồn, thanh ray).
+  3. Kiểm tra giấy tờ tùy thân (CCCD) của người đến nhận máy chủ.
+  4. Ký biên bản bàn giao (đại diện kỹ thuật ODS và người nhận máy chủ cùng ký xác nhận).
+  5. Hướng dẫn khách hàng làm thủ tục an ninh cổng xuất của Data Center.
+
+### Bước 5: Thu hồi tài nguyên & Đóng case
+- **Hành động của SP**:
+  1. Gửi email xác nhận việc xuất thiết bị cho khách hàng và CC cho Sales phụ trách.
+  2. **Thu hồi tài nguyên giám sát**:
+     - Xóa thiết bị/sensor tương ứng trên hệ thống giám sát PRTG Network Monitor.
+     - Vô hiệu hóa (Deactive) hồ sơ dịch vụ trên hệ thống OnlineTicket.
+  3. **Thu hồi tài nguyên mạng**:
+     - Đối với dịch vụ Colocation: Kích hoạt [Quy trình thu hồi IP](/internal/network/processes/ip-reclaim) để xóa gán IP trên IPAM, xóa VLAN cổng switch nếu cần.
+  4. Chuyển trạng thái Ticket sang `Closed`.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Người đến nhận không có giấy tờ ủy quyền hoặc sai thông tin** | Giữ thiết bị tại phòng máy, liên hệ trực tiếp người đại diện ký hợp đồng của khách hàng và báo Sales xác nhận trước khi bàn giao. |
+| **Khách hàng không thể shutdown máy chủ từ xa** | Yêu cầu khách hàng gửi email xác nhận cho phép Support bấm nút nguồn tắt cứng tại chỗ mới được thao tác. |
+| **Thiết bị có dấu hiệu trầy xước, móp méo từ trước** | Ghi chú rõ tình trạng ngoại quan vào biên bản bàn giao để khách hàng ký xác nhận, tránh tranh chấp sau khi rời DC. |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Quy trình nhập mới Server](/internal/data-center/processes/import-server)
+- [Thu hồi IP & Range IP](/internal/network/processes/ip-reclaim)
+- [Bảo mật & Dữ liệu khách hàng](/internal/security)

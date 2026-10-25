@@ -1,0 +1,85 @@
+---
+title: Sơ đồ hệ thống Network ODS
+description: Mô hình phân tầng kết nối từ Access Switch tại tủ rack, Distribution Switch, Router Core đến các hướng kết nối viễn thông ISP.
+---
+
+Tài liệu này mô tả sơ đồ kiến trúc phân tầng hệ thống mạng (Network Topology) của ODS, giúp nhân viên Support nắm bắt đường đi của luồng dữ liệu (traffic flow) từ máy chủ khách hàng ra ngoài Internet để phục vụ công tác chẩn đoán sự cố.
+
+<Callout title="Lưu ý về tính hiện hành của sơ đồ" type="info">
+  Sơ đồ phân tầng dưới đây được trích xuất từ tài liệu thiết kế mạng nội bộ của ODS. Để đảm bảo tính chính xác tuyệt đối theo cấu hình thực tế trên môi trường Production, kỹ sư Support cần đối chiếu với các bản cập nhật sơ đồ mạng mới nhất từ bộ phận NOC.
+</Callout>
+
+---
+
+## 1. Mô hình phân tầng mạng (Network Architecture)
+
+Hạ tầng mạng ODS được thiết kế theo mô hình phân cấp 3 lớp tiêu chuẩn:
+
+```text
+               ┌────────────────────────────────────────────────────────┐
+               │           CÁC HƯỚNG KẾT NỐI ISP & TRANSIT              │
+               │   [FPT]  [VTN/VNPT]  [VNIX]  [HTC]  [FPT-GIA-1/2]     │
+               └──────────────────────────┬─────────────────────────────┘
+                                          │ BGP Peering / Uplink
+                                          ▼
+               ┌────────────────────────────────────────────────────────┐
+               │                     TẦNG ROUTER CORE                   │
+               │         [Core 1]  ───  [Core Nix]  ───  [Core Limit]    │
+               └──────────────────────────┬─────────────────────────────┘
+                                          │ 10Gbps / 40Gbps Trunk
+                                          ▼
+               ┌────────────────────────────────────────────────────────┐
+               │               TẦNG DISTRIBUTION SWITCH (DSW)           │
+               │                 [DSW 6]   ───   [DSW 7]                │
+               └──────────────────────────┬─────────────────────────────┘
+                                          │ 1Gbps / 10Gbps Trunk
+                                          ▼
+               ┌────────────────────────────────────────────────────────┐
+               │                 TẦNG ACCESS SWITCH (ASW)               │
+               │           [ASW Tủ 1]   [ASW Tủ 2]   [ASW Tủ n...]      │
+               └──────────────────────────┬─────────────────────────────┘
+                                          │ Cáp mạng RJ45 / Direct Attach
+                                          ▼
+                               [Máy chủ của Khách hàng]
+```
+
+---
+
+## 2. Chi tiết các thành phần trong sơ đồ
+
+### A. Tầng kết nối Nhà mạng & Trạm trung chuyển (External ISP & IXP)
+- **FPT Telecom**: Hướng kết nối Internet trong nước và quốc tế chính qua hạ tầng FPT.
+- **VTN (VNPT)**: Kênh kết nối băng thông rộng qua Tập đoàn Bưu chính Viễn thông Việt Nam.
+- **VNIX (Vietnam Internet Network Information Center)**: Điểm trung chuyển Internet quốc gia của VNNIC, cho phép trao đổi lưu lượng trực tiếp giữa các ISP tại Việt Nam mà không phải đi vòng qua cổng quốc tế.
+- **HTC (Hanoi Telecom)**: Hướng truyền dẫn cáp quang liên tỉnh và dự phòng kênh truyền.
+- **FPT-GIA-1, FPT-GIA-2**: Các cổng đấu nối chuyên dụng kết nối trực tiếp với hạ tầng mạng đối tác.
+
+### B. Tầng Router Core (Core Layer)
+- **Core 1 & Core Nix**: Cụm thiết bị định tuyến trung tâm (Core Router) chịu trách nhiệm chạy giao thức định tuyến động BGP, nhận bảng định tuyến toàn cầu (Full BGP Routing Table) và xử lý lưu lượng lớn nhất của toàn bộ hệ thống ODS.
+- **Core Limit**: Cụm thiết bị áp dụng các chính sách giới hạn băng thông (QoS / Traffic Shaping) và kiểm soát lưu lượng theo gói cước dịch vụ của khách hàng.
+
+### C. Tầng Distribution Switch (DSW Layer)
+- **DSW 6 & DSW 7**: Cặp Switch phân phối trung tâm hoạt động ở chế độ dự phòng kép (Redundancy / HA). 
+- Đóng vai trò gom các đường cáp quang kết nối (Trunk link) từ hàng chục switch tầng/tủ rack bên dưới để đẩy lên tầng Core.
+
+### D. Tầng Access Switch (ASW Layer)
+- **ASW (Access Switch)**: Các thiết bị switch gắn tại từng tủ rack phòng máy Data Center (ví dụ: Cisco Catalyst, Cisco SG300, Edge-Core...).
+- Cung cấp cổng cắm mạng trực tiếp (RJ45 100/1000Mbps hoặc SFP) cho từng máy chủ vật lý của khách hàng. Phân tách lưu lượng giữa các khách hàng thông qua công nghệ mạng cục bộ ảo (VLAN).
+
+---
+
+## 3. Ý nghĩa vận hành đối với Support
+
+Khi chẩn đoán sự cố mạng bằng lệnh `tracert`, Support đối chiếu các bước nhảy (Hop) theo trình tự phân tầng trên:
+1. **Từ máy chủ đến ASW**: Nếu mất gói ngay cổng này $\rightarrow$ kiểm tra cáp mạng và switch tại tủ rack.
+2. **Từ ASW lên DSW**: Nếu mất gói $\rightarrow$ kiểm tra cổng Trunk quang hoặc module SFP nối lên DSW 6/7.
+3. **Từ DSW lên Core**: Nếu mất gói $\rightarrow$ báo động NOC kiểm tra Router Core.
+4. **Từ Core ra ISP**: Nếu mất gói ở các nút FPT, VTN, VNIX $\rightarrow$ sự cố thuộc tuyến cáp nhà mạng đối tác.
+
+---
+
+## 4. Tài liệu liên quan
+
+- [Kiểm tra & Chẩn đoán kết nối mạng](/internal/network/runbooks/network-troubleshooting)
+- [Xử lý sự cố Switch tủ Rack](/internal/network/runbooks/switch-outage)
+- [Xử lý sự cố Leased-Line](/internal/network/runbooks/leased-line-issues)

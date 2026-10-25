@@ -1,0 +1,103 @@
+---
+title: Kiểm tra & Chẩn đoán kết nối mạng
+description: Hướng dẫn chẩn đoán sự cố mất kết nối, chập chờn, suy giảm băng thông qua ping/tracert hai chiều, VPN nhà mạng và 3 kịch bản xử lý traffic.
+---
+
+Runbook này hướng dẫn quy trình tiêu chuẩn dành cho nhân viên Support khi tiếp nhận phản ánh của khách hàng về sự cố mất kết nối mạng, đường truyền chập chờn hoặc truy cập máy chủ bị chậm từ các nhà mạng khác nhau.
+
+---
+
+## 1. Triệu chứng sự cố
+
+- Khách hàng không thể truy cập vào máy chủ (SSH, RDP, Web không mở được).
+- Kết nối đến máy chủ bị chập chờn, mất gói (Packet Loss cao), độ trễ (Latency/Ping) tăng đột biến.
+- Sự cố chỉ xảy ra từ một số nhà mạng cụ thể (ví dụ: Viettel vào được nhưng FPT không vào được, hoặc chỉ nghẽn từ hướng quốc tế).
+
+---
+
+## 2. Phạm vi ảnh hưởng
+
+- **Cục bộ một máy chủ**: Do lỗi card mạng, firewall nội bộ của OS hoặc máy chủ bị treo.
+- **Tuyến nhà mạng (ISP Routing)**: Do đứt cáp quang biển hoặc nghẽn mạch kết nối giữa nhà mạng khách hàng với cổng Core của ODS.
+- **Hạ tầng phân vùng**: Do sự cố switch tủ rack hoặc cổng uplink của tủ Data Center.
+
+---
+
+## 3. Thông tin & Bằng chứng cần thu thập
+
+Để chẩn đoán chính xác nguyên nhân, Support bắt buộc phải yêu cầu khách hàng cung cấp và tự thu thập bộ thông tin sau:
+
+| Thông tin cần có | Mô tả chi tiết | Kênh thu thập |
+| :--- | :--- | :--- |
+| **IP WAN của Khách hàng** | Địa chỉ IP công cộng tại văn phòng/nhà của khách hàng (tra cứu qua `whatismyip.com`). | Khách hàng cung cấp. |
+| **IP Máy chủ tại ODS** | Địa chỉ IP công cộng gán cho máy chủ của khách hàng. | Ticket / Odoo. |
+| **Bảng Ping & Tracert chiều đến** | Kết quả `ping` và `tracert` (hoặc `mtr`) từ máy khách hàng đến IP máy chủ ODS. | Khách hàng chụp gửi. |
+| **Bảng Ping & Tracert chiều về** | Kết quả kiểm tra từ máy chủ ODS ngược về IP WAN của khách hàng. | Support thực hiện qua Console/SSH. |
+| **Mẫu kiểm tra đa hướng** | Kết quả ping/tracert từ các hướng nhà mạng trong nước (FPT, VNPT, Viettel) và các công cụ Looking Glass quốc tế. | Support thực hiện qua VPN Client. |
+
+---
+
+## 4. Lưu đồ xử lý sự cố
+
+<ProcessFlowchart flowId="network-troubleshooting" />
+
+---
+
+## 5. Các bước thực hiện chi tiết
+
+### Bước 1: Xác thực & Thu thập dữ liệu chẩn đoán
+- **Hành động của SP**:
+  1. Kiểm tra thông tin người gửi yêu cầu (đối chiếu danh bạ đăng ký trên Odoo).
+  2. Kiểm tra các bằng chứng khách hàng gửi kèm: IP WAN, IP Server, bảng ping, bảng tracert.
+  3. **Nếu chưa đủ**: Gửi email phản hồi ngay theo mẫu:
+     > *"Để kiểm tra chính xác nguyên nhân nghẽn/mất kết nối, Anh/Chị vui lòng gửi giúp Support ODS: (1) Địa chỉ IP WAN của Quý khách (xem tại whatismyip.com), (2) Hình ảnh kết quả lệnh `ping <IP_Server>` và `tracert <IP_Server>` từ máy tính của Quý khách. Xin cảm ơn!"*
+
+### Bước 2: Thực hiện kiểm tra chéo đa hướng
+- **Hành động của SP**:
+  1. **Kiểm tra hướng Quốc tế**: Truy cập các trang web Looking Glass quốc tế uy tín để ping và tracert đến IP máy chủ.
+  2. **Kiểm tra hướng Trong nước**: Sử dụng phần mềm VPN Client nội bộ của Support lần lượt kết nối qua các hướng mạng **FPT, VNPT, Viettel** rồi thực hiện ping/tracert đến IP máy chủ.
+  3. Ghi lại nút mạng (Hop IP) bắt đầu xuất hiện tình trạng mất gói hoặc tăng độ trễ (latency vọt lên cao).
+
+### Bước 3: Khoanh vùng lỗi theo triệu chứng
+
+#### Phân nhánh A: Hoàn toàn không thể kết nối (Mất kết nối 100%)
+1. **Kiểm tra trạng thái chặn**: Kiểm tra xem địa chỉ IP máy chủ có đang bị áp rule chặn hướng Quốc tế hoặc Trong nước (do vi phạm trước đó hoặc cảnh báo bảo mật) hay không. Nếu có $\rightarrow$ kiểm tra lý do chặn, mở chặn thử nghiệm và gửi email nhờ khách hàng kiểm tra lại.
+2. **Kiểm tra tấn công DDoS**: Nếu không có lệnh chặn, tiến hành bắt gói tin (Sniff traffic) trên cổng switch xem IP có đang bị tấn công flood hay không. Nếu bị tấn công $\rightarrow$ chuyển sang [Runbook xử lý DDoS](/internal/network/runbooks/ddos-mitigation).
+3. **Kiểm tra phần cứng tại tủ**: Nếu không bị tấn công, kiểm tra bảng MAC/ARP cổng switch, di chuyển vào DC cắm Console kiểm tra trực tiếp máy chủ và đèn tín hiệu cổng mạng.
+
+#### Phân nhánh B: Mạng chập chờn, chậm, mất gói
+- Đọc kỹ từng bước nhảy (Hop) trong bảng `tracert`:
+  - Nếu mất gói ngay từ các bước nhảy đầu tiên (Hop 1-3) $\rightarrow$ lỗi từ modem/hạ tầng mạng nội bộ của khách hàng.
+  - Nếu mất gói ở các bước nhảy trung gian của nhà mạng (Transit ISP) $\rightarrow$ sự cố tuyến cáp quang của ISP.
+  - Nếu mất gói ở bước nhảy cuối cùng tại cổng Gateway/Switch của ODS $\rightarrow$ nghẽn port switch hoặc quá tải trên máy chủ.
+
+### Bước 4: Xử lý theo 3 Kịch bản chuẩn
+
+#### Kịch bản 1: Traffic về đến ODS, máy chủ không bị treo
+- **Đặc điểm**: Ping từ mạng ngoài đến Gateway ODS thông suốt, máy chủ vẫn đăng nhập bình thường qua console nhưng từ mạng văn phòng khách hàng lại chập chờn.
+- **Xử lý**: Lỗi do đường truyền internet của khách hàng hoặc modem văn phòng bị treo bảng định tuyến NAT. Gửi email đính kèm các log ping/tracert chứng minh hạ tầng ODS ổn định, hướng dẫn khách hàng khởi động lại modem mạng văn phòng.
+
+#### Kịch bản 2: Máy chủ bị treo, đèn port mạng không sáng
+- **Đặc điểm**: Đèn mạng phía sau máy chủ tắt hẳn hoặc sáng đứng đơ, gắn console màn hình tối đen hoặc bị đơ cứng.
+- **Xử lý**: Máy chủ bị lỗi phần cứng/treo hệ điều hành. Gửi email thông báo tình trạng cho khách hàng. **Chỉ thực hiện khởi động lại (Reboot) máy chủ khi nhận được email đồng ý của khách hàng**.
+
+#### Kịch bản 3: Traffic không về được đến ODS, máy chủ không bị treo
+- **Đặc điểm**: Kết nối bị đứt quãng tại các router trung gian của nhà mạng viễn thông bên ngoài, trong khi máy chủ nội bộ ODS vẫn hoạt động tốt.
+- **Xử lý**: Tạo ticket gửi **NOC Team** đính kèm bảng tracert để NOC làm việc với đối tác viễn thông (FPT, VNPT, Viettel). **Chỉ gửi thông báo cho đối tác hoặc cập nhật thông tin cho khách hàng khi có kết luận chính thức từ NOC Team**.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Sự cố đứt cáp quang biển quốc tế diện rộng (AAG, APG, IA...)** | Tham khảo thông báo chính thức từ ban điều hành mạng ODS, gửi thông báo diện rộng tới khách hàng về việc định tuyến lưu lượng dự phòng và thời gian khắc phục dự kiến của đối tác quốc tế. |
+| **Nhiều khách hàng cùng một tủ rack đồng loạt báo chậm** | Nguy cơ nghẽn cổng Uplink của Switch tủ. Kiểm tra ngay lưu lượng switch tủ trên PRTG và kích hoạt [Runbook sự cố Switch](/internal/network/runbooks/switch-outage). |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Xử lý sự cố tấn công DDoS](/internal/network/runbooks/ddos-mitigation)
+- [Xử lý sự cố Switch tủ Rack](/internal/network/runbooks/switch-outage)
+- [Quy trình gắn Console kiểm tra Server](/internal/data-center/processes/attach-console)

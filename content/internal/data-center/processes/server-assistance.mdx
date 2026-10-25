@@ -1,0 +1,132 @@
+---
+title: Hỗ trợ thao tác Server & Cài đặt hệ điều hành
+description: Quy trình tiếp nhận yêu cầu, xác thực khách hàng, gắn console kiểm tra phần cứng và cài đặt OS kèm mẫu cam kết miễn trừ trách nhiệm dữ liệu.
+---
+
+Quy trình này hướng dẫn nhân viên Support ODS thực hiện các tác vụ hỗ trợ kỹ thuật trực tiếp trên máy chủ vật lý của khách hàng tại Trung tâm dữ liệu (Data Center), bao gồm kiểm tra cấu hình phần cứng, gắn console và cài đặt lại hệ điều hành (OS).
+
+---
+
+## 1. Mục đích & Phạm vi áp dụng
+
+- **Mục đích**: Chuẩn hóa thao tác hỗ trợ phần cứng tại phòng máy DC, bảo vệ tính toàn vẹn của thiết bị và phòng ngừa rủi ro pháp lý/tranh chấp mất mát dữ liệu khách hàng.
+- **Phạm vi áp dụng**: Áp dụng cho các dịch vụ Thuê chỗ đặt máy chủ (Colocation) và Máy chủ dùng riêng (Dedicated Server) đặt tại các Data Center của ODS.
+- **Đối tượng thực hiện**: Nhân viên Support Onsite / Kỹ sư trực ca Data Center, phối hợp cùng bộ phận Kinh doanh (Sales).
+
+---
+
+## 2. Điều kiện & Thông tin đầu vào
+
+Trước khi bắt đầu, Support cần thu thập và đối chiếu các thông tin sau:
+
+| Thông tin cần có | Mô tả chi tiết | Kênh xác thực |
+| :--- | :--- | :--- |
+| **Thông tin người yêu cầu** | Họ tên, số điện thoại, địa chỉ email gửi yêu cầu. | Đối chiếu với danh bạ người liên hệ hợp lệ trên hệ thống Odoo / Ticket. |
+| **Mã dịch vụ (Service ID)** | Mã dịch vụ ODS cấp cho máy chủ (ví dụ: `CO1U_...`, `DedSer_...`). | Tra cứu trên Odoo hợp đồng. |
+| **Địa chỉ IP chính** | IP tĩnh gán cho máy chủ đang hoạt động. | Tra cứu IPAM / Thông tin dịch vụ Odoo. |
+| **Vị trí vật lý** | Tên Data Center, số Tủ Rack, vị trí Unit (U). | Sơ đồ tủ rack DC / Ghi chú kỹ thuật. |
+| **Nội dung yêu cầu cụ thể** | Kiểm tra phần cứng (CPU, RAM, RAID, HDD) hoặc Cài đặt lại OS (loại OS, phiên bản, phân vùng ổ đĩa). | Nội dung ticket / Email của khách hàng. |
+
+---
+
+## 3. Checklist tổng thể
+
+- [ ] Người yêu cầu trùng khớp với thông tin đã đăng ký trên hệ thống.
+- [ ] Ticket đã được khởi tạo và ghi nhận đầy đủ Mã DV, IP, Vị trí Rack/U.
+- [ ] Thiết bị Console / Monitor cáp chuyển đổi sẵn sàng tại phòng máy.
+- [ ] **BẮT BUỘC**: Khách hàng đã phản hồi văn bản xác nhận đồng ý miễn trừ trách nhiệm mất dữ liệu (đối với tác vụ cài lại OS).
+- [ ] Console đã được tháo thu hồi và trả về đúng vị trí sau khi hoàn tất.
+- [ ] Email thông báo hoàn tất đã được gửi cho khách hàng và thông báo cho Sales.
+
+---
+
+## 4. Lưu đồ quyết định
+
+<ProcessFlowchart flowId="server-assistance" />
+
+---
+
+## 5. Các bước thực hiện chi tiết
+
+### Bước 1: Tiếp nhận và xác thực thông tin khách hàng
+- **Hành động của SP**: Kiểm tra thông tin người gửi yêu cầu (Email/SĐT) đối chiếu với thông tin đại diện hợp pháp trên Odoo.
+- **Xử lý theo nhánh**:
+  - **Nhánh Không trùng khớp**: 
+    1. Yêu cầu khách hàng gửi email từ đúng địa chỉ email đã đăng ký trong hợp đồng hoặc dùng số điện thoại chính thức gọi lên tổng đài.
+    2. *Hoặc* Support chủ động liên hệ lại theo số điện thoại đã đăng ký của khách hàng trên Odoo để xác nhận việc ủy quyền yêu cầu này.
+    3. Tuyệt đối không can thiệp phần cứng khi chưa xác thực thành công.
+  - **Nhánh Trùng khớp**: Chuyển sang Bước 2.
+
+### Bước 2: Tạo Ticket & Xác định thông tin dịch vụ
+- **Hành động của SP**:
+  1. Tạo Ticket trên hệ thống nội bộ, gán danh mục `Hỗ trợ Thao tác Server`.
+  2. Tra cứu và điền đầy đủ: Mã dịch vụ, Địa chỉ IP, Tên Data Center, Số tủ Rack và Số Unit (U).
+- **Kết quả mong đợi**: Xác định chính xác vị trí máy chủ cần thao tác trong phòng DC.
+
+### Bước 3: Gắn Console kiểm tra tại phòng máy
+- **Hành động của SP**:
+  1. Di chuyển vào khu vực tủ Rack được chỉ định.
+  2. Gắn bộ Console (màn hình di động, bàn phím, cáp VGA/HDMI/USB) vào máy chủ của khách hàng.
+  3. Bật màn hình, kiểm tra tín hiệu hiển thị và tình trạng nhận diện phần cứng (ổ cứng trong BIOS/RAID card, RAM, CPU).
+  4. Nếu yêu cầu chỉ dừng ở mức kiểm tra phần cứng: ghi lại thông số/chụp ảnh màn hình BIOS $\rightarrow$ Chuyển sang Bước 6.
+  5. Nếu yêu cầu có cài đặt lại OS $\rightarrow$ Chuyển sang Bước 4.
+
+### Bước 4: Yêu cầu khách hàng xác nhận miễn trừ trách nhiệm dữ liệu (Bắt buộc)
+<Callout title="CẢNH BÁO QUAN TRỌNG VỀ RỦI RO DỮ LIỆU" type="warn">
+  Thao tác cài lại hệ điều hành, phân vùng lại ổ cứng hoặc cấu hình lại mảng RAID tiềm ẩn rủi ro xóa sạch toàn bộ dữ liệu hiện có trên máy chủ.
+  **Nhân viên Support tuyệt đối không tiến hành cài đặt OS nếu chưa nhận được email đồng ý của khách hàng.**
+</Callout>
+
+- **Hành động của SP**: Gửi email chính thức từ hệ thống Ticket đến khách hàng với nội dung chuẩn:
+  > *"Kính gửi Quý khách hàng,*
+  > 
+  > *Theo yêu cầu cài đặt lại hệ điều hành cho máy chủ [Mã DV] - [Địa chỉ IP], Support ODS xin lưu ý thao tác này sẽ format và làm mới ổ cứng.*
+  > 
+  > *Quý khách vui lòng phản hồi email này xác nhận giúp: **ODS sẽ không chịu trách nhiệm về việc mất dữ liệu khi cài đặt lại server.** Ngay khi nhận được phản hồi xác nhận, chúng tôi sẽ tiến hành xử lý ngay.*
+  > 
+  > *Trân trọng,"*
+- **Xử lý theo nhánh quyết định**:
+  - **Khách hàng Không đồng ý / Không phản hồi**: **NGƯNG THỰC HIỆN NGAY LẬP TỨC**. Cập nhật trạng thái ticket chờ phản hồi và thông báo cho Sales phụ trách.
+  - **Khách hàng xác nhận "Đồng ý" qua email**: Lưu email xác nhận vào ticket $\rightarrow$ Chuyển sang Bước 5.
+
+### Bước 5: Tiến hành cài đặt hệ điều hành
+- **Hành động của SP**:
+  1. Cắm USB cài đặt hoặc gắn ổ đĩa ảo/iDRAC theo phiên bản hệ điều hành khách hàng yêu cầu (CentOS, Ubuntu, Windows Server...).
+  2. Phân vùng ổ đĩa theo yêu cầu hoặc theo cấu hình chuẩn.
+  3. Cài đặt hệ điều hành, cấu hình địa chỉ IP tĩnh, Gateway, DNS theo đúng thông số mạng của mã dịch vụ.
+  4. Mở dịch vụ điều khiển từ xa (SSH port 22 trên Linux, Remote Desktop port 3389 trên Windows).
+  5. Kiểm tra kết nối mạng: ping ra ngoài Internet và ping từ mạng ngoài vào địa chỉ IP của server.
+
+### Bước 6: Kiểm tra bàn giao & Thu hồi Console
+- **Hành động của SP**:
+  1. Tháo dỡ cáp nối, tắt bộ Console di động và đưa về vị trí cất giữ quy định tại phòng trực DC.
+  2. Đóng cửa tủ Rack cẩn thận, đảm bảo dây mạng và dây nguồn không bị chèn ép.
+- **Kết quả mong đợi**: Máy chủ hoạt động ổn định, đèn mạng port switch sáng xanh, console được thu hồi nguyên vẹn.
+
+### Bước 7: Phản hồi khách hàng & Đóng ticket
+- **Hành động của SP**:
+  1. Gửi email thông báo hoàn tất cho khách hàng theo mẫu:
+     > *"Vào lúc [Giờ:Phút] ngày [Ngày/Tháng/Năm], Support ODS đã hoàn tất hỗ trợ Anh/Chị thao tác máy chủ [Mã DV] - [Địa chỉ IP].*
+     > *Thông tin truy cập ban đầu: [Gửi thông tin an toàn hoặc yêu cầu KH tự đặt mật khẩu].*
+     > *Quý khách vui lòng kiểm tra lại dịch vụ và đổi mật khẩu quản trị ngay sau khi nhận bàn giao."*
+  2. Cập nhật ghi chú trên Odoo / Ticket.
+  3. Gửi email/thông báo nội bộ cho nhân viên Kinh doanh (Sales) phụ trách khách hàng nắm tiến độ.
+  4. Chuyển trạng thái Ticket sang `Resolved` / `Closed`.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng khẩn cấp
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Phần cứng lỗi (ổ cứng hỏng, RAM lỗi, nguồn không lên)** | Dừng cài đặt, chụp ảnh màn hình thông báo lỗi phần cứng từ BIOS/Console, gửi mail báo cáo khách hàng và thông báo Sales để phối hợp bảo hành/thay thế. |
+| **Không nhận được tín hiệu mạng sau khi cài OS** | Kiểm tra lại cấu hình VLAN trên Switch Port, kiểm tra dây patch cord mạng từ server cắm vào switch, đảm bảo card mạng trong OS đã nhận đúng Driver. |
+| **Khách hàng gọi điện giục cài đặt khi chưa có email xác nhận dữ liệu** | Lịch sự giải thích đây là quy định an toàn bảo vệ quyền lợi của khách hàng, đề nghị khách hàng gửi email xác nhận bằng chữ để làm căn cứ thực hiện. |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Mã dịch vụ & tra cứu trên Odoo](/internal/service-codes)
+- [Tiếp nhận & điều hướng xử lý yêu cầu](/internal/request-routing)
+- [Quy định bảo mật & Dữ liệu khách hàng](/internal/security)

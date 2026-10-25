@@ -1,0 +1,5 @@
+{
+  "title": "Quy trình vận hành",
+  "description": "Các quy trình cấp phát, quản lý và thu hồi tài nguyên IP mạng.",
+  "pages": ["index", "ip-allocation", "ip-reclaim"]
+}

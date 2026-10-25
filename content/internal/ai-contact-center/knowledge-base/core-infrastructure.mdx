@@ -1,29 +1,33 @@
 ---
-title: Bảng IP hạ tầng core
-description: Khung tra cứu IP hạ tầng core phục vụ chẩn đoán dịch vụ Tổng đài.
+title: Bảng IP hạ tầng core đầu số
+description: Danh sách IP Core đầu số ODS tương ứng với từng nhà mạng viễn thông phục vụ triển khai và đấu nối Trunk.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Bảng dữ liệu sẽ được bổ sung sau khi nguồn chuẩn và người chịu trách nhiệm cập nhật được xác nhận.
-</Callout>
+Bảng tra cứu IP Core hạ tầng đầu số ODS dùng khi triển khai đấu nối đầu số (SIP Trunk) từ các nhà mạng viễn thông về hệ thống tổng đài ODS:
 
-## Mục đích
+---
 
-Mô tả phạm vi sử dụng của bảng tra cứu này trong quá trình hỗ trợ.
+## 1. Bảng IP Core ODS theo nhà mạng
 
-## Bảng dữ liệu
+| Nhà mạng (Telco) | IP WAN Core ODS | Port SIP |
+|---|---|:---:|
+| **FPT (Đầu 1900)** | `112.78.0.22` | `5060` |
+| **FPT (Đầu cố định)** | `112.78.0.25` | `5060` |
+| **VNPT (Khu vực HCM)** | `14.225.162.60` | `5060` |
+| **VNPT (Khu vực HN)** | `14.225.68.156` | `5060` |
+| **VIETTEL** | `112.78.0.23` | `5060` |
+| **MOBIFONE** | `112.78.0.24` | **`51000`** |
+| **ITEL** | `112.78.0.26` | `5060` |
+| **CMC** | `112.78.0.26` | `5060` |
+| **GTEL** | `112.78.0.52` | `5060` |
+| **DIGITEL** | `112.78.0.52` | `5060` |
+| **SPT** | `112.78.0.20` | `5060` |
+| **VTC** | `112.78.0.21` | `5060` |
+| **ĐỐI TÁC** | `112.78.0.51` | `5060` |
 
-Chưa có dữ liệu đã xác minh trong TASK-014.
+---
 
-## Nguồn chuẩn
+## 2. Lưu ý kỹ thuật
 
-Chưa xác định.
-
-## Người cập nhật
-
-Chưa xác định.
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
-
+- **Port kết nối SIP**: Các nhà mạng dùng port chuẩn `5060`, riêng **Mobifone sử dụng port `51000`**.
+- **Thủ tục Whitelist IP**: Cung cấp đúng IP Core ODS theo nhà mạng để Telco whitelist IP Signaling & Media (RTP).

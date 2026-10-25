@@ -1,0 +1,120 @@
+---
+title: Xử lý sự cố tấn công từ chối dịch vụ (DDoS)
+description: Hướng dẫn chẩn đoán lưu lượng bất thường, sniff gói tin, cô lập chặn hướng quốc tế và theo dõi phục hồi sau khi mở chặn.
+---
+
+Runbook này hướng dẫn quy trình tiêu chuẩn dành cho nhân viên Support khi phát hiện hoặc tiếp nhận phản ánh về các cuộc tấn công từ chối dịch vụ phân tán (DDoS) nhắm vào địa chỉ IP máy chủ của khách hàng đặt tại ODS.
+
+---
+
+## 1. Triệu chứng sự cố
+
+Sự cố tấn công DDoS thường được nhận biết thông qua 2 kênh kích hoạt:
+
+1. **Hệ thống cảnh báo tự động**:
+   - Cảnh báo từ hệ thống giám sát mạng (PRTG Network Monitor, NetFlow hoặc cảnh báo từ NOC Team) ghi nhận băng thông tăng đột biến bất thường trên cổng Switch hoặc dải IP.
+   - Cảnh báo ngưỡng lưu lượng UDP Flood, SYN Flood, ICMP Flood hoặc HTTP/HTTPS Request Flood vượt xa mức sử dụng bình thường.
+2. **Khách hàng phản ánh**:
+   - Khách hàng liên hệ qua Hotline/Ticket báo website hoặc dịch vụ trên máy chủ bị chậm, chập chờn, mất kết nối từ mạng Internet bên ngoài.
+
+---
+
+## 2. Phạm vi ảnh hưởng
+
+- **Ảnh hưởng trực tiếp**: Máy chủ mục tiêu bị cạn kiệt tài nguyên (CPU, RAM, băng thông cổng mạng), dẫn đến ngừng trệ toàn bộ website và ứng dụng.
+- **Ảnh hưởng lan tỏa**: Nếu lưu lượng DDoS quá lớn (vượt quá dung lượng cổng uplink của Switch hoặc tuyến truyền dẫn), sự cố có thể gây nghẽn mạng cục bộ, ảnh hưởng đến các máy chủ và khách hàng khác trong cùng phân vùng mạng Data Center.
+
+---
+
+## 3. Thông tin & Bằng chứng cần thu thập
+
+Trước khi thực hiện can thiệp kỹ thuật, Support bắt buộc phải thu thập các bằng chứng sau:
+
+| Thông tin / Bằng chứng | Mục đích sử dụng | Công cụ thu thập |
+| :--- | :--- | :--- |
+| **Địa chỉ IP đích bị tấn công** | Định danh máy chủ và khách hàng sở hữu. | PRTG Monitor / NetFlow / Ticket |
+| **Hình ảnh chụp Sniff Traffic** | Bằng chứng kỹ thuật ghi nhận loại gói tin, lưu lượng (Mbps/Gbps), gói/giây (pps), IP nguồn và IP đích. | Công cụ bắt gói tin (Wireshark / tcpdump / Port Mirroring) |
+| **Hướng lưu lượng** | Xác định cuộc tấn công đến từ hướng Quốc tế hay Trong nước (các nhà mạng Viettel, VNPT, FPT...). | Hệ thống Router Core / Looking Glass / PRTG |
+| **Thông tin xác thực khách hàng** | Họ tên, email, số điện thoại người liên hệ đăng ký trên Odoo (đối với trường hợp khách hàng chủ động yêu cầu). | Hệ thống ERP Odoo / Danh bạ liên hệ hợp đồng |
+
+---
+
+## 4. Lưu đồ xử lý sự cố DDoS
+
+<ProcessFlowchart flowId="ddos-mitigation" />
+
+---
+
+## 5. Các bước xử lý chi tiết
+
+### Bước 1: Xác thực nguồn tin & Phân tích lưu lượng (Sniff Traffic)
+- **Nếu tiếp nhận từ phản ánh của khách hàng**:
+  - Đối chiếu người gửi email/gọi điện có thuộc danh bạ đăng ký của Mã khách hàng trên Odoo hay không.
+  - Nếu không khớp: Yêu cầu gửi từ email chính thức hoặc gọi lại số điện thoại đã đăng ký để xác nhận.
+- **Tiến hành Sniff kiểm tra**:
+  - Truy cập công cụ giám sát hoặc bắt gói tin trên cổng switch/vlan của máy chủ.
+  - Phân tích mẫu lưu lượng: Kiểm tra số lượng request/packet bất thường, tỷ lệ gói tin SYN, UDP, ICMP hoặc các request dồn dập từ hàng nghìn IP quốc tế khác nhau.
+- **Đánh giá kết quả**:
+  - **Không có dấu hiệu bất thường**: Băng thông trong giới hạn bình thường, không có flood. Phản hồi kết quả phân tích cho khách hàng kèm hình ảnh lưu lượng $\rightarrow$ Đóng case.
+  - **Phát hiện lưu lượng tấn công xấu**: Chuyển sang Bước 2.
+
+### Bước 2: Chụp ảnh bằng chứng kỹ thuật
+- **Hành động của SP**: Chụp ảnh màn hình hiển thị kết quả Sniff (thể hiện rõ ngày giờ, biểu đồ băng thông, loại gói tin và địa chỉ IP đích bị tấn công).
+- **Lưu ý**: Bằng chứng này bắt buộc phải lưu vào Ticket và đính kèm trong email gửi khách hàng để đảm bảo tính minh bạch.
+
+### Bước 3: Thực hiện cô lập — Chặn lưu lượng hướng Quốc tế
+<Callout title="Nguyên tắc xử lý an toàn mạng" type="warn">
+  Để bảo vệ hạ tầng mạng chung và không làm gián đoạn các khách hàng khác trong cùng Data Center, Support thực hiện **chặn luồng truy cập hướng Quốc tế (Block International Traffic)** nhắm vào địa chỉ IP bị tấn công.
+</Callout>
+
+- **Hành động của SP**:
+  - Áp dụng rule chặn hướng Quốc tế cho địa chỉ IP bị tấn công trên hệ thống tường lửa / bộ định tuyến Core theo quy định vận hành.
+  - Giữ kết nối trong nước hoạt động để khách hàng vẫn có thể truy cập quản trị máy chủ qua mạng nội địa hoặc VPN trong nước.
+
+### Bước 4: Xác định khách hàng & Gửi email thông báo
+- **Hành động của SP**:
+  1. Tra cứu thông tin hợp đồng và mã dịch vụ gắn với địa chỉ IP bị tấn công trên Odoo.
+  2. Gửi email thông báo chính thức đến khách hàng từ hệ thống Ticket:
+     - Nêu rõ thời điểm phát hiện lưu lượng tấn công DDoS nhắm vào IP của máy chủ.
+     - Đính kèm hình ảnh bằng chứng Sniff traffic đã chụp ở Bước 2.
+     - Thông báo tạm thời áp dụng biện pháp chặn lưu lượng hướng quốc tế để bảo vệ hệ thống.
+     - Đề nghị khách hàng rà soát mã nguồn website, dịch vụ đang chạy và chuẩn bị phương án bảo vệ (như sử dụng dịch vụ Cloudflare / Web Application Firewall).
+
+### Bước 5: Mở chặn theo quy định thời hạn
+Biện pháp chặn hướng quốc tế sẽ được dỡ bỏ theo một trong các điều kiện sau:
+
+| Điều kiện dỡ bỏ chặn | Thời điểm thực hiện | Ghi chú |
+| :--- | :--- | :--- |
+| **Khách hàng yêu cầu mở lại** | Mở ngay sau khi tiếp nhận yêu cầu hợp lệ qua email ticket. | Khách hàng xác nhận đã rà soát hoặc sẵn sàng bật CDN/WAF bảo vệ. |
+| **Khách hàng Mắt Bão** | Tự động dỡ bỏ sau **3 ngày** kể từ thời điểm chặn. | Căn cứ theo quy định phối hợp hạ tầng. |
+| **Các khách hàng khác** | Tự động dỡ bỏ sau **7 ngày** kể từ thời điểm chặn. | Áp dụng khi khách hàng không có yêu cầu mở sớm hơn. |
+
+### Bước 6: Theo dõi sau khi mở chặn & Đóng ticket
+- **Hành động của SP**:
+  - Sau khi dỡ bỏ lệnh chặn, Support tiếp tục theo dõi lưu lượng mạng của địa chỉ IP này trong vòng **60 phút đến 24 giờ**.
+- **Xử lý theo tình huống**:
+  - **Tình huống 1: Cuộc tấn công tiếp diễn (Tiếp tục bị DDoS)**:
+    - Băng thông quốc tế lập tức tăng vọt trở lại ngay khi vừa mở.
+    - Thực hiện **chặn lại ngay lập tức** hướng quốc tế cho IP.
+    - Gửi email thông báo tiếp tục áp dụng biện pháp cô lập cho khách hàng.
+  - **Tình huống 2: Lưu lượng trở lại bình thường**:
+    - Dịch vụ hoạt động ổn định, không còn dấu hiệu tấn công flood.
+    - Cập nhật nhật ký xử lý trên ticket và chuyển trạng thái sang `Closed`.
+
+---
+
+## 6. Điều kiện dừng & Chuyển cấp (Escalation)
+
+Support cần dừng thao tác và liên hệ ngay với **NOC Team / Quản trị mạng cấp cao** trong các trường hợp sau:
+
+1. **Lưu lượng tấn công vượt ngưỡng chịu đựng**: Băng thông DDoS quá lớn làm suy giảm chất lượng các cổng kết nối Core hoặc router biên Data Center.
+2. **Tấn công từ nhiều hướng trong nước**: Khi cuộc tấn công xuất phát ồ ạt từ các nhà mạng nội địa (FPT, Viettel, VNPT) mà biện pháp chặn quốc tế không có tác dụng.
+3. **Cần áp dụng các giải pháp định tuyến đặc biệt**: Cần định tuyến Blackhole / Null-route dải IP hoặc kích hoạt hệ thống Anti-DDoS chuyên dụng của đối tác hạ tầng.
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Tiếp nhận & điều hướng xử lý yêu cầu](/internal/request-routing)
+- [Mã dịch vụ & tra cứu trên Odoo](/internal/service-codes)
+- [Tổng quan dịch vụ Mạng](/internal/network)

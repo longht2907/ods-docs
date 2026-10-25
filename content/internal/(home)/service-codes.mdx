@@ -1,0 +1,109 @@
+---
+title: Mã dịch vụ & tra cứu trên Odoo
+description: Nguyên tắc nhận diện mã dịch vụ, phân biệt tầng định danh trên ERP Odoo và hệ thống kỹ thuật dành cho nhân viên Support.
+---
+
+Trên hệ thống quản trị của ODS, **mọi dịch vụ cung cấp cho khách hàng đều được quản lý bằng một mã dịch vụ riêng trên phần mềm ERP Odoo**.
+
+Mã dịch vụ là cầu nối then chốt giữa thông tin hợp đồng pháp lý/cước phí và tài nguyên kỹ thuật thực tế đang vận hành trên hạ tầng. Nắm vững nguyên tắc phân biệt và đối chiếu mã dịch vụ là yêu cầu bắt buộc đối với mọi nhân viên Support trước khi thực hiện bất kỳ thao tác kỹ thuật nào.
+
+---
+
+## 1. Phân biệt 3 tầng định danh dịch vụ
+
+Trong quá trình tiếp nhận và xử lý yêu cầu, Support tuyệt đối không được nhầm lẫn giữa 3 tầng thông tin sau:
+
+| Tầng định danh | Khái niệm & Mục đích | Ví dụ minh họa | Hệ thống quản lý |
+| :--- | :--- | :--- | :--- |
+| **1. Mã khách hàng** *(Customer ID / Partner)* | Đại diện cho chủ thể pháp lý (cá nhân hoặc doanh nghiệp) ký kết hợp đồng với ODS. Một khách hàng có thể sở hữu cùng lúc nhiều dịch vụ khác nhau. | `KH12345`, `Cong ty TNHH ABC` | Odoo (Contacts / Customers) |
+| **2. Mã dịch vụ** *(Service ID)* | Đại diện cho một hợp đồng dịch vụ cụ thể đang thuê tại ODS. Dùng để quản lý vòng đời dịch vụ: ngày kích hoạt, chu kỳ cước, thời hạn sử dụng, trạng thái hợp đồng (hoạt động, tạm ngưng, thanh lý). | `CO1U_...`, `DedSer_...`, `CloudFone_...` | Odoo (Subscriptions / Sales / Services) |
+| **3. Thông số kỹ thuật** *(Technical Parameters)* | Các thông số cấu hình và tài nguyên thực tế gán cho dịch vụ trên hạ tầng mạng, máy chủ và tổng đài. | Địa chỉ IP, Switch Port, VLAN ID, Extension, SIP Trunk, Node ảo hóa | Hệ thống kỹ thuật (Switch, Router, Hypervisor, PBX Portal) |
+
+---
+
+## 2. Các nguyên tắc bắt buộc khi tiếp nhận & tra cứu
+
+Nhân viên Support cần tuân thủ nghiêm ngặt 5 nguyên tắc sau:
+
+### Nguyên tắc 1: Luôn xác định đúng khách hàng và mã dịch vụ trước khi thao tác
+Mọi yêu cầu hỗ trợ (đổi cấu hình, khởi động lại máy chủ, reset mật khẩu, mở hướng gọi, tạm ngưng...) bắt buộc phải được gắn với đúng Mã dịch vụ còn hiệu lực trên Odoo. Tuyệt đối không thao tác kỹ thuật khi chỉ có tên công ty chung chung hoặc thông tin chưa được kiểm chứng.
+
+### Nguyên tắc 2: Một khách hàng có thể sở hữu nhiều dịch vụ
+Một doanh nghiệp có thể thuê đồng thời nhiều loại dịch vụ tại ODS, ví dụ:
+- Thuê 02 chỗ đặt máy chủ (Colocation).
+- Thuê 01 đường truyền Internet Dedicated.
+- Đăng ký 01 hệ thống Tổng đài CloudFone cho 50 nhân viên.
+- Thuê license phần mềm Plesk và bản quyền Windows Server.
+
+Support cần làm rõ yêu cầu của khách hàng đang áp dụng cho **mã dịch vụ cụ thể nào** trong danh sách các dịch vụ họ đang sử dụng.
+
+### Nguyên tắc 3: Một mã dịch vụ không nhất thiết tương ứng một máy chủ vật lý
+- Một mã dịch vụ có thể là một máy chủ vật lý độc lập (`DedSer...`).
+- Nhưng một mã dịch vụ cũng có thể chỉ là một máy chủ ảo (`Cloud Server`), một phân vùng lưu trữ, một dải IP bổ sung (`61IP...`), một cổng nguồn (`Power Port...`), hoặc một gói tổng đài thoại đám mây.
+- Ngược lại, một máy chủ vật lý có thể gắn kèm nhiều mã dịch vụ phụ (ví dụ: mã máy chủ + mã license Windows + mã dải IP phụ + mã cổng mạng 1Gbps).
+
+### Nguyên tắc 4: Không mặc định trạng thái Odoo tự động đồng bộ sang hạ tầng kỹ thuật
+<Callout title="Nguyên tắc cốt lõi về Odoo và Hệ thống kỹ thuật" type="warn">
+  Hệ thống Odoo quản lý trạng thái hành chính, hợp đồng và cước phí. **Việc thay đổi trạng thái dịch vụ trên Odoo (như Chuyển sang Tạm ngưng, Đã hủy, Gia hạn) KHÔNG tự động can thiệp hoặc thay đổi cấu hình tài nguyên trên hệ thống kỹ thuật.**
+</Callout>
+
+Khi một dịch vụ bị tạm ngưng do quá hạn cước hoặc theo yêu cầu thanh lý:
+- Odoo chỉ ghi nhận trạng thái hành chính.
+- Nhân viên Support hoặc Kỹ sư vận hành bắt buộc phải thực hiện thao tác kỹ thuật tương ứng theo quy trình (ví dụ: shutdown port switch, tắt máy ảo, khóa SIP trunk trên tổng đài) và ghi nhận log nghiệm thu.
+
+### Nguyên tắc 5: Bảo mật thông tin mã dịch vụ và dữ liệu khách hàng
+Mã dịch vụ chứa thông tin định danh nội bộ. Khi trao đổi với bên thứ ba hoặc gửi email cho người yêu cầu không nằm trong danh sách người liên hệ chính thức của Mã khách hàng, Support phải xác thực danh tính người yêu cầu trước khi cung cấp thông tin.
+
+---
+
+## 3. Nhận diện các quy ước tiền tố mã dịch vụ thực tế
+
+Căn cứ theo tài liệu mô tả dịch vụ thực tế của ODS, các mã dịch vụ thường mang các tiền tố nhận diện quy ước sau:
+
+| Tiền tố mã dịch vụ | Nhóm dịch vụ | Mô tả đặc trưng |
+| :--- | :--- | :--- |
+| `CO1U...`, `BS 2U...` | Data Center / Colocation | Thuê chỗ đặt máy chủ theo kích thước Unit (1U, 2U) hoặc Block Space tại Data Center. |
+| `DedSer...`, `RL...`, `Local2U...` | Dedicated Server | Máy chủ dùng riêng (Dedicated Server) theo cấu hình phần cứng tiêu chuẩn hoặc đặc thù. |
+| `Int net shared...` | Kết nối mạng | Băng thông Internet chia sẻ (Shared Internet) tại Data Center. |
+| `LL...`, `MPLS/VPN...` | Truyền dẫn / Kênh riêng | Kênh truyền Internet chuyên dụng Leased Line hoặc kênh truyền số liệu bảo mật MPLS/VPN. |
+| `61IP...` | Tài nguyên IP | Cấp phát bổ sung dải địa chỉ IPv4 tĩnh cho khách hàng. |
+| `Power Port...`, `Power Extra...` | Nguồn điện bổ sung | Cấp thêm ổ cắm nguồn hoặc mở rộng công suất Ampe cho tủ rack/máy chủ. |
+| `Wadmin...` | Quản trị hệ thống | Dịch vụ kỹ sư ODS hỗ trợ quản trị và bảo trì máy chủ cho khách hàng. |
+| `WP...`, `WH...` | License Plesk | Bản quyền Plesk Web Pro (`WP`), Plesk Web Host (`WH`) hoặc Web Admin. |
+| `AC...`, `DC...`, `WinSer...` | License Microsoft SPLA | Bản quyền hệ điều hành Windows Server Standard / Datacenter tính theo Core. |
+| `CloudFone...` | Tổng đài đám mây | Hệ thống tổng đài doanh nghiệp CloudFone / AI Contact Center. |
+
+---
+
+## 4. Quy trình tra cứu đối chiếu cơ bản
+
+Khi nhận được yêu cầu từ khách hàng:
+
+```text
+[Yêu cầu hỗ trợ]
+       │
+       ▼
+[1. Tra cứu Mã khách hàng trên Odoo]
+       │
+       ▼
+[2. Liệt kê danh sách Dịch vụ đang hoạt động]
+       │
+       ▼
+[3. Xác định đúng Mã dịch vụ cần xử lý]
+       │
+       ▼
+[4. Đối chiếu thông số kỹ thuật (IP, Port, Extension, Domain)]
+       │
+       ▼
+[5. Mở Runbook/Quy trình kỹ thuật tương ứng để xử lý]
+```
+
+1. **Tra cứu Mã khách hàng**: Tìm theo Tên công ty, Mã số thuế, Số điện thoại hoặc Email người liên hệ đăng ký trên Odoo.
+2. **Liệt kê danh sách dịch vụ**: Xem các dịch vụ đang ở trạng thái hiệu lực (In Progress / Active).
+3. **Xác định mã dịch vụ liên quan**: Đối chiếu nội dung yêu cầu (ví dụ: máy chủ IP nào, số tổng đài nào) với thông tin ghi chú trên mã dịch vụ Odoo.
+4. **Đối chiếu thông số kỹ thuật**: Mở trang quản trị kỹ thuật liên quan (Network Monitor, PBX Portal, Virtualization Cluster) để xác nhận tài nguyên thực tế.
+5. **Thực hiện theo quy trình**: Chuyển sang bước điều hướng xử lý theo tài liệu vận hành tương ứng.
+
+<Callout title="Thông tin quy trình thao tác màn hình Odoo" type="info">
+  Quy trình thao tác chi tiết từng bước bấm nút, màn hình tra cứu và phân quyền trên hệ thống Odoo đang được cập nhật và chuẩn hóa bởi ban quản trị hệ thống ODS. Khi có tài liệu hướng dẫn màn hình chính thức, Support Wiki sẽ bổ sung vào trang này.
+</Callout>

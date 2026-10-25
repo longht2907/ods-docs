@@ -44,6 +44,7 @@ import { ClickToCallV2Flow } from '@/components/docs/click-to-call-v2-flow';
 import { ApiArchitectureOverview } from '@/components/docs/api-architecture-overview';
 import { CustomerFlowDiagram } from '@/components/docs/customer-flow-diagram';
 import { DocsProductDirectory } from '@/components/docs/docs-product-directory';
+import { ProcessFlowchart } from '@/components/flowchart';
 
 const cardIcons = {
   Activity,
@@ -102,6 +103,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ClickToCallFlow,
     ClickToCallV2Flow,
     ApiArchitectureOverview,
+    ProcessFlowchart,
     ...components,
   } satisfies MDXComponents;
 }

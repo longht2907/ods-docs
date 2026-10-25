@@ -1,29 +1,106 @@
 ---
-title: Rule cấu hình gọi ra
-description: Khung tra cứu rule định tuyến và cấu hình gọi ra của dịch vụ Tổng đài.
+title: Rule gọi ra (Outbound Rules)
+description: Hướng dẫn cú pháp Dial Pattern, bộ rule gọi ra mặc định và bảng mẫu định tuyến theo từng nhà mạng trên tổng đài.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Bảng dữ liệu sẽ được bổ sung sau khi nguồn chuẩn và người chịu trách nhiệm cập nhật được xác nhận.
-</Callout>
+Template mẫu về quy tắc định tuyến cuộc gọi ra (Outbound Rules) trên tổng đài FreePBX / Asterisk để nhân viên kỹ thuật (SP) tra cứu, sao chép và cấu hình nhanh chóng.
 
-## Mục đích
+---
 
-Mô tả phạm vi sử dụng của bảng tra cứu này trong quá trình hỗ trợ.
+## 1. Tổng quan về Dial Patterns (FreePBX / Asterisk)
 
-## Bảng dữ liệu
+Giao diện **Quy định gọi ra (Dial Patterns that will use this Route)** trên tổng đài gồm 4 trường cấu hình:
 
-Chưa có dữ liệu đã xác minh trong TASK-014.
+```text
+( prepend ) + [ prefix ] | [ match pattern ] / [ CallerID ]
+```
 
-## Nguồn chuẩn
+| Ký hiệu / Trường | Ý nghĩa kỹ thuật | Ví dụ thực tế |
+|---|---|---|
+| **`X`** | Đại diện cho 1 chữ số bất kỳ từ `0` đến `9`. | `09XXXXXXXX` (Số di động 10 chữ số) |
+| **`Z`** | Đại diện cho 1 chữ số bất kỳ từ `1` đến `9`. | `0ZXXXXXXXX` (Số có đầu 01–09) |
+| **`N`** | Đại diện cho 1 chữ số bất kỳ từ `2` đến `9`. | `02XXXXXXXXX` (Số cố định mã vùng) |
+| **`[1237-9]`** | Khớp với 1 chữ số nằm trong tập hợp hoặc khoảng được khai báo trong ngoặc. | `03[2-9]XXXXXXX` (Đầu 032 đến 039) |
+| **`.` (Dấu chấm)** | Ký tự đại diện khớp với 1 hoặc nhiều chữ số tiếp theo bất kỳ (wildcard match). | `00.` (Gọi quốc tế), `1[89]00.` (Hotline) |
+| **Prepend `( )`** | Dãy số được tổng đài tự động chèn thêm vào trước số gọi đi sau khi đã khớp pattern và cắt bỏ prefix. | Prepend `028` ghép vào `NXXXXXXX` thành `028NXXXXXXX` |
+| **Prefix `+ [ ]`** | Tiền tố cần quay trên điện thoại; tổng đài sẽ cắt bỏ tiền tố này trước khi gửi tới nhà mạng. | Prefix `+84` bị cắt bỏ để chuyển thành đầu `0` |
+| **Match Pattern `[ ]`** | Mẫu số điện thoại đích cần so khớp để kích hoạt Outbound Route này. | `090XXXXXXX` |
+| **CallerID `/ [ ]`** | Giới hạn chỉ máy nhánh có số Extension tương ứng mới được phép dùng Route này (để trống nếu áp dụng cho toàn bộ máy nhánh). | `101` hoặc để trống |
 
-Chưa xác định.
+---
 
-## Người cập nhật
+## 2. Rule mẫu gọi ra mặc định (Default Outbound Route)
 
-Chưa xác định.
+Bộ 10 quy tắc chuẩn được cấu hình trên Route mặc định (Default Route) khi khởi tạo tổng đài:
 
-## Cập nhật lần cuối
+| STT | Prepend | Prefix | Match Pattern | CallerID | Loại cuộc gọi / Mục đích |
+|:---:|:---:|:---:|:---|:---:|:---|
+| 1 | | | `*XXXX` | | Mã dịch vụ nội bộ (*8, *98...) |
+| 2 | | | `00.` | | Gọi quốc tế |
+| 3 | | | `0ZXXXXXXXX` | | Di động & Cố định 10 số (09x, 03x, 07x...) |
+| 4 | | | `0ZXXXXXXXXX` | | Cố định 11 số (02x...) |
+| 5 | | | `1[89]00.` | | Hotline miễn cước 1800 & tính cước 1900 |
+| 6 | | | `108X` | | Hộp thư giải đáp thông tin (1080, 1088) |
+| 7 | | | `11N` | | Đầu số khẩn cấp quốc gia (113, 114, 115) |
+| 8 | `028` | | `NXXXXXXX` | | Gọi nội hạt TP.HCM (khách bấm 8 số, tổng đài tự bù 028) |
+| 9 | `0` | `+84` | `XXXXXXXXX` | | Chuẩn hóa CRM di động (bỏ +84, bù 0 thành 10 số) |
+| 10 | `0` | `+84` | `XXXXXXXXXX` | | Chuẩn hóa CRM cố định (bỏ +84, bù 0 thành 11 số) |
+---
 
-Chưa cập nhật.
+## 3. Rule gọi ra theo nhà mạng
 
+Khi tổng đài định tuyến qua nhiều SIP Trunk hoặc nhiều nhóm SIM của từng nhà mạng, tạo Outbound Route riêng cho từng mạng và cấu hình các pattern tương ứng:
+
+### 3.1. Viettel
+
+| Prepend | Prefix | Match Pattern | Dải đầu số áp dụng |
+|:---:|:---:|:---|:---|
+| | | `03[2-9]XXXXXXX` | Di động Viettel đầu mới (032, 033, 034, 035, 036, 037, 038, 039) |
+| | | `09[6-8]XXXXXXX` | Di động Viettel đầu số cũ (096, 097, 098) |
+| | | `086XXXXXXX` | Di động Viettel đầu số 086 |
+
+
+### 3.2. Vinaphone
+
+| Prepend | Prefix | Match Pattern | Dải đầu số áp dụng |
+|:---:|:---:|:---|:---|
+| | | `08[81-5]XXXXXXX` | Di động Vina đầu mới (081, 082, 083, 084, 085 và 088) |
+| | | `09[14]XXXXXXX` | Di động Vina đầu số cũ (091, 094) |
+
+### 3.3. Mobifone
+
+| Prepend | Prefix | Match Pattern | Dải đầu số áp dụng |
+|:---:|:---:|:---|:---|
+| | | `07[06-9]XXXXXXX` | Di động Mobi đầu mới (070, 076, 077, 078, 079) |
+| | | `089XXXXXXX` | Di động Mobi đầu số 089 |
+| | | `09[03]XXXXXXX` | Di động Mobi đầu số cũ (090, 093) |
+
+### 3.4. Điện thoại cố định (Toàn quốc)
+
+| Prepend | Prefix | Match Pattern | Dải đầu số áp dụng |
+|:---:|:---:|:---|:---|
+| | | `02XXXXXXXXX` | Mã vùng cố định 11 số toàn bộ 63 tỉnh thành (020x – 029x) |
+
+
+### 3.5. Đầu số Dịch vụ & Hotline
+
+| Prepend | Prefix | Match Pattern | Dải đầu số áp dụng |
+|:---:|:---:|:---|:---|
+| | | `1[89]00.` | Hotline miễn cước 1800 và tính cước 1900 |
+| | | `10[68]X` | Hộp thư giải đáp thông tin 106x, 108x |
+| | | `[68]XXX` | Dải số dịch vụ giá trị gia tăng (VAS) 6xxx, 8xxx |
+| | | `1400` | Cổng thông tin nhân đạo quốc gia |
+
+---
+
+## 4. Lưu ý quan trọng khi cấu hình
+
+1. **Thứ tự ưu tiên Route (Route Priority)**:
+   - Tổng đài so khớp danh sách Outbound Routes theo thứ tự **từ trên xuống dưới** (First-Match-Wins). Khi cuộc gọi khớp với một route, các route phía dưới sẽ không được kiểm tra tiếp.
+   - Các Route chuyên biệt (gọi nội bộ, mã dịch vụ `*XXXX`, số khẩn cấp `11N`) phải luôn được đặt **ở trên cùng**.
+   - Các Route có wildcard dấu chấm (`.`) như `00.` hoặc `1[89]00.` phải đặt **ở dưới các route cụ thể** để tránh bắt nhầm cuộc gọi.
+2. **Kiểm tra định dạng số của Trunk nhà mạng**:
+   - Đa số nhà mạng tại Việt Nam nhận định dạng nội địa `0xxxxxxxxx`.
+   - Một số SIP Trunk viễn thông quốc tế hoặc yêu cầu E.164 bắt buộc nhận `84xxxxxxxxx` (bỏ số `0`). Khi đó cấu hình tại dòng pattern: **Prefix**: `0`, **Prepend**: `84`.
+3. **Kiểm soát bảo mật cuộc gọi quốc tế**:
+   - Dòng gọi quốc tế (`00.`) nên được cân nhắc tách thành một Outbound Route riêng và gắn mã PIN hoặc phân quyền theo Extension để ngăn chặn nguy cơ bị lợi dụng phát sinh cước quốc tế ngoài ý muốn.

@@ -1,0 +1,87 @@
+---
+title: "Tổng đài ảo"
+description: Quy trình hủy dịch vụ tổng đài ảo.
+---
+
+## Lưu đồ quy trình
+
+<ProcessFlowchart flowId="cancel-contact-center" />
+
+---
+
+## Các bước thực hiện
+
+### Bước 1: Tiếp nhận yêu cầu & Tiền kiểm điều kiện hủy
+
+Mở Ticket yêu cầu hủy dịch vụ từ bộ phận Kinh doanh, Chăm sóc khách hàng (CSKH) trên hệ thống Support Desk và kiểm tra đầy đủ các thông số kỹ thuật:
+
+| Thông số kiểm tra | Mô tả chi tiết | Mục đích đối soát |
+| :--- | :--- | :--- |
+| **Mã dịch vụ (MDV)** | `VTPxxxxxxx` hoặc `CF-PBXxxxxxxx` | Định danh chính xác dịch vụ trên ERP Online Odoo |
+| **Tên khách hàng** | Tên doanh nghiệp trên hợp đồng | Xác định đúng hồ sơ khách hàng cần thu hồi |
+| **Địa chỉ IP tổng đài** | IP WAN tenant của khách hàng | Định vị cụ thể máy chủ/tổng đài cần giải phóng |
+| **Dịch vụ Addon đi kèm** | Auto Call, Mini CRM, Voice Brandname, Dung lượng ghi âm... | Đảm bảo hủy đồng bộ toàn bộ hệ sinh thái dịch vụ đi kèm |
+| **Xác nhận thanh lý** | Phê duyệt từ Kinh doanh và Kế toán | Đảm bảo khách hàng đã hoàn tất nghĩa vụ công nợ trước khi hủy |
+
+---
+
+### Bước 2: Thu hồi tài nguyên kỹ thuật & Giải phóng hệ thống
+
+1. **Thao tác gỡ đầu số hiện có trên tổng đài**:
+   - Sử dụng tài khoản quản trị kỹ thuật đăng nhập vào giao diện Portal tổng đài của khách hàng.
+2. **Xử lý ngoại lệ khi không tìm thấy đầu số**:
+   - Trường hợp vào tổng đài nhưng **không tìm thấy đầu số** để gỡ (do cấu hình ẩn trực tiếp dưới backend, đầu số Trunk Auth qua SBC hoặc đã mất liên kết trước đó):
+   - Kỹ sư **ghi chú rõ tình trạng này** vào nội dung bàn giao để chuyển tiếp cho bộ phận **DevOps VoIP** can thiệp gỡ triệt để dưới hạ tầng ở Bước 4.
+
+---
+
+### Bước 3: Cập nhật ERP Online (Odoo) & Dừng dịch vụ
+
+1. Đăng nhập hệ thống [ERP Online ODS](https://erponline.ods.vn/).
+2. Điều hướng vào phân hệ **Services** (`sale.service`) và tìm kiếm theo **Mã dịch vụ** (Ví dụ: `VTP0004767`).
+3. Mở trang chi tiết hợp đồng dịch vụ của khách hàng.
+4. Nhấn nút **STOP** (nằm ở góc trên bên trái thanh công cụ) để chuyển trạng thái dịch vụ sang ngừng hoạt động:
+   - Hệ thống tự động ghi nhận dịch vụ đã dừng và tạm ngắt các luồng tính cước định kỳ.
+
+---
+
+### Bước 4: Chuyển thông tin cho Team DevOps VoIP xử lý hủy dưới hệ thống
+
+Bàn giao thông tin qua kênh vận hành chuyên trách cho **Team DevOps VoIP** để tiến hành giải phóng tài nguyên hạ tầng backend.
+
+Cung cấp đầy đủ thông tin dịch vụ theo mẫu chuẩn:
+
+```text
+YÊU CẦU THU HỒI TÀI NGUYÊN DỊCH VỤ TỔNG ĐÀI:
+- Mã dịch vụ: [VTPxxxxxxx]
+- IP tổng đài: [Địa chỉ IP WAN tenant]
+- Dịch vụ Addon đi kèm: [Liệt kê Auto Call, CRM, gói ghi âm mở rộng...]
+- Tình trạng đầu số: [Đã gỡ thành công trên tổng đài / Chưa tìm thấy đầu số để gỡ, nhờ DevOps hỗ trợ gỡ trên Core]
+- Mã Ticket yêu cầu: [#MãTicket]
+```
+
+Team DevOps VoIP sẽ tiến hành:
+- Gỡ bỏ định tuyến đầu số trên hệ thống SBC / Core Switch (đặc biệt đối với các đầu số chưa gỡ được ở Bước 2).
+- Tắt container / máy ảo tenant tổng đài và thu hồi địa chỉ IP WAN đưa về kho IP chưa sử dụng.
+- Hủy cấu hình các phân hệ Addon (Auto Call, API kết nối CRM) liên quan đến mã dịch vụ.
+
+---
+
+### Bước 5: Nhận thông tin hoàn tất hủy và Đóng Ticket
+
+1. **Nhận xác nhận từ DevOps VoIP**:
+   - Tiếp nhận phản hồi từ Team DevOps VoIP xác nhận toàn bộ tài nguyên hạ tầng, IP và đầu số của dịch vụ đã được giải phóng thành công.
+2. **Phản hồi và Đóng Ticket**:
+   - Phản hồi trên Ticket yêu cầu ban đầu cho bộ phận Kinh doanh / Kế toán / CSKH xác nhận dịch vụ đã được chấm dứt hoàn tất trên cả hệ thống ERP và hạ tầng kỹ thuật.
+   - Chuyển trạng thái Ticket sang **Closed**.
+
+---
+
+## Xử lý sự cố thường gặp (Troubleshooting)
+
+| Tình huống sự cố | Nguyên nhân khả dĩ | Phương án xử lý chuẩn |
+| :--- | :--- | :--- |
+| **Không tìm thấy đầu số để gỡ trên tổng đài** | Đầu số cấu hình qua Trunk IP Auth trực tiếp dưới SBC hoặc đầu số nhà mạng riêng | Không cố xóa ép; note rõ danh sách số Hotline vào thông tin bàn giao Bước 4 để DevOps VoIP gỡ trực tiếp trên hệ thống Core |
+| **Nút STOP trên Odoo bị mờ hoặc không hiển thị** | Tài khoản kỹ sư chưa được phân quyền thao tác trạng thái hoặc dịch vụ đang ở trạng thái chưa hợp lệ | Kiểm tra lại quyền tài khoản trên Odoo hoặc liên hệ Kế toán / Quản trị viên ERP Online để hỗ trợ duyệt dừng dịch vụ |
+| **Khách hàng xin hoãn hủy để xuất file ghi âm** | Khách hàng phát sinh nhu cầu lưu trữ dữ liệu lịch sử cuộc gọi trước khi thanh lý | Tạm dừng thao tác hủy tại Bước 4; yêu cầu khách hàng phản hồi trên Ticket và thông báo Sales xác nhận thời gian gia hạn tạm thời |
+| **Hạ tầng vẫn phát sinh cảnh báo sau khi báo hủy** | Chưa hủy đồng bộ các dịch vụ Addon (như chiến dịch Auto Call hoặc dung lượng lưu trữ) | Rà soát lại danh sách dịch vụ đi kèm trên Odoo, báo bổ sung cho DevOps VoIP để gỡ triệt để các dịch vụ thành phần |

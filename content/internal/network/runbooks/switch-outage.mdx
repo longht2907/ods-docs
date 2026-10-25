@@ -1,0 +1,115 @@
+---
+title: Xử lý sự cố Switch tủ Rack
+description: Hướng dẫn chẩn đoán cảnh báo mất kết nối switch từ PRTG, phân biệt báo giả, xử lý rớt nguồn, lỗi cổng trunk và quy trình thay thế switch dự phòng SG300.
+---
+
+Runbook này hướng dẫn nhân viên Support thực hiện quy trình ứng cứu khẩn cấp khi hệ thống giám sát cảnh báo mất kết nối Switch tầng/tủ Rack tại Trung tâm dữ liệu, bao gồm kiểm tra nguồn, cổng trunk quang và thay thế switch dự phòng.
+
+---
+
+## 1. Triệu chứng sự cố
+
+- Hệ thống giám sát **PRTG Network Monitor** kích hoạt cảnh báo đỏ: `Switch Down / Ping failed / SNMP Trap lost`.
+- Toàn bộ máy chủ của khách hàng trong một tủ rack bị mất kết nối đồng loạt.
+- Không thể SSH, Telnet hoặc truy cập giao diện quản trị Web của thiết bị Switch.
+
+---
+
+## 2. Phạm vi ảnh hưởng
+
+- **Mức độ nghiêm trọng (P1 / Critical)**: Ảnh hưởng toàn bộ các máy chủ đấu nối vào switch của tủ rack đó.
+- Nguy cơ gián đoạn dịch vụ diện rộng nếu switch gặp sự cố là switch phân phối (Distribution Switch) hoặc switch gom máy chủ quan trọng.
+
+---
+
+## 3. Thông tin & Bằng chứng cần thu thập
+
+| Thông tin cần có | Mô tả chi tiết | Kênh thu thập |
+| :--- | :--- | :--- |
+| **Tên Switch & IP Quản trị** | Tên thiết bị (ví dụ: `ASW-Rack-05`, `DSW-06`), IP Management của Switch. | PRTG Monitor / Sơ đồ mạng. |
+| **Vị trí tủ rack** | Tên DC, Số tủ Rack chứa switch gặp sự cố. | Sơ đồ tủ rack Data Center. |
+| **Trạng thái đèn LED Switch** | Trạng thái đèn nguồn (Power LED), đèn cổng mạng máy chủ và đèn cổng Trunk (SFP/Uplink). | Quan sát trực tiếp tại phòng máy. |
+| **Switch dự phòng khả dụng** | Vị trí switch thay thế (Model tiêu chuẩn: **Cisco SG300** đặt tại tủ thiết bị phòng Core). | Kho thiết bị phòng Core. |
+
+---
+
+## 4. Lưu đồ xử lý sự cố Switch
+
+<ProcessFlowchart flowId="switch-outage" />
+
+---
+
+## 5. Các bước xử lý chi tiết
+
+### Bước 1: Xác minh cảnh báo (Loại trừ báo giả)
+- **Hành động của SP**:
+  1. Khi nhận cảnh báo PRTG: Lập tức mở cửa sổ dòng lệnh gõ `ping <IP_Management_Switch> -t`.
+  2. Thử truy cập qua giao thức Telnet / SSH vào cổng quản trị của Switch.
+- **Đánh giá**:
+  - **Nếu ping và truy cập bình thường**: Đây là cảnh báo giả từ PRTG (do nghẽn sensor hoặc SNMP timeout). Khởi động lại sensor trên PRTG, theo dõi tiếp.
+  - **Nếu không thể ping hoặc telnet**: Sự cố thật $\rightarrow$ Khẩn trương di chuyển vào phòng máy Data Center đến đúng tủ rack chứa switch.
+
+### Bước 2: Quan sát hiện trường & Phân loại sự cố
+Đến trước tủ rack, mở cửa tủ và quan sát hệ thống đèn LED của switch:
+
+#### Tình huống A: Tất cả đèn tín hiệu đều tắt (Sự cố mất nguồn)
+1. Kiểm tra phích cắm nguồn phía sau switch và thanh cắm nguồn PDU.
+2. Cắm chuyển phích cắm nguồn của switch sang một ổ cắm PDU khác (hoặc chuyển sang nguồn B dự phòng).
+3. Thay thế dây nguồn mới nếu dây cũ bị lỏng hoặc đứt ngầm.
+4. Sau khi cắm lại: Quan sát switch khởi động lại, quạt tản nhiệt quay và đèn cổng sáng trở lại.
+
+#### Tình huống B: Đèn cổng sáng đứng đơ hoặc Đèn cổng Trunk bị tắt
+1. **Kiểm tra cổng Uplink / Trunk quang**:
+   - Quan sát đèn cổng quang (SFP) nối lên switch phân phối trung tâm (ví dụ: `DSW-06`).
+   - Nếu đèn port trunk trên switch tủ tắt: Kiểm tra đầu nhảy quang (patch cord) và **thay thế luân phiên module quang SFP dự phòng** có sẵn trong tủ.
+2. **Khởi động lại Switch bị treo phần mềm**:
+   - Nếu đèn trunk vẫn sáng bình thường nhưng switch bị đơ không chuyển tiếp gói tin: Rút nguồn switch, chờ 10 giây và cắm lại để khởi động lại switch.
+
+### Bước 3: Theo dõi sau xử lý ban đầu
+- **Xử lý theo diễn biến**:
+  - **Nếu Switch hoạt động ổn định trở lại**:
+    - Tiếp tục theo dõi trong 30–60 phút.
+    - Bàn giao ca trực tiếp theo tiếp tục theo dõi sát sao.
+    - Soạn email báo cáo nội bộ sự cố cho Trưởng ca và Sales quản lý khách hàng.
+  - **Nếu Switch tiếp tục rớt nguồn, reboot lặp lại hoặc mất kết nối lần nữa**: Thiết bị phần cứng đã bị hỏng linh kiện $\rightarrow$ Kích hoạt ngay phương án thay thế phần cứng ở Bước 4.
+
+### Bước 4: Quy trình thay thế Switch dự phòng (Cisco SG300)
+<Callout title="Kế hoạch dự phòng phòng Core" type="important">
+  Tại phòng Core Data Center luôn có sẵn thiết bị switch dự phòng tiêu chuẩn (Model: **Cisco SG300**) đã được dán nhãn sẵn sàng thay thế khẩn cấp.
+</Callout>
+
+1. **Chuẩn bị thiết bị**: Xuống phòng Core lấy switch SG300 dự phòng mang lên tủ rack gặp sự cố.
+2. **Cấu hình Switch Backup**:
+   - Dùng cáp Console cắm vào switch SG300.
+   - Nạp cấu hình VLAN tương ứng theo sơ đồ cổng của switch cũ (căn cứ theo tài liệu hướng dẫn cấu hình SG300 tại kho tài liệu nội bộ).
+   - Đặt IP Management và khai báo cổng Uplink Trunk.
+3. **Thay thế vật lý**:
+   - Tháo switch cũ ra khỏi tủ rack. Lắp switch SG300 vào vị trí.
+   - Cắm lại dây cáp mạng của các máy chủ khách hàng theo đúng thứ tự cổng (Port-to-Port).
+   - Cắm lại dây nhảy cổng Trunk.
+4. **Phối hợp & Kiểm tra**:
+   - Liên hệ ngay với **NOC Team** để kiểm tra bảng MAC Address và thông tuyến từ Core xuống switch mới.
+   - Kiểm tra trạng thái ping toàn bộ máy chủ trong tủ rack xem đã online đầy đủ chưa.
+
+### Bước 5: Báo cáo & Bàn giao thiết bị lỗi
+- **Hành động của SP**:
+  1. Gán nhãn lỗi lên switch cũ, mang về phòng bảo hành để kiểm tra sửa chữa nguồn/bo mạch.
+  2. Gửi email báo cáo tổng kết sự cố: Thời gian bắt đầu mất kết nối, thời gian thay thế hoàn tất, danh sách khách hàng bị ảnh hưởng.
+  3. Đóng ticket sự cố.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Không tìm thấy file backup cấu hình của switch cũ** | Liên hệ NOC Team trích xuất cấu hình đã lưu trên hệ thống backup tự động của ODS hoặc cấu hình nhanh dựa trên thông tin VLAN ghi chú tại tủ rack. |
+| **Switch SG300 dự phòng không đủ số lượng cổng cắm** | Tạm thời ưu tiên cắm các máy chủ quan trọng có hợp đồng cam kết SLA cao trước, sau đó phối hợp NOC lấy thêm switch phụ để đấu nối phần còn lại. |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Kiểm tra & Chẩn đoán kết nối mạng](/internal/network/runbooks/network-troubleshooting)
+- [Quy trình khởi động lại Server, Thiết bị](/internal/data-center/processes/reboot-server)
+- [Sơ đồ hệ thống Network](/internal/network/knowledge-base/topology)

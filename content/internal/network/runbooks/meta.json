@@ -1,0 +1,13 @@
+{
+  "title": "Xử lý sự cố",
+  "description": "Các runbook xử lý sự cố kết nối, tấn công DDoS, Blacklist và thiết bị mạng.",
+  "pages": [
+    "index",
+    "network-troubleshooting",
+    "switch-outage",
+    "leased-line-issues",
+    "ddos-mitigation",
+    "ip-blacklist",
+    "abuse-malware"
+  ]
+}

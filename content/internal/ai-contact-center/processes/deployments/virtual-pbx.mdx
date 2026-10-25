@@ -16,7 +16,7 @@ Mở Ticket yêu cầu triển khai từ Sales trên hệ thống Support Desk v
 
 | Thông số | Giá trị chuẩn / Định dạng | Mục đích sử dụng |
 | :--- | :--- | :--- |
-| **Mã dịch vụ (MDV)** | `VTPxxxxxxx` (Ví dụ: `VTP0004767`) | Định danh dịch vụ trên ERP Odoo và Portal Support |
+| **Mã dịch vụ (MDV)** | `VTPxxxxxxx` (Ví dụ: `VTP0000001`) | Định danh dịch vụ trên ERP Odoo và Portal Support |
 | **Gói dịch vụ** | Tổng Đài Ảo | Xác định số lượng máy nhánh và tính năng kích hoạt |
 | **Kịch bản cuộc gọi** | Sơ đồ luồng thoại (IVR, Ring Group, Time Condition) | Cấu hình định tuyến cuộc gọi vào và gọi ra |
 | **Đầu số kết nối (DID)** | Số điện thoại Hotline doanh nghiệp | Đấu nối Trunk viễn thông |
@@ -32,19 +32,19 @@ Mở Ticket yêu cầu triển khai từ Sales trên hệ thống Support Desk v
 
 #### 2.1. Cập nhật thông số kỹ thuật trên ERP Online (Odoo)
 1. Đăng nhập hệ thống [ERP Online ODS](https://erponline.ods.vn) → Truy cập phân hệ **Services** (`sale.service`).
-2. Tìm kiếm theo **Mã dịch vụ** (Ví dụ: `VTP0004767`).
+2. Tìm kiếm theo **Mã dịch vụ** (Ví dụ: `VTP0000001`).
 3. Mở chi tiết bản ghi dịch vụ và kiểm tra thông tin hợp đồng.
 4. Nhấn nút **START** (góc trên bên trái) để kích hoạt chuyển trạng thái dịch vụ sang hoạt động.
 
-![Trang chi tiết dịch vụ trên Odoo và nút START](/media/ai-contact-center/virtual-pbx/odoo_service_start.png)
+> Ảnh giao diện đã được gỡ để bảo vệ dữ liệu khách hàng. Chỉ bổ sung ảnh demo đã được làm sạch và duyệt.
 
 #### 2.2. Khởi tạo mật khẩu & Gửi thông tin cho khách hàng
-1. Tại giao diện dịch vụ trên Odoo, nhấp chuột vào tên **Khách hàng** (Ví dụ: `[ODS013394] CÔNG TY CỔ PHẦN BAO BÌ SẮC MÀU`) để chuyển sang trang hồ sơ đối tác (`res.partner`).
+1. Tại giao diện dịch vụ trên Odoo, nhấp chuột vào tên **Khách hàng** (Ví dụ: `[MÃ_KH_DEMO] KHÁCH HÀNG DEMO`) để chuyển sang trang hồ sơ đối tác (`res.partner`).
 2. Nhấn nút **GENERATE PASSWORD** trên thanh công cụ:
-   - Hệ thống tự động sinh mật khẩu ngẫu nhiên an toàn và gửi thông báo trực tiếp về **Email** đã đăng ký của khách hàng (Ví dụ: `thanhkdsm@gmail.com`).
-3. **Lưu ý nghiệp vụ bắt buộc**: Copy chuỗi mật khẩu vừa sinh và nhấp vào mục **Log an internal note** phía dưới trang khách hàng để lưu lại mật khẩu nội bộ. Việc này giúp đối soát và hỗ trợ khách hàng nhanh chóng khi cần tra cứu lại.
+   - Hệ thống tự động sinh mật khẩu ngẫu nhiên an toàn và gửi thông báo trực tiếp về **Email** đã đăng ký của khách hàng (Ví dụ: `admin@example.com`).
+3. **Bảo mật**: Không lưu mật khẩu dạng rõ trong ticket hoặc ghi chú Odoo. Bàn giao qua kênh được phê duyệt; ticket chỉ ghi nhận việc đã bàn giao, không chứa bí mật.
 
-![Trang khách hàng với nút GENERATE PASSWORD và Log an internal note](/media/ai-contact-center/virtual-pbx/odoo_generate_password.png)
+> Ảnh giao diện đã được gỡ để bảo vệ dữ liệu khách hàng. Chỉ bổ sung ảnh demo đã được làm sạch và duyệt.
 
 ---
 
@@ -54,24 +54,24 @@ Mở Ticket yêu cầu triển khai từ Sales trên hệ thống Support Desk v
 1. Đăng nhập hệ thống [Support Portal ODS](https://supportportal.matbao.one/).
 2. Điều hướng vào menu **CloudFone** → Chọn **Danh sách tổng đài chưa sử dụng** (`/ServerCloudfone/CloudFoneManage/AddIPWan`).
 3. Hệ thống hiển thị danh sách các địa chỉ IP WAN khả dụng:
-   - Chọn một địa chỉ IP bất kỳ trong danh sách (Ví dụ: `103.129.90.254`).
+   - Chọn một địa chỉ IP bất kỳ trong danh sách (Ví dụ: `192.0.2.10`).
    - Nhấp vào icon **Cấp phát** (biểu tượng thứ 3 tại cột *Thao tác*) để mở popup cấu hình.
 
-![Danh sách IP tổng đài chưa sử dụng trên Portal](/media/ai-contact-center/virtual-pbx/portal_unused_ips.png)
+> Ảnh giao diện đã được gỡ để bảo vệ dữ liệu khách hàng. Chỉ bổ sung ảnh demo đã được làm sạch và duyệt.
 
 #### 3.2. Cấp phát và đồng bộ dữ liệu dịch vụ
 1. Trong popup **Tìm dịch vụ**:
-   - Nhập Mã dịch vụ (Ví dụ: `VTP0004767`) vào ô **Từ khóa**.
+   - Nhập Mã dịch vụ (Ví dụ: `VTP0000001`) vào ô **Từ khóa**.
    - Nhấn nút **Kiểm tra** để hệ thống truy vấn và lấy thông tin gói cước từ Odoo.
 2. Kiểm tra các trường dữ liệu hiển thị tự động:
-   - **IP**: Địa chỉ IP đã chọn (Ví dụ: `103.129.90.254`).
-   - **Domain**: Đổi tương tự IP (103.129.90.254).
+   - **IP**: Địa chỉ IP đã chọn (Ví dụ: `192.0.2.10`).
+   - **Domain**: Đối chiếu domain được cấp theo dịch vụ; không tự thay domain bằng địa chỉ IP.
    - **Tên đăng nhập**: Mặc định là `admin`.
    - **Mật khẩu**: Mật khẩu quản trị tổng đài.
-   - **Dịch vụ**: Khớp đúng tên gói (Ví dụ: `VTP0004767 - Tổng Đài Ảo Start Up`).
+   - **Dịch vụ**: Khớp đúng tên gói (Ví dụ: `VTP0000001 - Tổng Đài Ảo Start Up`).
 3. Sau khi xác nhận thông tin chính xác, nhấn **Lưu** để hệ thống tiến hành cấp phát tài nguyên và khởi tạo cơ sở dữ liệu tổng đài.
 
-![Popup Cấp phát dịch vụ tổng đài trên Portal](/media/ai-contact-center/virtual-pbx/portal_allocate_service.png)
+> Ảnh giao diện đã được gỡ để bảo vệ dữ liệu khách hàng. Chỉ bổ sung ảnh demo đã được làm sạch và duyệt.
 
 ---
 
@@ -79,7 +79,7 @@ Mở Ticket yêu cầu triển khai từ Sales trên hệ thống Support Desk v
 
 #### 4.1. Định vị tổng đài vừa khởi tạo
 1. Trên Support Portal, vào menu **CloudFone** → Chọn **Danh sách tổng đài** (`/ServerCloudfone/CloudFoneManage/Index`).
-2. Nhập mã dịch vụ `VTP0004767` vào ô tìm kiếm để định vị tổng đài vừa tạo.
+2. Nhập mã dịch vụ `VTP0000001` vào ô tìm kiếm để định vị tổng đài vừa tạo.
 
 #### 4.2. Cấu hình kịch bản theo yêu cầu Ticket
 1. Mở trình duyệt, truy cập vào giao diện quản trị tổng đài vừa cấp.

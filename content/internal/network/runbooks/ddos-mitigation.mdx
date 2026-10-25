@@ -3,6 +3,10 @@ title: Xử lý sự cố tấn công từ chối dịch vụ (DDoS)
 description: Hướng dẫn chẩn đoán lưu lượng bất thường, sniff gói tin, cô lập chặn hướng quốc tế và theo dõi phục hồi sau khi mở chặn.
 ---
 
+<Callout title="Trạng thái xác nhận quy trình" type="warn">
+Bản biên soạn từ tài liệu nguồn, chưa phải xác nhận chính sách hiện hành. Trước thao tác ảnh hưởng dịch vụ, phải xác nhận phạm vi, thẩm quyền và phương án xử lý với người phụ trách. Các thời hạn, biện pháp chặn/mở hoặc thông số tài khoản trong nguồn không tự trở thành quy định đã được phê duyệt. Lưu đồ cũng chịu cùng giới hạn này.
+</Callout>
+
 Runbook này hướng dẫn quy trình tiêu chuẩn dành cho nhân viên Support khi phát hiện hoặc tiếp nhận phản ánh về các cuộc tấn công từ chối dịch vụ phân tán (DDoS) nhắm vào địa chỉ IP máy chủ của khách hàng đặt tại ODS.
 
 ---
@@ -55,7 +59,7 @@ Trước khi thực hiện can thiệp kỹ thuật, Support bắt buộc phải
   - Truy cập công cụ giám sát hoặc bắt gói tin trên cổng switch/vlan của máy chủ.
   - Phân tích mẫu lưu lượng: Kiểm tra số lượng request/packet bất thường, tỷ lệ gói tin SYN, UDP, ICMP hoặc các request dồn dập từ hàng nghìn IP quốc tế khác nhau.
 - **Đánh giá kết quả**:
-  - **Không có dấu hiệu bất thường**: Băng thông trong giới hạn bình thường, không có flood. Phản hồi kết quả phân tích cho khách hàng kèm hình ảnh lưu lượng $\rightarrow$ Đóng case.
+  - **Không có dấu hiệu bất thường**: Băng thông trong giới hạn bình thường, không có flood. Phản hồi kết quả phân tích cho khách hàng kèm hình ảnh lưu lượng → Đóng case.
   - **Phát hiện lưu lượng tấn công xấu**: Chuyển sang Bước 2.
 
 ### Bước 2: Chụp ảnh bằng chứng kỹ thuật
@@ -64,11 +68,11 @@ Trước khi thực hiện can thiệp kỹ thuật, Support bắt buộc phải
 
 ### Bước 3: Thực hiện cô lập — Chặn lưu lượng hướng Quốc tế
 <Callout title="Nguyên tắc xử lý an toàn mạng" type="warn">
-  Để bảo vệ hạ tầng mạng chung và không làm gián đoạn các khách hàng khác trong cùng Data Center, Support thực hiện **chặn luồng truy cập hướng Quốc tế (Block International Traffic)** nhắm vào địa chỉ IP bị tấn công.
+  Để bảo vệ hạ tầng mạng chung và không làm gián đoạn các khách hàng khác trong cùng Data Center, nguồn mô tả **chặn luồng truy cập hướng Quốc tế (Block International Traffic)** nhắm vào IP bị tấn công. Chỉ can thiệp khi NOC/người phụ trách xác nhận điều kiện và thẩm quyền; đây không phải ủy quyền mặc định cho Support.
 </Callout>
 
 - **Hành động của SP**:
-  - Áp dụng rule chặn hướng Quốc tế cho địa chỉ IP bị tấn công trên hệ thống tường lửa / bộ định tuyến Core theo quy định vận hành.
+  - Sau xác nhận của người phụ trách, áp dụng rule chặn hướng Quốc tế cho địa chỉ IP bị tấn công trên hệ thống tường lửa / bộ định tuyến Core theo quy định vận hành.
   - Giữ kết nối trong nước hoạt động để khách hàng vẫn có thể truy cập quản trị máy chủ qua mạng nội địa hoặc VPN trong nước.
 
 ### Bước 4: Xác định khách hàng & Gửi email thông báo
@@ -85,17 +89,17 @@ Biện pháp chặn hướng quốc tế sẽ được dỡ bỏ theo một tron
 
 | Điều kiện dỡ bỏ chặn | Thời điểm thực hiện | Ghi chú |
 | :--- | :--- | :--- |
-| **Khách hàng yêu cầu mở lại** | Mở ngay sau khi tiếp nhận yêu cầu hợp lệ qua email ticket. | Khách hàng xác nhận đã rà soát hoặc sẵn sàng bật CDN/WAF bảo vệ. |
-| **Khách hàng Mắt Bão** | Tự động dỡ bỏ sau **3 ngày** kể từ thời điểm chặn. | Căn cứ theo quy định phối hợp hạ tầng. |
-| **Các khách hàng khác** | Tự động dỡ bỏ sau **7 ngày** kể từ thời điểm chặn. | Áp dụng khi khách hàng không có yêu cầu mở sớm hơn. |
+| **Khách hàng yêu cầu mở lại** | Xác nhận điều kiện và thẩm quyền trước khi mở; không coi yêu cầu là phê duyệt tự động. | Khách hàng xác nhận đã rà soát hoặc sẵn sàng bật CDN/WAF bảo vệ. |
+| **Khách hàng Mắt Bão** | Nguồn cũ ghi **3 ngày**; chỉ áp dụng sau khi người phụ trách xác nhận. | Căn cứ theo quy định phối hợp hạ tầng. |
+| **Các khách hàng khác** | Nguồn cũ ghi **7 ngày**; chỉ áp dụng sau khi người phụ trách xác nhận. | Áp dụng khi khách hàng không có yêu cầu mở sớm hơn. |
 
 ### Bước 6: Theo dõi sau khi mở chặn & Đóng ticket
 - **Hành động của SP**:
-  - Sau khi dỡ bỏ lệnh chặn, Support tiếp tục theo dõi lưu lượng mạng của địa chỉ IP này trong vòng **60 phút đến 24 giờ**.
+  - Sau khi dỡ bỏ lệnh chặn, Support tiếp tục theo dõi lưu lượng mạng của địa chỉ IP này theo khoảng thời gian và tiêu chí được NOC/người phụ trách xác nhận; nguồn hiện có chưa quy định một khoảng theo dõi chung.
 - **Xử lý theo tình huống**:
   - **Tình huống 1: Cuộc tấn công tiếp diễn (Tiếp tục bị DDoS)**:
     - Băng thông quốc tế lập tức tăng vọt trở lại ngay khi vừa mở.
-    - Thực hiện **chặn lại ngay lập tức** hướng quốc tế cho IP.
+    - Báo NOC/người phụ trách xác nhận biện pháp cô lập lại theo quyền và điều kiện đã được duyệt.
     - Gửi email thông báo tiếp tục áp dụng biện pháp cô lập cho khách hàng.
   - **Tình huống 2: Lưu lượng trở lại bình thường**:
     - Dịch vụ hoạt động ổn định, không còn dấu hiệu tấn công flood.

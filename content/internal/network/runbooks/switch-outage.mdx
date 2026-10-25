@@ -3,6 +3,10 @@ title: Xử lý sự cố Switch tủ Rack
 description: Hướng dẫn chẩn đoán cảnh báo mất kết nối switch từ PRTG, phân biệt báo giả, xử lý rớt nguồn, lỗi cổng trunk và quy trình thay thế switch dự phòng SG300.
 ---
 
+<Callout title="Trạng thái xác nhận quy trình" type="warn">
+Bản biên soạn từ tài liệu nguồn, chưa phải xác nhận chính sách hiện hành. Trước thao tác ảnh hưởng dịch vụ, phải xác nhận phạm vi, thẩm quyền và phương án xử lý với người phụ trách. Các thời hạn, biện pháp chặn/mở hoặc thông số tài khoản trong nguồn không tự trở thành quy định đã được phê duyệt. Lưu đồ cũng chịu cùng giới hạn này.
+</Callout>
+
 Runbook này hướng dẫn nhân viên Support thực hiện quy trình ứng cứu khẩn cấp khi hệ thống giám sát cảnh báo mất kết nối Switch tầng/tủ Rack tại Trung tâm dữ liệu, bao gồm kiểm tra nguồn, cổng trunk quang và thay thế switch dự phòng.
 
 ---
@@ -47,7 +51,7 @@ Runbook này hướng dẫn nhân viên Support thực hiện quy trình ứng c
   2. Thử truy cập qua giao thức Telnet / SSH vào cổng quản trị của Switch.
 - **Đánh giá**:
   - **Nếu ping và truy cập bình thường**: Đây là cảnh báo giả từ PRTG (do nghẽn sensor hoặc SNMP timeout). Khởi động lại sensor trên PRTG, theo dõi tiếp.
-  - **Nếu không thể ping hoặc telnet**: Sự cố thật $\rightarrow$ Khẩn trương di chuyển vào phòng máy Data Center đến đúng tủ rack chứa switch.
+  - **Nếu không thể ping hoặc telnet**: Sự cố thật → Khẩn trương di chuyển vào phòng máy Data Center đến đúng tủ rack chứa switch.
 
 ### Bước 2: Quan sát hiện trường & Phân loại sự cố
 Đến trước tủ rack, mở cửa tủ và quan sát hệ thống đèn LED của switch:
@@ -68,10 +72,10 @@ Runbook này hướng dẫn nhân viên Support thực hiện quy trình ứng c
 ### Bước 3: Theo dõi sau xử lý ban đầu
 - **Xử lý theo diễn biến**:
   - **Nếu Switch hoạt động ổn định trở lại**:
-    - Tiếp tục theo dõi trong 30–60 phút.
+    - Tiếp tục theo dõi theo khoảng thời gian và tiêu chí do NOC/người phụ trách xác nhận; tài liệu nguồn không nêu mốc phút cố định.
     - Bàn giao ca trực tiếp theo tiếp tục theo dõi sát sao.
     - Soạn email báo cáo nội bộ sự cố cho Trưởng ca và Sales quản lý khách hàng.
-  - **Nếu Switch tiếp tục rớt nguồn, reboot lặp lại hoặc mất kết nối lần nữa**: Thiết bị phần cứng đã bị hỏng linh kiện $\rightarrow$ Kích hoạt ngay phương án thay thế phần cứng ở Bước 4.
+  - **Nếu Switch tiếp tục rớt nguồn, reboot lặp lại hoặc mất kết nối lần nữa**: Thiết bị phần cứng đã bị hỏng linh kiện → Kích hoạt ngay phương án thay thế phần cứng ở Bước 4.
 
 ### Bước 4: Quy trình thay thế Switch dự phòng (Cisco SG300)
 <Callout title="Kế hoạch dự phòng phòng Core" type="important">

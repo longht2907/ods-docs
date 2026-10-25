@@ -3,6 +3,10 @@ title: Xử lý địa chỉ IP bị dính Blacklist
 description: Hướng dẫn quy trình gỡ bỏ IP khỏi danh sách đen Barracuda, Spamhaus, thông báo khách hàng xử lý mã nguồn và chính sách khóa vĩnh viễn khi tái phạm lần 2.
 ---
 
+<Callout title="Trạng thái xác nhận quy trình" type="warn">
+Bản biên soạn từ tài liệu nguồn, chưa phải xác nhận chính sách hiện hành. Trước thao tác ảnh hưởng dịch vụ, phải xác nhận phạm vi, thẩm quyền và phương án xử lý với người phụ trách. Các thời hạn, biện pháp chặn/mở hoặc thông số tài khoản trong nguồn không tự trở thành quy định đã được phê duyệt. Lưu đồ cũng chịu cùng giới hạn này.
+</Callout>
+
 Runbook này hướng dẫn quy trình tiêu chuẩn dành cho nhân viên Support khi nhận được cảnh báo hoặc phát hiện địa chỉ IP / Range IP của khách hàng đặt tại ODS bị các tổ chức an ninh mạng quốc tế (Spamhaus, Barracuda Reputation...) đưa vào danh sách đen (Blacklist) do phát tán thư rác (spam mail), mã độc hoặc tấn công mạng.
 
 ---
@@ -76,8 +80,8 @@ Tùy theo tổ chức ghi nhận, Support tiến hành thủ tục gỡ bỏ ban
 
 ### Bước 4: Theo dõi & Áp dụng chế tài theo chính sách ODS
 <Callout title="CHÍNH SÁCH CHẾ TÀI BLACKLIST BẮT BUỘC" type="warn">
-  1. **Khóa Quốc tế sau 3 ngày**: Nếu sau 3 ngày kể từ khi gửi thông báo mà khách hàng không phản hồi hoặc không xử lý triệt để nguyên nhân phát tán $\rightarrow$ Support thực hiện cấu hình **chặn kết nối hướng Quốc tế** của địa chỉ IP đó.
-  2. **KHÓA VĨNH VIỄN KHI TÁI PHẠM LẦN 2**: Đối với các địa chỉ IP bị dính Blacklist lần thứ 2 sau khi đã được hỗ trợ xử lý và mở lại trước đó $\rightarrow$ **Áp dụng biện pháp KHÓA VĨNH VIỄN** tài nguyên IP này, không hỗ trợ gỡ thêm và chuyển thông tin cho Sales làm việc thu hồi IP.
+  1. **Khóa Quốc tế sau 3 ngày**: Nếu sau 3 ngày kể từ khi gửi thông báo mà khách hàng không phản hồi hoặc không xử lý triệt để nguyên nhân phát tán → Support thực hiện cấu hình **chặn kết nối hướng Quốc tế** của địa chỉ IP đó.
+  2. **KHÓA VĨNH VIỄN KHI TÁI PHẠM LẦN 2**: Đối với các địa chỉ IP bị dính Blacklist lần thứ 2 sau khi đã được hỗ trợ xử lý và mở lại trước đó → **Áp dụng biện pháp KHÓA VĨNH VIỄN** tài nguyên IP này, không hỗ trợ gỡ thêm và chuyển thông tin cho Sales làm việc thu hồi IP.
 </Callout>
 
 ### Bước 5: Đóng ticket & Cập nhật nhật ký

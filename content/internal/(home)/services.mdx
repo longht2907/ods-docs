@@ -11,7 +11,7 @@ Khi tiếp nhận yêu cầu từ khách hàng, nhân viên Support cần xác �
 
 ## 1. Dịch vụ Trung tâm dữ liệu (Data Center / IDC)
 
-Dịch vụ cung cấp không gian đặt máy chủ, tủ rack và hạ tầng vận hành tại các Trung tâm dữ liệu (Data Center) đạt tiêu chuẩn Tier 3 tại Việt Nam (Viettel, VNPT, FPT...).
+Dịch vụ cung cấp không gian đặt máy chủ, tủ rack và hạ tầng vận hành tại Data Center theo phạm vi dịch vụ và hợp đồng đã xác nhận.
 
 ### Nhu cầu sử dụng
 - Doanh nghiệp sở hữu thiết bị phần cứng máy chủ riêng nhưng cần môi trường vận hành chuyên nghiệp (nguồn điện ổn định, UPS dự phòng, máy phát điện, điều hòa làm mát công nghiệp, bảo mật vật lý 24/7).
@@ -19,7 +19,7 @@ Dịch vụ cung cấp không gian đặt máy chủ, tủ rack và hạ tầng 
 
 ### Các thành phần Support cần nhận diện
 - **Thuê chỗ đặt máy chủ (Colocation)**: Phân theo không gian lắp đặt (1U, 2U, 4U...) hoặc dạng tháp (Tower). Mỗi vị trí được cấp nguồn điện cơ bản, cổng mạng switch và địa chỉ IPv4 WAN.
-- **Thuê tủ Rack (Rack Colocation)**: Thuê trọn gói nửa tủ (21U) hoặc nguyên tủ (42U) kèm tổng công suất điện (PDU, Ampe) và dải IP riêng.
+- **Thuê tủ Rack (Rack Colocation)**: Thuê nửa/nguyên rack theo số U, nguồn điện và phạm vi kết nối trong hợp đồng; không suy ra cấu hình chỉ từ tên rack.
 - **Máy chủ dùng riêng (Dedicated Server)**: ODS cung cấp cả phần cứng máy chủ (CPU, RAM, Ổ cứng SAS/SSD/NVMe, RAID card, iDRAC/iLO) đặt tại Data Center.
 
 ### Thông tin cần tra cứu khi tiếp nhận yêu cầu
@@ -39,9 +39,9 @@ Dịch vụ cung cấp đường truyền internet, kênh truyền số liệu b
 - Kết nối bảo mật điểm - điểm hoặc đa điểm giữa các chi nhánh công ty về trung tâm dữ liệu.
 
 ### Các thành phần Support cần nhận diện
-- **Internet Shared**: Băng thông chia sẻ dùng chung cho máy chủ đặt tại Data Center (cổng 100Mbps / 1Gbps / 10Gbps, cam kết băng thông quốc tế và trong nước).
-- **Internet Dedicated / Leased Line**: Kênh truyền internet chuyên dụng với băng thông cố định đối xứng (1:1), cam kết chất lượng dịch vụ SLA cao.
-- **MPLS / VPN / Metronet**: Kênh truyền số liệu bảo mật nội bộ kết nối trực tiếp các văn phòng của khách hàng về Data Center.
+- **Internet Shared**: Băng thông chia sẻ dùng chung cho máy chủ đặt tại Data Center (cổng 100Mbps / 1Gbps / 10Gbps, giới hạn lưu lượng theo gói; không mặc định là băng thông cam kết riêng).
+- **Internet Dedicated / Leased Line**: Hai loại dịch vụ cần phân biệt theo điểm đấu nối và hợp đồng; đối chiếu băng thông trong nước/quốc tế, không mặc định đối xứng hoặc cùng SLA.
+- **MPLS / VPN**: Kênh truyền số liệu bảo mật nội bộ kết nối trực tiếp các văn phòng của khách hàng về Data Center.
 - **Địa chỉ IP tĩnh (Static IP Address)**: Các block dải IP công cộng (/32, /30, /29, /28...) cấp phát cho máy chủ hoặc hạ tầng mạng.
 
 ### Thông tin cần tra cứu khi tiếp nhận yêu cầu
@@ -64,7 +64,7 @@ Cung cấp tài nguyên tính toán, lưu trữ và hạ tầng ảo hóa linh h
 ### Các thành phần Support cần nhận diện
 - **Cloud Server / VPS**: Máy chủ ảo hóa phân vùng từ cụm máy chủ vật lý, độc lập hệ điều hành, hỗ trợ cấu hình tùy biến vCPU, RAM và dung lượng ổ cứng (SSD/NVMe).
 - **Private Cloud**: Cụm hạ tầng ảo hóa dành riêng cho một doanh nghiệp, cô lập tài nguyên phần cứng và mạng ảo hóa.
-- **Cloud Storage / Cloud Files**: Dịch vụ lưu trữ dữ liệu dung lượng lớn, hỗ trợ giao thức S3-compatible hoặc chia sẻ tệp tin trực tuyến.
+- **Cloud Files**: Lưu trữ, chia sẻ dữ liệu doanh nghiệp theo phân quyền. Không mặc định có giao thức S3; kiểm tra tính năng được cấp theo dịch vụ.
 
 ### Thông tin cần tra cứu khi tiếp nhận yêu cầu
 - Thông số gói: Số lượng vCPU, dung lượng RAM, dung lượng và loại Disk (OS / Data).

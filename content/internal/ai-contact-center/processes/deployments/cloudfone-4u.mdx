@@ -25,7 +25,7 @@ Mở Ticket yêu cầu triển khai từ Sales trên hệ thống Support Desk v
 | **Kịch bản cuộc gọi** | Sơ đồ luồng thoại vào và cơ chế thẻ cước gọi ra | Cấu hình định tuyến và Dialplan |
 | **Danh sách máy nhánh** | Dải số nội bộ (Ví dụ: `1000329`, `1000330`,...) | Cấp phát tài khoản SIP cho trường học |
 | **Đầu số kết nối (DID)** | Số Hotline trường học (VNPT, Viettel, FPT, CMC,...) | Cấu hình Inbound / Outbound Trunk |
-| **Máy chủ Core PBX** | IP Server PBX Core: `172.16.123.239` | Nền tảng vận hành CloudFone Share |
+| **Máy chủ Core PBX** | IP Server PBX Core: `PBX_CORE_HOST` | Nền tảng vận hành CloudFone Share |
 
 - **Quy tắc kiểm tra**:
   - Mã dịch vụ bắt buộc phải có tiền tố `CF-4U`. Nếu sai mã hoặc thuộc nhóm dịch vụ khác → Phản hồi trên Ticket yêu cầu Sales làm rõ.
@@ -39,27 +39,27 @@ Mở Ticket yêu cầu triển khai từ Sales trên hệ thống Support Desk v
 1. Đăng nhập hệ thống [ERP Online ODS](https://erponline.ods.vn) → Truy cập phân hệ **Services** (`sale.service`).
 2. Tìm kiếm theo **Mã dịch vụ** (Ví dụ: `CF-4U0000012`).
 
-![Danh sách dịch vụ trên ERP Online Odoo](/media/ai-contact-center/cloudfone-4u/odoo_services_list.png)
+> Ảnh giao diện đã được gỡ để bảo vệ dữ liệu khách hàng. Chỉ bổ sung ảnh demo đã được làm sạch và duyệt.
 
 3. Mở chi tiết dịch vụ và điền các trường kỹ thuật:
-   - **IP**: Nhập IP máy chủ Core tổng đài: `172.16.123.239`.
+   - **IP**: Nhập IP máy chủ Core tổng đài: `PBX_CORE_HOST`.
    - **Sub IP**: Nhập danh sách đầu số Hotline gắn với dịch vụ.
 4. Chuyển trạng thái dịch vụ sang **Active** (Kích hoạt).
 
-![Chi tiết thông tin cấu hình dịch vụ trên Odoo](/media/ai-contact-center/cloudfone-4u/odoo_service_detail.png)
+> Ảnh giao diện đã được gỡ để bảo vệ dữ liệu khách hàng. Chỉ bổ sung ảnh demo đã được làm sạch và duyệt.
 
 #### 2.2. Khởi tạo tổng đài trên Portal Support
 1. Đăng nhập hệ thống [Support Portal ODS](https://supportportal.matbao.one/) (hoặc `http://supportsoftphone.cloudfone.vn/`).
 2. Vào menu **CloudFone** → Chọn **CloudFone Share**.
 
-![Danh sách CloudFone Share trên Portal Quản trị](/media/ai-contact-center/cloudfone-4u/portal_cloudfone_share_list.png)
+> Ảnh giao diện đã được gỡ để bảo vệ dữ liệu khách hàng. Chỉ bổ sung ảnh demo đã được làm sạch và duyệt.
 
 3. Nhấp nút **+ Thêm dịch vụ**:
    - Nhập **Mã dịch vụ** (Ví dụ: `CF-4U0000012`) vào ô từ khóa tra cứu.
    - Chọn Core tổng đài tương ứng và nhấn nút **Kiểm tra** để hệ thống truy vấn thông tin gói cước.
    - Sau khi hệ thống xác thực dữ liệu thành công, nhấn **Lưu** để khởi tạo máy nhánh và cơ sở dữ liệu tổng đài.
 
-![Form thêm mới dịch vụ CloudFone Share trên Portal](/media/ai-contact-center/cloudfone-4u/portal_cloudfone_add_form.png)
+> Ảnh giao diện đã được gỡ để bảo vệ dữ liệu khách hàng. Chỉ bổ sung ảnh demo đã được làm sạch và duyệt.
 
 ---
 
@@ -68,7 +68,7 @@ Mở Ticket yêu cầu triển khai từ Sales trên hệ thống Support Desk v
 Học sinh gọi ra ngoài bằng thẻ cước cá nhân (`cardnumber`), do đó máy nhánh phải được chuyển sang context kiểm tra thẻ trước khi đẩy vào luồng cước tổng đài.
 
 #### 3.1. Đổi Context trên giao diện FreePBX
-1. Truy cập Web GUI FreePBX Core tại địa chỉ `http://172.16.123.239/admin/`.
+1. Truy cập Web GUI FreePBX Core tại địa chỉ `http://PBX_CORE_HOST/admin/`.
 2. Vào mục **Applications** → **Extensions**.
 3. Chọn số máy nhánh nội bộ của dịch vụ (Ví dụ: `1000329`).
 4. Tại tab **Advanced**, đổi giá trị trường **Context** từ `from-internal` thành:
@@ -78,7 +78,7 @@ Học sinh gọi ra ngoài bằng thẻ cước cá nhân (`cardnumber`), do đ�
 5. Nhấn **Submit** và **Apply Config**.
 
 #### 3.2. Cấu hình Dialplan kiểm tra thẻ cước trong Asterisk
-1. SSH vào máy chủ tổng đài Core `172.16.123.239` bằng quyền root.
+1. SSH vào máy chủ tổng đài Core `PBX_CORE_HOST` bằng tài khoản được cấp quyền theo quy trình vận hành.
 2. Mở file cấu hình Dialplan tùy biến `/etc/asterisk/extensions_override_private.conf`:
    ```bash
    nano /etc/asterisk/extensions_override_private.conf
@@ -100,10 +100,7 @@ Học sinh gọi ra ngoài bằng thẻ cước cá nhân (`cardnumber`), do đ�
   - Nếu `${cardnumber}` có dữ liệu hợp lệ → Cuộc gọi được chuyển tiếp (`Goto`) vào context cước `${mdv}` để thực hiện gọi ra ngoài.
 </Callout>
 
-4. Lưu file và reload lại Dialplan:
-   ```bash
-   asterisk -rx 'dialplan reload'
-   ```
+4. Trước khi áp dụng: xác nhận quyền thay đổi, sao lưu và phương án hoàn tác với người phụ trách. Cách áp dụng/reload chưa được tài liệu nguồn xác nhận; dừng tại đây nếu chưa có hướng dẫn được duyệt.
 
 ---
 
@@ -112,7 +109,7 @@ Học sinh gọi ra ngoài bằng thẻ cước cá nhân (`cardnumber`), do đ�
 #### 4.1. Tạo Domain dịch vụ
 1. Yêu cầu bộ phận System khởi tạo bản ghi DNS theo định dạng:
    - **Tên miền**: `cf-4uxxxxxx.cloudfone.vn` (Ví dụ: `cf-4u0000012.cloudfone.vn`).
-   - Bản ghi `A` trỏ về IP PBX Core: `172.16.123.239`.
+   - Bản ghi `A` trỏ về IP PBX Core: `PBX_CORE_HOST`.
 2. Kiểm tra phản hồi DNS:
    ```bash
    ping cf-4u0000012.cloudfone.vn
@@ -120,7 +117,7 @@ Học sinh gọi ra ngoài bằng thẻ cước cá nhân (`cardnumber`), do đ�
    *Yêu cầu kết quả phân giải chính xác về địa chỉ IP máy chủ Core.*
 
 #### 4.2. Đấu nối đầu số (Trunk) trên FreePBX & Portal
-1. Truy cập FreePBX `172.16.123.239` → mục **Connectivity** → **Trunks**:
+1. Truy cập FreePBX `PBX_CORE_HOST` → mục **Connectivity** → **Trunks**:
    - Xác định **Trunk Name** của đầu số tương ứng.
    - Xác định tham số thứ tự Trunk (**Parameter Trunk** / ID đầu số).
 2. Đăng nhập Portal Support (`supportportal.matbao.one` hoặc `supportsoftphone.cloudfone.vn`):
@@ -136,7 +133,7 @@ Học sinh gọi ra ngoài bằng thẻ cước cá nhân (`cardnumber`), do đ�
 ### Bước 5: Bàn giao API & Cấu hình IP Phone trường học
 
 #### 5.1. Bàn giao API cho đối tác
-Gửi tài liệu kết nối API, danh sách SIP Extension và Domain dịch vụ cho bộ phận kỹ thuật của Công ty CP Vật tư Bưu điện (`ODS000801`).
+Gửi tài liệu kết nối API, danh sách SIP Extension và Domain dịch vụ cho bộ phận kỹ thuật của đối tác triển khai được xác nhận trên ticket.
 
 #### 5.2. Cấu hình thiết bị IP Phone tại trường học
 Hỗ trợ kỹ thuật cấu hình điện thoại IP Phone (Grandstream, Yealink, Flyingvoice,...):

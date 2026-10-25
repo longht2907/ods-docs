@@ -20,7 +20,7 @@ export const deployCloudfone4uFlow: FlowchartData = {
       subLabel: 'Đúng format CF-4U & có kịch bản',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-yeu-cau-trien-khai-tu-sales-tren-ticket',
+      stepLink: '#bước-1-tiếp-nhận--kiểm-tra-thông-số-triển-khai',
     },
     {
       id: 'step-reject',
@@ -34,10 +34,10 @@ export const deployCloudfone4uFlow: FlowchartData = {
       id: 'step-active-init',
       type: 'step',
       label: 'Bước 2: Active Odoo & Tạo tổng đài trên Portal',
-      subLabel: 'Gán IP Core 172.16.123.239 & Sub IP đầu số',
+      subLabel: 'Gán IP Core PBX_CORE_HOST & Sub IP đầu số',
       row: 3,
       col: 0,
-      stepLink: '#buoc-2-active-dich-vu-odoo-va-khoi-tao-tong-dai-tren-portal',
+      stepLink: '#bước-2-kích-hoạt-dịch-vụ-odoo--khởi-tạo-tổng-đài-trên-portal',
     },
     {
       id: 'step-context-dialplan',
@@ -46,7 +46,7 @@ export const deployCloudfone4uFlow: FlowchartData = {
       subLabel: 'context = from-school & kiểm tra cardnumber',
       row: 4,
       col: 0,
-      stepLink: '#buoc-3-thay-doi-context-may-nhanh-va-cau-hinh-dialplan-freepbx',
+      stepLink: '#bước-3-đổi-context-máy-nhánh--cấu-hình-dialplan-freepbx',
     },
     {
       id: 'step-domain-trunk',
@@ -55,7 +55,7 @@ export const deployCloudfone4uFlow: FlowchartData = {
       subLabel: 'Domain cf-4uxxxxxx.cloudfone.vn & gán DID',
       row: 5,
       col: 0,
-      stepLink: '#buoc-4-tao-domain-va-dau-noi-dau-so-trunk',
+      stepLink: '#bước-4-tạo-domain--đấu-nối-trunk-đầu-số',
     },
     {
       id: 'step-handover-phone',
@@ -64,7 +64,7 @@ export const deployCloudfone4uFlow: FlowchartData = {
       subLabel: 'Bắt buộc khóa phím Dsskey tránh bấm nhầm',
       row: 6,
       col: 0,
-      stepLink: '#buoc-5-ban-giao-api-va-ho-tro-cau-hinh-ip-phone-truong-hoc',
+      stepLink: '#bước-5-bàn-giao-api--cấu-hình-ip-phone-trường-học',
     },
     {
       id: 'dec-test-call',
@@ -125,7 +125,7 @@ export const deployVirtualPbxFlow: FlowchartData = {
       subLabel: 'Đúng format VTP & có kịch bản thoại',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-yeu-cau-trien-khai-tu-sales-tren-ticket',
+      stepLink: '#bước-1-tiếp-nhận-yêu-cầu-triển-khai-từ-sales-trên-ticket',
     },
     {
       id: 'step-reject',
@@ -142,7 +142,7 @@ export const deployVirtualPbxFlow: FlowchartData = {
       subLabel: 'Start dịch vụ, Generate password, Log note',
       row: 3,
       col: 0,
-      stepLink: '#buoc-2-kich-hoat-dich-vu-odoo-va-cap-mat-khau-nguoi-dung',
+      stepLink: '#bước-2-kích-hoạt-dịch-vụ-odoo--cấp-mật-khẩu-người-dùng',
     },
     {
       id: 'step-portal-init',
@@ -151,7 +151,7 @@ export const deployVirtualPbxFlow: FlowchartData = {
       subLabel: 'Cấp phát IP, Kiểm tra mã VTP, Đổi domain, Lưu',
       row: 4,
       col: 0,
-      stepLink: '#buoc-3-khoi-tao-tong-dai-tren-portal-support',
+      stepLink: '#bước-3-khởi-tạo-tổng-đài-trên-portal-support',
     },
     {
       id: 'step-config-script',
@@ -160,7 +160,7 @@ export const deployVirtualPbxFlow: FlowchartData = {
       subLabel: 'Tạo máy nhánh, IVR, Group, Routing',
       row: 5,
       col: 0,
-      stepLink: '#buoc-4-dang-nhap-quan-tri-va-cau-hinh-kich-ban-tong-dai',
+      stepLink: '#bước-4-đăng-nhập-quản-trị--cấu-hình-kịch-bản-tổng-đài',
     },
     {
       id: 'dec-test-call',

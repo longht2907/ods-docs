@@ -1,8 +1,8 @@
 ---
-status: in-progress
+status: done
 branch: task/TASK-024-quy-hoach-support-wiki
-commit: ""
-verified-by: npm run verify:task
+commit: "d04939f"
+verified-by: PR-25 CI verify (check:env, check:links, check:scope, types:check, guard, build, test:routes)
 ---
 
 # TASK-024 — Quy hoạch lại Support Wiki tại /internal
@@ -15,7 +15,7 @@ Support Wiki tại `/internal` là cổng thông tin nội bộ cho nhân viên 
    - **Data Center**: Quy trình nhập/xuất server, gắn KVM/Console, reboot và hỗ trợ thao tác phần cứng/OS.
    - **Network**: Quy trình cấp/thu hồi IP, runbooks xử lý sự cố (DDoS, Blacklist, Leased-Line, rớt switch, kiểm tra mạng) và sơ đồ topology.
    - **License phần mềm**: Quy trình đăng ký license Plesk, cPanel, DirectAdmin.
-3. Bảo toàn nguyên vẹn tài nguyên wiki Tổng đài (`ai-contact-center`) đã làm trước đó.
+3. Có thay đổi wiki Tổng đài (`ai-contact-center`): thêm/sửa bài triển khai và vòng đời dịch vụ, media và 6 lưu đồ Voice. Không còn mô tả là bảo toàn nguyên vẹn.
 
 ## Mục tiêu
 
@@ -71,3 +71,7 @@ Support Wiki tại `/internal` là cổng thông tin nội bộ cho nhân viên 
 - [x] `npm run verify:code` PASS (typecheck + check:env + check:links + guard).
 - [x] `npm run check:scope` PASS.
 - [x] Báo cáo nghiệm thu `.harness/reports/TASK-024-report.md` đầy đủ minh chứng.
+
+## Đối chiếu sau review
+
+TASK-024 đã merge qua PR #25; `commit` là snapshot head của PR đã kiểm tra, không phải hash tự tham chiếu của file này. Trạng thái done ghi nhận hoàn tất triển khai khung, **không xác nhận mọi nội dung là chính sách vận hành đã duyệt**. Các lỗi F1–F6 được theo dõi riêng tại TASK-025 và báo cáo tương ứng.

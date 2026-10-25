@@ -30,18 +30,22 @@ Support Wiki tại `/internal` là cổng thông tin nội bộ cho nhân viên 
 
 - `tasks/TASK-024-quy-hoach-support-wiki.md`
 - `.harness/reports/**`
+- `.agents/skills/write-operational-process/**`
 - `content/internal/(home)/**`
-- `content/internal/ai-contact-center/**` (bảo toàn thay đổi hiện có)
+- `content/internal/ai-contact-center/**`
 - `content/internal/data-center/**`
 - `content/internal/network/**`
 - `content/internal/software-license/**`
 - `content/internal/meta.json`
+- `public/media/ai-contact-center/**`
 - `src/app/internal/**`
+- `src/components/flowchart/**`
+- `src/components/mdx.tsx`
 
 ## Ngoài phạm vi
 
 - Không sửa `content/docs/**` hoặc bất kỳ nội dung public nào.
-- Không sửa `src/**`, auth, proxy, login, session hay middleware.
+- Không sửa auth, proxy, login, session hay middleware.
 - Không sửa Search API hay sitemap.
 - Không thêm dependency mới vào `package.json`.
 - Không commit bí mật, API key, credential hay dữ liệu cá nhân khách hàng.

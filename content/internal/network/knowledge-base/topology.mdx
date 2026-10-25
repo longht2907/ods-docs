@@ -71,10 +71,10 @@ Hạ tầng mạng ODS được thiết kế theo mô hình phân cấp 3 lớp 
 ## 3. Ý nghĩa vận hành đối với Support
 
 Khi chẩn đoán sự cố mạng bằng lệnh `tracert`, Support đối chiếu các bước nhảy (Hop) theo trình tự phân tầng trên:
-1. **Từ máy chủ đến ASW**: Nếu mất gói ngay cổng này $\rightarrow$ kiểm tra cáp mạng và switch tại tủ rack.
-2. **Từ ASW lên DSW**: Nếu mất gói $\rightarrow$ kiểm tra cổng Trunk quang hoặc module SFP nối lên DSW 6/7.
-3. **Từ DSW lên Core**: Nếu mất gói $\rightarrow$ báo động NOC kiểm tra Router Core.
-4. **Từ Core ra ISP**: Nếu mất gói ở các nút FPT, VTN, VNIX $\rightarrow$ sự cố thuộc tuyến cáp nhà mạng đối tác.
+1. **Từ máy chủ đến ASW**: Nếu mất gói ngay cổng này → kiểm tra cáp mạng và switch tại tủ rack.
+2. **Từ ASW lên DSW**: Nếu mất gói → kiểm tra cổng Trunk quang hoặc module SFP nối lên DSW 6/7.
+3. **Từ DSW lên Core**: Nếu mất gói → báo động NOC kiểm tra Router Core.
+4. **Từ Core ra ISP**: Nếu mất gói ở các nút FPT, VTN, VNIX → sự cố thuộc tuyến cáp nhà mạng đối tác.
 
 ---
 

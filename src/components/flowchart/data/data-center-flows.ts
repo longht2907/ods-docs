@@ -25,7 +25,7 @@ export const importServerFlow: FlowchartData = {
       label: 'Mở Ticket & Xác định thông tin KH',
       row: 3,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-yeu-cau-mo-ticket',
+      stepLink: '#bước-1-tiếp-nhận-yêu-cầu--mở-ticket',
     },
     {
       id: 'dec-service-type',
@@ -50,34 +50,34 @@ export const importServerFlow: FlowchartData = {
       label: 'Xác định Tủ Rack & Lắp Server',
       row: 6,
       col: -1,
-      stepLink: '#buoc-2-lap-dat-thiet-bi-dau-noi-mang',
+      stepLink: '#bước-2-lắp-đặt-thiết-bị--đấu-nối-mạng',
     },
-    // Nhánh Local/Dedicated (Rẽ phải, col 1)
+    // Nhánh Local (Rẽ phải, col 1)
     {
       id: 'step-local-prep',
       type: 'step',
-      label: 'Chuẩn bị Server Local theo cấu hình',
+      label: 'Local: xác nhận vị trí & mạng KH',
       row: 5,
       col: 1,
-      stepLink: '#buoc-2-lap-dat-thiet-bi-dau-noi-mang',
+      stepLink: '#bước-2-lắp-đặt-thiết-bị--đấu-nối-mạng',
     },
     // Hội tụ về bước Đấu nối & Cấu hình mạng (row 7, col 0)
     {
       id: 'step-switchport',
       type: 'step',
-      label: 'Cấu hình Switch Port (IP, Tủ, Port)',
+      label: 'Đấu nối theo phạm vi dịch vụ',
       row: 7,
       col: 0,
-      stepLink: '#buoc-2-lap-dat-thiet-bi-dau-noi-mang',
+      stepLink: '#bước-2-lắp-đặt-thiết-bị--đấu-nối-mạng',
     },
     // Kiểm tra Online (row 8, col 0)
     {
       id: 'dec-online',
       type: 'decision',
-      label: 'Kiểm tra Server đã Online?',
+      label: 'Kết nối đúng phạm vi dịch vụ?',
       row: 8,
       col: 0,
-      stepLink: '#buoc-3-kiem-tra-trang-thai-may-chu-online',
+      stepLink: '#bước-3-kiểm-tra-trạng-thái-máy-chủ-online',
     },
     // Nhánh chưa Online (Rẽ trái, col -1)
     {
@@ -91,10 +91,10 @@ export const importServerFlow: FlowchartData = {
     {
       id: 'step-notify-monitor',
       type: 'step',
-      label: 'Gửi mail Nhập mới & Add PRTG, OnlineTicket',
+      label: 'Thông báo nhập mới; PRTG theo dịch vụ',
       row: 9,
       col: 0,
-      stepLink: '#buoc-4-khoi-tao-giam-sat-gui-thong-bao-nhap-moi',
+      stepLink: '#bước-4-khởi-tạo-giám-sát--gửi-thông-báo-nhập-mới',
     },
     {
       id: 'step-sales-code',
@@ -102,7 +102,7 @@ export const importServerFlow: FlowchartData = {
       label: 'Sales tạo & cung cấp Mã DV Odoo',
       row: 10,
       col: 0,
-      stepLink: '#buoc-5-cap-nhat-thong-tin-ma-dich-vu-dong-case',
+      stepLink: '#bước-5-cập-nhật-thông-tin-mã-dịch-vụ--đóng-case',
     },
     {
       id: 'step-complete',
@@ -110,7 +110,7 @@ export const importServerFlow: FlowchartData = {
       label: 'Hoàn tất cập nhật & Đóng case',
       row: 11,
       col: 0,
-      stepLink: '#buoc-5-cap-nhat-thong-tin-ma-dich-vu-dong-case',
+      stepLink: '#bước-5-cập-nhật-thông-tin-mã-dịch-vụ--đóng-case',
     },
   ],
   edges: [
@@ -121,7 +121,7 @@ export const importServerFlow: FlowchartData = {
     { from: 'dec-service-type', to: 'ref-ip-alloc', label: 'Colocation', variant: 'yes' },
     { from: 'ref-ip-alloc', to: 'step-rack-mount' },
     { from: 'step-rack-mount', to: 'step-switchport' },
-    { from: 'dec-service-type', to: 'step-local-prep', label: 'Local/Dedicated' },
+    { from: 'dec-service-type', to: 'step-local-prep', label: 'Local' },
     { from: 'step-local-prep', to: 'step-switchport' },
     // Từ switchport đến kiểm tra online
     { from: 'step-switchport', to: 'dec-online' },
@@ -159,7 +159,7 @@ export const exportServerFlow: FlowchartData = {
       label: 'Sales kiểm tra công nợ & phê duyệt?',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-xac-nhan-tu-sales-mo-ticket',
+      stepLink: '#bước-1-tiếp-nhận-xác-nhận-từ-sales--mở-ticket',
     },
     {
       id: 'sales-reject',
@@ -181,7 +181,7 @@ export const exportServerFlow: FlowchartData = {
       label: 'Bước 1: Mở Ticket & Định vị thiết bị',
       row: 3,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-xac-nhan-tu-sales-mo-ticket',
+      stepLink: '#bước-1-tiếp-nhận-xác-nhận-từ-sales--mở-ticket',
     },
     {
       id: 'dec-shutdown',
@@ -189,7 +189,7 @@ export const exportServerFlow: FlowchartData = {
       label: 'Bước 2: Máy chủ đã Shutdown hoàn toàn?',
       row: 4,
       col: 0,
-      stepLink: '#buoc-2-kiem-tra-trang-thai-may-chu-bat-buoc-shutdown',
+      stepLink: '#bước-2-kiểm-tra-trạng-thái-máy-chủ-bắt-buộc-shutdown',
     },
     {
       id: 'step-contact-shutdown',
@@ -204,7 +204,7 @@ export const exportServerFlow: FlowchartData = {
       label: 'Bước 3: Tháo dỡ & Chuyển ra bàn thao tác',
       row: 5,
       col: 0,
-      stepLink: '#buoc-3-thao-do-thiet-bi-chuyen-ra-ban-thao-tac',
+      stepLink: '#bước-3-tháo-dỡ-thiết-bị-ra-bàn-thao-tác',
     },
     {
       id: 'step-handover',
@@ -212,7 +212,7 @@ export const exportServerFlow: FlowchartData = {
       label: 'Bước 4: Lập phiếu xuất & Ký biên bản bàn giao',
       row: 6,
       col: 0,
-      stepLink: '#buoc-4-lap-phieu-xuat-kho-ky-bien-ban-ban-giao',
+      stepLink: '#bước-4-lập-thủ-tục-xuất-kho--bàn-giao',
     },
     {
       id: 'step-reclaim',
@@ -220,7 +220,7 @@ export const exportServerFlow: FlowchartData = {
       label: 'Bước 5: Xóa PRTG, Deactive Ticket & Thu hồi IP',
       row: 7,
       col: 0,
-      stepLink: '#buoc-5-thu-hoi-tai-nguyen-he-thong-dong-ticket',
+      stepLink: '#bước-5-thu-hồi-tài-nguyên--đóng-case',
     },
     {
       id: 'end-export',
@@ -263,7 +263,7 @@ export const attachKvmFlow: FlowchartData = {
       label: 'Bước 1: Xác thực thông tin khách hàng?',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-xac-thuc-khach-hang',
+      stepLink: '#bước-1-tiếp-nhận--xác-thực-khách-hàng',
     },
     {
       id: 'step-auth-reject',
@@ -285,7 +285,7 @@ export const attachKvmFlow: FlowchartData = {
       label: 'Bước 2: Tạo Ticket & Định vị máy chủ',
       row: 3,
       col: 0,
-      stepLink: '#buoc-2-tao-ticket-dinh-vi-may-chu',
+      stepLink: '#bước-2-tạo-ticket--chuẩn-bị-thiết-bị-kvm',
     },
     {
       id: 'step-mount-kvm',
@@ -293,7 +293,7 @@ export const attachKvmFlow: FlowchartData = {
       label: 'Bước 3: Gắn thiết bị KVM tại tủ rack',
       row: 4,
       col: 0,
-      stepLink: '#buoc-3-gan-thiet-bi-kvm-tai-tu-rack',
+      stepLink: '#bước-3-đấu-nối-kvm-vào-máy-chủ-tại-tủ-rack',
     },
     {
       id: 'dec-check-kvm',
@@ -301,7 +301,7 @@ export const attachKvmFlow: FlowchartData = {
       label: 'Bước 4: Kiểm tra truy cập KVM thành công?',
       row: 5,
       col: 0,
-      stepLink: '#buoc-4-kiem-tra-truy-cap-kvm-noi-bo',
+      stepLink: '#bước-4-kiểm-tra-khả-năng-truy-cập-kvm',
     },
     {
       id: 'step-swap-kvm',
@@ -316,7 +316,7 @@ export const attachKvmFlow: FlowchartData = {
       label: 'Bước 5: Gửi mail thông tin KVM cho KH',
       row: 6,
       col: 0,
-      stepLink: '#buoc-5-ban-giao-thong-tin-truy-cap-kvm-cho-khach-hang',
+      stepLink: '#bước-5-bàn-giao-thông-tin-kvm-cho-khách-hàng',
     },
     {
       id: 'step-reclaim-kvm',
@@ -324,7 +324,7 @@ export const attachKvmFlow: FlowchartData = {
       label: 'Bước 6: Thu hồi KVM sau 10 tiếng & Đóng case',
       row: 7,
       col: 0,
-      stepLink: '#buoc-6-theo-doi-va-thu-hoi-thiet-bi-kvm',
+      stepLink: '#bước-6-theo-dõi-thu-hồi-thiết-bị--đóng-ticket',
     },
     {
       id: 'end-kvm',
@@ -367,7 +367,7 @@ export const attachConsoleFlow: FlowchartData = {
       label: 'Bước 1: Xác thực thông tin khách hàng?',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-xac-thuc-khach-hang',
+      stepLink: '#bước-1-tiếp-nhận--xác-thực-khách-hàng',
     },
     {
       id: 'step-auth-reject',
@@ -389,7 +389,7 @@ export const attachConsoleFlow: FlowchartData = {
       label: 'Bước 2: Mở Ticket & Định vị máy chủ',
       row: 3,
       col: 0,
-      stepLink: '#buoc-2-tao-ticket-dinh-vi-may-chu',
+      stepLink: '#bước-2-tạo-ticket--định-vị-máy-chủ',
     },
     {
       id: 'step-mount-console',
@@ -397,7 +397,7 @@ export const attachConsoleFlow: FlowchartData = {
       label: 'Bước 3: Gắn Console màn hình/phím tại tủ',
       row: 4,
       col: 0,
-      stepLink: '#buoc-3-gan-console-tai-tu-rack',
+      stepLink: '#bước-3-gắn-console-kiểm-tra-tại-tủ-rack',
     },
     {
       id: 'dec-screen',
@@ -405,7 +405,7 @@ export const attachConsoleFlow: FlowchartData = {
       label: 'Bước 4: Tình trạng hiển thị Console?',
       row: 5,
       col: 0,
-      stepLink: '#buoc-4-kiem-tra-man-hinh-ban-phim',
+      stepLink: '#bước-4-kiểm-tra-tín-hiệu--chẩn-đoán-tình-trạng',
     },
     // Nhánh 1: Bình thường (col -1)
     {
@@ -482,7 +482,7 @@ export const attachConsoleFlow: FlowchartData = {
       label: 'Bước 5: Thu hồi Console & Đóng case',
       row: 10,
       col: 0,
-      stepLink: '#buoc-5-gui-thong-bao-thu-hoi-console-dong-ticket',
+      stepLink: '#bước-5-thu-hồi-console--đóng-ticket',
     },
     {
       id: 'end-console',
@@ -540,7 +540,7 @@ export const rebootServerFlow: FlowchartData = {
       label: 'Bước 1: Xác thực thông tin khách hàng?',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-yeu-cau-xac-thuc-khach-hang',
+      stepLink: '#bước-1-tiếp-nhận-yêu-cầu--xác-thực-khách-hàng',
     },
     {
       id: 'step-auth-reject',
@@ -562,7 +562,7 @@ export const rebootServerFlow: FlowchartData = {
       label: 'Bước 2: Tạo Ticket & Định vị máy chủ',
       row: 3,
       col: 0,
-      stepLink: '#buoc-2-tao-ticket-dinh-vi-may-chu',
+      stepLink: '#bước-2-mở-ticket--xác-định-thông-tin-dịch-vụ',
     },
     {
       id: 'step-check-tag',
@@ -570,7 +570,7 @@ export const rebootServerFlow: FlowchartData = {
       label: 'Bước 3: Đến tủ Rack kiểm tra nhãn & Service Tag',
       row: 4,
       col: 0,
-      stepLink: '#buoc-3-den-tu-rack-kiem-tra-nhan-may-chu',
+      stepLink: '#bước-3-định-vị-thiết-bị-tại-phòng-máy',
     },
     {
       id: 'step-power-cycle',
@@ -578,7 +578,7 @@ export const rebootServerFlow: FlowchartData = {
       label: 'Bước 4: Thực hiện Reboot (Tắt - Chờ 15s - Bật)',
       row: 5,
       col: 0,
-      stepLink: '#buoc-4-thuc-hien-reboot-khoi-dong-lai',
+      stepLink: '#bước-4-thao-tác-khởi-động-lại-nguồn-chuẩn-1015-giây',
     },
     {
       id: 'dec-ping',
@@ -586,7 +586,7 @@ export const rebootServerFlow: FlowchartData = {
       label: 'Bước 5: Kiểm tra Ping IP sau 3-5 phút?',
       row: 6,
       col: 0,
-      stepLink: '#buoc-5-kiem-tra-tin-hieu-mang-sau-reboot',
+      stepLink: '#bước-5-kiểm-tra-sau-khởi-động',
     },
     {
       id: 'step-check-console',
@@ -601,7 +601,7 @@ export const rebootServerFlow: FlowchartData = {
       label: 'Bước 6: Gọi điện & Gửi mail báo KH',
       row: 7,
       col: 0,
-      stepLink: '#buoc-6-thong-bao-ket-qua-cho-khach-hang-dong-ticket',
+      stepLink: '#bước-6-thông-báo-khách-hàng--đóng-ticket',
     },
     {
       id: 'end-reboot',
@@ -644,7 +644,7 @@ export const serverAssistanceFlow: FlowchartData = {
       label: 'Bước 1: Xác thực thông tin khách hàng?',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-xac-thuc-thong-tin-khach-hang',
+      stepLink: '#bước-1-tiếp-nhận-và-xác-thực-thông-tin-khách-hàng',
     },
     {
       id: 'step-auth-reject',
@@ -666,7 +666,7 @@ export const serverAssistanceFlow: FlowchartData = {
       label: 'Bước 2: Mở Ticket & Định vị máy chủ',
       row: 3,
       col: 0,
-      stepLink: '#buoc-2-mo-ticket-dinh-vi-server',
+      stepLink: '#bước-2-tạo-ticket--xác-định-thông-tin-dịch-vụ',
     },
     {
       id: 'step-mount-console',
@@ -674,7 +674,7 @@ export const serverAssistanceFlow: FlowchartData = {
       label: 'Bước 3: Gắn Console tại tủ rack phòng máy',
       row: 4,
       col: 0,
-      stepLink: '#buoc-3-gan-console-tai-tu-rack',
+      stepLink: '#bước-3-gắn-console-kiểm-tra-tại-phòng-máy',
     },
     {
       id: 'dec-install-os',
@@ -689,7 +689,6 @@ export const serverAssistanceFlow: FlowchartData = {
       label: 'Hỗ trợ kiểm tra phần cứng / BIOS',
       row: 6,
       col: -1,
-      stepLink: '#truong-hop-1-ho-tro-kiem-tra-phan-cung-bios-raid',
     },
     {
       id: 'step-waiver',
@@ -697,7 +696,7 @@ export const serverAssistanceFlow: FlowchartData = {
       label: 'Bước 4: Yêu cầu xác nhận MIỄN TRỪ TRÁCH NHIỆM',
       row: 6,
       col: 0,
-      stepLink: '#buoc-4-gui-mail-yeu-cau-khach-hang-xac-nhan-mien-tru-trach-nhiem-mat-du-lieu',
+      stepLink: '#bước-4-yêu-cầu-khách-hàng-xác-nhận-miễn-trừ-trách-nhiệm-dữ-liệu-bắt-buộc',
     },
     {
       id: 'dec-waiver-confirm',
@@ -719,7 +718,7 @@ export const serverAssistanceFlow: FlowchartData = {
       label: 'Bước 5: Cài đặt OS theo cấu hình',
       row: 8,
       col: 0,
-      stepLink: '#buoc-5-tien-hanh-cai-dat-he-dieu-hanh',
+      stepLink: '#bước-5-tiến-hành-cài-đặt-hệ-điều-hành',
     },
     {
       id: 'step-reclaim',
@@ -727,7 +726,7 @@ export const serverAssistanceFlow: FlowchartData = {
       label: 'Bước 6: Kiểm tra bàn giao, tháo thu hồi Console',
       row: 9,
       col: 0,
-      stepLink: '#buoc-6-kiem-tra-va-thu-hoi-console',
+      stepLink: '#bước-6-kiểm-tra-bàn-giao--thu-hồi-console',
     },
     {
       id: 'end-done',
@@ -735,7 +734,7 @@ export const serverAssistanceFlow: FlowchartData = {
       label: 'Bước 7: Gửi mail hoàn tất & Báo Sales đóng case',
       row: 10,
       col: 0,
-      stepLink: '#buoc-7-gui-mail-hoan-tat-thong-bao-sales-dong-ticket',
+      stepLink: '#bước-7-phản-hồi-khách-hàng--đóng-ticket',
     },
   ],
   edges: [

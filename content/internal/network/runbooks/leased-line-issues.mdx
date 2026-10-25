@@ -3,6 +3,10 @@ title: Xử lý sự cố kênh truyền Leased-Line
 description: Hướng dẫn giám sát kênh Leased-Line qua PRTG, xử lý mất ping kéo dài, nguyên tắc liên hệ ngoài giờ hành chính và phối hợp đối tác hạ tầng.
 ---
 
+<Callout title="Trạng thái xác nhận quy trình" type="warn">
+Bản biên soạn từ tài liệu nguồn, chưa phải xác nhận chính sách hiện hành. Trước thao tác ảnh hưởng dịch vụ, phải xác nhận phạm vi, thẩm quyền và phương án xử lý với người phụ trách. Các thời hạn, biện pháp chặn/mở hoặc thông số tài khoản trong nguồn không tự trở thành quy định đã được phê duyệt. Lưu đồ cũng chịu cùng giới hạn này.
+</Callout>
+
 Runbook này hướng dẫn quy trình điều phối và khắc phục sự cố gián đoạn kênh truyền số liệu / Internet chuyên dụng (Leased-Line) dành cho doanh nghiệp kết nối về Trung tâm dữ liệu của ODS.
 
 ---
@@ -63,7 +67,7 @@ Runbook này hướng dẫn quy trình điều phối và khắc phục sự c�
 - **Hành động của SP**:
   - Trong giờ làm việc: Gọi điện trực tiếp cho đầu mối kỹ thuật của khách hàng để hỏi xem văn phòng có đang bảo trì nguồn điện, di dời thiết bị hoặc thao tác router hay không.
   - **Nếu do khách hàng chủ động thao tác**: Đề nghị khách hàng thông báo khi hoàn tất; tiếp tục theo dõi trên PRTG cho đến khi kênh thông tuyến trở lại.
-  - **Nếu không phải do khách hàng**: Xác định đây là sự cố đứt cáp hoặc lỗi thiết bị chuyển đổi quang (Converter) $\rightarrow$ Chuyển sang Bước 4.
+  - **Nếu không phải do khách hàng**: Xác định đây là sự cố đứt cáp hoặc lỗi thiết bị chuyển đổi quang (Converter) → Chuyển sang Bước 4.
 
 ### Bước 4: Điều phối đối tác hạ tầng & Thông báo các bên
 - **Hành động của SP**:

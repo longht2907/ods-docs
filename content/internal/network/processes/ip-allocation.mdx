@@ -3,6 +3,10 @@ title: Quy trình cấp phát IP & Range IP
 description: Hướng dẫn cấp phát IP Colocation, dải IP dưới 13 IP và phối hợp NOC cho dải từ 13 IP trở lên, kiểm tra IPAM và kiểm tra danh sách đen Blacklist.
 ---
 
+<Callout title="Trạng thái xác nhận quy trình" type="warn">
+Bản biên soạn từ tài liệu nguồn, chưa phải xác nhận chính sách hiện hành. Trước thao tác ảnh hưởng dịch vụ, phải xác nhận phạm vi, thẩm quyền và phương án xử lý với người phụ trách. Các thời hạn, biện pháp chặn/mở hoặc thông số tài khoản trong nguồn không tự trở thành quy định đã được phê duyệt. Lưu đồ cũng chịu cùng giới hạn này.
+</Callout>
+
 Quy trình này hướng dẫn nhân viên Support thực hiện tra cứu tài nguyên trên hệ thống quản lý địa chỉ IP (IPAM), kiểm tra tính khả dụng, rà soát danh sách đen (Blacklist) và thực hiện cấp phát địa chỉ IPv4 tĩnh / Range IP cho khách hàng.
 
 ---
@@ -11,7 +15,7 @@ Quy trình này hướng dẫn nhân viên Support thực hiện tra cứu tài 
 
 - **Mục đích**: Đảm bảo địa chỉ IP cấp phát cho khách hàng là IP "sạch" (không dính blacklist thư rác/mã độc), không bị trùng lặp trên hạ tầng mạng, được ghi nhận chính xác trên IPAM và có sự phối hợp kỹ thuật với NOC đối với các dải IP lớn.
 - **Phạm vi áp dụng**: Áp dụng cho các yêu cầu cấp phát IP mới, cấp IP bổ sung cho dịch vụ Colocation, Dedicated Server và Kênh truyền tại ODS.
-- **Bên phối hợp**: Khách hàng / Sales, Support Team, NOC Team (với dải $\ge 13$ IP).
+- **Bên phối hợp**: Khách hàng / Sales, Support Team, NOC Team (với dải từ 13 IP).
 
 ---
 
@@ -32,10 +36,10 @@ Quy trình này hướng dẫn nhân viên Support thực hiện tra cứu tài 
 - [ ] Tra cứu IPAM: Ưu tiên cấp IP trong cùng Range mạng với các IP hiện có của khách hàng cũ.
 - [ ] Kiểm tra thực tế: Ping thử IP để đảm bảo không có thiết bị khác đang sử dụng ngầm.
 - [ ] Nếu phát hiện IP đang bị dùng trái phép: Lập biên bản thông báo khách hàng vi phạm.
-- [ ] **BẮT BUỘC**: Kiểm tra Blacklist toàn bộ các IP dự kiến cấp. Nếu dính Blacklist $\rightarrow$ thực hiện gỡ trước khi bàn giao.
-- [ ] Nếu Range IP $\ge 13$ IP: Đã gửi yêu cầu và nhận được xác nhận cấu hình phân tuyến/VLAN từ NOC Team.
+- [ ] **BẮT BUỘC**: Kiểm tra Blacklist toàn bộ các IP dự kiến cấp. Nếu dính Blacklist → thực hiện gỡ trước khi bàn giao.
+- [ ] Nếu Range IP từ 13 IP: Đã gửi yêu cầu và nhận được xác nhận cấu hình phân tuyến/VLAN từ NOC Team.
 - [ ] Ghi chú đầy đủ Mã dịch vụ, Tên khách hàng và ngày cấp lên IPAM.
-- [ ] Gửi email thông báo cấp IP chính thức cho Sales hoặc Khách hàng $\rightarrow$ Đóng ticket.
+- [ ] Gửi email thông báo cấp IP chính thức cho Sales hoặc Khách hàng → Đóng ticket.
 
 ---
 
@@ -56,14 +60,14 @@ Quy trình này hướng dẫn nhân viên Support thực hiện tra cứu tài 
    - Ping thử IP từ mạng ngoài:
      - **Nếu IP có phản hồi (Đang bị sử dụng ngầm)**:
        - Kiểm tra MAC Address và cổng switch của tủ rack để tìm máy chủ đang cắm IP này.
-       - *Trường hợp 1*: IPAM chưa ghi chú nhưng máy chủ đó có Mã dịch vụ hợp lệ $\rightarrow$ Cập nhật bổ sung ghi chú chính xác trên IPAM, sau đó chọn một IP khác chưa dùng để cấp cho yêu cầu hiện tại.
-       - *Trường hợp 2*: Máy chủ không có mã dịch vụ hợp lệ hoặc cắm nhầm IP $\rightarrow$ Lập ticket gửi email thông báo khách hàng về việc sử dụng trái phép tài nguyên IP, yêu cầu gỡ bỏ ngay lập tức.
+       - *Trường hợp 1*: IPAM chưa ghi chú nhưng máy chủ đó có Mã dịch vụ hợp lệ → Cập nhật bổ sung ghi chú chính xác trên IPAM, sau đó chọn một IP khác chưa dùng để cấp cho yêu cầu hiện tại.
+       - *Trường hợp 2*: Máy chủ không có mã dịch vụ hợp lệ hoặc cắm nhầm IP → Lập ticket gửi email thông báo khách hàng về việc sử dụng trái phép tài nguyên IP, yêu cầu gỡ bỏ ngay lập tức.
      - **Nếu IP không phản hồi (Chưa sử dụng)**: Chuyển sang bước kiểm tra Blacklist.
 
 ### Nhánh 2: Cấp phát Range IP (Dải IP)
-- **Nếu Range IP $< 13$ IP (Block /29, /28 nhỏ)**:
+- **Nếu Range IP dưới 13 IP (Block /29, /28 nhỏ)**:
   - Support tự tra cứu và phân bổ block IP còn trống trên IPAM.
-- **Nếu Range IP $\ge 13$ IP (Block /28 lớn, /27, /26...)**:
+- **Nếu Range IP từ 13 IP (Block /28 lớn, /27, /26...)**:
   - Tạo ticket phối hợp gửi **NOC Team**.
   - NOC Team thực hiện định tuyến Subnet, tạo VLAN riêng và cấu hình Default Gateway trên Router Core.
   - Sau khi nhận được thông báo hoàn tất từ NOC, Support tiếp nhận dải IP để thực hiện thủ tục cấp phát.

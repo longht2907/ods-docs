@@ -26,7 +26,6 @@ export const ipAllocationFlow: FlowchartData = {
       label: 'Cấp Colocation (Cấp theo dải hoặc gộp KH cũ)',
       row: 3,
       col: -1,
-      stepLink: '#truong-hop-1-cap-ip-cho-dich-vu-colocation',
     },
     {
       id: 'dec-ip-in-use',
@@ -49,7 +48,6 @@ export const ipAllocationFlow: FlowchartData = {
       label: 'Quy mô Range IP cần cấp?',
       row: 3,
       col: 1,
-      stepLink: '#truong-hop-2-cap-range-ip',
     },
     {
       id: 'step-range-small',
@@ -72,7 +70,6 @@ export const ipAllocationFlow: FlowchartData = {
       label: 'Bước kiểm tra BLACKLIST toàn bộ IP?',
       row: 6,
       col: 0,
-      stepLink: '#buoc-kiem-tra-blacklist-bat-buoc',
     },
     {
       id: 'step-delist',
@@ -119,100 +116,15 @@ export const ipAllocationFlow: FlowchartData = {
 
 export const ipReclaimFlow: FlowchartData = {
   id: 'ip-reclaim',
-  title: 'Lưu đồ Quy trình Thu hồi IP (Range IP & Colocation)',
-  caption: 'Lưu đồ đối chiếu theo tài liệu gốc THU HỒI IP.pdf của ODS',
+  title: 'Thu hồi IP — điểm dừng xác nhận nguồn',
+  caption: 'Hai nguồn Word/PDF chưa thống nhất; không cho phép suy ra quyền chặn hoặc thu hồi.',
   nodes: [
-    {
-      id: 'kh-req',
-      type: 'start',
-      label: 'Yêu cầu thu hồi IP từ KH / Sales',
-      row: 1,
-      col: 0,
-    },
-    {
-      id: 'step-ticket',
-      type: 'step',
-      label: 'Bước 1: Mở Ticket & Xác định IP cần thu hồi',
-      row: 2,
-      col: 0,
-      stepLink: '#buoc-1-tiep-nhan-yeu-cau-mo-ticket',
-    },
-    {
-      id: 'dec-in-use',
-      type: 'decision',
-      label: 'Bước 2: Kiểm tra IP còn đang sử dụng?',
-      row: 3,
-      col: 0,
-      stepLink: '#buoc-2-kiem-tra-thuc-te-trang-thai-ip',
-    },
-    {
-      id: 'step-contact-stop',
-      type: 'step',
-      label: 'Liên hệ KH ngưng sử dụng / Chặn hướng',
-      row: 4,
-      col: -1,
-    },
-    {
-      id: 'dec-blacklist',
-      type: 'decision',
-      label: 'Bước 3: Kiểm tra Blacklist (Spamhaus, Barracuda)?',
-      row: 4,
-      col: 0,
-      stepLink: '#buoc-3-kiem-tra-blacklist-truoc-khi-thu-hoi',
-    },
-    {
-      id: 'ref-delist',
-      type: 'reference',
-      label: 'Quy trình xử lý gỡ Blacklist',
-      subLabel: 'Tham chiếu Runbook Blacklist',
-      row: 5,
-      col: -1,
-      refUrl: '/internal/network/runbooks/ip-blacklist',
-    },
-    {
-      id: 'dec-range-size',
-      type: 'decision',
-      label: 'Bước 4: Phân loại theo Quy mô dải IP?',
-      row: 5,
-      col: 0,
-      stepLink: '#buoc-4-thu-hoi-theo-quy-mo-dai-ip',
-    },
-    {
-      id: 'step-small-reclaim',
-      type: 'step',
-      label: 'Dải < 13 IP: Hủy mã Odoo & Xóa note IPAM',
-      row: 6,
-      col: -1,
-    },
-    {
-      id: 'step-large-reclaim',
-      type: 'step',
-      label: 'Dải >= 13 IP: NOC xóa VLAN/Route & Xóa note',
-      row: 6,
-      col: 1,
-    },
-    {
-      id: 'end-reclaim',
-      type: 'end',
-      label: 'Cập nhật Odoo, gửi mail & Đóng ticket',
-      row: 7,
-      col: 0,
-    },
+    { id: 'start', type: 'start', label: 'Tiếp nhận & xác minh yêu cầu', row: 1, col: 0 },
+    { id: 'identify', type: 'step', label: 'Đối chiếu IP, mã DV & trạng thái', row: 2, col: 0 },
+    { id: 'confirm', type: 'step', label: 'Xác nhận phiên bản với phụ trách', row: 3, col: 0 },
+    { id: 'stop', type: 'end', label: 'Chờ duyệt trước can thiệp', row: 4, col: 0 },
   ],
-  edges: [
-    { from: 'kh-req', to: 'step-ticket' },
-    { from: 'step-ticket', to: 'dec-in-use' },
-    { from: 'dec-in-use', to: 'step-contact-stop', label: 'Còn dùng', variant: 'no', fromPort: 'left', toPort: 'top' },
-    { from: 'step-contact-stop', to: 'dec-blacklist', label: 'Đã dừng', fromPort: 'bottom', toPort: 'left' },
-    { from: 'dec-in-use', to: 'dec-blacklist', label: 'Đã ngắt', variant: 'yes' },
-    { from: 'dec-blacklist', to: 'ref-delist', label: 'Bị Blacklist', variant: 'no', fromPort: 'left', toPort: 'top' },
-    { from: 'ref-delist', to: 'dec-range-size', label: 'Đã gỡ', fromPort: 'bottom', toPort: 'left' },
-    { from: 'dec-blacklist', to: 'dec-range-size', label: 'Sạch', variant: 'yes' },
-    { from: 'dec-range-size', to: 'step-small-reclaim', label: '< 13 IP', fromPort: 'left', toPort: 'top' },
-    { from: 'dec-range-size', to: 'step-large-reclaim', label: '>= 13 IP', fromPort: 'right', toPort: 'top' },
-    { from: 'step-small-reclaim', to: 'end-reclaim', fromPort: 'bottom', toPort: 'left' },
-    { from: 'step-large-reclaim', to: 'end-reclaim', fromPort: 'bottom', toPort: 'right' },
-  ],
+  edges: [ { from: 'start', to: 'identify' }, { from: 'identify', to: 'confirm' }, { from: 'confirm', to: 'stop' } ],
 };
 
 export const networkTroubleshootingFlow: FlowchartData = {
@@ -233,7 +145,7 @@ export const networkTroubleshootingFlow: FlowchartData = {
       label: 'Bước 1: Xác thực thông tin khách hàng',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-xac-thuc-nguon-tin',
+      stepLink: '#bước-1-xác-thực--thu-thập-dữ-liệu-chẩn-đoán',
     },
     {
       id: 'dec-ping-tracert',
@@ -241,7 +153,7 @@ export const networkTroubleshootingFlow: FlowchartData = {
       label: 'Bước 2: Cung cấp đủ Ping/Tracert 2 chiều?',
       row: 3,
       col: 0,
-      stepLink: '#buoc-2-thu-thap-thong-tin-kiem-tra-2-chieu',
+      stepLink: '#bước-2-thực-hiện-kiểm-tra-chéo-đa-hướng',
     },
     {
       id: 'step-request-info',
@@ -256,7 +168,7 @@ export const networkTroubleshootingFlow: FlowchartData = {
       label: 'Bước 3: Kiểm tra đa hướng (VN VPN & Looking Glass)',
       row: 4,
       col: 0,
-      stepLink: '#buoc-3-kiem-tra-da-huong-looking-glass-va-vpn',
+      stepLink: '#bước-3-khoanh-vùng-lỗi-theo-triệu-chứng',
     },
     {
       id: 'dec-issue-type',
@@ -285,7 +197,7 @@ export const networkTroubleshootingFlow: FlowchartData = {
       label: 'Bước 4: Đối chiếu 3 Kịch bản Traffic',
       row: 7,
       col: 0,
-      stepLink: '#buoc-4-doi-chieu-3-kich-ban-traffic-dien-hinh',
+      stepLink: '#bước-4-xử-lý-theo-3-kịch-bản-chuẩn',
     },
     {
       id: 'step-scen-1',
@@ -354,7 +266,7 @@ export const switchOutageFlow: FlowchartData = {
       label: 'Bước 1: Ping / Telnet vào Switch được không?',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-xac-minh-canh-bao-loai-tru-bao-gia',
+      stepLink: '#bước-1-xác-minh-cảnh-báo-loại-trừ-báo-giả',
     },
     {
       id: 'step-false-alarm',
@@ -376,7 +288,7 @@ export const switchOutageFlow: FlowchartData = {
       label: 'Bước 2: Di chuyển đến tủ kiểm tra đèn LED Switch',
       row: 3,
       col: 0,
-      stepLink: '#buoc-2-kiem-tra-den-led-vat-ly-tai-tu-rack',
+      stepLink: '#bước-2-quan-sát-hiện-trường--phân-loại-sự-cố',
     },
     {
       id: 'dec-led-state',
@@ -391,7 +303,6 @@ export const switchOutageFlow: FlowchartData = {
       label: 'TẤT CẢ ĐÈN TẮT (Chuyển PDU, đổi dây nguồn mới)',
       row: 5,
       col: -1,
-      stepLink: '#tinh-huong-1-toan-bo-den-led-deu-tat-mat-nguon-switch',
     },
     {
       id: 'step-trunk-hang',
@@ -399,7 +310,6 @@ export const switchOutageFlow: FlowchartData = {
       label: 'ĐÈN TRUNK TẮT / TREO (Đổi module SFP hoặc Reboot)',
       row: 5,
       col: 1,
-      stepLink: '#tinh-huong-2-den-led-tat-ca-sang-do-hoac-den-port-trunk-tat',
     },
     {
       id: 'dec-recovered',
@@ -414,7 +324,7 @@ export const switchOutageFlow: FlowchartData = {
       label: 'Thay thế Switch Cisco SG300 dự phòng & Báo NOC',
       row: 7,
       col: 1,
-      stepLink: '#buoc-4-kich-hoat-phuong-an-thay-the-switch-sg300-du-phong',
+      stepLink: '#bước-4-quy-trình-thay-thế-switch-dự-phòng-cisco-sg300',
     },
     {
       id: 'end-switch-ok',
@@ -458,7 +368,7 @@ export const leasedLineIssuesFlow: FlowchartData = {
       label: 'Bước 1: Xác định tuyến LL & Khởi tạo Ticket',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-canh-bao-khoi-tao-ticket',
+      stepLink: '#bước-1-tiếp-nhận-cảnh-báo--khởi-tạo-ticket',
     },
     {
       id: 'dec-traffic',
@@ -466,7 +376,7 @@ export const leasedLineIssuesFlow: FlowchartData = {
       label: 'Bước 2: Kiểm tra Traffic trên PRTG (Core-NIX)?',
       row: 3,
       col: 0,
-      stepLink: '#buoc-2-kiem-tra-bieu-do-traffic-tren-prtg',
+      stepLink: '#bước-2-kiểm-tra-biểu-đồ-traffic-trên-prtg',
     },
     {
       id: 'step-traffic-ok',
@@ -481,7 +391,7 @@ export const leasedLineIssuesFlow: FlowchartData = {
       label: 'Bước 3: Liên hệ Khách hàng (Đêm khuya gửi mail & gọi đối tác)',
       row: 4,
       col: 1,
-      stepLink: '#buoc-3-lien-he-khach-hang-nguyen-tac-ung-xu-gio-khuya',
+      stepLink: '#bước-3-liên-hệ-khách-hàng-nguyên-tắc-ứng-xử-giờ-khuya',
     },
     {
       id: 'dec-reason',
@@ -503,7 +413,7 @@ export const leasedLineIssuesFlow: FlowchartData = {
       label: 'SỰ CỐ ĐỨT CÁP (Gọi đối tác hàn nối, CC NOC/Sales)',
       row: 6,
       col: 1,
-      stepLink: '#buoc-4-goi-nha-cung-cap-doi-tac-ha-tang-kenh-truyen',
+      stepLink: '#bước-4-điều-phối-đối-tác-hạ-tầng--thông-báo-các-bên',
     },
     {
       id: 'end-leased-line',
@@ -511,7 +421,7 @@ export const leasedLineIssuesFlow: FlowchartData = {
       label: 'Bước 5: Kênh phục hồi -> Đối soát thời gian & Đóng case',
       row: 7,
       col: 0,
-      stepLink: '#buoc-5-phuc-hoi-doi-soat-thoi-gian-gian-doan-dong-case',
+      stepLink: '#bước-5-theo-dõi-phục-hồi--ghi-nhận-nguyên-nhân-đóng-case',
     },
   ],
   edges: [
@@ -546,7 +456,7 @@ export const ddosMitigationFlow: FlowchartData = {
       label: 'Bước 1: Xác thực & Sniff phân tích lưu lượng',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-xac-thuc-nguon-tin-phan-tich-luu-luong-sniff-traffic',
+      stepLink: '#bước-1-xác-thực-nguồn-tin--phân-tích-lưu-lượng-sniff-traffic',
     },
     {
       id: 'dec-ddos',
@@ -568,7 +478,7 @@ export const ddosMitigationFlow: FlowchartData = {
       label: 'Bước 2: Chụp ảnh bằng chứng Sniff traffic',
       row: 4,
       col: 0,
-      stepLink: '#buoc-2-chup-anh-bang-chung-sniff-traffic',
+      stepLink: '#bước-2-chụp-ảnh-bằng-chứng-kỹ-thuật',
     },
     {
       id: 'step-block-intl',
@@ -576,7 +486,7 @@ export const ddosMitigationFlow: FlowchartData = {
       label: 'Bước 3: Chặn hướng QUỐC TẾ cho IP đích',
       row: 5,
       col: 0,
-      stepLink: '#buoc-3-thuc-hien-chan-huong-quoc-te-cho-ip-bi-tan-cong',
+      stepLink: '#bước-3-thực-hiện-cô-lập--chặn-lưu-lượng-hướng-quốc-tế',
     },
     {
       id: 'step-notify-kh',
@@ -584,7 +494,7 @@ export const ddosMitigationFlow: FlowchartData = {
       label: 'Bước 4: Tra cứu IPAM & Gửi mail thông báo KH',
       row: 6,
       col: 0,
-      stepLink: '#buoc-4-tra-cuu-thong-tin-va-gui-email-thong-bao-cho-khach-hang',
+      stepLink: '#bước-4-xác-định-khách-hàng--gửi-email-thông-báo',
     },
     {
       id: 'step-unblock-policy',
@@ -592,7 +502,7 @@ export const ddosMitigationFlow: FlowchartData = {
       label: 'Bước 5: Mở chặn theo quy định (MB: 3 ngày, KH khác: 7 ngày)',
       row: 7,
       col: 0,
-      stepLink: '#buoc-5-chinh-sach-va-quy-dinh-mo-chan-ip',
+      stepLink: '#bước-5-mở-chặn-theo-quy-định-thời-hạn',
     },
     {
       id: 'dec-attack-again',
@@ -600,7 +510,7 @@ export const ddosMitigationFlow: FlowchartData = {
       label: 'Bước 6: Có bị tấn công tái diễn sau mở chặn?',
       row: 8,
       col: 0,
-      stepLink: '#buoc-6-theo-doi-sau-khi-mo-chan',
+      stepLink: '#bước-6-theo-dõi-sau-khi-mở-chặn--đóng-ticket',
     },
     {
       id: 'step-re-block',
@@ -650,7 +560,7 @@ export const ipBlacklistFlow: FlowchartData = {
       label: 'Bước 1: Tra cứu IPAM & Khởi tạo Ticket',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-dinh-vi-khach-hang-mo-ticket',
+      stepLink: '#bước-1-tiếp-nhận-định-vị-khách-hàng--mở-ticket',
     },
     {
       id: 'dec-bl-org',
@@ -658,7 +568,7 @@ export const ipBlacklistFlow: FlowchartData = {
       label: 'Bước 2: Phân loại tổ chức Blacklist?',
       row: 3,
       col: 0,
-      stepLink: '#buoc-2-phan-loai-va-quy-trinh-go-blacklist-theo-to-chuc',
+      stepLink: '#bước-2-thực-hiện-thủ-tục-gỡ-bỏ-blacklist-delist',
     },
     {
       id: 'step-barracuda',
@@ -680,7 +590,7 @@ export const ipBlacklistFlow: FlowchartData = {
       label: 'Bước 3: Gửi mail yêu cầu KH rà soát mã độc gấp',
       row: 5,
       col: 0,
-      stepLink: '#buoc-3-thong-bao-va-yeu-cau-khach-hang-xu-ly-nguon-phat-tan',
+      stepLink: '#bước-3-gửi-email-cảnh-báo-khẩn-cấp-cho-khách-hàng',
     },
     {
       id: 'dec-kh-response',
@@ -688,7 +598,7 @@ export const ipBlacklistFlow: FlowchartData = {
       label: 'Bước 4: KH có phản hồi xử lý trong 3 ngày?',
       row: 6,
       col: 0,
-      stepLink: '#buoc-4-theo-doi-phan-hoi-va-ap-dung-che-tai',
+      stepLink: '#bước-4-theo-dõi--áp-dụng-chế-tài-theo-chính-sách-ods',
     },
     {
       id: 'step-resolved',
@@ -710,7 +620,6 @@ export const ipBlacklistFlow: FlowchartData = {
       label: 'Tái diễn vi phạm Blacklist lần thứ 2?',
       row: 8,
       col: 0,
-      stepLink: '#che-tai-dac-biet-tai-dien-lan-thu-2',
     },
     {
       id: 'step-permanent-block',
@@ -763,7 +672,7 @@ export const abuseMalwareFlow: FlowchartData = {
       label: 'Bước 1: Tra cứu IPAM & Mở Ticket',
       row: 2,
       col: 0,
-      stepLink: '#buoc-1-tiep-nhan-thong-tin-khoi-tao-ticket',
+      stepLink: '#bước-1-tiếp-nhận-thông-tin--khởi-tạo-ticket',
     },
     {
       id: 'step-warn-1',
@@ -771,7 +680,7 @@ export const abuseMalwareFlow: FlowchartData = {
       label: 'Bước 2: Gửi email cảnh báo Lần 1 cho KH',
       row: 3,
       col: 0,
-      stepLink: '#buoc-2-gui-email-canh-bao-vi-pham-cho-khach-hang',
+      stepLink: '#bước-2-gửi-email-cảnh-báo-vi-phạm-cho-khách-hàng',
     },
     {
       id: 'dec-kh-reply',
@@ -779,7 +688,7 @@ export const abuseMalwareFlow: FlowchartData = {
       label: 'Bước 3: Khách hàng có phản hồi & xử lý?',
       row: 4,
       col: 0,
-      stepLink: '#buoc-3-quy-trinh-nhac-nho-3-lan-va-theo-doi-phan-hoi',
+      stepLink: '#bước-3-đếm-số-lần-thông-báo--áp-dụng-chế-tài-chặn-quốc-tế',
     },
     {
       id: 'end-resolved',
@@ -808,7 +717,7 @@ export const abuseMalwareFlow: FlowchartData = {
       label: 'Bước 4: CHẶN HƯỚNG QUỐC TẾ CỦA IP & Báo mail',
       row: 7,
       col: 1,
-      stepLink: '#buoc-4-ap-dung-lenh-khoa-chan-huong-quoc-te',
+      stepLink: '#bước-4-phối-hợp-noc-team-khi-có-phát-sinh',
     },
     {
       id: 'step-reopen-check',
@@ -816,7 +725,7 @@ export const abuseMalwareFlow: FlowchartData = {
       label: 'Bước 5: Thẩm định khi KH yêu cầu mở lại / Báo NOC',
       row: 8,
       col: 1,
-      stepLink: '#buoc-5-dieu-kien-va-thu-tuc-mo-chan-ip',
+      stepLink: '#bước-5-xác-nhận-khắc-phục--đóng-ticket',
     },
     {
       id: 'end-abuse',

@@ -3,14 +3,18 @@ title: Quy trình đăng ký License (Plesk, cPanel, DirectAdmin)
 description: Hướng dẫn chi tiết các bước nhập thông số Sub IP, Key ID và Activation Code cho từng hãng bản quyền Plesk, cPanel và DirectAdmin.
 ---
 
+<Callout title="Trạng thái xác nhận quy trình" type="warn">
+Bản biên soạn từ tài liệu nguồn, chưa phải xác nhận chính sách hiện hành. Trước thao tác ảnh hưởng dịch vụ, phải xác nhận phạm vi, thẩm quyền và phương án xử lý với người phụ trách. Các thời hạn, biện pháp chặn/mở hoặc thông số tài khoản trong nguồn không tự trở thành quy định đã được phê duyệt. Lưu đồ cũng chịu cùng giới hạn này.
+</Callout>
+
 Quy trình này hướng dẫn nhân viên Support thực hiện các bước đăng ký, khởi tạo và xuất mã kích hoạt bản quyền (License Key / Activation Code) cho 3 phần mềm quản trị bảng điều khiển máy chủ phổ biến: **Plesk**, **cPanel** và **DirectAdmin** trên cổng quản lý license đối tác của ODS.
 
 ---
 
 ## 1. Mục đích & Phạm vi áp dụng
 
-- **Mục đích**: Chuẩn hóa thao tác khai báo thông số IP và mã dịch vụ khi đăng ký bản quyền phần mềm; tránh sai lệch địa chỉ IP dẫn đến license không kích hoạt được hoặc phát sinh chi phí phạt từ hãng.
-- **Phạm vi áp dụng**: Áp dụng cho các yêu cầu mua mới, gia hạn hoặc đổi IP bản quyền Plesk, cPanel, DirectAdmin cho khách hàng thuê máy chủ tại ODS hoặc khách hàng mua license lẻ.
+- **Mục đích**: Chuẩn hóa thao tác khai báo thông số IP và mã dịch vụ khi đăng ký bản quyền phần mềm; tránh khai báo sai hãng, địa chỉ IP hoặc trường thông tin.
+- **Phạm vi áp dụng**: Áp dụng cho các yêu cầu đăng ký mới bản quyền Plesk, cPanel, DirectAdmin cho khách hàng thuê máy chủ tại ODS hoặc khách hàng mua license lẻ.
 - **Đối tượng thực hiện**: Nhân viên Support phụ trách dịch vụ phần mềm, phối hợp cùng bộ phận Chăm sóc khách hàng (CS) và Kinh doanh (Sales).
 
 ---
@@ -53,42 +57,37 @@ Support kiểm tra thông tin yêu cầu từ ticket:
 - **Trường hợp A: Đã có Mã dịch vụ Odoo**: Đã được Sales tạo mã dịch vụ trên Odoo (`WP_...`, `WH_...`).
 - **Trường hợp B: Chưa có Mã dịch vụ Odoo**: Khách hàng cần gấp trước hoặc Sales đang hoàn tất thủ tục hợp đồng.
 
-### Bước 2: Khai báo thông số trên cổng quản lý License
+### Bước 2: Trường hợp đã có mã dịch vụ
 
-Dưới đây là bảng quy tắc khai báo cụ thể cho từng loại phần mềm:
-
-| Hãng phần mềm | Trường hợp ĐÃ CÓ Mã DV | Trường hợp CHƯA CÓ Mã DV |
+| Hãng | Thông tin khai báo theo lưu đồ nguồn | Kết quả ghi nhận |
 | :--- | :--- | :--- |
-| **PLESK** | - Điền trường **Sub IP**: Nhập đúng địa chỉ IP máy chủ cần đăng ký. | - Điền trường **Sub IP**: Nhập mã quy ước nội bộ **`9602`**. |
-| **CPANEL** | - Điền trường **IP**: Nhập đúng địa chỉ IP máy chủ cần đăng ký. | - Bắt đầu bằng mã DV tạm, sau đó điền các thông tin IP theo hướng dẫn của hệ thống. |
-| **DIRECTADMIN** | - Điền trường **IP**: Nhập đúng địa chỉ IP máy chủ cần đăng ký. | - Báo người phụ trách chuyên trách license để xin cấp phép trước, sau khi nhận được phản hồi thì gửi thông tin cho CS/Khách hàng và nhờ tạo mã DV. |
+| Plesk | `Sub IP`: IP cần đăng ký. | Ô thông tin trả về trong nguồn chưa ghi chi tiết; cần người phụ trách xác nhận. |
+| cPanel | `IP`: IP cần đăng ký. | `Key ID` theo nguồn. |
+| DirectAdmin | `IP`: IP cần đăng ký; `Sub IP`: `9602`. | `Key ID` theo nguồn. |
 
-### Bước 3: Thu thập thông tin License trả về sau đăng ký
+`9602` là quy ước được ghi cho DirectAdmin, **không dùng cho Plesk**. Xác nhận quy ước này còn áp dụng với tài khoản đối tác hiện tại trước khi khai báo.
 
-Sau khi nhấn nút xác nhận đăng ký thành công trên cổng quản lý, hệ thống sẽ trả về các thông số bản quyền. Support ghi nhận vào ticket theo chuẩn sau:
+### Bước 3: Trường hợp chưa có mã dịch vụ
 
-#### 1. Đối với PLESK
-- **Trường IP**: Ghi nhận License ID của hãng (định dạng `PLSK.xxxxxxx`).
-- **Trường Sub IP**: Ghi nhận địa chỉ IP máy chủ đã đăng ký.
-- **Trường Key ID**: Ghi nhận mã kích hoạt (**Activation Code**).
-- **Thông tin gửi khách hàng**: Gửi mã **Activation Code** (khách hàng chỉ cần nhập mã này vào trang quản trị Plesk để kích hoạt tự động qua Internet).
+Cả ba nhánh Plesk, cPanel và DirectAdmin trong lưu đồ nguồn đều đi qua:
+1. Báo người phụ trách để xử lý yêu cầu đăng ký.
+2. Nhận phản hồi và bàn giao thông tin qua kênh được phê duyệt cho khách hàng/CS.
+3. Nhờ tạo mã dịch vụ, sau đó Start mã và cập nhật thông tin theo phân quyền được xác nhận.
 
-#### 2. Đối với CPANEL
-- **Trường IP**: Địa chỉ IP máy chủ đã đăng ký bản quyền.
-- **Trường Key ID**: Ghi nhận **License ID** tương ứng do cPanel cấp.
-- **Thông tin gửi khách hàng**: Thông báo IP đã được kích hoạt license trực tiếp trên máy chủ xác thực của cPanel (khách hàng chạy lệnh `/usr/local/cpanel/cpkeyclt` trên server để cập nhật).
+Không tự tạo “mã dịch vụ tạm” hoặc bỏ qua phê duyệt vì khách hàng cần gấp.
 
-#### 3. Đối với DIRECTADMIN
-- **Trường IP**: Địa chỉ IP máy chủ đã đăng ký bản quyền.
-- **Trường Sub IP**: Nhập mã quy ước **`9602`**.
-- **Trường Key ID**: Ghi nhận mã kích hoạt (**Activation Code**).
-- **Thông tin gửi khách hàng**: Gửi mã **Activation Code** (hoặc Client ID + License ID) cho khách hàng cài đặt.
+| Hãng | Thông tin cập nhật theo nhánh chưa có mã trong nguồn |
+| :--- | :--- |
+| Plesk | `IP`: License ID (`PLSK.xxx`); `Sub IP`: IP đã đăng ký; `Key ID`: Activation Code. |
+| cPanel | `IP`: IP đã đăng ký; `Key ID`: License ID. |
+| DirectAdmin | `IP`: IP đã đăng ký; `Sub IP`: `9602`; `Key ID`: Activation Code. |
 
-### Bước 4: Bàn giao & Phối hợp hoàn thiện Mã dịch vụ
-- **Hành động của SP**:
-  1. Gửi thông tin bản quyền vừa khởi tạo cho khách hàng qua hệ thống Ticket.
-  2. Đối với trường hợp chưa có Mã DV: Gửi thông tin (Loại license, IP, License ID) cho bộ phận Chăm sóc khách hàng (CS) và Sales phụ trách để tạo mã dịch vụ trên Odoo.
-  3. Khi Sales tạo xong mã DV: Cập nhật đối soát lại trên cổng license.
+### Bước 4: Kiểm tra và bàn giao
+
+- Đối chiếu hãng, IP và mã dịch vụ trước khi xác nhận kết quả.
+- Quy ước trường Odoo/cổng license không đồng nghĩa tên trường của API hãng.
+- Bàn giao bí mật qua kênh được phê duyệt; không lưu Activation Code hoặc khóa thật trong wiki hay ghi chú/ticket không được phép chứa bí mật.
+- Nếu giao diện hiện tại khác nguồn hoặc thiếu kết quả trả về, dừng và xác nhận với người phụ trách; không tự suy ra từ hãng khác.
 
 ### Bước 5: Đóng ticket
 - Chuyển trạng thái Ticket sang `Resolved` / `Closed`.
@@ -97,11 +96,9 @@ Sau khi nhấn nút xác nhận đăng ký thành công trên cổng quản lý,
 
 ## 6. Ngoại lệ & Điểm dừng
 
-| Tình huống ngoại lệ | Xử lý của Support |
-| :--- | :--- |
-| **Hệ thống cPanel báo lỗi IP đã tồn tại license tại một nhà cung cấp khác** | Yêu cầu khách hàng liên hệ nhà cung cấp cũ để hủy (release) license cho IP đó, hoặc hướng dẫn khách hàng gửi ticket xác minh quyền sở hữu IP cho cPanel. |
-| **Đổi địa chỉ IP cho License đang chạy** | Đăng nhập cổng quản lý, tìm License ID của khách hàng, sử dụng tính năng `Change IP / Transfer IP` để chuyển sang IP mới mà không cần mua license mới. |
-| **Hết hạn mức license trong tài khoản đại lý ODS** | Báo cáo ngay cho Trưởng bộ phận phụ trách license để nạp thêm hạn mức quota từ hãng. |
+- Thiếu mã dịch vụ: đi theo Bước 3, không tự tạo mã tạm.
+- IP/license đang gắn với nhà cung cấp khác, thay đổi IP, gia hạn hoặc hạn mức đại lý: chuyển người phụ trách xác nhận quy trình riêng; tài liệu nguồn đăng ký mới chưa đủ để hướng dẫn các thao tác này.
+- Chưa xác nhận quy ước tài khoản DirectAdmin hoặc trường trả về Plesk: không khai báo theo suy đoán.
 
 ---
 

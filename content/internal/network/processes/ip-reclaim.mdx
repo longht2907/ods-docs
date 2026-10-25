@@ -1,111 +1,43 @@
 ---
 title: Quy trình thu hồi IP & Range IP
-description: Hướng dẫn các bước tiếp nhận yêu cầu thanh lý, kiểm tra trạng thái sử dụng, xử lý dải IP dưới 13 IP và từ 13 IP trở lên, rà soát Blacklist và biện pháp NULL IP.
+description: Hướng dẫn tiếp nhận yêu cầu thu hồi IP và các điểm phải xác nhận giữa hai phiên bản tài liệu nguồn trước khi can thiệp.
 ---
 
-Quy trình này hướng dẫn nhân viên Support thực hiện thu hồi địa chỉ IPv4 đơn lẻ hoặc toàn bộ dải IP (Range IP) khi khách hàng chấm dứt hợp đồng, giảm bớt tài nguyên hoặc chuyển đổi dịch vụ tại ODS.
+<Callout title="Chưa phê duyệt luồng thao tác" type="warn">
+Hai nguồn “Thu hồi IP.pdf” và “THU HỒI IP.docx” có nhánh xử lý khác nhau. Trang này chưa cho phép dùng các nhánh chặn kết nối, NULL IP, hủy VLAN hoặc hủy mã dịch vụ như một quy trình đã được phê duyệt.
+</Callout>
 
----
+## 1. Phạm vi và thông tin đầu vào
 
-## 1. Mục đích & Phạm vi áp dụng
+Ghi nhận nguồn yêu cầu, người liên hệ được xác minh, khách hàng, mã dịch vụ liên quan, IP/range IP và thời điểm dự kiến. Đối chiếu yêu cầu với Sales/CS và trạng thái thực tế; không thu hồi chỉ dựa vào tên khách hàng hoặc một kết quả ping.
 
-- **Mục đích**: Thu hồi tài nguyên IP về kho khả dụng của ODS một cách an toàn; đảm bảo IP thu hồi không còn kết nối hoạt động ngầm, không bị dính danh sách đen (Blacklist), cập nhật trạng thái hợp đồng trên Odoo và hủy cấu hình định tuyến/VLAN trên hạ tầng.
-- **Phạm vi áp dụng**: Áp dụng cho các yêu cầu hủy, tạm ngưng hoặc thu hồi IP bổ sung của dịch vụ Colocation, Dedicated Server và Kênh truyền.
-- **Bên phối hợp**: Khách hàng, Chăm sóc khách hàng (CSKH) / Sales, Support Team, NOC Team.
+## 2. Checklist tiếp nhận
 
----
+- [ ] Mở ticket và xác minh người yêu cầu theo quy định hiện hành.
+- [ ] Đối chiếu chính xác IP/range, mã dịch vụ, tài nguyên liên quan.
+- [ ] Thu thập bằng chứng trạng thái sử dụng từ công cụ được phép.
+- [ ] Gửi người phụ trách xác nhận phiên bản quy trình và phạm vi thay đổi.
+- [ ] **Dừng trước mọi thao tác gián đoạn** nếu chưa có xác nhận.
 
-## 2. Điều kiện & Thông tin đầu vào
-
-| Thông tin cần có | Mô tả chi tiết | Kênh xác thực |
-| :--- | :--- | :--- |
-| **Nguồn gốc yêu cầu** | Yêu cầu chủ động từ Khách hàng hoặc Thông báo thanh lý/giảm tài nguyên từ Bộ phận Kinh doanh/CSKH. | Ticket / Email chính thức. |
-| **Danh sách IP cần thu hồi** | Địa chỉ IP đơn lẻ hoặc dải mạng (ví dụ: `103.x.x.x/28`). | Tra cứu trên hợp đồng Odoo. |
-| **Mã dịch vụ liên quan** | Mã dịch vụ IP hoặc mã dịch vụ chính gắn với IP (`61IP_...`, `CO1U_...`). | Tra cứu Odoo. |
-| **Công cụ kiểm tra** | Công cụ kiểm tra Blacklist (Spamhaus, Barracuda) và Hệ thống quản lý IPAM. | Công cụ nội bộ. |
-
----
-
-## 3. Checklist tổng thể
-
-- [ ] Tiếp nhận yêu cầu thu hồi và mở Ticket theo dõi.
-- [ ] Xác định chính xác danh sách IP và Mã dịch vụ cần hủy.
-- [ ] Ping kiểm tra thực tế: Xác định IP còn đang có thiết bị sử dụng hay đã ngắt kết nối hoàn toàn.
-- [ ] Nếu IP vẫn còn phát sinh lưu lượng: Phối hợp CSKH làm việc với khách hàng hoặc áp dụng biện pháp kỹ thuật (Chặn trong nước / NULL IP).
-- [ ] Rà soát Blacklist: Đảm bảo IP sạch trước khi trả về kho (nếu dính BL phải xử lý gỡ bỏ).
-- [ ] Xử lý theo quy mô dải:
-  - Dải $< 13$ IP: Hủy mã dịch vụ trên Odoo và xóa ghi chú trên IPAM.
-  - Dải $\ge 13$ IP: Phối hợp NOC Team xóa cấu hình VLAN/định tuyến trên Switch Core và xóa note IPAM.
-- [ ] Cập nhật trạng thái ngày kết thúc cước trên Odoo.
-- [ ] Gửi email thông báo thu hồi IP hoàn tất cho các bên $\rightarrow$ Đóng ticket.
-
----
-
-## 4. Lưu đồ quyết định
+## 3. Lưu đồ kiểm soát
 
 <ProcessFlowchart flowId="ip-reclaim" />
 
----
+## 4. Các khác biệt cần xác nhận
 
-## 5. Các bước thực hiện chi tiết
+| Hạng mục | PDF | Word | Quyết định cần có |
+| :--- | :--- | :--- | :--- |
+| Phân nhánh quy mô | Có nhánh dưới 13 và từ 13 IP; phối hợp NOC ở nhánh dải lớn. | Không biểu diễn cùng cách phân nhánh này. | Ngưỡng và loại tài nguyên thực tế nào được áp dụng? |
+| IP còn được sử dụng | Có nhánh thông báo, phối hợp CSKH hoặc chặn trong nước. | Có nhánh yêu cầu ngưng dùng, phối hợp NOC NULL IP. | Điều kiện, thẩm quyền và biện pháp được duyệt là gì? |
+| Cập nhật hành chính | Có hủy mã dịch vụ. | Có ghi bỏ tick sử dụng và ngày kết thúc tính tiền. | Trình tự, trường Odoo và bên thực hiện hiện hành? |
+| Kiểm tra blacklist | Có kiểm tra và dẫn sang quy trình xử lý blacklist. | Có kiểm tra nhưng công cụ tham chiếu khác. | Công cụ được phép và tiêu chí đưa IP về kho? |
 
-### Bước 1: Tiếp nhận & Xác định thông tin
-- **Hành động của SP**:
-  1. Mở Ticket ghi nhận yêu cầu thu hồi.
-  2. Xác định danh sách IP hoặc Subnet Range IP cần thu hồi.
-  3. Tra cứu trên Odoo: Kiểm tra mã dịch vụ, ngày kết thúc tính phí và tình trạng hợp đồng.
+## 5. Điều kiện tiếp tục và bàn giao
 
-### Bước 2: Kiểm tra tình trạng sử dụng thực tế
-- **Hành động của SP**: Thực hiện lệnh ping và kiểm tra bảng MAC/ARP trên cổng switch xem IP có còn đang nhận diện thiết bị hay không.
-- **Xử lý theo nhánh**:
-  - **Nhánh 1: IP không còn sử dụng**: Thiết bị đã tắt hoặc đã gỡ IP $\rightarrow$ Chuyển sang Bước 3.
-  - **Nhánh 2: IP vẫn còn đang sử dụng (Traffic đang chạy)**:
-    - *Tình huống A (Khách hàng có nhu cầu sử dụng tiếp)*: Báo ngay cho bộ phận CSKH/Sales để làm phụ lục hợp đồng duy trì dịch vụ, tạm hoãn thu hồi.
-    - *Tình huống B (Khách hàng không phản hồi hoặc đã hết hạn hợp đồng nhưng chưa chịu tháo IP)*:
-      1. Gửi email cảnh báo thời hạn ngắt kết nối.
-      2. Áp dụng rule chặn kết nối trong nước trên Firewall/Switch.
-      3. Đối với trường hợp vi phạm kéo dài hoặc chiếm dụng trái phép: Liên hệ **NOC Team cấu hình NULL IP (định tuyến về Null0)** để triệt tiêu toàn bộ lưu lượng của IP này. Sau khi IP ngắt hẳn kết nối $\rightarrow$ chuyển sang Bước 3.
+Người phụ trách cần xác nhận phiên bản, phạm vi và quyền thay đổi. Chỉ thực hiện theo quy trình được duyệt, lưu bằng chứng trước/sau, kiểm tra ảnh hưởng và thông báo kết quả. Trang sẽ được cập nhật sau khi có quyết định; không coi việc đóng ticket là bằng chứng IP đã an toàn để cấp lại.
 
-### Bước 3: Rà soát danh sách đen (Blacklist)
-- **Hành động của SP**:
-  - Sử dụng công cụ kiểm tra danh sách đen trực tuyến để quét toàn bộ các địa chỉ IP vừa thu hồi.
-  - **Nếu phát hiện dính Blacklist**: Kích hoạt [Runbook xử lý IP bị Blacklist](/internal/network/runbooks/ip-blacklist) để gửi yêu cầu gỡ bỏ, làm sạch IP trước khi đưa về kho lưu trữ dùng chung.
-  - **Nếu IP sạch**: Tiến hành các bước giải phóng tài nguyên.
+## 6. Tài liệu liên quan
 
-### Bước 4: Giải phóng tài nguyên theo quy mô dải IP
-Tuân thủ phân nhánh kỹ thuật theo độ lớn của dải IP:
-
-#### Phân nhánh A: Dải IP nhỏ ($< 13$ IP — Block /29, IP lẻ)
-1. Đăng nhập phần mềm Odoo: Tìm mã dịch vụ IP của khách hàng, bỏ tick `Sử dụng`, cập nhật `Ngày kết thúc tính tiền` và chuyển trạng thái sang `Cancelled`.
-2. Đăng nhập hệ thống IPAM: Tìm các địa chỉ IP tương ứng, xóa toàn bộ ghi chú (bỏ note Tên KH, Mã DV cũ) và chuyển trạng thái IP về `Available` (hoặc gắn nhãn chờ cấp phát mới).
-
-#### Phân nhánh B: Dải IP lớn ($\ge 13$ IP — Block /28, /27, /26...)
-1. Tạo ticket gửi **NOC Team** đề nghị:
-   - Thu hồi dải Subnet mạng.
-   - Xóa VLAN riêng của khách hàng trên Switch Core/Distribution.
-   - Hủy cấu hình Default Gateway trên Router.
-2. Sau khi NOC hoàn tất: Xóa toàn bộ ghi chú của dải IP trên IPAM và cập nhật hủy mã dịch vụ trên Odoo.
-
-### Bước 5: Gửi thông báo hoàn tất & Đóng ticket
-- **Hành động của SP**:
-  1. Gửi email xác nhận thu hồi IP hoàn tất:
-     - Gửi cho khách hàng và CSKH/Sales (nêu rõ danh sách IP đã thu hồi và thời điểm chấm dứt dịch vụ).
-     - Đối với IP tặng kèm dịch vụ: gửi email thông báo hủy chính sách ưu đãi kèm theo.
-  2. Chuyển trạng thái Ticket sang `Closed`.
-
----
-
-## 6. Ngoại lệ & Điểm dừng
-
-| Tình huống ngoại lệ | Xử lý của Support |
-| :--- | :--- |
-| **Khách hàng khiếu nại bị mất kết nối do thu hồi nhầm IP** | Tạm thời khôi phục lại cấu hình mạng trên switch/router nếu khách hàng chứng minh được hợp đồng còn hạn, đồng thời báo Sales khẩn cấp để đối chiếu lại phụ lục hợp đồng. |
-| **IP sau khi thu hồi vẫn tiếp tục bị tấn công DDoS từ bên ngoài** | Giữ nguyên trạng thái NULL IP hoặc chặn quốc tế, không đưa vào pool cấp mới cho khách hàng khác cho đến khi lưu lượng tấn công chấm dứt hoàn toàn. |
-
----
-
-## 7. Tài liệu liên quan
-
-- [Quy trình cấp phát IP & Range IP](/internal/network/processes/ip-allocation)
-- [Xử lý IP bị Blacklist](/internal/network/runbooks/ip-blacklist)
-- [Mã dịch vụ & tra cứu trên Odoo](/internal/service-codes)
+- [Cấp phát IP](/internal/network/processes/ip-allocation)
+- [Xử lý blacklist](/internal/network/runbooks/ip-blacklist)
+- [Mã dịch vụ trên Odoo](/internal/service-codes)

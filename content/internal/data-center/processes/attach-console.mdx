@@ -3,6 +3,10 @@ title: Quy trình gắn Console kiểm tra máy chủ
 description: Hướng dẫn kỹ thuật gắn màn hình console tại chỗ, kiểm tra tín hiệu bàn phím/màn hình, chẩn đoán server bị treo hoặc báo lỗi và xử lý theo yêu cầu.
 ---
 
+<Callout title="Trạng thái xác nhận quy trình" type="warn">
+Bản biên soạn từ tài liệu nguồn, chưa phải xác nhận chính sách hiện hành. Trước thao tác ảnh hưởng dịch vụ, phải xác nhận phạm vi, thẩm quyền và phương án xử lý với người phụ trách. Các thời hạn, biện pháp chặn/mở hoặc thông số tài khoản trong nguồn không tự trở thành quy định đã được phê duyệt. Lưu đồ cũng chịu cùng giới hạn này.
+</Callout>
+
 Quy trình này hướng dẫn nhân viên Support thực hiện gắn bộ Console di động trực tiếp tại tủ rack để kiểm tra tình trạng hoạt động thực tế của máy chủ khách hàng khi máy chủ mất kết nối mạng hoặc không phản hồi từ xa.
 
 ---
@@ -68,8 +72,8 @@ Kỹ sư quan sát và kiểm tra theo 3 tình huống sau:
 
 #### Tình huống 1: Màn hình & Bàn phím hoạt động bình thường
 - Màn hình hiển thị cửa sổ đăng nhập hệ điều hành bình thường (Login prompt trên Linux hoặc màn hình Lock Screen trên Windows).
-- Bấm phím `Caps Lock` hoặc `Num Lock`, đèn tín hiệu trên bàn phím sáng/tắt nhịp nhàng $\rightarrow$ Hệ điều hành không bị treo.
-- **Xử lý**: Server vẫn đang chạy tốt. Nguyên nhân mất kết nối từ xa có thể do cấu hình firewall trong OS chặn mạng hoặc lỗi dịch vụ SSH/RDP. Chụp ảnh màn hình đăng nhập $\rightarrow$ gửi email thông báo khách hàng kiểm tra lại cấu hình mạng nội bộ.
+- Bấm phím `Caps Lock` hoặc `Num Lock`, đèn tín hiệu trên bàn phím sáng/tắt nhịp nhàng → Hệ điều hành không bị treo.
+- **Xử lý**: Server vẫn đang chạy tốt. Nguyên nhân mất kết nối từ xa có thể do cấu hình firewall trong OS chặn mạng hoặc lỗi dịch vụ SSH/RDP. Chụp ảnh màn hình đăng nhập → gửi email thông báo khách hàng kiểm tra lại cấu hình mạng nội bộ.
 
 #### Tình huống 2: Màn hình hiển thị thông báo lỗi
 - Màn hình hiển thị lỗi hệ điều hành: Màn hình xanh chết chóc (BSOD trên Windows), lỗi Kernel Panic trên Linux, hoặc lỗi phần cứng `No boot device found / RAID degraded`.
@@ -79,7 +83,7 @@ Kỹ sư quan sát và kiểm tra theo 3 tình huống sau:
   3. Hỏi ý kiến khách hàng có muốn hỗ trợ Reboot lại máy chủ hay không.
 
 #### Tình huống 3: Bàn phím không phản hồi hoặc Màn hình tối đen
-- Màn hình không xuất tín hiệu (No Signal) dù dây cắm chắc chắn, hoặc màn hình bị đơ cứng, bấm `Caps Lock` / `Num Lock` đèn không sáng $\rightarrow$ Máy chủ hoặc card màn hình đã bị treo cứng (Hardware Freeze).
+- Màn hình không xuất tín hiệu (No Signal) dù dây cắm chắc chắn, hoặc màn hình bị đơ cứng, bấm `Caps Lock` / `Num Lock` đèn không sáng → Máy chủ hoặc card màn hình đã bị treo cứng (Hardware Freeze).
 - **Xử lý**:
   1. Gửi email thông báo cho khách hàng tình trạng máy chủ đang bị treo hoàn toàn ở lớp vật lý.
   2. Đề xuất khách hàng phương án khởi động lại máy chủ (Reboot).

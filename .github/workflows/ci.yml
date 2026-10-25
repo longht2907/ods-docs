@@ -10,6 +10,8 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      ODS_DOCS_SITE_URL: https://ods-docs-ci.invalid
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,3 +48,9 @@ jobs:
 
       - name: Test Routes
         run: npm run test:routes
+
+      - name: Test Internal Content and Media
+        run: npm run test:internal-content
+
+      - name: Test Flowchart UI
+        run: npm run test:flowchart

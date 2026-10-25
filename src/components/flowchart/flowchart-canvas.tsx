@@ -1,16 +1,11 @@
-import React from 'react';
+import React, { useId } from 'react';
+import { flowchartSize, wrapLabel, NODE_WIDTH, NODE_HEIGHT, COL_SPACING, ROW_SPACING } from './layout';
 import type { FlowchartData, FlowchartNode, FlowchartEdge } from './types';
 
 interface CanvasProps {
   data: FlowchartData;
   className?: string;
 }
-
-const NODE_W = 204;
-const NODE_H = 68;
-const COL_SPACING = 380;
-const ROW_SPACING = 135;
-const PADDING = 48;
 
 interface ComputedNode extends FlowchartNode {
   x: number;
@@ -20,40 +15,16 @@ interface ComputedNode extends FlowchartNode {
 }
 
 export function FlowchartCanvas({ data, className = '' }: CanvasProps) {
-  // 1. Tính toán tọa độ của từng node theo row và col
-  // Tìm min/max col để căn giữa
-  const cols = data.nodes.map((n) => n.col);
-  const rows = data.nodes.map((n) => n.row);
-  const minCol = Math.min(...cols, 0);
-  const maxCol = Math.max(...cols, 0);
-  const minRow = Math.min(...rows, 1);
-  const maxRow = Math.max(...rows, 1);
-
+  const instanceId = useId().replace(/:/g, '');
+  const { minCol, minRow, padLeft, width: svgWidth, height: svgHeight } = flowchartSize(data);
   const colOffset = Math.abs(minCol);
-  const totalCols = maxCol - minCol + 1;
-  const totalRows = maxRow - minRow + 1;
-
-  // Kiểm tra xem có đường loop bên trái hoặc bên phải không để nới rộng lề cho nhãn
-  const hasLeftLoop = data.edges.some((edge) => {
-    return edge.fromPort === 'left' && edge.toPort === 'left';
-  });
-  const hasRightLoop = data.edges.some((edge) => {
-    return edge.fromPort === 'right' && edge.toPort === 'right';
-  });
-
-  const padLeft = hasLeftLoop ? 120 : 60;
-  const padRight = hasRightLoop ? 120 : 60;
   const padTop = 40;
-  const padBottom = 40;
-
-  const svgWidth = Math.max(totalCols * COL_SPACING + padLeft + padRight, 600);
-  const svgHeight = totalRows * ROW_SPACING + padTop + padBottom + 20;
 
   const computedNodes: Record<string, ComputedNode> = {};
 
   data.nodes.forEach((n) => {
-    const w = n.width || NODE_W;
-    const h = n.height || NODE_H;
+    const w = n.width || NODE_WIDTH;
+    const h = Math.max(n.height || NODE_HEIGHT, wrapLabel(n.label).length * 18 + (n.subLabel ? wrapLabel(n.subLabel, 32).length * 15 + 24 : 24));
     // Căn giữa mỗi cột
     const cx = padLeft + (n.col + colOffset) * COL_SPACING + COL_SPACING / 2;
     const cy = padTop + (n.row - minRow) * ROW_SPACING + h / 2;
@@ -163,17 +134,22 @@ export function FlowchartCanvas({ data, className = '' }: CanvasProps) {
     return `M ${p1.x} ${p1.y} C ${p1.x} ${(p1.y + p2.y) / 2}, ${p2.x} ${(p1.y + p2.y) / 2}, ${p2.x} ${p2.y}`;
   }
 
-  const prefix = `fc-${data.id}`;
+  const prefix = `fc-${data.id}-${instanceId}`;
 
   return (
     <svg
+      role="img"
+      aria-labelledby={`${prefix}-title ${prefix}-description`}
+      data-flowchart-svg={data.id}
       viewBox={`0 0 ${svgWidth} ${svgHeight}`}
       className={`w-full h-auto text-fd-foreground select-none ${className}`}
       style={{
         fontFamily: 'var(--font-sans, system-ui, sans-serif)',
-        maxHeight: '100%',
+
       }}
     >
+      <title id={`${prefix}-title`}>{data.title}</title>
+      <desc id={`${prefix}-description`}>{data.caption || 'Lưu đồ; các bước và nhánh được mô tả trong nội dung bài viết.'}</desc>
       <defs>
         {/* Mũi tên mặc định */}
         <marker
@@ -255,25 +231,25 @@ export function FlowchartCanvas({ data, className = '' }: CanvasProps) {
             labelY = p2.y - 12;
           }
 
-          let strokeClass = 'stroke-fd-border';
+          let strokeClass = 'stroke-fd-muted-foreground/60';
           let markerEnd = `url(#${prefix}-arrow)`;
           let labelBgClass = 'fill-fd-muted/80 stroke-fd-border';
           let labelTextClass = 'fill-fd-foreground';
 
-          if (edge.variant === 'yes' || edge.label?.toLowerCase().includes('có') || edge.label?.toLowerCase().includes('đã') || edge.label?.toLowerCase().includes('hợp lệ') || edge.label?.toLowerCase().includes('thành công')) {
-            strokeClass = 'stroke-emerald-500/70 dark:stroke-emerald-400/70';
+          if (edge.variant === 'yes') {
+            strokeClass = 'stroke-emerald-600 dark:stroke-emerald-400';
             markerEnd = `url(#${prefix}-arrow-yes)`;
             labelBgClass = 'fill-emerald-500/15 stroke-emerald-500/40';
-            labelTextClass = 'fill-emerald-700 dark:fill-emerald-300 font-semibold';
-          } else if (edge.variant === 'no' || edge.label?.toLowerCase().includes('không') || edge.label?.toLowerCase().includes('chưa') || edge.label?.toLowerCase().includes('thiếu') || edge.label?.toLowerCase().includes('lỗi')) {
-            strokeClass = 'stroke-amber-500/70 dark:stroke-amber-400/70';
+            labelTextClass = 'fill-emerald-800 dark:fill-emerald-200 font-semibold';
+          } else if (edge.variant === 'no') {
+            strokeClass = 'stroke-amber-600 dark:stroke-amber-400';
             markerEnd = `url(#${prefix}-arrow-no)`;
             labelBgClass = 'fill-amber-500/15 stroke-amber-500/40';
-            labelTextClass = 'fill-amber-700 dark:fill-amber-300 font-semibold';
+            labelTextClass = 'fill-amber-900 dark:fill-amber-200 font-semibold';
           }
 
-          const labelW = edge.label ? Math.max(edge.label.length * 8 + 18, 64) : 0;
-          const labelH = 22;
+          const labelW = edge.label ? Math.max(edge.label.length * 8 + 24, 64) : 0;
+          const labelH = 28;
 
           return (
             <g key={`edge-${idx}`}>
@@ -311,7 +287,7 @@ export function FlowchartCanvas({ data, className = '' }: CanvasProps) {
                     x="0"
                     y="3.5"
                     textAnchor="middle"
-                    className={`text-[10.5px] select-none ${labelTextClass}`}
+                    className={`text-[13px] select-none ${labelTextClass}`}
                   >
                     {edge.label}
                   </text>
@@ -350,20 +326,14 @@ export function FlowchartCanvas({ data, className = '' }: CanvasProps) {
             titleColor = 'fill-purple-900 dark:fill-purple-200 font-semibold';
           }
 
-          // Chia dòng văn bản thông minh (tối đa 2 dòng)
-          const words = node.label.split(' ');
-          let line1 = node.label;
-          let line2 = '';
-          if (node.label.length > 22 && words.length > 2) {
-            const mid = Math.ceil(words.length / 2);
-            line1 = words.slice(0, mid).join(' ');
-            line2 = words.slice(mid).join(' ');
-          }
-
-          const hasTwoLines = Boolean(line2);
+          const lines = wrapLabel(node.label);
+          const link = node.refUrl || node.stepLink;
+          const firstLineY = (n.h - (node.subLabel ? wrapLabel(node.subLabel, 32).length * 15 + 4 : 0)) / 2 - (lines.length - 1) * 9 + 5;
 
           return (
-            <g key={node.id} transform={`translate(${n.x}, ${n.y})`} className="transition-transform duration-150">
+            <g key={node.id} data-flowchart-node={node.id} transform={`translate(${n.x}, ${n.y})`} className="transition-transform duration-150">
+              <a href={link} aria-label={link ? node.label : undefined} className={link ? 'outline-none focus-visible:outline-2 focus-visible:outline-fd-primary' : undefined}>
+              <title>{`${node.label}${node.subLabel ? ` — ${node.subLabel}` : ''}`}</title>
               {/* Khối nền */}
               <rect
                 width={n.w}
@@ -398,42 +368,19 @@ export function FlowchartCanvas({ data, className = '' }: CanvasProps) {
                 </g>
               )}
 
-              {/* Văn bản nhãn của Node */}
-              <text
-                x={isDecision ? n.w / 2 + 6 : n.w / 2}
-                y={
-                  hasTwoLines
-                    ? n.h / 2 - 3
-                    : n.h / 2 + 4
-                }
-                textAnchor="middle"
-                className={`text-[12px] ${titleColor}`}
-              >
-                {line1}
-              </text>
-
-              {hasTwoLines && (
-                <text
-                  x={isDecision ? n.w / 2 + 6 : n.w / 2}
-                  y={n.h / 2 + 13}
-                  textAnchor="middle"
-                  className={`text-[11px] ${titleColor} opacity-90`}
-                >
-                  {line2}
+              {/* Wrap at word boundaries; size is independent of viewport. */}
+              {lines.map((line, index) => (
+                <text key={index} x={n.w / 2} y={firstLineY + index * 18}
+                  textAnchor="middle" className={`text-[14px] ${titleColor}`}>
+                  {line}
                 </text>
-              )}
+              ))}
 
-              {/* Sub-label nếu có */}
-              {node.subLabel && (
-                <text
-                  x={n.w / 2}
-                  y={n.h - 8}
-                  textAnchor="middle"
-                  className="text-[9.5px] fill-fd-muted-foreground"
-                >
-                  {node.subLabel}
-                </text>
-              )}
+              {node.subLabel && wrapLabel(node.subLabel, 32).map((line, index, list) => (
+                <text key={`sub-${index}`} x={n.w / 2} y={n.h - 10 - (list.length - 1 - index) * 15}
+                  textAnchor="middle" className="text-[12px] fill-fd-muted-foreground">{line}</text>
+              ))}
+              </a>
             </g>
           );
         })}

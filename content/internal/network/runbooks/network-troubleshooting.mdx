@@ -3,6 +3,10 @@ title: Kiểm tra & Chẩn đoán kết nối mạng
 description: Hướng dẫn chẩn đoán sự cố mất kết nối, chập chờn, suy giảm băng thông qua ping/tracert hai chiều, VPN nhà mạng và 3 kịch bản xử lý traffic.
 ---
 
+<Callout title="Trạng thái xác nhận quy trình" type="warn">
+Bản biên soạn từ tài liệu nguồn, chưa phải xác nhận chính sách hiện hành. Trước thao tác ảnh hưởng dịch vụ, phải xác nhận phạm vi, thẩm quyền và phương án xử lý với người phụ trách. Các thời hạn, biện pháp chặn/mở hoặc thông số tài khoản trong nguồn không tự trở thành quy định đã được phê duyệt. Lưu đồ cũng chịu cùng giới hạn này.
+</Callout>
+
 Runbook này hướng dẫn quy trình tiêu chuẩn dành cho nhân viên Support khi tiếp nhận phản ánh của khách hàng về sự cố mất kết nối mạng, đường truyền chập chờn hoặc truy cập máy chủ bị chậm từ các nhà mạng khác nhau.
 
 ---
@@ -61,15 +65,15 @@ Runbook này hướng dẫn quy trình tiêu chuẩn dành cho nhân viên Suppo
 ### Bước 3: Khoanh vùng lỗi theo triệu chứng
 
 #### Phân nhánh A: Hoàn toàn không thể kết nối (Mất kết nối 100%)
-1. **Kiểm tra trạng thái chặn**: Kiểm tra xem địa chỉ IP máy chủ có đang bị áp rule chặn hướng Quốc tế hoặc Trong nước (do vi phạm trước đó hoặc cảnh báo bảo mật) hay không. Nếu có $\rightarrow$ kiểm tra lý do chặn, mở chặn thử nghiệm và gửi email nhờ khách hàng kiểm tra lại.
-2. **Kiểm tra tấn công DDoS**: Nếu không có lệnh chặn, tiến hành bắt gói tin (Sniff traffic) trên cổng switch xem IP có đang bị tấn công flood hay không. Nếu bị tấn công $\rightarrow$ chuyển sang [Runbook xử lý DDoS](/internal/network/runbooks/ddos-mitigation).
+1. **Kiểm tra trạng thái chặn**: Kiểm tra xem địa chỉ IP máy chủ có đang bị áp rule chặn hướng Quốc tế hoặc Trong nước (do vi phạm trước đó hoặc cảnh báo bảo mật) hay không. Nếu có → kiểm tra lý do chặn, mở chặn thử nghiệm và gửi email nhờ khách hàng kiểm tra lại.
+2. **Kiểm tra tấn công DDoS**: Nếu không có lệnh chặn, tiến hành bắt gói tin (Sniff traffic) trên cổng switch xem IP có đang bị tấn công flood hay không. Nếu bị tấn công → chuyển sang [Runbook xử lý DDoS](/internal/network/runbooks/ddos-mitigation).
 3. **Kiểm tra phần cứng tại tủ**: Nếu không bị tấn công, kiểm tra bảng MAC/ARP cổng switch, di chuyển vào DC cắm Console kiểm tra trực tiếp máy chủ và đèn tín hiệu cổng mạng.
 
 #### Phân nhánh B: Mạng chập chờn, chậm, mất gói
 - Đọc kỹ từng bước nhảy (Hop) trong bảng `tracert`:
-  - Nếu mất gói ngay từ các bước nhảy đầu tiên (Hop 1-3) $\rightarrow$ lỗi từ modem/hạ tầng mạng nội bộ của khách hàng.
-  - Nếu mất gói ở các bước nhảy trung gian của nhà mạng (Transit ISP) $\rightarrow$ sự cố tuyến cáp quang của ISP.
-  - Nếu mất gói ở bước nhảy cuối cùng tại cổng Gateway/Switch của ODS $\rightarrow$ nghẽn port switch hoặc quá tải trên máy chủ.
+  - Nếu mất gói ngay từ các bước nhảy đầu tiên (Hop 1-3) → lỗi từ modem/hạ tầng mạng nội bộ của khách hàng.
+  - Nếu mất gói ở các bước nhảy trung gian của nhà mạng (Transit ISP) → sự cố tuyến cáp quang của ISP.
+  - Nếu mất gói ở bước nhảy cuối cùng tại cổng Gateway/Switch của ODS → nghẽn port switch hoặc quá tải trên máy chủ.
 
 ### Bước 4: Xử lý theo 3 Kịch bản chuẩn
 

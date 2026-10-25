@@ -2,7 +2,12 @@
 
 ## Trạng thái
 
-Đã kiểm thử local trên nhánh `task/TASK-025-internal-review-fixes`, nền `fb781d5` (main sau PR #25). Chưa merge/deploy. Lần kết nối cũ bị từ chối ghi (403); kết nối mới đã tạo nhánh thành công. Đang xuất bản bản sửa và chờ CI của PR. TASK-025 giữ in-progress cho tới khi CI đạt.
+Đã hoàn tất bản sửa và kiểm chứng kỹ thuật: **done**. Đã xuất bản [PR #26](https://github.com/longht2907/ods-docs/pull/26) từ `task/TASK-025-internal-review-fixes` vào main, nền `fb781d5` (main sau PR #25). **Chưa merge/deploy**.
+
+- Snapshot bản sửa được CI xác nhận: `c7830fe36523f30e0148cc9defd76fc6a2cedfa6`.
+- [CI verify thành công](https://github.com/longht2907/ods-docs/actions/runs/40171058393/job/121101792778): env, links, scope, types, guard, build, routes, internal content/media và flowchart UI.
+- Trường `commit` của task ghi snapshot đã kiểm chứng trước commit cập nhật hồ sơ, không phải tự tham chiếu hash hiện tại.
+- Done chỉ đóng phần sửa lỗi/kiểm chứng kỹ thuật, không phê duyệt chính sách vận hành hoặc xác nhận đã xóa dữ liệu khỏi lịch sử.
 
 ## Phạm vi sửa
 
@@ -30,7 +35,7 @@ Lệnh cuối: `ODS_DOCS_SITE_URL=https://ods-docs-review.invalid npm run verify
 
 Ảnh kiểm chứng local đã xem trực tiếp: desktop/mobile, sáng/tối, nhập server/license/DDoS. Không đưa ảnh khách hàng cũ vào bằng chứng. Hai test mới được thêm vào `verify:task` và CI; không nới test/guard cũ. Một lượt trước test API UI cũ lỗi khôi phục tab Python ở StartCampaign; lượt đầy đủ cuối PASS. Không kết luận đã khắc phục nguyên nhân flakiness của test cũ.
 
-**CI GitHub đang chờ xuất bản PR.** Lỗi 403 thuộc kết nối cũ; sau khi người dùng kết nối lại đã tạo nhánh thành công. Sẽ cập nhật PR/head/CI thực tế sau khi xuất bản. Không merge/deploy hoặc sửa lịch sử.
+**CI GitHub đã thành công** trên snapshot nêu trên: [verify](https://github.com/longht2907/ods-docs/actions/runs/40171058393/job/121101792778). Kết nối mới đã tạo nhánh, cập nhật workflow, đẩy file và tạo PR được. Lỗi 403 trước đó đã được giải quyết. Không merge/deploy hoặc sửa lịch sử. Commit đóng hồ sơ chỉ sửa task/report; CI sẽ chạy lại trên head mới.
 
 ## Cần owner xử lý/xác nhận
 

@@ -1,0 +1,94 @@
+---
+title: Tiếp nhận & điều hướng xử lý yêu cầu
+description: Luồng xử lý tiêu chuẩn 7 bước từ khi nhận yêu cầu, phân loại nhóm tác vụ đến định hướng tới quy trình vận hành và runbook sự cố phù hợp.
+---
+
+Trang này hướng dẫn khung luồng xử lý yêu cầu tiêu chuẩn áp dụng cho toàn bộ hoạt động hỗ trợ khách hàng tại ODS. Hướng dẫn đóng vai trò định hướng chung giúp nhân viên Support tiếp nhận, phân loại và tìm đúng tài liệu xử lý; không thay thế cho các quy trình kỹ thuật chuyên sâu của từng mảng dịch vụ.
+
+---
+
+## 1. Luồng xử lý yêu cầu chuẩn 7 bước
+
+Mọi yêu cầu gửi đến đội ngũ Support (qua kênh Ticket, Email hỗ trợ, Hotline hoặc Hệ thống quản trị) đều trải qua chu trình 7 bước sau:
+
+```text
+[1. Nhận yêu cầu từ khách hàng]
+               │
+               ▼
+[2. Xác thực chủ thể & Xác định mã dịch vụ]
+               │
+               ▼
+[3. Đối chiếu thông tin kỹ thuật liên quan]
+               │
+               ▼
+[4. Phân loại nhóm yêu cầu]
+               │
+               ▼
+[5. Tra cứu quy trình / runbook xử lý phù hợp]
+               │
+               ▼
+[6. Thực hiện kỹ thuật & Kiểm tra kết quả]
+               │
+               ▼
+[7. Ghi nhận kết quả & Phản hồi hoàn tất]
+```
+
+### Bước 1: Tiếp nhận yêu cầu
+Ghi nhận đầy đủ thông tin ban đầu: người gửi, kênh liên hệ, thời điểm phát sinh và mô tả hiện tượng/nhu cầu cần hỗ trợ.
+
+### Bước 2: Xác thực chủ thể & Xác định mã dịch vụ
+- Đối chiếu người gửi có nằm trong danh sách người liên hệ hợp lệ của khách hàng hay không.
+- Tra cứu [Mã dịch vụ & tra cứu trên Odoo](/internal/service-codes) để xác định chính xác hợp đồng dịch vụ đang được yêu cầu.
+
+### Bước 3: Đối chiếu thông tin kỹ thuật liên quan
+- Kiểm tra trạng thái hiệu lực của dịch vụ trên Odoo (đang hoạt động, quá hạn cước, tạm ngưng...).
+- Đối chiếu các thông số kỹ thuật thực tế liên quan: địa chỉ IP, cổng mạng, số máy nhánh, domain tổng đài, tài khoản quản trị.
+
+### Bước 4: Phân loại nhóm yêu cầu
+Xác định yêu cầu thuộc nhóm nào trong 4 nhóm tác vụ chính:
+1. Vòng đời dịch vụ (Triển khai, Thay đổi, Tạm ngưng, Khôi phục, Hủy).
+2. Yêu cầu cấu hình kỹ thuật.
+3. Xử lý sự cố kỹ thuật (Troubleshooting).
+4. Yêu cầu thông tin hoặc Hỗ trợ tích hợp.
+
+### Bước 5: Tra cứu quy trình hoặc runbook phù hợp
+Mở đúng tài liệu hướng dẫn kỹ thuật trên Support Wiki theo mảng dịch vụ tương ứng để nắm rõ các bước thao tác an toàn và các lưu ý kỹ thuật.
+
+### Bước 6: Thực hiện kỹ thuật & Kiểm tra kết quả
+- Tiến hành xử lý theo đúng trình tự hướng dẫn trong quy trình/runbook.
+- Luôn kiểm tra lại tính ổn định của dịch vụ sau khi thay đổi (gọi thử, ping kiểm tra đường truyền, kiểm tra trạng thái port...).
+
+### Bước 7: Ghi nhận kết quả & Phản hồi hoàn tất
+- Cập nhật nhật ký xử lý (log ghi chú) vào hệ thống ticket hoặc phần mềm quản lý.
+- Phản hồi kết quả rõ ràng, lịch sự cho khách hàng kèm hướng dẫn kiểm tra lại từ phía khách hàng.
+
+---
+
+## 2. Phân loại 4 nhóm yêu cầu chính
+
+| Nhóm yêu cầu | Bản chất tác vụ | Ví dụ thực tế | Hướng xử lý tài liệu |
+| :--- | :--- | :--- | :--- |
+| **1. Vòng đời dịch vụ** | Khởi tạo mới, thay đổi gói hợp đồng, tạm ngưng, khôi phục hoặc chấm dứt dịch vụ. | - Khởi tạo máy chủ mới sau khi ký hợp đồng.<br/>- Tạm ngưng dịch vụ do quá hạn cước.<br/>- Tiếp nhận yêu cầu thanh lý dịch vụ chỗ đặt. | Tra cứu mục Quy trình vận hành của dịch vụ tương ứng (ví dụ: Quy trình triển khai / Quy trình hủy dịch vụ). |
+| **2. Yêu cầu cấu hình** | Thay đổi hoặc bổ sung thông số kỹ thuật theo đề nghị của khách hàng trong quá trình sử dụng. | - Mở port mạng trên firewall.<br/>- Tạo thêm máy nhánh tổng đài.<br/>- Cập nhật kịch bản IVR, nhóm đổ chuông.<br/>- Đổi địa chỉ IP máy chủ. | Mở các bài hướng dẫn cấu hình chi tiết hoặc quy trình thay đổi thông số dịch vụ. |
+| **3. Xử lý sự cố** | Dịch vụ bị gián đoạn, hoạt động bất thường, hiệu năng suy giảm hoặc báo lỗi. | - Máy chủ mất kết nối Internet.<br/>- Cuộc gọi tổng đài bị nghẽn, rớt cuộc gọi.<br/>- Lỗi máy nhánh không đăng ký được (SIP 403, 408).<br/>- Kênh truyền Leased Line chập chờn. | Tra cứu danh mục **Runbook xử lý sự cố** theo từng nhóm triệu chứng kỹ thuật. |
+| **4. Thông tin & Tích hợp** | Cung cấp tài liệu hướng dẫn, tra cứu số liệu cước/CDR, hỗ trợ kết nối hệ thống bên ngoài. | - Cung cấp tài liệu API / Webhook tổng đài.<br/>- Hướng dẫn kết nối Softphone trên điện thoại.<br/>- Trích xuất dữ liệu cuộc gọi (CDR). | Tra cứu Kiến thức kỹ thuật, Tài liệu API public hoặc hướng dẫn tích hợp widget/WebRTC. |
+
+---
+
+## 3. Bảng điều hướng tới tài liệu chuyên môn
+
+Tùy theo mảng dịch vụ và nhóm yêu cầu, Support truy cập vào các khu vực tài liệu chuyên biệt dưới đây:
+
+### Dịch vụ Tổng đài (CloudFone / AI Contact Center)
+- **Quy trình vận hành**: Xem [Quy trình vận hành Tổng đài](/internal/ai-contact-center/processes) để nắm các bước tiếp nhận và xử lý yêu cầu dịch vụ.
+- **Xử lý sự cố**: Xem [Runbooks xử lý sự cố Tổng đài](/internal/ai-contact-center/runbooks) để tra cứu theo triệu chứng (cuộc gọi gián đoạn, lỗi âm thanh, lỗi máy nhánh, lỗi kết nối nhà mạng).
+- **Kiến thức kỹ thuật**: Xem [Kiến thức kỹ thuật Tổng đài](/internal/ai-contact-center/knowledge-base) để tra cứu hạn chế nhà mạng, tiêu chuẩn kỹ thuật thoại, IP Core và mã tính năng.
+
+### Các dịch vụ Hạ tầng khác (Data Center, Network, Cloud, License)
+- Xem [Tổng quan dịch vụ ODS](/internal/services) để nhận diện các thành phần kỹ thuật cần thu thập khi tiếp nhận.
+- Xem [Mã dịch vụ & tra cứu trên Odoo](/internal/service-codes) để đối chiếu thông số hạ tầng tương ứng với mã dịch vụ.
+- Khi gặp sự cố phức tạp thuộc hạ tầng mạng và máy chủ vật lý, phối hợp cùng bộ phận Kỹ thuật hạ tầng (NOC / System Admin) theo quy định nội bộ.
+
+### Quy định chung & An toàn thông tin
+- Tra cứu [Bảo mật & Dữ liệu khách hàng](/internal/security) để đảm bảo không vi phạm quy tắc an toàn thông tin khi xử lý yêu cầu.
+- Tra cứu [Công cụ làm việc](/internal/tools) để biết các công cụ tra cứu và giám sát được phân quyền cho Support.

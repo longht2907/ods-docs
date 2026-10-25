@@ -1,0 +1,64 @@
+---
+title: "Tạm ngưng dịch vụ"
+description: Quy trình tiếp nhận yêu cầu, chuyển thông tin cho DevOps VoIP tạm ngưng và bảo lưu tài nguyên tổng đài.
+---
+## Lưu đồ quy trình
+
+<ProcessFlowchart flowId="suspend-contact-center" />
+
+---
+
+## Các bước thực hiện
+
+### Bước 1: Tiếp nhận yêu cầu & Kiểm tra thông tin tạm ngưng
+
+Mở Ticket yêu cầu tạm ngưng dịch vụ từ bộ phận Kế toán (do quá hạn thanh toán/nợ cước), Kinh doanh hoặc Chăm sóc khách hàng (CSKH) trên hệ thống Support Desk và kiểm tra đầy đủ các thông số kỹ thuật:
+
+| Thông số kiểm tra | Mô tả chi tiết | Mục đích đối soát |
+| :--- | :--- | :--- |
+| **Mã dịch vụ (MDV)** | `VTPxxxxxxx` hoặc `CF-PBXxxxxxxx` | Định danh chính xác dịch vụ trên ERP Online Odoo |
+| **Địa chỉ IP tổng đài** | IP WAN tenant của khách hàng | Định vị máy chủ/tổng đài cần tạm ngưng |
+| **Dịch vụ Addon đi kèm** | Auto Call, Mini CRM, Voice Brandname, Dung lượng ghi âm... | Đảm bảo tạm ngưng đồng bộ toàn bộ dịch vụ phụ trợ |
+| **Mã Ticket yêu cầu** | Mã định danh Ticket trên Support Desk | Lưu vết lịch sử và phản hồi đúng tiến độ |
+
+---
+
+### Bước 2: Chuyển thông tin cho Team DevOps VoIP xử lý
+
+Bàn giao thông tin qua kênh vận hành chuyên trách cho **Team DevOps VoIP** để tiến hành khóa tạm ngưng dịch vụ dưới hệ thống.
+
+Cung cấp đầy đủ thông tin dịch vụ theo mẫu chuẩn:
+
+```text
+YÊU CẦU Tạm ngưng dịch vụ :
+- Mã dịch vụ: [VTPxxxxxxx]
+- IP tổng đài: [Địa chỉ IP WAN tenant]
+- Dịch vụ Addon đi kèm: [Liệt kê Auto Call, CRM, gói ghi âm mở rộng...]
+- Mã Ticket yêu cầu: [#MãTicket]
+```
+
+Team DevOps VoIP sẽ tiến hành:
+- Tạm khóa các chiều cuộc gọi vào/ra hoặc ngắt tạm thời kết nối Trunk viễn thông trên Core / SBC.
+- Tạm dừng các tiến trình dịch vụ phụ trợ (Auto Call, API tích hợp) để tránh phát sinh cước viễn thông ngoài ý muốn.
+
+---
+
+### Bước 3: Xác nhận hoàn tất & Quản lý bảo lưu tài nguyên
+
+1. **Nhận xác nhận từ DevOps VoIP**:
+   - Tiếp nhận phản hồi từ Team DevOps VoIP xác nhận dịch vụ đã được tạm ngưng thành công dưới hệ thống hạ tầng.
+2. **Nguyên tắc bảo lưu tài nguyên**:
+   - Khác với quy trình Hủy dịch vụ, toàn bộ tài nguyên của khách hàng bao gồm: **Địa chỉ IP WAN**, **cấu hình đầu số Hotline**, **kịch bản thoại (IVR/Queue)** và **kho dữ liệu ghi âm/CDR** đều được **bảo lưu nguyên trạng** trong suốt thời gian tạm ngưng.
+3. **Phản hồi và Cập nhật Ticket**:
+   - Phản hồi trên Ticket yêu cầu xác nhận dịch vụ đã được tạm ngưng kỹ thuật thành công và hệ thống đang trong trạng thái bảo lưu tài nguyên.
+   - Cập nhật trạng thái Ticket hoặc theo dõi theo quy định vận hành.
+
+---
+
+## Xử lý sự cố thường gặp (Troubleshooting)
+
+| Tình huống sự cố | Nguyên nhân khả dĩ | Phương án xử lý chuẩn |
+| :--- | :--- | :--- |
+| **Khách hàng yêu cầu mở lại dịch vụ (Resume)** | Khách hàng đã hoàn tất công nợ hoặc có thông báo mở lại từ Kế toán/Sales | Gửi thông tin cho DevOps VoIP yêu cầu kích hoạt lại dịch vụ; test gọi thử 2 chiều và phản hồi Ticket |
+| **Khách hàng phản ánh vẫn phát sinh cước khi tạm ngưng** | Chưa ngắt đồng bộ các luồng cuộc gọi tự động (Auto Call) hoặc Trunk chưa khóa triệt để | Kiểm tra lại danh sách Addon, báo ngay cho DevOps VoIP để rà soát khóa toàn bộ luồng cước |
+| **Hết hạn tạm ngưng nhưng khách hàng không thanh toán** | Khách hàng quyết định chấm dứt hợp đồng hoặc quá thời gian bảo lưu | Báo Sales/Kế toán duyệt thanh lý và chuyển tiếp sang [Quy trình Hủy dịch vụ](/internal/ai-contact-center/processes/cancellations) |

@@ -1,12 +1,33 @@
 ---
-title: Hội nhập nhân viên mới
-description: Khung onboarding dành cho nhân viên Support mới tại ODS.
+title: Hướng dẫn sử dụng wiki & Hội nhập
+description: Hướng dẫn cách tra cứu, cấu trúc Support Wiki và quy chuẩn tài liệu vận hành dành cho nhân viên Support ODS.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Nội dung onboarding chi tiết sẽ được bổ sung sau khi có nguồn nội bộ đã duyệt.
-</Callout>
+Tài liệu này hướng dẫn nhân viên Support cách sử dụng hiệu quả hệ thống Support Wiki nội bộ và nắm vững các quy chuẩn vận hành chung tại ODS.
 
-## Mục tiêu hội nhập
+## Cấu trúc Support Wiki
 
-Khung nội dung dành cho nhân viên Support mới làm quen với công cụ, quy trình và đầu mối phối hợp tại ODS.
+Support Wiki được phân tách thành 3 khối nội dung cốt lõi:
+
+1. **Quy trình vận hành (SOP)**: Hướng dẫn chi tiết từng bước để hoàn thành một yêu cầu dịch vụ hoặc tác vụ kỹ thuật cụ thể từ lúc tiếp nhận đến khi bàn giao.
+2. **Xử lý sự cố (Runbooks)**: Hướng dẫn chẩn đoán, khoanh vùng và xử lý theo từng triệu chứng kỹ thuật mà khách hàng hoặc hệ thống ghi nhận.
+3. **Kiến thức kỹ thuật (Knowledge Base)**: Cơ sở dữ liệu thông số kỹ thuật, bảng đầu số, địa chỉ hạ tầng core, mã lỗi SIP và thuật ngữ để tra cứu nhanh.
+
+## Nguyên tắc bảo mật & Dữ liệu (ADR-006)
+
+- **Không lưu trữ bí mật**: Tuyệt đối không commit mật khẩu, token xác thực, API key hoặc private key lên repository.
+- **Bảo vệ thông tin khách hàng**: Thông tin khách hàng thực tế (tên, số điện thoại, hợp đồng) phải được ẩn danh hoặc sử dụng dữ liệu mẫu (placeholder) trong tài liệu.
+- **Dữ liệu hạ tầng**: Thông tin IP hạ tầng và dải đầu số nhà mạng chỉ được phép lưu trữ có kiểm soát trong mục `knowledge-base`.
+
+## Quy chuẩn cấu trúc một bài Quy trình vận hành
+
+Mọi bài quy trình vận hành (SOP) mới trên Support Wiki cần tuân thủ cấu trúc chuẩn 7 phần:
+
+1. **Mục đích & phạm vi áp dụng**: Xác định rõ quy trình này giải quyết nghiệp vụ gì và áp dụng cho đối tượng nào.
+2. **Thông tin / điều kiện cần chuẩn bị**: Các dữ liệu, tài khoản quyền hạn hoặc điều kiện tiên quyết cần có trước khi thực hiện.
+3. **Checklist tổng thể**: Bảng kiểm tóm tắt nhanh các bước để kỹ sư rà soát tiến độ.
+4. **Các bước thực hiện**: Trình bày tuần tự việc cần làm, bên thực hiện/phối hợp, kiểm tra kết quả từng bước và điều kiện chuyển cấp nếu phát sinh sự cố.
+5. **Kiểm thử & xác nhận hoàn tất**: Các bước test kỹ thuật để đảm bảo dịch vụ hoạt động ổn định.
+6. **Bàn giao & đóng yêu cầu**: Tiêu chuẩn phản hồi khách hàng và cập nhật ticket/hệ thống quản lý.
+7. **Tài liệu liên quan**: Liên kết tới runbook sự cố liên quan, hướng dẫn công khai `/docs` hoặc biểu mẫu đính kèm.
+

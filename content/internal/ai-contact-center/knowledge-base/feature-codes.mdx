@@ -1,0 +1,31 @@
+---
+title: Mã phím tắt PBX & Thao tác thiết bị
+description: Bảng mã phím tắt tính năng trên tổng đài (chuyển cuộc gọi, rước cuộc gọi, gọi nhóm), lưu ý trên IP Phone Yealink và quy định bảo mật thông tin.
+---
+
+Tài liệu này cung cấp danh mục mã phím tắt tính năng (Feature Codes) trên tổng đài, lưu ý kỹ thuật khi thao tác trên dòng điện thoại IP Yealink và quy định bảo mật thông tin tài khoản khách hàng.
+
+---
+
+## 1. Bảng mã phím tắt tính năng PBX (Feature Codes)
+
+Nhân viên sử dụng bàn phím điện thoại IP Phone hoặc phần mềm Softphone để bấm các cú pháp sau khi đang đàm thoại hoặc lúc nhấc máy:
+
+| Tính năng | Cú pháp phím tắt | Hướng dẫn thao tác |
+|---|---|---|
+| **Chuyển cuộc gọi (Call Transfer)** | **`*2<Số nội bộ/Nhóm>#`** | Đang nghe máy, bấm `*2` + số Extension hoặc số nhóm cần chuyển + kết thúc bằng phím `#` |
+| **Gọi nhóm nội bộ (Group Call)** | **`*3`** | Nhấc máy bấm `*3` để đổ chuông toàn bộ các máy nhánh trong nhóm |
+| **Rước cuộc gọi (Call Pickup)** | **`*8#`** | Khi máy nhánh khác trong cùng nhóm đang đổ chuông, nhấc máy bấm `*8#` để rước cuộc gọi về máy mình |
+
+---
+
+## 2. Lưu ý thao tác chuyển cuộc gọi trên IP Phone Yealink
+
+Đối với các dòng điện thoại cứng Yealink (SIP-T3x, SIP-T4x...):
+
+- **Hiện tượng hiển thị số khi Transfer**:
+  - Dù nhân viên bấm phím cứng **`Tran` (Transfer)** trên thân máy hay bấm cú pháp phím tắt **`*2`**, trên màn hình điện thoại của người nhận chuyển **đều không hiển thị được số điện thoại của người gọi ban đầu** (CallerID bên ngoài).
+- **Trường hợp ngoại lệ duy nhất**:
+  - Máy nhánh chỉ thấy được số người gọi ban đầu nếu nhân viên sử dụng tính năng **Forward (FW)** trực tiếp ngay khi chuông đang reo trên điện thoại mà **chưa nhấc máy trả lời**.
+
+---

@@ -1,18 +1,37 @@
 ---
 title: Tổng đài
-description: Điểm bắt đầu tra cứu quy trình, runbook và kiến thức kỹ thuật hỗ trợ dịch vụ Tổng đài ODS.
+description: Điểm bắt đầu tra cứu quy trình vận hành, runbook xử lý sự cố và kiến thức kỹ thuật hỗ trợ dịch vụ Tổng đài ODS.
 ---
 
-Support Wiki cho mảng Tổng đài được tổ chức theo ba nhóm nội dung:
+Support Wiki Tổng đài là không gian làm việc và tra cứu kỹ thuật dành riêng cho đội Support ODS trong việc quản lý, vận hành và giải quyết sự cố liên quan đến hệ thống AI Contact Center.
 
-<Card href="/internal/ai-contact-center/processes" title="Quy trình vận hành">
-  Các bước thực hiện công việc và yêu cầu dịch vụ.
-</Card>
+Toàn bộ tài liệu được chuẩn hóa theo ba nhóm trụ cột:
 
-<Card href="/internal/ai-contact-center/runbooks" title="Xử lý sự cố">
-  Tìm runbook theo triệu chứng khách hàng đang gặp phải.
-</Card>
+<AutoIndex />
 
-<Card href="/internal/ai-contact-center/knowledge-base" title="Kiến thức kỹ thuật">
-  Tra cứu cấu hình và dữ liệu kỹ thuật nội bộ.
-</Card>
+
+## Truy cập nhanh
+
+Các tài liệu nghiệp vụ và runbook kỹ thuật thường dùng đã được rà soát:
+
+<div className="grid gap-4 sm:grid-cols-2">
+  <Card href="/internal/ai-contact-center/runbooks/calls/outbound-failed" title="Sự cố gọi ra thất bại">
+    Chẩn đoán mã lỗi SIP, kiểm tra số dư, trạng thái trunk và định tuyến gọi đi.
+  </Card>
+  <Card href="/internal/ai-contact-center/runbooks/calls/inbound-failed" title="Sự cố gọi vào thất bại">
+    Kiểm tra luồng DID, định tuyến IVR, máy nhánh trực và log cuộc gọi đến.
+  </Card>
+  <Card href="/internal/ai-contact-center/runbooks/calls/one-way-audio" title="Sự cố âm thanh một chiều">
+    Khoanh vùng lỗi RTP, NAT traversal, firewall và codec thoại.
+  </Card>
+  <Card href="/internal/ai-contact-center/knowledge-base/outbound-rules" title="Rule gọi ra (Outbound Rules)">
+    Hướng dẫn cú pháp Dial Pattern, bộ rule mặc định và định tuyến theo nhà mạng.
+  </Card>
+  <Card href="/internal/ai-contact-center/knowledge-base/core-infrastructure" title="Hạ tầng Core & SIP Server">
+    Danh sách IP các cụm máy chủ PBX, Media Server và Proxy nội bộ.
+  </Card>
+  <Card href="/internal/ai-contact-center/processes" title="Nguyên tắc xử lý yêu cầu">
+    Quy trình tiếp nhận, phân loại và luồng phối hợp xử lý yêu cầu nghiệp vụ.
+  </Card>
+</div>
+

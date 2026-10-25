@@ -1,0 +1,122 @@
+---
+title: "Bàn giao dịch vụ"
+description: Quy trình kiểm tra, tổng hợp hồ sơ, bàn giao và nghiệm thu thực tế hệ thống tổng đài AI Contact Center cho khách hàng.
+---
+
+Quy trình áp dụng cho hỗ trợ và triển khai kỹ thuật ODS khi thực hiện bàn giao hệ thống tổng đài AI Contact Center đã cấu hình hoàn tất cho người đại diện kỹ thuật của khách hàng doanh nghiệp.
+
+## Lưu đồ quy trình
+
+<ProcessFlowchart flowId="handover-contact-center" />
+
+---
+
+## Các bước triển khai
+
+### Bước 1: Tiếp nhận & Kiểm tra điều kiện bàn giao
+
+Trước khi gửi bất kỳ thông tin bàn giao nào cho khách hàng, kỹ sư phụ trách bắt buộc phải tiền kiểm toàn bộ các hạng mục kỹ thuật để đảm bảo hệ thống đã vận hành ổn định:
+
+| Hạng mục kiểm tra | Tiêu chuẩn đạt | Hành động khi chưa đạt |
+| :--- | :--- | :--- |
+| **Trạng thái hợp đồng Odoo** | Dịch vụ ở trạng thái **ACTIVE** | Kiểm tra với Sales hoặc nhấn nút **START** trên Odoo nếu đã đủ điều kiện |
+| **Đầu số Hotline (DID / Trunk)** | Đã kết nối Trunk viễn thông, gọi vào và gọi ra thành công | Kiểm tra lại cấu hình Trunk / IP Auth với nhà mạng viễn thông |
+| **Kịch bản cuộc gọi (IVR / Queue)** | Lời chào phát rõ, bấm phím điều hướng và đổ chuông đúng máy nhánh | Kiểm tra lại sơ đồ Dialplan, Sound prompt và nhóm đổ chuông |
+| **Máy nhánh nội bộ (Extensions)** | Đã tạo đủ số lượng máy nhánh theo hợp đồng và đăng ký SIP thành công | Rà soát cấu hình Extension trên Portal Support |
+| **Ghi âm cuộc gọi** | File ghi âm được sinh đầy đủ sau khi kết thúc cuộc gọi thử nghiệm | Kiểm tra dịch vụ Call Recording trên máy chủ tổng đài |
+
+- **Nguyên tắc an toàn**: Nếu có bất kỳ lỗi nào liên quan đến gọi vào/gọi ra hoặc kịch bản không khớp với file yêu cầu từ Sales, kỹ sư phải phối hợp xử lý dứt điểm trước khi liên hệ bàn giao cho khách hàng.
+
+---
+
+### Bước 2: Tổng hợp hồ sơ & Thông tin bàn giao kỹ thuật
+
+Kỹ sư tổng hợp đầy đủ bộ hồ sơ bàn giao kỹ thuật gồm 5 thành phần chính:
+
+1. **Thông tin đăng nhập Portal quản trị**:
+   - Đường dẫn truy cập Portal quản trị tổng đài .
+   - Tên tài khoản quản trị cao nhất .
+   - Mật khẩu khởi tạo ban đầu (đã sinh từ Odoo).
+2. **Danh sách tài khoản máy nhánh (Extensions)**:
+   - Bảng phân bổ máy nhánh: Số nội bộ (101, 102...), tên người dùng hiển thị, mật khẩu SIP tương ứng.
+   - Đường link tải ứng dụng CloudFone Client đa nền tảng (Windows, macOS, Android, iOS).
+3. **Thông tin đầu số & Kịch bản cuộc gọi**:
+   - Danh sách số điện thoại Hotline hiển thị khi gọi ra.
+   - Sơ đồ tóm tắt các nhánh bấm phím IVR và danh sách nhân sự trực theo ca/khung giờ.
+4. **Tài liệu tích hợp hệ thống (nếu có đăng ký gói tích hợp)**:
+   - Thông số API Key, Secret Token.
+   - Hướng dẫn cấu hình Webhook đẩy dữ liệu cuộc gọi (Call Event / CDR) về CRM hoặc ERP của khách hàng.
+---
+### Bước 3: Hướng dẫn sử dụng & Hỗ trợ nghiệm thu thực tế
+
+Sau khi gửi thông tin bàn giao, kỹ sư liên hệ trực tiếp với đại diện kỹ thuật của khách hàng (qua điện thoại, Google Meet hoặc UltraViewer/AnyDesk) để hướng dẫn sử dụng và tiến hành nghiệm thu theo 6 nội dung cụ thể:
+
+#### 3.1. Hướng dẫn đăng nhập giao diện quản trị tổng đài
+1. Hướng dẫn khách hàng mở trình duyệt và truy cập đường dẫn Portal quản trị tổng đài.
+2. Nhập tài khoản và mật khẩu đã cung cấp trước đó
+3. Hướng dẫn thao tác đổi mật khẩu quản trị ban đầu tại mục **Cài đặt tài khoản** → **Đổi mật khẩu** để đảm bảo tính riêng tư và bảo mật tuyệt đối cho doanh nghiệp.
+
+#### 3.2. Tổng quan giao diện quản trị Portal
+Giới thiệu trực quan cấu trúc giao diện để khách hàng nắm bắt các khu vực chức năng trọng yếu:
+- **Khu vực thiết lập hệ thống**: Cấu hình thời gian làm việc (khung giờ hành chính, giờ nghỉ trưa, ngày nghỉ lễ/cuối tuần), thiết lập nhạc chờ doanh nghiệp.
+- **Khu vực quản lý kịch bản thoại**: Quản lý cây thư mục lời chào tự động (IVR), nhóm đổ chuông (Ring Groups), hàng đợi tiếp nhận cuộc gọi (Queues).
+- **Khu vực quản lý lịch sử cuộc gọi**: Báo cáo chi tiết cuộc gọi vào, gọi ra, gọi nội bộ và kho lưu trữ file ghi âm.
+
+#### 3.3. Hướng dẫn tạo máy nhánh, phân quyền & đăng nhập thiết bị đầu cuối
+1. **Tạo máy nhánh & phân quyền**:
+   - Hướng dẫn vào menu **Quản lý máy nhánh** → Nhấn **Thêm mới**.
+   - Cung cấp số nội bộ, tên hiển thị nhân viên và mật khẩu SIP ngẫu nhiên.
+   - Phân quyền tài khoản: Phân biệt rõ quyền **Admin** (toàn quyền cấu hình), quyền **Supervisor** (nghe ghi âm, xem báo cáo nhóm) và quyền **Agent / User** (chỉ xem lịch sử cá nhân).
+2. **Cài đặt và đăng nhập trên thiết bị đầu cuối (Client)**:
+   - **Web App (Webphone)**: Đăng nhập trực tiếp trên trình duyệt Chrome/Edge, cấp quyền Micro và thực hiện nghe gọi trực tiếp không cần cài phần mềm.
+   - **Softphone trên máy tính**: Cài đặt ứng dụng Zoiper Desktop trên Windows hoặc macOS, đăng nhập bằng số máy nhánh và mật khẩu SIP.
+   - **Mobile App**: Tìm kiếm và cài đặt ứng dụng ODS Phone trên App Store (iOS) hoặc Google Play (Android), quét mã QR cấu hình nhanh hoặc nhập thông số SIP.
+   - **Điện thoại bàn IP Phone (Yealink, Grandstream, Fanvil)**: Hướng dẫn truy cập địa chỉ IP của điện thoại qua Web GUI, cấu hình SIP Server, Port, SIP User ID và SIP Secret.
+
+#### 3.4. Hướng dẫn & giải thích kịch bản cuộc gọi
+1. **Rà soát kịch bản đã setup trước đó**:
+   - Trình bày sơ đồ luồng cuộc gọi đã cấu hình: Khi khách hàng gọi vào Hotline → Nghe lời chào IVR → Bấm phím 1 gặp bộ phận Kinh doanh (đổ chuông nhóm máy nhánh 101, 102...) → Bấm phím 2 gặp Kỹ thuật.
+   - Hướng dẫn luồng xử lý ngoài giờ làm việc: Chuyển hướng sang số di động trực gác hoặc phát thông báo ngoài giờ và tự động cúp máy.
+2. **Trường hợp yêu cầu bàn giao chưa có kịch bản**:
+   - Nếu trước đó Sales chưa gửi kèm kịch bản chi tiết, kỹ sư chủ động đề nghị khách hàng cung cấp sơ đồ phân bổ mong muốn: Các phím chức năng, danh sách nhân sự phụ trách từng bộ phận và file âm thanh lời chào.
+   - Kỹ sư hỗ trợ tạo ngay kịch bản chuẩn trực tiếp trên Portal trong buổi làm việc.
+
+#### 3.5. Hướng dẫn tra cứu lịch sử cuộc gọi (CDR) & nghe ghi âm
+1. Điều hướng vào menu **Lịch sử cuộc gọi (CDR)**.
+2. Hướng dẫn sử dụng bộ lọc tìm kiếm: Lọc theo khoảng ngày/giờ, số điện thoại khách hàng, số máy nhánh tiếp nhận, trạng thái cuộc gọi (Trả lời, Không trả lời, Bận máy).
+3. Hướng dẫn nghe trực tiếp file ghi âm trên trình duyệt và cách tải file ghi âm `.mp3`/`.wav` về máy tính để phục vụ công tác kiểm tra chất lượng dịch vụ.
+
+#### 3.6. Hỗ trợ khách hàng test thực tế & Tinh chỉnh tại chỗ
+Kỹ sư đồng hành cùng đại diện khách hàng thực hiện các bài test nghiệm thu thực tế:
+1. **Test 1 cuộc gọi vào (Inbound Call)**:
+   - Dùng số di động cá nhân gọi trực tiếp vào số Hotline doanh nghiệp.
+   - Kiểm tra chất lượng phát âm thanh lời chào IVR, thử bấm phím điều hướng để kiểm tra phân bổ chuông đổ đúng các máy nhánh được gán.
+2. **Test 1 cuộc gọi ra (Outbound Call)**:
+   - Dùng máy nhánh (Softphone/Webphone) gọi ra số di động ngoài mạng viễn thông.
+   - Xác nhận trên màn hình điện thoại người nhận hiển thị chính xác số Hotline đã đăng ký.
+3. **Quy tắc xử lý tinh chỉnh**:
+   - *Điều chỉnh nhỏ tại chỗ*: Hỗ trợ sửa ngay nếu khách hàng muốn đổi tên hiển thị nhân viên, đổi số máy nhánh, tăng giảm thời gian reo chuông trước khi chuyển máy (Ring timeout).
+   - *Yêu cầu thay đổi luồng kịch bản lớn*: Nếu khách hàng muốn thay đổi hoàn toàn kiến trúc tổng đài hoặc bổ sung tính năng vượt phạm vi gói dịch vụ đã ký hợp đồng → Kỹ sư ghi nhận cụ thể và hướng dẫn khách hàng liên hệ chuyên viên Sales để làm phụ lục dịch vụ hoặc Change Request (CR).
+
+---
+
+### Bước 4: Xác nhận nghiệm thu & Đóng Ticket
+
+1. **Ghi nhận xác nhận nghiệm thu**:
+   - Yêu cầu đại diện khách hàng phản hồi trực tiếp trên Ticket triển khai hoặc gửi email xác nhận: *"Hệ thống tổng đài đã được bàn giao đầy đủ, hoạt động ổn định và đạt yêu cầu nghiệm thu"*.
+   - Hoặc ký biên bản nghiệm thu kỹ thuật điện tử theo mẫu của ODS.
+2. **Đóng Ticket triển khai**:
+   - Cập nhật giải pháp: *"Đã hoàn tất hướng dẫn sử dụng và nghiệm thu thành công hệ thống tổng đài cùng đại diện khách hàng"*.
+   - Chuyển trạng thái Ticket sang **Closed**.
+
+---
+
+## Xử lý sự cố thường gặp (Troubleshooting)
+
+| Tình huống sự cố | Nguyên nhân khả dĩ | Phương án xử lý chuẩn |
+| :--- | :--- | :--- |
+| **Khách hàng không nhận được email bàn giao** | Email rơi vào mục Spam/Junk hoặc sai địa chỉ email nhận trên Odoo | Nhờ khách hàng kiểm tra hòm thư rác; đối soát lại trường Email trên hồ sơ khách hàng Odoo và gửi lại thông tin qua Ticket |
+| **Khách hàng đăng nhập sai bị khóa IP** | Đăng nhập sai mật khẩu quá 5 lần kích hoạt tính năng chặn IP tự động | Đề nghị khách hàng cung cấp IP WAN hiện tại (truy cập `ipinfo.io`); kỹ sư kiểm tra bảng chặn IP trên Portal Support và mở khóa |
+| **Máy nhánh Softphone/IP Phone không đăng ký được** | Mạng Wifi nội bộ của khách hàng chặn cổng SIP UDP `5060` | Hướng dẫn IT khách hàng mở port `5060/UDP` hoặc chuyển cấu hình kết nối máy nhánh sang giao thức **TLS/WebRTC** an toàn |
+| **Cuộc gọi ra không hiển thị đúng số Hotline** | Sai cấu hình Caller ID (CID) trên Outbound Route hoặc Trunk | Kiểm tra lại Outbound Route trên Portal, xác nhận đầu số đã được nhà mạng kích hoạt quyền hiển thị Caller ID chính xác |
+| **Khách hàng muốn đổi kịch bản sau khi đã bàn giao** | Nhu cầu vận hành thay đổi sau thời gian chạy thực tế | Hướng dẫn khách hàng tự thao tác trên Portal nếu là chỉnh sửa thời gian/nhánh bấm đơn giản; nếu kịch bản phức tạp thì hướng dẫn tạo Ticket hỗ trợ kỹ thuật |

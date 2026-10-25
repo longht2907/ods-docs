@@ -1,0 +1,109 @@
+---
+title: "Dịch vụ Addon"
+description: Quy trình tiếp nhận yêu cầu, gỡ bỏ và đồng bộ hủy dịch vụ Addon (đầu số, ghi âm, máy nhánh) trên hệ thống tổng đài.
+---
+
+Quy trình áp dụng khi khách hàng có yêu cầu cắt giảm hoặc hủy một phần tài nguyên phụ trợ (Đầu số, gói ghi âm, số lượng máy nhánh, dịch vụ mở rộng) trong khi hệ thống tổng đài chính vẫn đang duy trì hoạt động bình thường.
+
+## Lưu đồ quy trình
+
+<ProcessFlowchart flowId="cancel-addon" />
+
+---
+
+## Các bước thực hiện
+
+### Bước 1: Tiếp nhận yêu cầu & Tiền kiểm điều kiện hủy Addon
+
+Mở Ticket yêu cầu từ bộ phận Kinh doanh, Chăm sóc khách hàng hoặc Kế toán trên hệ thống Support Desk và rà soát các thông số kỹ thuật:
+
+| Thông số kiểm tra | Mô tả chi tiết | Mục đích đối soát |
+| :--- | :--- | :--- |
+| **Mã dịch vụ tổng đài chính** | `VTPxxxxxxx` hoặc `CF-PBXxxxxxxx` | Đảm bảo tổng đài chính đang ở trạng thái **ACTIVE** |
+| **Mã dịch vụ Addon / Tên Addon** | Mã bản ghi Addon trên Odoo | Xác định chính xác thành phần dịch vụ phụ trợ cần hủy |
+| **Loại Addon cần hủy** | Đầu số (DID), Dung lượng ghi âm, Máy nhánh, Auto Call... | Lựa chọn phương án xử lý kỹ thuật tương ứng |
+| **Xác nhận thanh lý** | Phê duyệt từ Kế toán và Kinh doanh | Đảm bảo đã chốt công nợ và điều chỉnh phụ lục hợp đồng |
+
+---
+
+### Bước 2: Xử lý kỹ thuật theo từng loại Addon
+
+Tùy theo loại Addon cần hủy, kỹ sư thực hiện thao tác kỹ thuật tương ứng trên giao diện tổng đài:
+
+#### 2.1. Hủy Đầu số Hotline (DID / Trunk)
+1. Đăng nhập giao diện quản trị tổng đài của khách hàng.
+2. Điều hướng vào phân hệ **Inbound Routes** và **Outbound Routes**:
+   - Gỡ bỏ đầu số cần hủy khỏi danh sách định tuyến cuộc gọi vào và danh sách số hiển thị gọi ra.
+   - **Lưu ý an toàn**: Kiểm tra đảm bảo tổng đài vẫn còn ít nhất 1 đầu số chính để khách hàng duy trì liên lạc.
+3. *Trường hợp không tìm thấy đầu số*: Ghi chú lại danh sách số để chuyển tiếp cho DevOps VoIP gỡ trực tiếp trên SBC/Core ở Bước 4.
+
+#### 2.2. Hủy / Giảm gói dung lượng ghi âm (Storage)
+1. Kiểm tra dung lượng file ghi âm thực tế khách hàng đang sử dụng trên hệ thống.
+2. **Cảnh báo an toàn dữ liệu**: Nếu dung lượng hiện tại vượt quá định mức của gói mới sau khi giảm, yêu cầu khách hàng sao lưu dữ liệu cũ về máy trước khi hạ hạn mức để tránh nguy cơ đầy dung lượng.
+3. Điều chỉnh lại quota lưu trữ ghi âm của tenant trên hệ thống.
+
+#### 2.3. Giảm số lượng máy nhánh (Extensions)
+1. Đối chiếu danh sách các số nội bộ (Extension) cần cắt giảm theo yêu cầu của khách hàng.
+2. Vào menu **Quản lý máy nhánh** trên tổng đài:
+   - Xóa các máy nhánh tương ứng và thu hồi tài khoản SIP Extension để ngăn chặn truy cập tiếp tục.
+
+#### 2.4. Hủy dịch vụ tính năng bổ trợ (Auto Call, Mini CRM)
+1. Vô hiệu hóa các chiến dịch gọi tự động đang chạy.
+2. Thu hồi hoặc xóa API Key / Webhook kết nối tích hợp của gói Addon tương ứng.
+
+---
+
+### Bước 3: Cập nhật ERP Online (Odoo) cho dịch vụ Addon
+
+1. Đăng nhập hệ thống [ERP Online ODS](https://erponline.ods.vn/).
+2. Tìm kiếm theo **Mã dịch vụ Addon** (hoặc mở dịch vụ tổng đài chính và xem danh sách Addon con liên kết).
+3. Mở chi tiết bản ghi dịch vụ Addon:
+   - Nhấn nút **STOP** trên bản ghi Addon cần hủy (hoặc điều chỉnh số lượng Quantity theo hợp đồng mới).
+4. **Lưu ý nghiệp vụ đặc biệt**:
+   - Tuyệt đối **không nhấn nút STOP trên mã dịch vụ tổng đài chính**, vì thao tác này sẽ làm ngưng trệ toàn bộ hệ thống của khách hàng.
+
+---
+
+### Bước 4: Chuyển thông tin cho Team DevOps VoIP đồng bộ hạ tầng
+
+Bàn giao thông tin qua kênh vận hành chuyên trách cho **Team DevOps VoIP** để cập nhật cấu hình hạ tầng backend.
+
+Cung cấp đầy đủ thông tin dịch vụ theo mẫu chuẩn:
+
+```text
+YÊU CẦU THU HỒI / HỦY ADDON DỊCH VỤ:
+- Mã dịch vụ tổng đài chính: [VTPxxxxxxx]
+- IP tổng đài: [Địa chỉ IP WAN tenant]
+- Loại Addon hủy: [Hủy đầu số 028xxxx / Giảm gói ghi âm từ 20GB về 10GB / Xóa 5 máy nhánh 105-109...]
+- Tình trạng đầu số (nếu có): [Đã gỡ trên tổng đài / Chưa tìm thấy đầu số, nhờ DevOps gỡ trên Core]
+- Mã Ticket yêu cầu: [#MãTicket]
+```
+
+Team DevOps VoIP sẽ tiến hành:
+- Gỡ bỏ định tuyến đầu số trên hệ thống SBC / Core Switch.
+- Điều chỉnh quota lưu trữ trên hạ tầng lưu trữ tập trung.
+- Thu hồi tài nguyên phân hệ Addon tương ứng.
+
+---
+
+### Bước 5: Kiểm tra an toàn tổng đài chính & Đóng Ticket
+
+1. **Nhận xác nhận từ DevOps VoIP**:
+   - Tiếp nhận phản hồi từ Team DevOps VoIP xác nhận đã đồng bộ hạ tầng và giải phóng tài nguyên Addon thành công.
+2. **Kiểm tra an toàn tổng đài chính**:
+   - Dùng số di động gọi thử vào đầu số Hotline chính còn lại của khách hàng để đảm bảo kịch bản IVR và phân bổ chuông vẫn hoạt động bình thường.
+   - Thực hiện 1 cuộc gọi ra từ máy nhánh đang sử dụng để xác nhận tín hiệu thoại thông suốt.
+3. **Phản hồi và Đóng Ticket**:
+   - Ghi nhận nhật ký nội bộ trên Odoo qua mục **Log an internal note**.
+   - Phản hồi xác nhận hoàn tất hủy Addon trên Ticket quản trị cho Sales / Kế toán / CSKH.
+   - Chuyển trạng thái Ticket sang **Closed**.
+
+---
+
+## Xử lý sự cố thường gặp (Troubleshooting)
+
+| Tình huống sự cố | Nguyên nhân khả dĩ | Phương án xử lý chuẩn |
+| :--- | :--- | :--- |
+| **Nhấn nhầm nút STOP trên dịch vụ tổng đài chính** | Nhầm lẫn giữa mã dịch vụ tổng đài chính và mã dịch vụ Addon con | Ngay lập tức mở lại dịch vụ tổng đài chính trên Odoo và nhấn **START**; kiểm tra lại luồng thoại và báo DevOps hỗ trợ khôi phục |
+| **Gỡ nhầm đầu số chính của khách hàng** | Nhầm lẫn giữa đầu số phụ cần hủy và đầu số chính đang tiếp nhận cuộc gọi | Cấu hình gán lại ngay đầu số chính vào Inbound Route trên tổng đài; test gọi vào kiểm tra thông suốt |
+| **Tổng đài không lưu được file ghi âm mới sau khi giảm gói** | Dung lượng ghi âm thực tế vượt quá quota gói mới dẫn tới đầy ổ cứng | Hướng dẫn khách hàng xóa bớt hoặc tải về các file ghi âm cũ; hoặc liên hệ Sales để nâng lại gói lưu trữ phù hợp |

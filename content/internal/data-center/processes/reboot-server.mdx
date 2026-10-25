@@ -1,0 +1,116 @@
+---
+title: Quy trình khởi động lại (Reboot) Server & Thiết bị
+description: Hướng dẫn các bước xác thực người yêu cầu, định vị máy chủ và quy chuẩn thao tác tắt mở lại nguồn sau 10-15 giây an toàn cho thiết bị.
+---
+
+Quy trình này hướng dẫn nhân viên Support thực hiện tác vụ khởi động lại vật lý (Hard Reboot / Power Cycle) cho máy chủ hoặc thiết bị mạng của khách hàng đặt tại Trung tâm dữ liệu (Data Center) của ODS khi thiết bị bị treo hoặc theo yêu cầu bảo trì.
+
+---
+
+## 1. Mục đích & Phạm vi áp dụng
+
+- **Mục đích**: Chuẩn hóa thao tác khởi động lại thiết bị phần cứng tại phòng máy DC, đảm bảo ngắt điện và cấp lại điện theo đúng khoảng thời gian xả tĩnh điện an toàn (10–15 giây), tránh sốc điện cho linh kiện và xác thực nghiêm ngặt quyền yêu cầu.
+- **Phạm vi áp dụng**: Áp dụng cho các máy chủ Colocation, Dedicated Server, Switch, Router và Firewall của khách hàng đặt tại các Data Center của ODS.
+- **Đối tượng thực hiện**: Kỹ sư Support Onsite / Trực ca Data Center.
+
+---
+
+## 2. Điều kiện & Thông tin đầu vào
+
+Trước khi bấm nút nguồn máy chủ, Support bắt buộc phải có đầy đủ các thông tin xác thực sau:
+
+| Thông tin cần có | Mô tả chi tiết | Kênh xác thực |
+| :--- | :--- | :--- |
+| **Thông tin người yêu cầu** | Họ tên, email, số điện thoại người yêu cầu reboot. | Đối chiếu với danh bạ người liên hệ hợp lệ trên Odoo. |
+| **Mã dịch vụ** | Mã dịch vụ ODS cấp cho máy chủ (`CO1U_...`, `DedSer_...`). | Tra cứu trên Odoo. |
+| **Địa chỉ IP** | Địa chỉ IP chính của máy chủ cần reboot. | Khách hàng cung cấp và tra cứu IPAM. |
+| **Định vị phần cứng** | Tên Data Center, Số Tủ Rack, Vị trí Unit (U) chính xác. | Sổ trực DC / Sơ đồ rack. |
+
+---
+
+## 3. Checklist tổng thể
+
+- [ ] Người yêu cầu trùng khớp với thông tin đã đăng ký trên hệ thống.
+- [ ] Ticket đã được tạo ghi nhận rõ lý do yêu cầu reboot.
+- [ ] Đã định vị chính xác vị trí Tủ Rack và số U của máy chủ (kiểm tra nhãn mác, Service Tag trước khi bấm nút).
+- [ ] Tiến hành tắt nguồn máy chủ (ấn giữ nút nguồn hoặc rút cáp nguồn).
+- [ ] **BẮT BUỘC**: Chờ đúng **10 đến 15 giây** để toàn bộ tụ điện phần cứng xả hết điện tích trước khi bật lại.
+- [ ] Bật lại nguồn và quan sát đèn tín hiệu khởi động (Power LED, quạt tản nhiệt quay).
+- [ ] Kiểm tra ping IP máy chủ từ mạng ngoài sau 3–5 phút.
+- [ ] Gửi email và gọi điện thoại thông báo kết quả cho khách hàng $\rightarrow$ Đóng ticket.
+
+---
+
+## 4. Lưu đồ quyết định
+
+<ProcessFlowchart flowId="reboot-server" />
+
+---
+
+## 5. Các bước thực hiện chi tiết
+
+### Bước 1: Tiếp nhận yêu cầu & Xác thực khách hàng
+<Callout title="NGUYÊN TẮC BẢO VỆ DỊCH VỤ KHÁCH HÀNG" type="warn">
+  Thao tác tắt nguồn máy chủ đột ngột sẽ làm gián đoạn toàn bộ dịch vụ đang chạy của khách hàng.
+  **Tuyệt đối không thực hiện reboot khi thông tin người yêu cầu chưa được xác thực trùng khớp với dữ liệu hợp đồng.**
+</Callout>
+
+- **Hành động của SP**:
+  - Đối chiếu số điện thoại gọi đến hoặc địa chỉ email gửi yêu cầu với danh bạ kỹ thuật trên Odoo.
+  - **Nếu Không trùng khớp**:
+    1. Yêu cầu khách hàng gửi email từ hòm thư chính thức đã đăng ký.
+    2. *Hoặc* Support chủ động gọi lại vào số điện thoại đăng ký chính thức của khách hàng để xin xác nhận ủy quyền.
+  - **Nếu Trùng khớp**: Chuyển sang Bước 2.
+
+### Bước 2: Mở Ticket & Xác định thông tin dịch vụ
+- **Hành động của SP**:
+  1. Mở Ticket trên hệ thống với tiêu đề: `[Reboot Server] - <Mã DV> - <Địa chỉ IP>`.
+  2. Ghi nhận rõ: Mã dịch vụ, Địa chỉ IP, Tủ Rack và vị trí Unit (U).
+
+### Bước 3: Định vị thiết bị tại phòng máy
+- **Hành động của SP**:
+  1. Di chuyển vào phòng máy Data Center đến đúng tủ rack được phân công.
+  2. **Kiểm tra chéo thiết bị**: Đối chiếu số Unit (U), tem nhãn máy chủ, Service Tag hoặc địa chỉ MAC/IP dán trên mặt trước/mặt sau máy chủ để đảm bảo không bấm nhầm máy chủ của khách hàng khác.
+
+### Bước 4: Thao tác khởi động lại nguồn (Chuẩn 10–15 giây)
+- **Hành động của SP**:
+  1. Ấn giữ nút nguồn (Power button) ở mặt trước máy chủ khoảng 5 giây cho đến khi toàn bộ đèn nguồn tắt hẳn (hoặc ngắt công tắc PDU nếu khách hàng thuê nguồn điều khiển).
+  2. **Quy chuẩn thời gian**: Bắt buộc giữ máy chủ ở trạng thái tắt trong vòng **10 đến 15 giây**. 
+     *(Khoảng thời gian này giúp bo mạch chủ, bộ điều khiển RAID và các tụ điện xả hoàn toàn điện áp dư, tránh lỗi sốc điện hoặc chip bán dẫn bị kẹt trạng thái cũ).*
+  3. Ấn nút nguồn để bật lại máy chủ. Quan sát đèn nguồn sáng xanh, quạt tản nhiệt quay và đèn ổ cứng bắt đầu nhấp nháy khởi động.
+
+### Bước 5: Kiểm tra sau khởi động
+- **Hành động của SP**:
+  - Đợi khoảng 3–5 phút cho hệ điều hành máy chủ nạp xong.
+  - Kiểm tra đèn cổng mạng Switch (Switch Port LED) xem có sáng và nhấp nháy truyền nhận gói tin không.
+  - Thực hiện lệnh ping kiểm tra địa chỉ IP của máy chủ từ mạng ngoài hoặc máy tính giám sát phòng trực.
+
+### Bước 6: Thông báo khách hàng & Đóng ticket
+- **Hành động của SP**:
+  1. Gọi điện thoại hoặc gửi email thông báo hoàn tất cho khách hàng theo mẫu:
+     > *"Kính gửi Quý khách hàng,*
+     > 
+     > *Theo yêu cầu của Anh/Chị, Support ODS đã hoàn tất thao tác khởi động lại (Reboot) vật lý cho máy chủ [Mã DV] - [Địa chỉ IP] tại Data Center.*
+     > *Thời điểm thực hiện: [Giờ:Phút] ngày [Ngày/Tháng/Năm].*
+     > *Hiện tại tín hiệu nguồn và cổng mạng của máy chủ đã hoạt động bình thường. Quý khách vui lòng kiểm tra lại dịch vụ.*
+     > 
+     > *Trân trọng,"*
+  2. Cập nhật nhật ký xử lý vào Ticket và chuyển trạng thái sang `Closed`.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Bật lại nguồn nhưng máy chủ không lên điện** | Kiểm tra lại cáp nguồn cắm vào PDU, kiểm tra bộ nguồn PSU. Nếu máy chủ có 2 nguồn, thử cắm sang cổng PDU khác. Nếu vẫn không lên, báo khách hàng nguy cơ hỏng nguồn phần cứng. |
+| **Máy chủ lên nguồn nhưng sau 10 phút vẫn không ping được IP** | Chuyển sang kích hoạt [Quy trình gắn Console kiểm tra Server](/internal/data-center/processes/attach-console) để kiểm tra xem hệ điều hành có bị kẹt ở màn hình BIOS hoặc lỗi boot hay không. |
+| **Khách hàng yêu cầu reboot liên tục nhiều lần trong ngày** | Cảnh báo khách hàng việc tắt mở cứng liên tục có thể gây hại ổ cứng, đề nghị khách hàng cho phép gắn KVM để kiểm tra sâu nguyên nhân gốc rễ. |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Quy trình gắn Console kiểm tra Server](/internal/data-center/processes/attach-console)
+- [Quy trình gắn KVM over IP](/internal/data-center/processes/attach-kvm)
+- [Tiếp nhận & điều hướng xử lý yêu cầu](/internal/request-routing)

@@ -1,0 +1,112 @@
+---
+title: Quy trình đăng ký License (Plesk, cPanel, DirectAdmin)
+description: Hướng dẫn chi tiết các bước nhập thông số Sub IP, Key ID và Activation Code cho từng hãng bản quyền Plesk, cPanel và DirectAdmin.
+---
+
+Quy trình này hướng dẫn nhân viên Support thực hiện các bước đăng ký, khởi tạo và xuất mã kích hoạt bản quyền (License Key / Activation Code) cho 3 phần mềm quản trị bảng điều khiển máy chủ phổ biến: **Plesk**, **cPanel** và **DirectAdmin** trên cổng quản lý license đối tác của ODS.
+
+---
+
+## 1. Mục đích & Phạm vi áp dụng
+
+- **Mục đích**: Chuẩn hóa thao tác khai báo thông số IP và mã dịch vụ khi đăng ký bản quyền phần mềm; tránh sai lệch địa chỉ IP dẫn đến license không kích hoạt được hoặc phát sinh chi phí phạt từ hãng.
+- **Phạm vi áp dụng**: Áp dụng cho các yêu cầu mua mới, gia hạn hoặc đổi IP bản quyền Plesk, cPanel, DirectAdmin cho khách hàng thuê máy chủ tại ODS hoặc khách hàng mua license lẻ.
+- **Đối tượng thực hiện**: Nhân viên Support phụ trách dịch vụ phần mềm, phối hợp cùng bộ phận Chăm sóc khách hàng (CS) và Kinh doanh (Sales).
+
+---
+
+## 2. Điều kiện & Thông tin đầu vào
+
+Trước khi đăng ký license, Support cần thu thập đủ các thông số sau:
+
+| Thông tin cần có | Mô tả chi tiết | Ghi chú |
+| :--- | :--- | :--- |
+| **Loại phần mềm & Phiên bản** | Plesk (Web Admin / Web Pro / Web Host), cPanel (Admin / Pro / Premier), DirectAdmin (Standard). | Xác định mẫu khai báo. |
+| **Trạng thái Mã dịch vụ** | Đã được tạo Mã DV trên Odoo hay Chưa có Mã DV. | Quyết định quy ước gán Sub IP / Key ID. |
+| **Địa chỉ IP máy chủ** | Địa chỉ IPv4 tĩnh công cộng của máy chủ cần gán bản quyền. | Bắt buộc đối với cPanel và DirectAdmin. |
+| **Cổng quản lý License** | Tài khoản đối tác của ODS trên hệ thống cấp phép bản quyền. | Cổng quản trị phân quyền nội bộ. |
+
+---
+
+## 3. Checklist tổng thể
+
+- [ ] Xác định rõ loại phần mềm cần cấp (Plesk, cPanel hay DirectAdmin).
+- [ ] Xác định tình trạng mã dịch vụ (Đã có mã DV hay Đang chờ tạo mã DV).
+- [ ] Đối chiếu chính xác địa chỉ IP máy chủ của khách hàng (không có khoảng trắng, đúng định dạng IPv4).
+- [ ] Khai báo đúng các trường dữ liệu trên hệ thống (`Sub IP`, `IP`, `Key ID`, `License ID`).
+- [ ] Nhận được mã kích hoạt (`Activation Code` hoặc `Key ID`) trả về thành công từ hệ thống.
+- [ ] Gửi thông tin bàn giao cho khách hàng hoặc gửi cho bộ phận CS/Sales để hoàn tất mã DV trên Odoo.
+- [ ] Đóng ticket theo dõi.
+
+---
+
+## 4. Lưu đồ quyết định
+
+<ProcessFlowchart flowId="license-registration" />
+
+---
+
+## 5. Hướng dẫn khai báo chi tiết theo từng hãng
+
+### Bước 1: Tiếp nhận & Phân loại trạng thái Mã dịch vụ
+Support kiểm tra thông tin yêu cầu từ ticket:
+- **Trường hợp A: Đã có Mã dịch vụ Odoo**: Đã được Sales tạo mã dịch vụ trên Odoo (`WP_...`, `WH_...`).
+- **Trường hợp B: Chưa có Mã dịch vụ Odoo**: Khách hàng cần gấp trước hoặc Sales đang hoàn tất thủ tục hợp đồng.
+
+### Bước 2: Khai báo thông số trên cổng quản lý License
+
+Dưới đây là bảng quy tắc khai báo cụ thể cho từng loại phần mềm:
+
+| Hãng phần mềm | Trường hợp ĐÃ CÓ Mã DV | Trường hợp CHƯA CÓ Mã DV |
+| :--- | :--- | :--- |
+| **PLESK** | - Điền trường **Sub IP**: Nhập đúng địa chỉ IP máy chủ cần đăng ký. | - Điền trường **Sub IP**: Nhập mã quy ước nội bộ **`9602`**. |
+| **CPANEL** | - Điền trường **IP**: Nhập đúng địa chỉ IP máy chủ cần đăng ký. | - Bắt đầu bằng mã DV tạm, sau đó điền các thông tin IP theo hướng dẫn của hệ thống. |
+| **DIRECTADMIN** | - Điền trường **IP**: Nhập đúng địa chỉ IP máy chủ cần đăng ký. | - Báo người phụ trách chuyên trách license để xin cấp phép trước, sau khi nhận được phản hồi thì gửi thông tin cho CS/Khách hàng và nhờ tạo mã DV. |
+
+### Bước 3: Thu thập thông tin License trả về sau đăng ký
+
+Sau khi nhấn nút xác nhận đăng ký thành công trên cổng quản lý, hệ thống sẽ trả về các thông số bản quyền. Support ghi nhận vào ticket theo chuẩn sau:
+
+#### 1. Đối với PLESK
+- **Trường IP**: Ghi nhận License ID của hãng (định dạng `PLSK.xxxxxxx`).
+- **Trường Sub IP**: Ghi nhận địa chỉ IP máy chủ đã đăng ký.
+- **Trường Key ID**: Ghi nhận mã kích hoạt (**Activation Code**).
+- **Thông tin gửi khách hàng**: Gửi mã **Activation Code** (khách hàng chỉ cần nhập mã này vào trang quản trị Plesk để kích hoạt tự động qua Internet).
+
+#### 2. Đối với CPANEL
+- **Trường IP**: Địa chỉ IP máy chủ đã đăng ký bản quyền.
+- **Trường Key ID**: Ghi nhận **License ID** tương ứng do cPanel cấp.
+- **Thông tin gửi khách hàng**: Thông báo IP đã được kích hoạt license trực tiếp trên máy chủ xác thực của cPanel (khách hàng chạy lệnh `/usr/local/cpanel/cpkeyclt` trên server để cập nhật).
+
+#### 3. Đối với DIRECTADMIN
+- **Trường IP**: Địa chỉ IP máy chủ đã đăng ký bản quyền.
+- **Trường Sub IP**: Nhập mã quy ước **`9602`**.
+- **Trường Key ID**: Ghi nhận mã kích hoạt (**Activation Code**).
+- **Thông tin gửi khách hàng**: Gửi mã **Activation Code** (hoặc Client ID + License ID) cho khách hàng cài đặt.
+
+### Bước 4: Bàn giao & Phối hợp hoàn thiện Mã dịch vụ
+- **Hành động của SP**:
+  1. Gửi thông tin bản quyền vừa khởi tạo cho khách hàng qua hệ thống Ticket.
+  2. Đối với trường hợp chưa có Mã DV: Gửi thông tin (Loại license, IP, License ID) cho bộ phận Chăm sóc khách hàng (CS) và Sales phụ trách để tạo mã dịch vụ trên Odoo.
+  3. Khi Sales tạo xong mã DV: Cập nhật đối soát lại trên cổng license.
+
+### Bước 5: Đóng ticket
+- Chuyển trạng thái Ticket sang `Resolved` / `Closed`.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Hệ thống cPanel báo lỗi IP đã tồn tại license tại một nhà cung cấp khác** | Yêu cầu khách hàng liên hệ nhà cung cấp cũ để hủy (release) license cho IP đó, hoặc hướng dẫn khách hàng gửi ticket xác minh quyền sở hữu IP cho cPanel. |
+| **Đổi địa chỉ IP cho License đang chạy** | Đăng nhập cổng quản lý, tìm License ID của khách hàng, sử dụng tính năng `Change IP / Transfer IP` để chuyển sang IP mới mà không cần mua license mới. |
+| **Hết hạn mức license trong tài khoản đại lý ODS** | Báo cáo ngay cho Trưởng bộ phận phụ trách license để nạp thêm hạn mức quota từ hãng. |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Mã dịch vụ & tra cứu trên Odoo](/internal/service-codes)
+- [Tổng quan dịch vụ ODS](/internal/services)
+- [Tiếp nhận & điều hướng xử lý yêu cầu](/internal/request-routing)

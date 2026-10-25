@@ -1,4 +1,10 @@
 {
   "title": "Cổng thông tin Support",
-  "pages": ["(home)", "ai-contact-center"]
+  "pages": [
+    "(home)",
+    "ai-contact-center",
+    "data-center",
+    "network",
+    "software-license"
+  ]
 }

@@ -15,6 +15,8 @@ import {
 } from '../_components/announcement-list';
 import { getAnnouncements } from '../_lib/announcements';
 
+import { AutoIndex } from '../_components/auto-index';
+
 interface PageProps {
   params: Promise<{ slug?: string[] }>;
 }
@@ -48,12 +50,18 @@ export default async function Page(props: PageProps) {
         <MDX
           components={getMDXComponents({
             a: createRelativeLink(internalSource, page),
+            AutoIndex: (props: any) => (
+              <AutoIndex currentUrl={page.url} {...props} />
+            ),
           })}
         />
       </DocsBody>
     </DocsPage>
   );
 }
+
+
+
 
 export function generateStaticParams() {
   return internalSource.generateParams();

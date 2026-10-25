@@ -1,0 +1,7 @@
+{
+  "title": "License phần mềm",
+  "description": "Support Wiki cho dịch vụ Bản quyền phần mềm (Plesk, cPanel, DirectAdmin, Microsoft SPLA).",
+  "root": true,
+  "defaultOpen": false,
+  "pages": ["index", "processes"]
+}

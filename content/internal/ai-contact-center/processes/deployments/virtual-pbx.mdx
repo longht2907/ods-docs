@@ -1,0 +1,108 @@
+---
+title: "Tổng Đài Ảo"
+description: Quy trình triển khai dịch vụ **Tổng Đài Ảo**
+---
+## Lưu đồ quy trình
+
+<ProcessFlowchart flowId="deploy-virtual-pbx" />
+
+---
+
+## Các bước triển khai
+
+### Bước 1: Tiếp nhận yêu cầu triển khai từ Sales trên Ticket
+
+Mở Ticket yêu cầu triển khai từ Sales trên hệ thống Support Desk và kiểm tra đầy đủ các thông số kỹ thuật trước khi bắt đầu cấu hình:
+
+| Thông số | Giá trị chuẩn / Định dạng | Mục đích sử dụng |
+| :--- | :--- | :--- |
+| **Mã dịch vụ (MDV)** | `VTPxxxxxxx` (Ví dụ: `VTP0004767`) | Định danh dịch vụ trên ERP Odoo và Portal Support |
+| **Gói dịch vụ** | Tổng Đài Ảo | Xác định số lượng máy nhánh và tính năng kích hoạt |
+| **Kịch bản cuộc gọi** | Sơ đồ luồng thoại (IVR, Ring Group, Time Condition) | Cấu hình định tuyến cuộc gọi vào và gọi ra |
+| **Đầu số kết nối (DID)** | Số điện thoại Hotline doanh nghiệp | Đấu nối Trunk viễn thông |
+| **Email khách hàng** | Email người đại diện kỹ thuật / quản trị | Nhận thông tin tài khoản và mật khẩu khởi tạo |
+
+- **Quy tắc kiểm tra**:
+  - Mã dịch vụ bắt buộc phải có tiền tố `VTP`. Nếu sai mã hoặc thuộc nhóm dịch vụ khác → Phản hồi trên Ticket yêu cầu Sales xác nhận lại.
+  - Phải có file kịch bản thoại chi tiết kèm danh sách số máy nhánh phân bổ,đầu số. Nếu thiếu thông tin → Tạm dừng xử lý, yêu cầu Sales bổ sung.
+
+---
+
+### Bước 2: Kích hoạt dịch vụ Odoo & Cấp mật khẩu người dùng
+
+#### 2.1. Cập nhật thông số kỹ thuật trên ERP Online (Odoo)
+1. Đăng nhập hệ thống [ERP Online ODS](https://erponline.ods.vn) → Truy cập phân hệ **Services** (`sale.service`).
+2. Tìm kiếm theo **Mã dịch vụ** (Ví dụ: `VTP0004767`).
+3. Mở chi tiết bản ghi dịch vụ và kiểm tra thông tin hợp đồng.
+4. Nhấn nút **START** (góc trên bên trái) để kích hoạt chuyển trạng thái dịch vụ sang hoạt động.
+
+![Trang chi tiết dịch vụ trên Odoo và nút START](/media/ai-contact-center/virtual-pbx/odoo_service_start.png)
+
+#### 2.2. Khởi tạo mật khẩu & Gửi thông tin cho khách hàng
+1. Tại giao diện dịch vụ trên Odoo, nhấp chuột vào tên **Khách hàng** (Ví dụ: `[ODS013394] CÔNG TY CỔ PHẦN BAO BÌ SẮC MÀU`) để chuyển sang trang hồ sơ đối tác (`res.partner`).
+2. Nhấn nút **GENERATE PASSWORD** trên thanh công cụ:
+   - Hệ thống tự động sinh mật khẩu ngẫu nhiên an toàn và gửi thông báo trực tiếp về **Email** đã đăng ký của khách hàng (Ví dụ: `thanhkdsm@gmail.com`).
+3. **Lưu ý nghiệp vụ bắt buộc**: Copy chuỗi mật khẩu vừa sinh và nhấp vào mục **Log an internal note** phía dưới trang khách hàng để lưu lại mật khẩu nội bộ. Việc này giúp đối soát và hỗ trợ khách hàng nhanh chóng khi cần tra cứu lại.
+
+![Trang khách hàng với nút GENERATE PASSWORD và Log an internal note](/media/ai-contact-center/virtual-pbx/odoo_generate_password.png)
+
+---
+
+### Bước 3: Khởi tạo tổng đài trên Portal Support
+
+#### 3.1. Chọn IP khả dụng trong danh sách chưa sử dụng
+1. Đăng nhập hệ thống [Support Portal ODS](https://supportportal.matbao.one/).
+2. Điều hướng vào menu **CloudFone** → Chọn **Danh sách tổng đài chưa sử dụng** (`/ServerCloudfone/CloudFoneManage/AddIPWan`).
+3. Hệ thống hiển thị danh sách các địa chỉ IP WAN khả dụng:
+   - Chọn một địa chỉ IP bất kỳ trong danh sách (Ví dụ: `103.129.90.254`).
+   - Nhấp vào icon **Cấp phát** (biểu tượng thứ 3 tại cột *Thao tác*) để mở popup cấu hình.
+
+![Danh sách IP tổng đài chưa sử dụng trên Portal](/media/ai-contact-center/virtual-pbx/portal_unused_ips.png)
+
+#### 3.2. Cấp phát và đồng bộ dữ liệu dịch vụ
+1. Trong popup **Tìm dịch vụ**:
+   - Nhập Mã dịch vụ (Ví dụ: `VTP0004767`) vào ô **Từ khóa**.
+   - Nhấn nút **Kiểm tra** để hệ thống truy vấn và lấy thông tin gói cước từ Odoo.
+2. Kiểm tra các trường dữ liệu hiển thị tự động:
+   - **IP**: Địa chỉ IP đã chọn (Ví dụ: `103.129.90.254`).
+   - **Domain**: Đổi tương tự IP (103.129.90.254).
+   - **Tên đăng nhập**: Mặc định là `admin`.
+   - **Mật khẩu**: Mật khẩu quản trị tổng đài.
+   - **Dịch vụ**: Khớp đúng tên gói (Ví dụ: `VTP0004767 - Tổng Đài Ảo Start Up`).
+3. Sau khi xác nhận thông tin chính xác, nhấn **Lưu** để hệ thống tiến hành cấp phát tài nguyên và khởi tạo cơ sở dữ liệu tổng đài.
+
+![Popup Cấp phát dịch vụ tổng đài trên Portal](/media/ai-contact-center/virtual-pbx/portal_allocate_service.png)
+
+---
+
+### Bước 4: Đăng nhập quản trị & Cấu hình kịch bản tổng đài
+
+#### 4.1. Định vị tổng đài vừa khởi tạo
+1. Trên Support Portal, vào menu **CloudFone** → Chọn **Danh sách tổng đài** (`/ServerCloudfone/CloudFoneManage/Index`).
+2. Nhập mã dịch vụ `VTP0004767` vào ô tìm kiếm để định vị tổng đài vừa tạo.
+
+#### 4.2. Cấu hình kịch bản theo yêu cầu Ticket
+1. Mở trình duyệt, truy cập vào giao diện quản trị tổng đài vừa cấp.
+2. Tiến hành cấu hình chi tiết theo kịch bản bàn giao:
+   - **Cấu hình Máy nhánh (Extensions)**: Tạo danh sách máy nhánh nội bộ (101, 102, 103...), cấp mật khẩu SIP cho từng nhân sự.
+   - **Cấu hình Đầu số & Trunk viễn thông**: Khai báo Trunk nhà mạng cho đầu số Hotline đăng ký.
+   - **Cấu hình Luồng gọi vào (Inbound Routes)**:
+     - Tải lên file ghi âm lời chào doanh nghiệp (Audio Recordings).
+     - Thiết lập menu tương tác phím bấm (IVR).
+     - Thiết lập nhóm đổ chuông (Ring Groups) hoặc hàng đợi (Queues).
+   - **Cấu hình Khung giờ làm việc (Time Conditions)**: Phân chia luồng cuộc gọi trong giờ hành chính và ngoài giờ làm việc.
+   - **Cấu hình Luồng gọi ra (Outbound Routes)**: Gán đầu số Hotline hiển thị khi máy nhánh gọi ra ngoài.
+
+---
+
+### Bước 5: Kiểm tra nghiệm thu 2 chiều & Bàn giao
+
+1. **Kiểm tra cuộc gọi vào (Inbound)**:
+   - Dùng số điện thoại cá nhân gọi vào Hotline tổng đài.
+   - Kiểm tra lời chào IVR phát rõ ràng, bấm phím điều hướng đổ chuông chính xác vào máy nhánh/nhóm trực theo đúng kịch bản.
+2. **Kiểm tra cuộc gọi ra (Outbound)**:
+   - Đăng nhập thử máy nhánh trên Softphone (ODS Phone App / Zoiper / MicroSIP).
+   - Thực hiện cuộc gọi ra số di động bên ngoài, xác nhận cuộc gọi kết nối ổn định và hiển thị đúng số Hotline công ty.
+3. **Bàn giao & Đóng Ticket**:
+   - Gửi thông tin đăng nhập quản trị tổng đài, danh sách tài khoản SIP máy nhánh và hướng dẫn cài đặt Softphone cho khách hàng qua Ticket.
+   - Phản hồi kết quả triển khai lên Ticket và chuyển trạng thái sang **Closed**.

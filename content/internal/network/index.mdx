@@ -1,0 +1,32 @@
+---
+title: Tổng quan dịch vụ Mạng
+description: Cổng tra cứu quy trình cấp phát IP, vận hành thiết bị mạng và runbook xử lý sự cố kết nối, DDoS, Blacklist tại ODS.
+---
+
+Chào mừng bạn đến với khu vực tài liệu **Network (Mạng & Kết nối)**. Khu vực này cung cấp hướng dẫn vận hành, điều phối và xử lý các sự cố liên quan đến đường truyền Internet, kênh Leased-Line, switch tủ mạng và an toàn thông tin (DDoS, Blacklist, Phishing).
+
+---
+
+## Danh mục tài liệu
+
+<Cards>
+  <Card href="/internal/network/processes" title="Quy trình vận hành Network">
+    Các quy trình cấp phát mới, kiểm tra và thu hồi địa chỉ IPv4 / Range IP cho khách hàng.
+  </Card>
+  <Card href="/internal/network/runbooks" title="Runbooks xử lý sự cố Network">
+    Hướng dẫn chẩn đoán và khắc phục sự cố mạng: tấn công DDoS, Blacklist IP, rớt switch, sự cố kênh Leased-Line và mã độc mạng.
+  </Card>
+  <Card href="/internal/network/knowledge-base" title="Kiến thức kỹ thuật Network">
+    Tra cứu mô hình phân tầng mạng (Network Topology) từ Access Switch đến Router Core và các hướng kết nối ISP.
+  </Card>
+</Cards>
+
+---
+
+## Nguyên tắc xử lý sự cố mạng
+
+<Callout title="Bảo vệ hạ tầng chung & Xử lý sự cố" type="warn">
+  1. **Ưu tiên ngăn chặn lan rộng**: Khi phát hiện tấn công DDoS hoặc lạm dụng băng thông đe dọa cổng Core/Switch chung, Support phải thực hiện cô lập IP bị ảnh hưởng theo đúng quy định.
+  2. **Thu thập bằng chứng trước khi can thiệp**: Luôn chụp màn hình Sniff traffic, log PRTG hoặc thông báo từ các tổ chức an ninh mạng trước khi tiến hành chặn lưu lượng.
+  3. **Phối hợp NOC**: Với các dải IP lớn ($\ge 13$ IP), cấu hình định tuyến BGP hoặc sự cố kênh truyền phức tạp, Support liên hệ bộ phận NOC để phối hợp xử lý.
+</Callout>

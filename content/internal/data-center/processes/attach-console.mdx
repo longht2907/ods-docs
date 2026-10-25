@@ -1,0 +1,109 @@
+---
+title: Quy trình gắn Console kiểm tra máy chủ
+description: Hướng dẫn kỹ thuật gắn màn hình console tại chỗ, kiểm tra tín hiệu bàn phím/màn hình, chẩn đoán server bị treo hoặc báo lỗi và xử lý theo yêu cầu.
+---
+
+Quy trình này hướng dẫn nhân viên Support thực hiện gắn bộ Console di động trực tiếp tại tủ rack để kiểm tra tình trạng hoạt động thực tế của máy chủ khách hàng khi máy chủ mất kết nối mạng hoặc không phản hồi từ xa.
+
+---
+
+## 1. Mục đích & Phạm vi áp dụng
+
+- **Mục đích**: Chẩn đoán nhanh tình trạng sống/chết của máy chủ tại lớp vật lý (Physical Layer), xác định nguyên nhân server bị treo, sập nguồn hay lỗi hệ điều hành để cung cấp bằng chứng cho khách hàng xử lý.
+- **Phạm vi áp dụng**: Áp dụng cho toàn bộ máy chủ Colocation và Dedicated Server đặt tại Trung tâm dữ liệu ODS.
+- **Đối tượng thực hiện**: Kỹ sư Support Onsite / Trực ca phòng máy Data Center.
+
+---
+
+## 2. Điều kiện & Thông tin đầu vào
+
+| Thông tin cần có | Mô tả chi tiết | Kênh xác thực |
+| :--- | :--- | :--- |
+| **Thông tin người yêu cầu** | Họ tên, email, số điện thoại người yêu cầu kiểm tra. | Đối chiếu với danh bạ đăng ký trên Odoo. |
+| **Mã dịch vụ** | Mã dịch vụ ODS cấp cho máy chủ (`CO1U_...`, `DedSer_...`). | Tra cứu trên Odoo. |
+| **Định vị máy chủ** | Địa chỉ IP, Tên Data Center, Số tủ Rack và Số Unit (U). | Tra cứu sơ đồ tủ rack DC. |
+| **Dụng cụ kiểm tra** | Bộ Console di động (màn hình LCD di động kèm bàn phím, cáp chuyển VGA/HDMI/USB). | Kho công cụ phòng trực DC. |
+
+---
+
+## 3. Checklist tổng thể
+
+- [ ] Người yêu cầu trùng khớp với thông tin đã đăng ký trên hệ thống.
+- [ ] Ticket đã được khởi tạo ghi nhận đầy đủ Mã DV, IP, Vị trí Rack/U.
+- [ ] Đã đấu nối Console vào cổng VGA/HDMI và USB bàn phím của máy chủ.
+- [ ] Đã kiểm tra tín hiệu hiển thị màn hình (có hình, không hình hay màn hình xanh/lỗi).
+- [ ] Đã kiểm tra tín hiệu bàn phím (bấm Caps Lock/Num Lock xem đèn có phản hồi).
+- [ ] Đã chụp ảnh màn hình làm bằng chứng nếu phát hiện lỗi hoặc màn hình treo.
+- [ ] Gửi email thông báo kết quả kiểm tra kèm hình ảnh cho khách hàng.
+- [ ] **Lưu ý**: Chỉ thực hiện Reboot/Khởi động lại máy chủ khi có yêu cầu bằng văn bản từ khách hàng.
+- [ ] Thu hồi thiết bị Console về vị trí cất giữ sau khi hoàn tất.
+
+---
+
+## 4. Lưu đồ quyết định
+
+<ProcessFlowchart flowId="attach-console" />
+
+---
+
+## 5. Các bước thực hiện chi tiết
+
+### Bước 1: Tiếp nhận & Xác thực khách hàng
+- **Hành động của SP**: Đối chiếu thông tin người yêu cầu với danh bạ đại diện kỹ thuật trên Odoo.
+  - **Không trùng khớp**: Yêu cầu gửi email từ hòm thư chính thức hoặc gọi lại số điện thoại đã đăng ký để xác nhận.
+  - **Trùng khớp**: Chuyển sang Bước 2.
+
+### Bước 2: Tạo Ticket & Định vị máy chủ
+- **Hành động của SP**:
+  - Mở Ticket trên hệ thống, phân loại `Kiểm Tra Server / Gắn Console`.
+  - Tra cứu chính xác số Tủ Rack và số U của máy chủ. Mang bộ Console di động đến trước tủ rack.
+
+### Bước 3: Gắn Console kiểm tra tại tủ Rack
+- **Hành động của SP**:
+  - Cắm cáp tín hiệu màn hình (VGA hoặc HDMI) vào cổng hiển thị của máy chủ.
+  - Cắm cáp USB bàn phím vào cổng USB của máy chủ. Bật nguồn màn hình Console.
+
+### Bước 4: Kiểm tra tín hiệu & Chẩn đoán tình trạng
+Kỹ sư quan sát và kiểm tra theo 3 tình huống sau:
+
+#### Tình huống 1: Màn hình & Bàn phím hoạt động bình thường
+- Màn hình hiển thị cửa sổ đăng nhập hệ điều hành bình thường (Login prompt trên Linux hoặc màn hình Lock Screen trên Windows).
+- Bấm phím `Caps Lock` hoặc `Num Lock`, đèn tín hiệu trên bàn phím sáng/tắt nhịp nhàng $\rightarrow$ Hệ điều hành không bị treo.
+- **Xử lý**: Server vẫn đang chạy tốt. Nguyên nhân mất kết nối từ xa có thể do cấu hình firewall trong OS chặn mạng hoặc lỗi dịch vụ SSH/RDP. Chụp ảnh màn hình đăng nhập $\rightarrow$ gửi email thông báo khách hàng kiểm tra lại cấu hình mạng nội bộ.
+
+#### Tình huống 2: Màn hình hiển thị thông báo lỗi
+- Màn hình hiển thị lỗi hệ điều hành: Màn hình xanh chết chóc (BSOD trên Windows), lỗi Kernel Panic trên Linux, hoặc lỗi phần cứng `No boot device found / RAID degraded`.
+- **Xử lý**:
+  1. Chụp ảnh rõ nét toàn bộ màn hình hiển thị mã lỗi.
+  2. Gửi email đính kèm hình ảnh cho khách hàng để kỹ thuật của khách hàng nắm được chi tiết lỗi.
+  3. Hỏi ý kiến khách hàng có muốn hỗ trợ Reboot lại máy chủ hay không.
+
+#### Tình huống 3: Bàn phím không phản hồi hoặc Màn hình tối đen
+- Màn hình không xuất tín hiệu (No Signal) dù dây cắm chắc chắn, hoặc màn hình bị đơ cứng, bấm `Caps Lock` / `Num Lock` đèn không sáng $\rightarrow$ Máy chủ hoặc card màn hình đã bị treo cứng (Hardware Freeze).
+- **Xử lý**:
+  1. Gửi email thông báo cho khách hàng tình trạng máy chủ đang bị treo hoàn toàn ở lớp vật lý.
+  2. Đề xuất khách hàng phương án khởi động lại máy chủ (Reboot).
+  3. **Chỉ bấm nút Reboot khi khách hàng đồng ý qua email/ticket**.
+
+### Bước 5: Thu hồi Console & Đóng ticket
+- **Hành động của SP**:
+  1. Tháo dỡ cáp Console, tắt màn hình và đưa thiết bị về vị trí cất giữ quy định.
+  2. Đóng cửa tủ rack, đảm bảo an toàn cho các thiết bị xung quanh.
+  3. Cập nhật kết quả vào Ticket và chuyển trạng thái sang `Resolved` / `Closed`.
+
+---
+
+## 6. Ngoại lệ & Điểm dừng
+
+| Tình huống ngoại lệ | Xử lý của Support |
+| :--- | :--- |
+| **Server không lên nguồn (không có đèn tín hiệu)** | Kiểm tra lại dây nguồn PDU, kiểm tra công tắc nguồn của bộ nguồn (PSU) phía sau máy chủ. Nếu PSU hỏng, báo khách hàng để phối hợp bảo hành. |
+| **Khách hàng yêu cầu bấm tổ hợp phím can thiệp sâu** | Nếu khách hàng yêu cầu đăng nhập vào OS để gõ lệnh: Support từ chối thao tác nội dung trong OS, đề xuất khách hàng chuyển sang sử dụng [Quy trình gắn KVM](/internal/data-center/processes/attach-kvm) để tự thao tác an toàn. |
+
+---
+
+## 7. Tài liệu liên quan
+
+- [Quy trình gắn KVM over IP](/internal/data-center/processes/attach-kvm)
+- [Quy trình khởi động lại Server, Thiết bị](/internal/data-center/processes/reboot-server)
+- [Hỗ trợ thao tác Server & Cài lại OS](/internal/data-center/processes/server-assistance)

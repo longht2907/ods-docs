@@ -1,0 +1,42 @@
+---
+title: Lưu ý định tuyến & Giới hạn nhà mạng
+description: Tổng hợp các giới hạn kết nối, điều kiện gọi ra và lưu ý kỹ thuật của các nhà mạng viễn thông (VTC, Mobifone SIP, Viettel PSTN, Viettel VConnect).
+---
+
+Tài liệu này tổng hợp các giới hạn kỹ thuật và lưu ý thực tế khi định tuyến cuộc gọi qua các nhà mạng viễn thông. Kỹ sư hỗ trợ (SP) cần nắm rõ để giải thích cho khách hàng và xử lý ticket sự cố nhanh chóng.
+
+---
+
+## 1. Mạng VTC
+
+- **Giới hạn kết nối liên mạng**: Hiện tại hạ tầng đầu số VTC **chưa kết nối (không gọi được)** sang các mạng:
+  - **Vietnamobile**
+  - **FPT**
+  - **CMC**
+- **Xử lý khi khách hàng phản ánh**: Hướng dẫn khách hàng sử dụng đầu số của nhà mạng khác (Viettel, VNPT, FPT...) để thực hiện cuộc gọi tới các thuê bao thuộc 3 nhà mạng trên.
+
+---
+
+## 2. Mạng Mobifone (Đầu số SIP Mobifone)
+
+- **Giới hạn đầu số dịch vụ**: Thuê bao sử dụng **số SIP Mobifone không gọi được vào các đầu số Hotline `1900` và `1800`**.
+- **Lưu ý**: Thuê bao di động Mobifone thông thường (gắn SIM vật lý) vẫn thực hiện cuộc gọi tới 1800/1900 bình thường; giới hạn này chỉ áp dụng đối với luồng SIP Trunk Mobifone.
+
+---
+
+## 3. Mạng Viettel
+
+### 3.1. Số Viettel PSTN (Cố định truyền thống)
+
+- **Quy tắc quay số cùng vùng**: Khi số Viettel PSTN gọi tới các số điện thoại cố định **cùng mã vùng thì không bấm mã vùng**.
+  - *Ví dụ tại TP.HCM (mã vùng 028)*: Nhân viên quay thẳng `7300xxxx` thay vì quay `0287300xxxx`. Cần kiểm tra cấu hình Dial Pattern trên PBX để cắt bỏ tiền tố mã vùng nếu gọi nội hạt qua Trunk Viettel PSTN.
+
+### 3.2. Số Viettel VConnect
+
+Dịch vụ thoại di động doanh nghiệp VConnect của Viettel có các đặc thù kỹ thuật sau:
+
+- **Không gọi được cho số di động SIP Viettel**: Các thuê bao VConnect không thực hiện được cuộc gọi đến các số di động SIP của cùng mạng Viettel.
+- **Không gọi được số có Voicemail / Forward**: Thuê bao VConnect không kết nối được đến các số thuê bao đích đang bật tính năng Hộp thư thoại (Voicemail) hoặc Chuyển tiếp cuộc gọi (Call Forwarding).
+- **Gọi Hotline 1800/1900 và Quốc tế**:
+  - Mặc định hướng gọi tới 1800, 1900 và gọi quốc tế bị khóa trên luồng VConnect.
+  - Khi khách hàng có nhu cầu sử dụng, SP phải hướng dẫn hoặc hỗ trợ tạo yêu cầu sang Viettel để **mở quyền (mở hướng gọi)** cho thuê bao.

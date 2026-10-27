@@ -135,11 +135,11 @@ async function main() {
       process.exit(1);
     }
 
-    console.log('[test:routes] Server đã sẵn sàng. Bắt đầu kiểm tra 16 cases:');
+    console.log('[test:routes] Server đã sẵn sàng. Bắt đầu kiểm tra 20 cases:');
 
     let passedCases = true;
 
-    // 1-7. Các route public chính phải trả về 200
+    // 1-8. Các route public chính phải trả về 200
     const t1 = await checkRoute(baseUrl, '/', 200, 'Home hub accessible', [
       'Trung tâm tài liệu ODS',
       'Tài liệu sản phẩm ODS',
@@ -160,69 +160,101 @@ async function main() {
     const t4 = await checkRoute(baseUrl, '/docs/cloudfile', 200, 'CloudFile docs accessible');
     passedCases = passedCases && t4;
 
-    const t5 = await checkRoute(baseUrl, '/docs/ai-contact-center/user-guider-portal', 200, 'Portal guide accessible');
+    const t5 = await checkRoute(baseUrl, '/docs/ai-contact-center/portal', 200, 'Portal guide accessible');
     passedCases = passedCases && t5;
 
-    const t6 = await checkRoute(baseUrl, '/docs/ai-contact-center/api', 200, 'API reference accessible');
+    const t6 = await checkRoute(
+      baseUrl,
+      '/docs/ai-contact-center/portal/cuoc-goi/giam-sat',
+      200,
+      'Short monitoring guide URL accessible',
+    );
     passedCases = passedCases && t6;
 
-    const t7 = await checkRoute(baseUrl, '/api/search', 200, 'Public search API accessible');
+    const t7 = await checkRoute(baseUrl, '/docs/ai-contact-center/api', 200, 'API reference accessible');
     passedCases = passedCases && t7;
 
-    // 8-9. Hai API đã loại bỏ phải giữ 404, không redirect sang API khác.
-    const t8 = await checkRoute(
+    const t8 = await checkRoute(baseUrl, '/api/search', 200, 'Public search API accessible');
+    passedCases = passedCases && t8;
+
+    // 9-10. Hai API đã loại bỏ phải giữ 404, không redirect sang API khác.
+    const t9 = await checkRoute(
       baseUrl,
       '/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-report',
       404,
       'Removed GetCallReport stays unavailable',
     );
-    passedCases = passedCases && t8;
+    passedCases = passedCases && t9;
 
-    const t9 = await checkRoute(
+    const t10 = await checkRoute(
       baseUrl,
       '/docs/ai-contact-center/api/tong-dai/lich-su-cuoc-goi/get-call-report-detail',
       404,
       'Removed GetCallReportDetail stays unavailable',
     );
-    passedCases = passedCases && t9;
+    passedCases = passedCases && t10;
 
-    // 10. Redirect Click-to-Call cũ vẫn hoạt động.
-    const t10 = await checkRedirect(
+    // 11-14. Redirect legacy phải đi thẳng đến canonical URL.
+    const t11 = await checkRedirect(
       baseUrl,
       '/docs/ai-contact-center/api/tong-dai/khoi-tao-cuoc-goi',
       '/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call',
       'Legacy Click-to-Call redirect',
     );
-    passedCases = passedCases && t10;
+    passedCases = passedCases && t11;
 
-    // 11. Social metadata phải tuyệt đối và không dùng loopback trong production build.
-    const t11 = await checkSocialMetadata(
+    const t12 = await checkRedirect(
+      baseUrl,
+      '/docs/ai-contact-center/user-guider-portal',
+      '/docs/ai-contact-center/portal',
+      'Legacy Portal root redirect',
+    );
+    passedCases = passedCases && t12;
+
+    const t13 = await checkRedirect(
+      baseUrl,
+      '/docs/ai-contact-center/user-guider-portal/06-quan-ly-cuoc-goi/huong-dan-giam-sat-cuoc-goi',
+      '/docs/ai-contact-center/portal/cuoc-goi/giam-sat',
+      'Legacy monitoring guide redirect',
+    );
+    passedCases = passedCases && t13;
+
+    const t14 = await checkRedirect(
+      baseUrl,
+      '/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/tao-cau-hinh-may-nhanh',
+      '/docs/ai-contact-center/portal/tong-dai/cai-dat/tao-cau-hinh-may-nhanh',
+      'Legacy nested Portal guide redirect',
+    );
+    passedCases = passedCases && t14;
+
+    // 15. Social metadata phải tuyệt đối và không dùng loopback trong production build.
+    const t15 = await checkSocialMetadata(
       baseUrl,
       '/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call',
     );
-    passedCases = passedCases && t11;
-
-    // 12-16. Vùng internal tiếp tục fail-closed.
-    const t12 = await checkRoute(baseUrl, '/internal', 401, 'Internal root blocked');
-    passedCases = passedCases && t12;
-
-    const t13 = await checkRoute(baseUrl, '/internal/', 401, 'Internal trailing slash blocked');
-    passedCases = passedCases && t13;
-
-    const t14 = await checkRoute(baseUrl, '/internal/onboarding', 401, 'Internal subpage blocked');
-    passedCases = passedCases && t14;
-
-    const t15 = await checkRoute(baseUrl, '/api/search/internal', 401, 'Internal search API blocked');
     passedCases = passedCases && t15;
 
-    const t16 = await checkRoute(baseUrl, '/api/search/internal/', 401, 'Internal search API trailing slash blocked');
+    // 16-20. Vùng internal tiếp tục fail-closed.
+    const t16 = await checkRoute(baseUrl, '/internal', 401, 'Internal root blocked');
     passedCases = passedCases && t16;
+
+    const t17 = await checkRoute(baseUrl, '/internal/', 401, 'Internal trailing slash blocked');
+    passedCases = passedCases && t17;
+
+    const t18 = await checkRoute(baseUrl, '/internal/onboarding', 401, 'Internal subpage blocked');
+    passedCases = passedCases && t18;
+
+    const t19 = await checkRoute(baseUrl, '/api/search/internal', 401, 'Internal search API blocked');
+    passedCases = passedCases && t19;
+
+    const t20 = await checkRoute(baseUrl, '/api/search/internal/', 401, 'Internal search API trailing slash blocked');
+    passedCases = passedCases && t20;
 
     if (!passedCases) {
       console.error('\n[test:routes FAIL] Một hoặc nhiều route không đạt mã HTTP mong đợi.');
       allPassed = false;
     } else {
-      console.log('\n[test:routes PASS] Toàn bộ 16/16 route test case đều đạt chuẩn.\n');
+      console.log('\n[test:routes PASS] Toàn bộ 20/20 route test case đều đạt chuẩn.\n');
       allPassed = true;
     }
   } finally {

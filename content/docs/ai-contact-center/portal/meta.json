@@ -1,0 +1,21 @@
+{
+  "title": "Hướng dẫn sử dụng",
+  "description": "Tài liệu hướng dẫn sử dụng và quản trị AI Contact Center trên giao diện Portal.",
+  "defaultOpen": true,
+  "pages": [
+    "index",
+    "---TỔNG QUAN & DỊCH VỤ---",
+    "tong-quan",
+    "dich-vu",
+    "---VẬN HÀNH TỔNG ĐÀI---",
+    "tong-dai",
+    "nguoi-dung",
+    "khach-hang",
+    "hoi-thoai",
+    "cuoc-goi",
+    "autocall",
+    "---KẾT NỐI & THIẾT BỊ---",
+    "tich-hop",
+    "may-nhanh"
+  ]
+}

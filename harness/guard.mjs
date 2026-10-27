@@ -429,7 +429,7 @@ try {
 
 		const requiredDocsNodes = [
 			'content/docs/(bat-dau)/index.mdx',
-			'content/docs/ai-contact-center/user-guider-portal/10-goi-tu-dong/meta.json',
+			'content/docs/ai-contact-center/portal/autocall/meta.json',
 			'content/docs/ai-contact-center/api/tong-dai/meta.json',
 			'content/docs/ai-contact-center/api/autocall/meta.json',
 			'content/docs/ai-contact-center/api/webhook/meta.json',

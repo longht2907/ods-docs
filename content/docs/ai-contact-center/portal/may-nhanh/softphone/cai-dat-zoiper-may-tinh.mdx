@@ -1,0 +1,261 @@
+---
+title: "Cài đặt Softphone Zoiper trên máy tính"
+description: "Hướng dẫn cài đặt và cấu hình tài khoản máy nhánh SIP tổng đài ODS trên phần mềm Zoiper 5 và Zoiper 3 cho máy tính PC/Laptop."
+---
+
+Zoiper là ứng dụng Softphone VoIP đa nền tảng (Windows, macOS, Linux) cho phép nhân viên tổng đài biến máy tính cá nhân hoặc laptop thành thiết bị nghe gọi chuyên nghiệp thông qua tai nghe chụp tai (headset).
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Quản trị viên cần tạo trước số máy nhánh và cung cấp **Mật khẩu SIP**, **Địa chỉ máy chủ SIP** trên Portal ODS.
+- Máy tính cần trang bị tai nghe có micro hoạt động tốt và kết nối Internet ổn định.
+- Cho phép quyền truy cập Micro (Microphone permission) cho phần mềm Zoiper trên hệ điều hành.
+</Callout>
+
+## 1. Lấy thông tin tài khoản SIP trên Portal ODS
+
+Để cấu hình máy nhánh trên Zoiper, nhân viên hoặc quản trị viên lấy thông tin xác thực từ trang quản trị ODS:
+
+1. Đăng nhập vào trang quản trị tổng đài ODS: `https://app.ods.vn/`.
+2. Truy cập menu **Tổng đài** → **Cài đặt tổng đài** → **Nhân viên**.
+3. Tại danh sách nhân viên, chọn biểu tượng **Chỉnh sửa** (cây bút) của máy nhánh cần sử dụng để xem chi tiết thông số xác thực SIP.
+
+![Form thông tin chi tiết số máy nhánh trên Portal ODS](/media/ai-contact-center/user-guider-portal/tao-may-nhanh_form-chi-tiet.png)
+
+Bảng đối chiếu thông tin từ Portal ODS sang giao diện cấu hình Zoiper:
+
+| Thông số trên ODS Portal | Trường tương ứng trên Zoiper | Ví dụ thực tế |
+| :--- | :--- | :--- |
+| **Số máy nhánh** | **Username / Login** (`<máy_nhánh>@<server>:<port>`) | `100@sip.ods.vn:51000` |
+| **Mật khẩu** | **Password** | `MatKhau@123` |
+| **Tên miền / IP Tổng đài** | **Hostname or Provider** | `sip.ods.vn:51000` |
+| **Port SIP** | Cổng dịch vụ SIP ODS | `51000` (hoặc `5060`) |
+
+## 2. Cấu hình trên Zoiper 5 (Phiên bản khuyến nghị)
+
+Zoiper 5 là phiên bản mới nhất, tối ưu giao diện hiện đại và cải tiến chất lượng âm thanh đàm thoại.
+
+<Steps>
+<Step>
+### Bước 1: Tải và cài đặt Zoiper 5
+
+Tải bộ cài đặt chính thức tại liên kết: [Zoiper 5 Download](https://www.zoiper.com/en/voip-softphone/download/current).
+
+![Trang tải bộ cài Zoiper 5 chính thức](/media/ai-contact-center/user-guider-portal/zoiper5_trang-download.png)
+
+Tiến hành cài đặt theo các bước mặc định của trình cài đặt. Khi mở ứng dụng lần đầu, chọn **Continue as a Free user** để sử dụng phiên bản miễn phí.
+
+![Chọn Continue as a Free user khi khởi chạy Zoiper 5](/media/ai-contact-center/user-guider-portal/zoiper5_dang-ky-free.png)
+
+*Kết quả: Màn hình đăng nhập tài khoản Softphone xuất hiện.*
+</Step>
+
+<Step>
+### Bước 2: Đăng ký tài khoản SIP trên Zoiper 5
+
+Tại màn hình đăng nhập ban đầu của Zoiper 5, tiến hành khai báo các thông số SIP:
+
+1. **Username / Login**: Nhập theo cú pháp `số_máy_nhánh@địa_chỉ_tổng_đài:port` (Ví dụ: `100@sip.ods.vn:51000`).
+2. **Password**: Nhập mật khẩu SIP của số máy nhánh.
+3. Nhấn nút **Login**.
+
+![Nhập thông tin Hostname hoặc IP tổng đài trên Zoiper 5](/media/ai-contact-center/user-guider-portal/zoiper5_nhap-hostname-tong-dai.png)
+
+4. Tại mục **Hostname or Provider**, nhập `địa_chỉ_tổng_đài:port` (Ví dụ: `sip.ods.vn:51000`) rồi nhấn **Next**.
+5. Màn hình **Authentication and Outbound proxy** hiển thị: Không cần điền thông tin, nhấn **Skip** để tiếp tục.
+
+![Bỏ qua bước Outbound Proxy trên Zoiper 5](/media/ai-contact-center/user-guider-portal/zoiper5_bo-qua-outbound-proxy.png)
+
+6. Zoiper 5 sẽ tự động quét cấu hình kết nối mạng (Searching for configuration). Khi dòng **SIP UDP** xuất hiện chữ màu xanh lá **Found**, nhấn **Next**.
+
+![Hệ thống tìm thấy cấu hình SIP UDP thành công](/media/ai-contact-center/user-guider-portal/zoiper5_kiem-tra-sip-udp-thanh-cong.png)
+
+*Kết quả: Tài khoản máy nhánh SIP được đăng ký thành công trên Zoiper 5.*
+</Step>
+
+<Step>
+### Bước 3: Tối ưu âm thanh và tắt tính năng STUN
+
+Để tránh hiện tượng cuộc gọi bị ngắt quãng hoặc mất âm thanh một chiều do cơ chế NAT của Router mạng:
+
+1. Nhấn vào biểu tượng **Cài đặt** (hình bánh răng) ở góc trên bên phải màn hình Zoiper 5.
+2. Chọn menu **Accounts** → nhấp vào tài khoản SIP vừa cấu hình.
+3. Chuyển sang tab **Advanced** → cuộn xuống mục **Network related settings**.
+4. Bỏ chọn (uncheck) ô **Use STUN**.
+5. Nhấn dấu **X** để lưu lại và quay lại giao diện chính.
+
+*Kết quả: Thiết bị sẵn sàng thực hiện cuộc gọi với luồng âm thanh thoại ổn định.*
+</Step>
+</Steps>
+
+## 3. Cấu hình trên Zoiper 3 (Phiên bản Classic)
+
+Zoiper 3 (Classic) là phiên bản nhẹ, phù hợp với các dòng máy tính cấu hình văn phòng cơ bản.
+
+<Steps>
+<Step>
+### Bước 1: Tải và cài đặt Zoiper 3
+
+Tải bộ cài đặt phiên bản Classic tại liên kết: [Zoiper Classic Download](https://www.zoiper.com/en/voip-softphone/download/classic).
+
+![Trang tải bộ cài Zoiper 3 Classic](/media/ai-contact-center/user-guider-portal/zoiper3_trang-download.png)
+
+Cài đặt ứng dụng theo hướng dẫn mặc định của bộ cài đặt trên máy tính.
+</Step>
+
+<Step>
+### Bước 2: Khai báo tài khoản SIP mới
+
+Khởi động ứng dụng Zoiper 3 và thực hiện theo các bước sau:
+
+1. Trên thanh menu trên cùng, chọn **Settings** → chọn **Create a new account**.
+
+![Chọn Create a new account trên Zoiper 3](/media/ai-contact-center/user-guider-portal/zoiper3_tao-tai-khoan-moi.png)
+
+2. Tại cửa sổ chọn loại giao thức (Account type), chọn **SIP** → nhấn **Next**.
+
+![Chọn giao thức SIP trên Zoiper 3](/media/ai-contact-center/user-guider-portal/zoiper3_chon-loai-sip.png)
+
+3. Nhập thông tin tài khoản SIP:
+   - **user / user@host**: Nhập theo cú pháp `số_máy_nhánh@địa_chỉ_tổng_đài:port` (Ví dụ: `100@sip.ods.vn:51000`).
+   - **Password**: Nhập mật khẩu SIP của số máy nhánh.
+
+![Khai báo user@host và mật khẩu trên Zoiper 3](/media/ai-contact-center/user-guider-portal/zoiper3_nhap-thong-tin-tai-khoan.png)
+
+4. Nhấn **Next** 2 lần. Chờ phần mềm gửi gói tin xác thực đến máy chủ tổng đài ODS cho đến khi xuất hiện thông báo thành công.
+
+![Thông báo cấu hình tài khoản thành công trên Zoiper 3](/media/ai-contact-center/user-guider-portal/zoiper3_dang-ky-thanh-cong.png)
+
+5. Nhấn **Close** để hoàn tất quá trình đăng ký.
+</Step>
+
+<Step>
+### Bước 3: Xác nhận trạng thái kích hoạt
+
+1. Vào menu **Settings** → chọn **Preferences**.
+
+![Mở menu Preferences trên Zoiper 3](/media/ai-contact-center/user-guider-portal/zoiper3_kiem-tra-preferences.png)
+
+2. Trong danh sách tài khoản tại mục **Accounts**, kiểm tra thấy tài khoản máy nhánh có dấu **tích xanh** bên cạnh biểu tượng SIP.
+
+![Tài khoản máy nhánh hiển thị dấu tích xanh hoạt động](/media/ai-contact-center/user-guider-portal/zoiper3_trang-thai-active.png)
+
+3. Nhấn **OK** để đóng cửa sổ thiết lập.
+</Step>
+</Steps>
+
+## 4. Thao tác gọi thoại & Chuyển cuộc gọi
+
+Sau khi đăng ký thành công, nhân viên có thể sử dụng các tính năng đàm thoại chính trên softphone:
+
+<Tabs items={['Thực hiện cuộc gọi đi', 'Tiếp nhận cuộc gọi đến', 'Chuyển cuộc gọi (Transfer)']}>
+<Tab value="Thực hiện cuộc gọi đi">
+1. Nhập số điện thoại khách hàng hoặc số máy nhánh nội bộ vào ô nhập số trên bàn phím mềm.
+2. Nhấn nút **Call** màu xanh (hoặc nhấn phím **Enter** trên bàn phím máy tính).
+3. Khi cuộc gọi được kết nối, đồng hồ tính cước bắt đầu chạy. Nhấn **Hang Up** màu đỏ để kết thúc cuộc gọi.
+
+![Thực hiện gọi đi trên Zoiper 3](/media/ai-contact-center/user-guider-portal/zoiper3_thuc-hien-cuoc-goi.png)
+![Giao diện cuộc gọi đang diễn ra trên Zoiper 3](/media/ai-contact-center/user-guider-portal/zoiper3_cuoc-goi-dang-ket-noi.png)
+</Tab>
+
+<Tab value="Tiếp nhận cuộc gọi đến">
+Khi có khách hàng hoặc đồng nghiệp gọi vào số máy nhánh, một cửa sổ pop-up thông báo sẽ hiển thị kèm chuông báo:
+
+- Nhấn nút **Answer** màu xanh để nhấc máy và bắt đầu đàm thoại.
+- Nhấn nút **Reject** màu đỏ để từ chối cuộc gọi.
+
+![Cửa sổ thông báo tiếp nhận cuộc gọi đến](/media/ai-contact-center/user-guider-portal/zoiper3_tiep-nhan-cuoc-goi-den.png)
+</Tab>
+
+<Tab value="Chuyển cuộc gọi (Transfer)">
+Khi đang trong cuộc gọi với khách hàng và cần chuyển tiếp cho một nhân sự hoặc phòng ban khác xử lý:
+
+1. Tại giao diện cuộc gọi đang diễn ra, nhấn vào tab **Dialpad** (bàn phím số).
+2. Nhập cú pháp chuyển tiếp chuẩn:
+
+```text
+*2<Số_nội_bộ_cần_chuyển>#
+```
+
+*Ví dụ: Để chuyển máy cho nhân viên nhánh `100`, bấm phím `*2100#`.*
+
+![Nhập cú pháp chuyển máy trên bàn phím Dialpad Zoiper](/media/ai-contact-center/user-guider-portal/zoiper3_chuyen-cuoc-goi-dialpad.png)
+
+3. Sau khi bấm cú pháp, khách hàng (người gọi) sẽ nghe nhạc chờ. Nhân viên sẽ nghe chuông đổ sang máy nhánh được chuyển đến.
+4. Khi nhân sự nhánh được chuyển nhấc máy trao đổi nhanh, bạn chỉ cần nhấn nút **Hang Up** (Gác máy) để nối cầu thoại trực tiếp giữa khách hàng và nhân sự tiếp nhận.
+</Tab>
+</Tabs>
+
+## 5. Kiểm tra kết quả
+
+Xác nhận việc thiết lập đã hoàn tất thành công qua các tiêu chí sau:
+
+- **Trạng thái tài khoản**: Biểu tượng góc trên softphone hiển thị trạng thái Online (chữ màu xanh hoặc biểu tượng Ready/Registered).
+- **Kiểm tra âm thanh (Audio Test)**: Gọi thử cuộc gọi thoại nội bộ đến một máy nhánh đồng nghiệp để kiểm tra:
+  - Loa/tai nghe phát ra âm thanh rõ ràng, không bị rè hoặc trễ tiếng.
+  - Micro truyền âm thanh tốt sang phía người nghe.
+- **Thử tiếp nhận cuộc gọi**: Dùng máy nhánh khác gọi đến và nhấc máy thành công.
+
+## 6. Xử lý sự cố thường gặp (Troubleshooting)
+
+<Accordions>
+<Accordion title="Zoiper báo lỗi 'Registration Failed' hoặc SIP UDP báo 'Not Found'">
+**Nguyên nhân:**
+- Sai mật khẩu SIP, sai số máy nhánh hoặc sai định dạng `user@host:port`.
+- Tường lửa (Windows Firewall) hoặc phần mềm Antivirus chặn phần mềm Zoiper gửi gói tin UDP ra cổng 51000/5060.
+- Router mạng văn phòng chặn cổng VoIP.
+
+**Cách xử lý:**
+1. Kiểm tra lại cú pháp tên đăng nhập: Đảm bảo có đầy đủ số máy nhánh, ký tự `@`, tên miền máy chủ và số cổng (ví dụ: `100@sip.ods.vn:51000`).
+2. Nhập lại mật khẩu SIP chính xác (kiểm tra phím Caps Lock hoặc bộ gõ tiếng Việt Unikey gây sai ký tự).
+3. Mở **Windows Defender Firewall** → chọn **Allow an app through firewall** → tích chọn cho phép **Zoiper** kết nối trên cả mạng Private và Public.
+</Accordion>
+
+<Accordion title="Cuộc gọi kết nối được nhưng không nghe thấy âm thanh (One-way Audio)">
+**Nguyên nhân:**
+- Tính năng STUN được bật trên Zoiper làm lệch địa chỉ IP gói tin thoại RTP khi đi qua Router NAT.
+- Router mạng bật tính năng SIP ALG.
+
+**Cách xử lý:**
+1. Vào **Settings** → **Accounts** → chọn tài khoản → **Advanced** → bỏ chọn tính năng **Use STUN**.
+2. Kiểm tra trang quản trị Modem/Router mạng của doanh nghiệp và chuyển tính năng **SIP ALG** sang chế độ **Disable** (Tắt).
+</Accordion>
+
+<Accordion title="Tai nghe không phát ra tiếng chuông hoặc Micro không thu được âm thanh">
+**Nguyên nhân:**
+- Chưa cấp quyền truy cập Microphone cho ứng dụng trong cài đặt quyền riêng tư của hệ điều hành.
+- Zoiper đang chọn sai thiết bị âm thanh đầu vào/đầu ra (Input/Output Device).
+
+**Cách xử lý:**
+1. Trên Windows: Vào **Settings** → **Privacy & Security** → **Microphone** → Bật tùy chọn **Allow desktop apps to access your microphone**.
+2. Trên Zoiper: Vào **Settings** → **Audio** → tại các mục **Playback Device** (loa) và **Recording Device** (micro), chọn chính xác tên tai nghe USB/Headset đang cắm thay vì để Default Audio Device.
+</Accordion>
+</Accordions>
+
+## 7. Bài viết liên quan
+
+<Cards>
+  <Card
+    title="Tổng quan thiết lập máy nhánh"
+    href="/docs/ai-contact-center/portal/may-nhanh"
+    icon="Layers"
+    description="Tìm hiểu và so sánh các phương thức thiết bị đầu cuối cho tổng đài ảo ODS."
+  />
+  <Card
+    title="Cài đặt nhân viên & cấp máy nhánh"
+    href="/docs/ai-contact-center/portal/tong-dai/cai-dat/tao-cau-hinh-may-nhanh"
+    icon="Users"
+    description="Hướng dẫn tạo số nội bộ và quản lý quyền đàm thoại trên Portal ODS."
+  />
+  <Card
+    title="Cấu hình IP Phone Yealink T19X - T30X"
+    href="/docs/ai-contact-center/portal/may-nhanh/ip-phone/cau-hinh-yealink-t19x-t30x"
+    icon="Phone"
+    description="Hướng dẫn cài đặt thiết bị điện thoại bàn phần cứng chuyên dụng Yealink."
+  />
+  <Card
+    title="Cấu hình ứng dụng ODS Phone"
+    href="/docs/ai-contact-center/portal/may-nhanh/mobile-app"
+    icon="PhoneCall"
+    description="Ứng dụng Softphone trên điện thoại di động iOS và Android cho nhân viên."
+  />
+</Cards>

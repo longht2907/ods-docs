@@ -79,7 +79,7 @@ export const docsProductProfiles: readonly DocsProductProfile[] = [
         kind: 'guide',
         title: 'Hướng dẫn sử dụng',
         description: 'Thiết lập và vận hành AI Contact Center trên Portal.',
-        href: '/docs/ai-contact-center/user-guider-portal',
+        href: '/docs/ai-contact-center/portal',
         icon: 'book-open',
       },
       {
@@ -94,7 +94,7 @@ export const docsProductProfiles: readonly DocsProductProfile[] = [
       {
         label: 'Hướng dẫn sử dụng',
         description: 'Portal',
-        href: '/docs/ai-contact-center/user-guider-portal',
+        href: '/docs/ai-contact-center/portal',
         icon: 'guide',
       },
       {

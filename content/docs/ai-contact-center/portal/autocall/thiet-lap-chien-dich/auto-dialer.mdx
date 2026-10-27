@@ -1,0 +1,148 @@
+---
+title: "Auto Dialer (Quay số tự động)"
+description: "Hướng dẫn thiết lập chiến dịch Auto Dialer 4 bước: nạp danh bạ khách hàng, cấu hình khung giờ và phân phối cuộc gọi đến nhóm tổng đài viên."
+---
+
+Auto Dialer (Quay số tự động) trên ODS AI Contact Center là giải pháp tự động quay số theo danh sách khách hàng và kết nối trực tiếp đến tổng đài viên ngay khi khách hàng nhấc máy. Tính năng này giúp tối ưu hóa năng suất của đội ngũ tư vấn, loại bỏ hoàn toàn thời gian chờ bấm số và lọc bỏ các cuộc gọi bận hoặc không liên lạc được.
+
+<Callout type="info" title="Trước khi bắt đầu">
+- **Vị trí màn hình**: **Chiến dịch** → **Danh sách chiến dịch** → nhấn **THÊM MỚI CHIẾN DỊCH** → chọn **Auto Dialer**.
+- **Quyền hạn yêu cầu**: Tài khoản Quản trị viên (Admin) hoặc tài khoản được phân quyền Quản lý chiến dịch.
+- **Điều kiện cần**: Đã có sẵn danh bạ khách hàng; đã tạo ít nhất 01 Nhóm nhân viên (Queue) với các máy nhánh đang sẵn sàng trực; đầu số SIP Trunk hoạt động bình thường.
+</Callout>
+
+## So sánh Auto Dialer và Auto Call
+
+| Tiêu chí | Auto Dialer (Quay số tự động) | Auto Call (Gọi tự động phát âm thanh) |
+| :--- | :--- | :--- |
+| **Đối tượng đàm thoại** | Khách hàng nói chuyện trực tiếp với **Tổng đài viên (Human Agent)** | Khách hàng nghe **tệp âm thanh ghi sẵn** hoặc **giọng đọc máy TTS** |
+| **Quy trình xử lý** | Hệ thống quay số → Khách nhấc máy → Đổ chuông nhóm nhân viên → Nối máy tức thì | Hệ thống quay số → Khách nhấc máy → Tự động phát âm thanh thông báo |
+| **Các bước thiết lập** | **4 bước** (Bước 4 là gán Nhóm nhân viên tiếp nhận) | **5 bước** (Bước 4 là Âm thanh, Bước 5 là Phím bấm IVR) |
+| **Mục đích phù hợp** | Telesales chốt đơn, tư vấn chuyên sâu, khảo sát tương tác trực tiếp | Thông báo hàng loạt, nhắc lịch thanh toán, chăm sóc tự động |
+
+## Quy trình 4 bước thiết lập chiến dịch Auto Dialer
+
+Tại màn hình **Chọn dịch vụ để phục vụ**, nhấn chọn thẻ **Auto Dialer**, sau đó bấm **TIẾP TỤC** để mở trình hướng dẫn thiết lập 4 bước.
+
+![Chọn dịch vụ Auto Dialer](/media/ai-contact-center/user-guider-portal/autodialer_tong-quan_chon-dich-vu.png)
+
+<Steps>
+<Step>
+### Chọn nguồn danh bạ khách hàng
+
+Tại bước **Nguồn khách hàng**, chọn danh sách số điện thoại mà hệ thống sẽ tự động gọi trong chiến dịch:
+
+- Chọn một hoặc chọn song song cả hai nguồn: **Danh bạ tổng đài** và **Danh bạ chiến dịch**.
+- Hoặc chọn nguồn theo **Nhóm danh bạ** đã phân loại từ trước.
+- Nhấn nút **THÊM MỚI** màu xanh nếu cần nạp nhanh danh bạ mới trực tiếp vào hệ thống.
+- Nhấn **Lưu thông tin bước 1** hoặc nhấn **TIẾP TỤC** để chuyển sang bước xem trước.
+
+![Chọn nguồn danh bạ cho chiến dịch Auto Dialer](/media/ai-contact-center/user-guider-portal/autodialer_buoc1_nguon-khach-hang.png)
+
+*Kết quả: Nguồn dữ liệu khách hàng được ghi nhận, mục số 1 chuyển sang trạng thái tích xanh.*
+</Step>
+
+<Step>
+### Xem trước và rà soát danh sách liên hệ
+
+Tại bước **Xem trước**, hệ thống hiển thị bảng **DANH SÁCH KHÁCH HÀNG ĐƯỢC THỰC HIỆN AUTO DIALER**:
+
+- Rà soát các thông tin: Tên khách hàng, Số điện thoại, Danh xưng (Ông/Bà).
+- Nhấn **Thêm mới** để bổ sung liên hệ thủ công, hoặc nhấn **Nhập Excel** để tải lên file danh sách bổ sung.
+- Nhấn biểu tượng thùng rác màu đỏ tại cột **THAO TÁC** để loại bỏ các số không cần gọi ra.
+- Nhấn **TIẾP TỤC** (hoặc **Lưu vào danh bạ**) để sang bước thiết lập thông số.
+
+![Xem trước danh sách khách hàng quay số tự động](/media/ai-contact-center/user-guider-portal/autodialer_buoc2_xem-truoc.png)
+
+*Kết quả: Danh sách người nhận được xác nhận đầy đủ trước khi cấu hình thời gian chạy.*
+</Step>
+
+<Step>
+### Cấu hình thông tin chung và lịch trình gọi
+
+Tại bước **Thiết lập chung**, khai báo các tham số vận hành cho chiến dịch:
+
+![Thiết lập thông tin chung và khung giờ chạy chiến dịch](/media/ai-contact-center/user-guider-portal/autodialer_buoc3_thiet-lap-chung.png)
+
+| Trường | Bắt buộc | Mô tả | Giá trị ví dụ |
+| :--- | :---: | :--- | :--- |
+| **Tên chiến dịch** | Có | Đặt tên định danh gợi nhớ cho chiến dịch quay số | `Chiến dịch Telesales Bất động sản` |
+| **Mô tả chiến dịch** | Không | Ghi chú mục đích, kịch bản hoặc yêu cầu cho đội ngũ nhân viên | `Tư vấn khách hàng quan tâm dự án mới` |
+| **Cấu hình chi tiết** | Không | Cấu hình mở rộng về đầu số gọi ra, tiền tố và thông số kết nối | Giữ mặc định |
+| **Thời gian chạy** | Có | Ngày và giờ bắt đầu khởi chạy chiến dịch | `15/10/2026 09:00` |
+| **Khoảng thời gian chạy** | Không | Khung giờ gọi trong ngày. Khuyến nghị **08:00 – 17:00** tránh nhà mạng đưa vào danh sách spam | `Từ 8 Giờ Đến 17 Giờ` |
+
+Nhấn **TIẾP TỤC** để lưu thông tin dưới dạng bản nháp và chuyển sang bước gán nhân viên.
+
+*Kết quả: Thông số thời gian và lịch trình chiến dịch được lưu thành công.*
+</Step>
+
+<Step>
+### Chọn nhóm nhân viên tiếp nhận cuộc gọi
+
+Tại bước **Nguồn nhân viên**, hệ thống hiển thị bảng **DANH SÁCH NHÓM NHÂN VIÊN THỰC HIỆN CUỘC GỌI**:
+
+![Chọn nhóm nhân viên tiếp nhận cuộc gọi Auto Dialer](/media/ai-contact-center/user-guider-portal/autodialer_buoc4_nguon-nhan-vien.png)
+
+1. Tích chọn nhóm nhân viên sẽ nhận cuộc gọi tại hộp kiểm (ví dụ: nhóm `KinhDoanh`, `CSKH`, `Support`).
+2. Kiểm tra các thông số nhóm:
+   - **TÊN NHÓM** & **SỐ NHÓM**: Mã định danh nhóm hàng đợi (ví dụ nhóm `KinhDoanh` số `7780`).
+   - **CHẾ ĐỘ ĐỔ CHUÔNG**: Quy tắc phân phối cuộc gọi đến nhân viên (ví dụ *Đổ chuông toàn bộ*, *Xoay vòng*, hoặc *Ngẫu nhiên*).
+   - **THỜI GIAN ĐỔ CHUÔNG**: Thời gian đổ chuông tối đa trước khi chuyển máy nhánh khác (mặc định 30 giây).
+3. Sử dụng các nút tiện ích nhanh:
+   - Biểu tượng nốt nhạc: Nghe thử hoặc thay đổi nhạc chờ của nhóm.
+   - Biểu tượng đồng hồ: Cài đặt khung giờ làm việc của nhóm.
+   - Biểu tượng bút chì: Điều chỉnh danh sách thành viên trong nhóm.
+4. Nhấn nút **+ Thêm mới** nếu cần tạo thêm nhóm nhân viên trực tiếp ngay tại đây.
+5. Nhấn **BẮT ĐẦU** để kích hoạt chiến dịch quay số tự động.
+
+*Kết quả: Toàn bộ cấu hình chiến dịch Auto Dialer hoàn tất và sẵn sàng kết nối cho tổng đài viên.*
+</Step>
+</Steps>
+
+## Kiểm tra kết quả
+
+Sau khi hoàn tất quá trình thiết lập, mở menu **Chiến dịch** → **Danh sách chiến dịch** để kiểm tra:
+
+![Danh sách chiến dịch sau khi kích hoạt Auto Dialer](/media/ai-contact-center/user-guider-portal/autodialer_ket-qua_danh-sach-chien-dich.png)
+
+- Bản ghi chiến dịch hiển thị tại bảng với cột **TÊN DỊCH VỤ** mang nhãn **Auto Dialer**.
+- Trạng thái chiến dịch nằm tại tab **Đang chờ gọi** (nếu đặt lịch tương lai) hoặc tab **Đang tiến hành gọi** (nếu kích hoạt ngay).
+- Khi khách hàng nhấc máy, tổng đài tự động phân phối cuộc gọi đến máy nhánh của nhân viên trong nhóm qua Webphone hoặc Softphone.
+- Cột **THAO TÁC** cung cấp 4 nút điều khiển trực tiếp: **Tạm dừng**, **Xem chi tiết**, **Sao chép** và **Xóa**.
+
+## Xử lý sự cố thường gặp
+
+<Accordions>
+<Accordion title="Khách hàng bắt máy nhưng không có nhân viên nào tiếp nhận">
+- **Nguyên nhân**: Toàn bộ máy nhánh trong nhóm nhân viên đang ở trạng thái Ngoại tuyến (Offline), Bận (Busy), hoặc chưa đăng nhập vào Webphone / Softphone.
+- **Cách xử lý**: Đảm bảo các điện thoại viên trong nhóm đã đăng nhập ứng dụng thoại và bật trạng thái Sẵn sàng (Available/Ready) trước giờ kích hoạt chiến dịch.
+</Accordion>
+
+<Accordion title="Không thể chỉnh sửa thông tin chiến dịch trước giờ chạy">
+- **Nguyên nhân**: Hệ thống tự động khóa tính năng chỉnh sửa trước **10 phút** so với lịch chạy dự kiến nhằm chốt danh sách và thuật toán quay số.
+- **Cách xử lý**: Nhấn nút **Tạm dừng** hoặc bấm biểu tượng **Sao chép** để tạo chiến dịch mới với thông số đã điều chỉnh.
+</Accordion>
+
+<Accordion title="Tỷ lệ kết nối cuộc gọi thấp hoặc số bị chặn">
+- **Nguyên nhân**: Thực hiện cuộc gọi dồn dập ngoài khung giờ hành chính hoặc danh sách khách hàng chưa được chuẩn hóa.
+- **Cách xử lý**: Cấu hình khung giờ chạy trong khoảng **08:00 – 17:00** và kiểm tra lại chất lượng danh bạ trước khi nạp vào chiến dịch.
+</Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card title="Gọi tự động (Auto Call)" href="/docs/ai-contact-center/portal/autocall/thiet-lap-chien-dich/goi-tu-dong-autocall" icon="PhoneCall">
+    Thiết lập chiến dịch phát âm thanh thông báo tự động qua đầu số viễn thông SIP Trunk.
+  </Card>
+  <Card title="Gọi tự động qua Zalo OA" href="/docs/ai-contact-center/portal/autocall/thiet-lap-chien-dich/goi-tu-dong-zalo-oa" icon="Phone">
+    Thực hiện chiến dịch cuộc gọi qua tài khoản Zalo OA có cơ chế fallback Auto Call.
+  </Card>
+  <Card title="Thêm danh bạ" href="/docs/ai-contact-center/portal/autocall/danh-ba/them-danh-ba" icon="Users">
+    Nhập và đồng bộ danh bạ khách hàng từ file Excel vào hệ thống.
+  </Card>
+  <Card title="Lịch và báo cáo" href="/docs/ai-contact-center/portal/autocall/lich-va-bao-cao" icon="BarChart3">
+    Theo dõi tiến độ, tỷ lệ bắt máy và kết quả gọi ra của từng chiến dịch.
+  </Card>
+</Cards>

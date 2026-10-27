@@ -18,18 +18,12 @@ import {
   type SharedProps,
 } from 'fumadocs-ui/components/dialog/search';
 import {
-  getSearchProductTag,
+  getSearchClientOptions,
+  getSearchRouteScope,
+  getSearchScopeOptions,
   parseSearchProductTag,
-  type SearchProductTag,
+  type SearchScope,
 } from '@/lib/search-results';
-
-type SearchScope = SearchProductTag | 'all';
-
-const scopeOptions: ReadonlyArray<{ value: SearchScope; label: string }> = [
-  { value: 'all', label: 'Tất cả sản phẩm' },
-  { value: 'ai-contact-center', label: 'AI Contact Center' },
-  { value: 'cloudfile', label: 'CloudFile' },
-];
 
 function compactBreadcrumbs(breadcrumbs: ReactNode[] | undefined): ReactNode[] | undefined {
   if (!breadcrumbs || breadcrumbs.length === 0) return undefined;
@@ -46,12 +40,10 @@ function plainText(value: ReactNode): string {
 
 export default function OdsSearchDialog(props: SharedProps) {
   const pathname = usePathname();
-  const routeScope = getSearchProductTag(pathname) ?? 'all';
+  const routeScope = getSearchRouteScope(pathname);
+  const scopeOptions = getSearchScopeOptions(pathname);
   const [scope, setScope] = useState<SearchScope>(routeScope);
-  const client = useMemo(
-    () => fetchClient({ tag: scope === 'all' ? undefined : scope }),
-    [scope],
-  );
+  const client = useMemo(() => fetchClient(getSearchClientOptions(scope)), [scope]);
   const { search, setSearch, query } = useDocsSearch({ client, delayMs: 100 });
 
   useEffect(() => {
@@ -119,7 +111,7 @@ export default function OdsSearchDialog(props: SharedProps) {
             value={scope}
             onChange={(event) => {
               const value = event.currentTarget.value;
-              if (value === 'all') setScope(value);
+              if (value === 'all' || value === 'internal') setScope(value);
               else {
                 const product = parseSearchProductTag(value);
                 if (product) setScope(product);

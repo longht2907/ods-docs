@@ -2,6 +2,11 @@
 
 import { execSync, spawn } from 'node:child_process';
 import net from 'node:net';
+import {
+  getSearchClientOptions,
+  getSearchRouteScope,
+  getSearchScopeOptions,
+} from '../../src/lib/search-results.ts';
 
 const queries = [
   'nhân viên',
@@ -87,6 +92,19 @@ function assert(condition, message) {
 }
 
 async function main() {
+  assert(getSearchRouteScope('/internal/ai-contact-center/runbooks') === 'internal', 'Internal route không mặc định scope internal');
+  assert(getSearchClientOptions('internal').api === '/api/search/internal', 'Scope internal không gọi internal Search API');
+  assert(getSearchClientOptions('all').api === '/api/search', 'Scope public all không gọi public Search API');
+  assert(getSearchClientOptions('cloudfile').tag === 'cloudfile', 'Scope CloudFile không truyền đúng tag');
+  assert(
+    !getSearchScopeOptions('/docs').some((option) => option.value === 'internal'),
+    'Public Search làm lộ scope internal',
+  );
+  assert(
+    getSearchScopeOptions('/internal').some((option) => option.value === 'internal'),
+    'Internal Search thiếu scope nội bộ',
+  );
+
   const port = await getFreePort();
   const baseUrl = `http://127.0.0.1:${port}`;
   const env = { ...process.env };
@@ -111,9 +129,9 @@ async function main() {
       const { data, bytes } = await search(baseUrl, query);
       const stats = groupStats(data);
       assert(data.length > 0, `Query "${query}" không có kết quả`);
-      assert(stats.pages <= 8, `Query "${query}" trả ${stats.pages} bài, vượt giới hạn 8`);
-      assert(stats.maxSnippets <= 3, `Query "${query}" có ${stats.maxSnippets} snippets/bài`);
-      assert(data.length <= 32, `Query "${query}" trả ${data.length} items, vượt giới hạn 32`);
+      assert(stats.pages <= 6, `Query "${query}" trả ${stats.pages} bài, vượt giới hạn 6`);
+      assert(stats.maxSnippets <= 2, `Query "${query}" có ${stats.maxSnippets} snippets/bài`);
+      assert(data.length <= 18, `Query "${query}" trả ${data.length} items, vượt giới hạn 18`);
       assert(bytes < 100_000, `Query "${query}" trả ${bytes} bytes, vượt 100 KB`);
       assert(data.every((item) => item.url.startsWith('/docs/') || item.url === '/docs'), `Query "${query}" có URL ngoài public docs`);
       assert(data.every((item) => !item.url.includes('/internal')), `Query "${query}" làm lộ URL internal`);
@@ -125,6 +143,17 @@ async function main() {
     assert(cardPlainText.includes('Xóa liên hệ'), 'Search làm mất title hữu ích của Card');
     assert(cardPlainText.includes('Xóa liên hệ khỏi danh bạ'), 'Search làm mất description hữu ích của Card');
     assert(!/<\/?Card\b|\bhref=|\bicon=|\bdescription=/i.test(cardText), 'Search còn làm lộ JSX/attributes của Card');
+
+    const supervision = await search(baseUrl, 'giám', 'ai-contact-center');
+    const firstSupervisionPage = supervision.data.find((item) => item.type === 'page');
+    assert(
+      firstSupervisionPage?.url.includes('/huong-dan-giam-sat-cuoc-goi'),
+      `Query giám chưa ưu tiên đúng title: ${firstSupervisionPage?.url ?? 'không có page'}`,
+    );
+    assert(
+      supervision.data.every((item) => !/\*\*[^*]+\*\*/.test(item.content)),
+      'Search còn trả Markdown emphasis thô trong snippet',
+    );
 
     for (const keyword of ['ServiceName', 'AuthUser', 'AuthKey', 'AutoCall', 'AddExtension']) {
       const { data } = await search(baseUrl, keyword);

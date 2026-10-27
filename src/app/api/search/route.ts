@@ -2,9 +2,10 @@ import { source } from '@/lib/source';
 import { createFromSource } from 'fumadocs-core/search/server';
 import {
   getSearchProductTag,
-  limitSearchResults,
   parseSearchProductTag,
+  prepareSearchResults,
   SEARCH_ENGINE_RESULT_LIMIT,
+  SEARCH_SNIPPET_LIMIT,
 } from '@/lib/search-results';
 
 const search = createFromSource(source, {
@@ -21,7 +22,7 @@ const search = createFromSource(source, {
   search: {
     groupBy: {
       properties: ['page_id'],
-      maxResult: 4,
+      maxResult: SEARCH_SNIPPET_LIMIT + 1,
     },
   },
 });
@@ -35,5 +36,5 @@ export async function GET(request: Request): Promise<Response> {
     limit: SEARCH_ENGINE_RESULT_LIMIT,
     tag: parseSearchProductTag(params.get('tag')),
   });
-  return Response.json(limitSearchResults(results));
+  return Response.json(prepareSearchResults(results, query));
 }

@@ -83,6 +83,20 @@ async function checkRedirect(baseUrl, path, expectedLocation, desc) {
   return pass;
 }
 
+async function checkActiveSidebarRoute(baseUrl, path) {
+  const res = await fetch(`${baseUrl}${path}`);
+  const html = await res.text();
+  const activeLinks = [...html.matchAll(
+    /<a\b(?=[^>]*\bdata-active="true")(?=[^>]*\bhref="([^"]+)")[^>]*>/gi,
+  )].map((match) => match[1]);
+  const pass = res.status === 200 && activeLinks.includes(path);
+
+  console.log(
+    `  ${pass ? '✓' : '✗'} Portal sidebar resolves canonical active route [${path}] -> active=${activeLinks.join(', ') || '(không có)'}`,
+  );
+  return pass;
+}
+
 async function checkSocialMetadata(baseUrl, path) {
   const res = await fetch(`${baseUrl}${path}`);
   const html = await res.text();
@@ -135,7 +149,7 @@ async function main() {
       process.exit(1);
     }
 
-    console.log('[test:routes] Server đã sẵn sàng. Bắt đầu kiểm tra 20 cases:');
+    console.log('[test:routes] Server đã sẵn sàng. Bắt đầu kiểm tra 21 cases:');
 
     let passedCases = true;
 
@@ -170,6 +184,12 @@ async function main() {
       'Short monitoring guide URL accessible',
     );
     passedCases = passedCases && t6;
+
+    const tSidebar = await checkActiveSidebarRoute(
+      baseUrl,
+      '/docs/ai-contact-center/portal/cuoc-goi/giam-sat',
+    );
+    passedCases = passedCases && tSidebar;
 
     const t7 = await checkRoute(baseUrl, '/docs/ai-contact-center/api', 200, 'API reference accessible');
     passedCases = passedCases && t7;
@@ -254,7 +274,7 @@ async function main() {
       console.error('\n[test:routes FAIL] Một hoặc nhiều route không đạt mã HTTP mong đợi.');
       allPassed = false;
     } else {
-      console.log('\n[test:routes PASS] Toàn bộ 20/20 route test case đều đạt chuẩn.\n');
+      console.log('\n[test:routes PASS] Toàn bộ 21/21 route test case đều đạt chuẩn.\n');
       allPassed = true;
     }
   } finally {

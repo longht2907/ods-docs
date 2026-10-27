@@ -15,6 +15,9 @@
   `/docs/ai-contact-center/portal/cuoc-goi/giam-sat`.
 - Cập nhật toàn bộ internal link đang hoạt động, home cards, product registry,
   sidebar mapping, Search suggestions và guard required node.
+- Cập nhật parent PageTree `content/docs/ai-contact-center/meta.json` từ folder cũ
+  `user-guider-portal` sang `portal`; route canonical hiện khôi phục đầy đủ sidebar
+  AI Contact Center và đánh dấu đúng trang active.
 - Giữ nguyên 136 references đến media path
   `/media/ai-contact-center/user-guider-portal/**`; không di chuyển asset.
 
@@ -46,7 +49,7 @@ thất bại exit code `1`:
 - `$env:ODS_DOCS_SITE_URL='https://ods-docs-ci.invalid'; npm run build` — PASS,
   452 static pages.
 - `$env:ODS_DOCS_SITE_URL='https://ods-docs-ci.invalid'; npm run test:routes`
-  — PASS 20/20 cases.
+  — PASS 21/21 cases, bao gồm active canonical sidebar route.
 - `npm run test:search` — PASS; Search trả canonical Portal URL và không trả
   `user-guider-portal`.
 
@@ -73,7 +76,8 @@ PASS, exit code `0`:
 
 - `types:check`, `check:env`, `check:links`, `guard`, `check:scope` — PASS.
 - `build` — PASS, 452 static pages.
-- `test:routes` — PASS 20/20.
+- `test:routes` — PASS 21/21; link
+  `/docs/ai-contact-center/portal/cuoc-goi/giam-sat` có `data-active="true"`.
 - `test:api-ui` — PASS desktop 1280/1440/1920, mobile 390/768,
   Light/Dark; Search race/keyboard/overflow đạt.
 - `test:search` — PASS.

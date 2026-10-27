@@ -39,6 +39,8 @@ prefix số làm cơ chế ordering trong URL.
 ### Sửa đổi
 
 - `next.config.mjs` — redirect 308 từ URL cũ sang canonical URL mới.
+- `content/docs/ai-contact-center/meta.json` — cập nhật parent PageTree sang folder
+  canonical `portal` để sidebar nhận diện active tab.
 - `content/docs/ai-contact-center/index.mdx` — cập nhật entry links.
 - `content/docs/ai-contact-center/user-guider-portal/**` — nguồn cũ được di chuyển.
 - `src/app/docs/layout.tsx` — cập nhật sidebar section/item/folder mapping.
@@ -95,6 +97,8 @@ prefix số làm cơ chế ordering trong URL.
   product code/content đang hoạt động.
 - [ ] Không có media path bị đổi.
 - [ ] Search result public trả canonical `/portal/**`, không trả URL cũ.
+- [ ] Sidebar nhận diện route `/portal/**` thuộc tab AI Contact Center và đánh dấu
+  đúng trang canonical đang active.
 - [ ] `npm run check:links`, `npm run guard`, `npm run test:routes` và
   `npm run verify:task` PASS.
 

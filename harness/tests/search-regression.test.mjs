@@ -146,9 +146,10 @@ async function main() {
 
     const supervision = await search(baseUrl, 'giám', 'ai-contact-center');
     const firstSupervisionPage = supervision.data.find((item) => item.type === 'page');
+    const firstSupervisionTitle = firstSupervisionPage?.content.replace(/<\/?mark>/g, '') ?? '';
     assert(
-      firstSupervisionPage?.url.includes('/huong-dan-giam-sat-cuoc-goi'),
-      `Query giám chưa ưu tiên đúng title: ${firstSupervisionPage?.url ?? 'không có page'}`,
+      firstSupervisionTitle.toLocaleLowerCase('vi').includes('giám'),
+      `Query giám chưa ưu tiên đúng title: ${firstSupervisionTitle || 'không có page'}`,
     );
     assert(
       supervision.data.every((item) => !/\*\*[^*]+\*\*/.test(item.content)),

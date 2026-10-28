@@ -19,11 +19,14 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.23.4
           cache: npm
 
       - name: Cai dependency
         run: npm ci
+
+      - name: Audit production dependencies
+        run: npm run audit:prod
 
       - name: Check Env
         run: npm run check:env

@@ -31,9 +31,9 @@ interface SidebarSection {
 }
 
 const sidebarSections: Readonly<Record<string, SidebarSection>> = {
-  'ai-contact-center/user-guider-portal': {
+  'ai-contact-center/portal': {
     landingLabel: 'GIỚI THIỆU',
-    landingUrl: '/docs/ai-contact-center/user-guider-portal',
+    landingUrl: '/docs/ai-contact-center/portal',
   },
   'ai-contact-center/api': {
     landingLabel: 'Tổng quan API',
@@ -42,28 +42,28 @@ const sidebarSections: Readonly<Record<string, SidebarSection>> = {
 };
 
 const sidebarItemLabels: Readonly<Record<string, string>> = {
-  '/docs/ai-contact-center/user-guider-portal/01-tong-quan/quickstart/nhung-viec-can-lam-khi-bat-dau':
+  '/docs/ai-contact-center/portal/tong-quan/quickstart/nhung-viec-can-lam-khi-bat-dau':
     'Những việc cần làm khi bắt đầu',
-  '/docs/ai-contact-center/user-guider-portal/01-tong-quan/quickstart/huong-dan-dang-nhap':
+  '/docs/ai-contact-center/portal/tong-quan/quickstart/huong-dan-dang-nhap':
     'Hướng dẫn đăng nhập',
-  '/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/thong-ke-bao-cao-cuoc-goi':
+  '/docs/ai-contact-center/portal/tong-dai/thong-ke-bao-cao-cuoc-goi':
     'Thống kê & báo cáo',
-  '/docs/ai-contact-center/user-guider-portal/05-quan-ly-khach-hang/tong-quan-chuc-nang':
+  '/docs/ai-contact-center/portal/khach-hang/tong-quan-chuc-nang':
     'Tổng quan chức năng',
-  '/docs/ai-contact-center/user-guider-portal/05-quan-ly-khach-hang/nhap-du-lieu-khach-hang':
+  '/docs/ai-contact-center/portal/khach-hang/nhap-du-lieu-khach-hang':
     'Nhập dữ liệu khách hàng',
-  '/docs/ai-contact-center/user-guider-portal/05-quan-ly-khach-hang/xem-va-chinh-sua-thong-tin':
+  '/docs/ai-contact-center/portal/khach-hang/xem-va-chinh-sua-thong-tin':
     'Xem và chỉnh sửa thông tin',
-  '/docs/ai-contact-center/user-guider-portal/07-quan-ly-hoi-thoai/quan-ly-tin-nhan-cuoc-goi':
+  '/docs/ai-contact-center/portal/hoi-thoai/quan-ly-tin-nhan-cuoc-goi':
     'Tin nhắn & cuộc gọi',
-  '/docs/ai-contact-center/user-guider-portal/08-tich-hop-da-kenh/tich-hop-zalo-oa':
+  '/docs/ai-contact-center/portal/tich-hop/tich-hop-zalo-oa':
     'Zalo OA',
-  '/docs/ai-contact-center/user-guider-portal/08-tich-hop-da-kenh/tich-hop-facebook-messenger':
+  '/docs/ai-contact-center/portal/tich-hop/tich-hop-facebook-messenger':
     'Facebook Messenger',
 };
 
 const sidebarFolderLabels: Readonly<Record<string, string>> = {
-  'ai-contact-center/user-guider-portal/09-thiet-lap-may-nhanh/softphone':
+  'ai-contact-center/portal/may-nhanh/softphone':
     'Softphone',
 };
 

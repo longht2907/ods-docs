@@ -178,6 +178,16 @@ async function main() {
       'CloudFile scope trả kết quả ngoài sản phẩm',
     );
 
+    const monitoring = await search(baseUrl, 'giám sát cuộc gọi', 'ai-contact-center');
+    assert(
+      monitoring.data.some((item) => item.url.startsWith('/docs/ai-contact-center/portal/cuoc-goi/giam-sat')),
+      'Search không trả canonical URL của bài giám sát cuộc gọi',
+    );
+    assert(
+      monitoring.data.every((item) => !item.url.includes('/user-guider-portal/')),
+      'Search còn trả legacy Portal URL',
+    );
+
     const invalidScope = await search(baseUrl, 'webhook', 'internal');
     assert(
       invalidScope.data.every((item) => !item.url.includes('/internal')),

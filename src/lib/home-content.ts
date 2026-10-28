@@ -14,11 +14,11 @@ export interface HomeContentModel {
 const searchSuggestions: readonly HomeSearchSuggestion[] = [
   {
     label: 'Tạo máy nhánh',
-    href: '/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/tao-cau-hinh-may-nhanh',
+    href: '/docs/ai-contact-center/portal/tong-dai/cai-dat/tao-cau-hinh-may-nhanh',
   },
   {
     label: 'Webhook cuộc gọi',
-    href: '/docs/ai-contact-center/user-guider-portal/04-thiet-lap-tong-dai/cai-dat/webhook-va-popup',
+    href: '/docs/ai-contact-center/portal/tong-dai/cai-dat/webhook-va-popup',
   },
   { label: 'Đồng bộ CloudFile', href: '/docs/cloudfile' },
 ] as const;

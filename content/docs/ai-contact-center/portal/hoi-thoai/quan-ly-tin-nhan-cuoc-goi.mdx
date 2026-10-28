@@ -1,0 +1,170 @@
+---
+title: "Quản lý hội thoại tin nhắn và cuộc gọi"
+description: "Hướng dẫn tiếp nhận, phản hồi tin nhắn đa kênh và quản lý hồ sơ khách hàng tập trung trên giao diện."
+---
+
+Giao diện **Tin nhắn** hợp nhất toàn bộ tương tác từ Zalo OA, Facebook Messenger và cuộc gọi hotline về một màn hình tập trung, giúp nhân viên tư vấn xử lý yêu cầu nhanh chóng và đồng bộ dữ liệu khách hàng.
+
+<Callout type="info" title="Trước khi bắt đầu">
+- Tài khoản người dùng được phân quyền truy cập phân hệ **Tin nhắn**.
+- Doanh nghiệp đã kết nối ít nhất một kênh tương tác trong mục **Tích hợp đa kênh** (Zalo OA, Facebook Fanpage).
+- Máy nhánh tổng đài (WebRTC, IP Phone hoặc Softphone) đang ở trạng thái trực tuyến nếu cần gọi ra cho khách hàng.
+</Callout>
+
+## Tổng quan không gian làm việc
+
+Màn hình làm việc được chia thành 3 phân vùng giúp bạn thao tác liền mạch:
+
+| Phân vùng | Vị trí | Chức năng chính |
+| :--- | :--- | :--- |
+| **Danh sách hội thoại** | Cột trái | Hiển thị các phiên nhắn tin và cuộc gọi theo thời gian thực, hỗ trợ tìm kiếm và lọc phiên. |
+| **Khung tương tác** | Cột giữa | Dòng thời gian trao đổi, nội dung tin nhắn gửi/nhận và thanh công cụ soạn thảo phản hồi. |
+| **Thông tin khách hàng** | Cột phải | Hồ sơ 360 độ của khách hàng đang chọn gồm số điện thoại, phân loại, nhãn dán và ghi chú. |
+
+![Tổng quan giao diện hộp thư hội thoại 3 cột trên Portal ODS](/media/ai-contact-center/user-guider-portal/quan-ly-hoi-thoai_giao-dien-tong-quan.png)
+
+## Tiếp nhận và phản hồi hội thoại
+
+Quy trình nhận phiên trao đổi mới và gửi phản hồi tới khách hàng qua các kênh kết nối:
+
+<Steps>
+  <Step>
+    ### Chọn phiên tương tác cần xử lý
+
+    Từ thanh điều hướng bên trái của Portal, chọn **Tin nhắn**.
+
+    Duyệt danh sách hội thoại ở cột trái và nhấp vào phiên cần hỗ trợ:
+    - Phiên chat hiển thị avatar khách hàng kèm biểu tượng kênh (Zalo, Messenger).
+    - Phiên cuộc gọi hiển thị biểu tượng ống nghe màu xanh kèm số máy nhánh tiếp nhận.
+
+    ![Danh sách phiên hội thoại và cuộc gọi ở cột trái](/media/ai-contact-center/user-guider-portal/quan-ly-hoi-thoai_danh-sach-hoi-thoai.png)
+
+    *Kết quả: Khung giữa tải toàn bộ lịch sử trao đổi và cột phải hiển thị hồ sơ khách hàng tương ứng.*
+  </Step>
+
+  <Step>
+    ### Soạn và gửi nội dung phản hồi
+
+    Tại khung tương tác ở giữa, chọn phương thức gửi tin phù hợp:
+
+    <Tabs items={['Tin nhắn văn bản', 'Gửi tệp & hình ảnh']}>
+      <Tab value="Tin nhắn văn bản">
+        Nhập nội dung tư vấn vào ô **Nhập tin nhắn...** ở cạnh đáy màn hình. Nhấn nút **Gửi** (biểu tượng mũi tên) hoặc nhấn phím `Enter` để gửi tin đi.
+      </Tab>
+      <Tab value="Gửi tệp & hình ảnh">
+        Nhấn biểu tượng ảnh để chọn hình ảnh minh họa, hoặc nhấn biểu tượng kẹp giấy để đính kèm tài liệu. Sau khi tệp được tải lên, nhấn **Gửi**.
+      </Tab>
+    </Tabs>
+
+    ![Khung soạn thảo và gửi tin nhắn phản hồi](/media/ai-contact-center/user-guider-portal/quan-ly-hoi-thoai_khung-chat-tin-nhan.png)
+
+    *Kết quả: Tin nhắn xuất hiện trong dòng thời gian hội thoại kèm tên nhân viên và thời điểm gửi.*
+  </Step>
+
+  <Step>
+    ### Gọi điện trực tiếp cho khách hàng
+
+    Khi cần tư vấn trực tiếp bằng giọng nói, nhấp chuột vào số điện thoại được gạch chân tại mục **Số điện thoại** ở cột thông tin bên phải.
+
+    Hệ thống tự động kích hoạt tính năng Click-to-Call qua máy nhánh đang kết nối của bạn để quay số tới khách hàng.
+
+    *Kết quả: Cuộc gọi được kết nối và bản ghi âm sẽ tự động lưu vào lịch sử tương tác của khách hàng.*
+  </Step>
+</Steps>
+
+## Cập nhật hồ sơ và ghi chú khách hàng
+
+Cập nhật thông tin nhận diện và phân loại khách hàng trực tiếp từ cột thông tin bên phải:
+
+<Steps>
+  <Step>
+    ### Phân loại khách hàng và gắn nhãn nghiệp vụ
+
+    Tại mục **Phân loại khách hàng**, chọn nhóm phù hợp từ danh sách thả xuống.
+
+    Nhấn **+ Thêm nhãn** để chọn nhãn phân loại nghiệp vụ (ví dụ: `BatDongSan`, `VIP`). Nhấn biểu tượng dấu `x` trên nhãn nếu muốn gỡ bỏ.
+
+    ![Cập nhật phân loại và gắn nhãn cho khách hàng](/media/ai-contact-center/user-guider-portal/quan-ly-hoi-thoai_thong-tin-khach-hang.png)
+
+    *Kết quả: Nhãn dán và trạng thái phân loại cập nhật ngay lập tức trên hồ sơ khách hàng.*
+  </Step>
+
+  <Step>
+    ### Thêm ghi chú tương tác
+
+    Tại mục **Ghi chú** ở cột bên phải, nhấn **Thêm ghi chú +**.
+
+    Nhập nội dung cần lưu ý vào ô **Thêm ghi chú mới**, sau đó nhấn nút **LƯU THAY ĐỔI** (hoặc nhấn **Hủy bỏ** để xóa nội dung vừa nhập).
+
+    *Kết quả: Ghi chú mới hiển thị trong hồ sơ kèm tên người tạo và mốc thời gian lưu.*
+  </Step>
+
+  <Step>
+    ### Bổ sung số điện thoại liên hệ
+
+    Nếu khách hàng cung cấp số điện thoại mới trong quá trình trao đổi, nhấn **Thêm số mới +** tại mục **Số điện thoại**. Nhập số thuê bao và xác nhận lưu.
+
+    *Kết quả: Số điện thoại mới được bổ sung vào hồ sơ và sẵn sàng cho tính năng Click-to-Call.*
+  </Step>
+</Steps>
+
+Các trường thông tin khách hàng trên giao diện hội thoại:
+
+| Trường | Bắt buộc | Mô tả | Ví dụ |
+| :--- | :--- | :--- | :--- |
+| **Số điện thoại** | Không | Số thuê bao liên lạc của khách hàng, hỗ trợ bấm để gọi trực tiếp | `0928816xxx` |
+| **Phân loại khách hàng** | Có | Phân nhóm trạng thái quan hệ khách hàng | `KH hiện tại`, `KH tiềm năng` |
+| **Nhãn** | Không | Thẻ màu phân khúc khách hàng theo nhu cầu hoặc chiến dịch | `BatDongSan`, `VIP` |
+| **Ghi chú** | Không | Nội dung tóm tắt yêu cầu, lịch hẹn hoặc lưu ý chăm sóc | `Khách hẹn gọi lại sau 15h` |
+
+## Kiểm tra kết quả
+
+Xác nhận quy trình xử lý hội thoại hoàn tất qua các dấu hiệu:
+
+- Tin nhắn phản hồi hiển thị trong luồng chat với trạng thái đã gửi thành công.
+- Nhãn phân loại và nhóm khách hàng ở cột bên phải phản ánh đúng thông tin vừa chọn.
+- Ghi chú mới được lưu lại kèm thời gian và người tạo.
+- Hộp thư bên trái không còn báo chấm đỏ hoặc số đếm chưa đọc cho phiên đã giải quyết.
+
+## Xử lý sự cố
+
+<Accordions>
+  <Accordion title="Tin nhắn gửi đi báo lỗi hoặc khách hàng không nhận được">
+    **Nguyên nhân:** Kênh kết nối (Zalo OA hoặc Facebook Fanpage) bị mất quyền truy cập hoặc hết hạn token ủy quyền.
+
+    **Cách xử lý:** Truy cập menu **Tích hợp đa kênh**, kiểm tra trạng thái hoạt động của kênh tương ứng và liên hệ quản trị viên cấp lại quyền nếu kênh báo ngắt kết nối.
+  </Accordion>
+  <Accordion title="Bấm vào số điện thoại nhưng tổng đài không đổ chuông">
+    **Nguyên nhân:** Máy nhánh SIP chưa đăng ký thành công trên thiết bị hoặc mất kết nối mạng Internet.
+
+    **Cách xử lý:** Kiểm tra phần mềm Softphone (Zoiper) hoặc điện thoại IP Phone, đảm bảo tài khoản máy nhánh hiển thị trạng thái màu xanh (Registered).
+  </Accordion>
+  <Accordion title="Hội thoại mới không hiển thị trong danh sách">
+    **Nguyên nhân:** Thanh tìm kiếm đang chứa từ khóa cũ hoặc bộ lọc trạng thái đang ẩn các phiên mới.
+
+    **Cách xử lý:** Nhấn biểu tượng bộ lọc ở đầu danh sách hội thoại và chọn xóa bộ lọc để hiển thị toàn bộ danh sách.
+  </Accordion>
+</Accordions>
+
+## Bài viết liên quan
+
+<Cards>
+  <Card
+    icon="MessageSquare"
+    title="Hợp nhất thông tin khách hàng"
+    description="Gộp nhiều phiên hội thoại trùng lặp xuyên kênh vào một hồ sơ duy nhất."
+    href="/docs/ai-contact-center/portal/hoi-thoai/hop-nhat-thong-tin-khach-hang"
+  />
+  <Card
+    icon="Users"
+    title="Xem và chỉnh sửa thông tin khách hàng"
+    description="Quản lý chi tiết hồ sơ 360 độ và danh bạ khách hàng trong Mini CRM."
+    href="/docs/ai-contact-center/portal/khach-hang/xem-va-chinh-sua-thong-tin"
+  />
+  <Card
+    icon="Phone"
+    title="Thiết lập tích hợp đa kênh"
+    description="Kết nối các trang Zalo OA và Facebook Fanpage vào tổng đài ODS."
+    href="/docs/ai-contact-center/portal/tich-hop"
+  />
+</Cards>

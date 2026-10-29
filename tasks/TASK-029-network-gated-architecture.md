@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: done
 branch: task/TASK-029-network-gated-architecture
-commit: ""
+commit: "0df447a"
 verified-by: npm run verify:task
 ---
 

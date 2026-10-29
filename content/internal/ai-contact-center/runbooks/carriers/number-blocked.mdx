@@ -1,48 +1,78 @@
 ---
 title: Đầu số bị chặn / báo spam
-description: Khung xử lý tình trạng đầu số bị chặn hoặc bị gắn nhãn spam.
+description: Runbook L1 phân biệt cuộc gọi bị nhà mạng từ chối với đầu số bị ứng dụng người nhận gắn nhãn spam.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
+  Không cam kết thời gian hoặc kết quả gỡ nhãn spam. Không hướng dẫn đổi CLI, giả mạo đầu số hay né chính sách nhà mạng.
 </Callout>
+
+## Phạm vi L1
+
+Áp dụng khi cuộc gọi bị từ chối/chặn hoặc người nhận thấy nhãn spam. Hai hiện tượng phải tách riêng vì cơ chế và đơn vị xử lý khác nhau.
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Cuộc gọi không kết nối tới một hay nhiều nhà mạng/nhóm thuê bao.
+- Thuê bao đích báo bận, từ chối hoặc thông báo hạn chế.
+- Cuộc gọi vẫn kết nối nhưng người nhận thấy nhãn spam/tên không mong muốn.
 
-## Cần hỏi KH
+### Phân nhánh nhanh
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
+| --- | --- | --- |
+| Cuộc gọi kết nối nhưng hiện nhãn spam | Nhãn nhận diện, không phải lỗi kết nối | Thu thập ảnh, ứng dụng/thiết bị và phạm vi xuất hiện |
+| Chỉ một thiết bị người nhận hiện nhãn | Có thể là dữ liệu cục bộ hoặc một nhà cung cấp nhận diện | Kiểm tra thêm thiết bị/nhà mạng khác trước khi chuyển cấp |
+| Nhiều thuê bao cùng nhà mạng từ chối | Có thể là chính sách hoặc chặn phía Carrier | Thu thập mã kết thúc và các mẫu cùng nhà mạng |
+| Mọi hướng gọi đều bị từ chối | Có thể đầu số bị khóa hoặc route lỗi | Dừng gọi thử hàng loạt và chuyển Carrier/L2 |
+| Chỉ một thuê bao đích không nhận | Chưa đủ bằng chứng đầu số bị chặn | Đề nghị kiểm tra trạng thái thuê bao và thử số đối chứng |
 
-## Kiểm tra
+## Cần hỏi khách hàng
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+- Đầu số gọi ra, số đích mẫu, nhà mạng đích và thời điểm/múi giờ.
+- Cuộc gọi có kết nối hay chỉ bị gắn nhãn; thông báo chính xác.
+- Lỗi ở mọi số đích hay chỉ một thiết bị/ứng dụng nhận diện.
+- Tần suất gọi, loại chiến dịch và thời điểm bắt đầu xuất hiện nhãn.
 
-## Xử lý
+## Kiểm tra L1
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+1. Đối chiếu ít nhất hai số đích thuộc nhà mạng/thiết bị khác nhau.
+2. Kiểm tra CDR/mã kết thúc để phân biệt network rejection với cuộc gọi đã kết nối.
+3. Xác định nhãn từ ứng dụng/điện thoại người nhận hay thông báo nhà mạng.
+4. Đối chiếu giới hạn nhà mạng và quyền gọi theo tài liệu nội bộ.
+5. Ghi nhận có trùng chiến dịch gọi số lượng lớn hay không; không tự kết luận spam.
 
-## Chuyển cấp
+## Xử lý trong phạm vi L1
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Giải thích khác biệt giữa lỗi kết nối và nhãn hiển thị phía người nhận.
+- Hướng dẫn tuân thủ danh sách gọi, tần suất và nội dung theo chính sách đã duyệt.
+- Thu thập mẫu tối thiểu để nhóm Carrier làm việc với nhà mạng/đơn vị nhận diện.
+- Nếu chỉ một thiết bị có nhãn, kiểm tra thêm thiết bị khác trước khi kết luận diện rộng.
+
+## Điểm dừng và chuyển cấp
+
+- Nhiều số đích/nhà mạng cùng từ chối cuộc gọi.
+- Có carrier rejection hoặc đầu số bị khóa quyền gọi.
+- Nhãn spam xuất hiện diện rộng và cần khiếu nại chính thức.
+- Cần nhà mạng xử lý, đổi quyền gọi hoặc cung cấp hồ sơ pháp lý chủ thể đầu số.
+
+## Dữ liệu chuyển cấp
+
+- Đầu số nguồn, nhà mạng, thời điểm và phạm vi.
+- Mẫu cuộc gọi đã che dữ liệu, Call-ID/mã SIP và trạng thái CDR.
+- Screenshot nhãn spam kèm tên ứng dụng/thiết bị; không đính kèm toàn bộ danh sách khách hàng.
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận phản ánh đầu số bị chặn hoặc hiển thị nhãn spam. Anh/chị vui lòng xác nhận cuộc gọi có kết nối hay không và cung cấp mẫu, thời điểm cùng ảnh đã che dữ liệu cá nhân.
 
-## Nguyên nhân đã gặp
+> **Chuyển cấp:** ODS đã chuyển đội phụ trách nhà mạng kiểm tra. Kết quả gỡ nhãn phụ thuộc chính sách nhà mạng/đơn vị nhận diện nên chưa thể cam kết thời gian tại L1.
 
-Chưa có dữ liệu đã xác minh.
+## Nguyên nhân thường gặp và tra cứu
 
-## Tra cứu liên quan
+- Ứng dụng nhận diện cuộc gọi tự gắn nhãn hoặc nhà mạng áp chính sách chống spam.
+- Đầu số bị hạn chế hướng/quyền gọi; tần suất gọi cao làm tăng phản ánh.
 
-- [Rule gọi ra (Outbound Rules)](/internal/ai-contact-center/knowledge-base/outbound-rules)
-- [Bảng IP hạ tầng core](/internal/ai-contact-center/knowledge-base/core-infrastructure)
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
-
+- [Giới hạn nhà mạng](/internal/ai-contact-center/knowledge-base/carrier-limitations)
+- [Rule gọi ra](/internal/ai-contact-center/knowledge-base/outbound-rules)
+- [Trunk SIP lỗi](/internal/ai-contact-center/runbooks/carriers/trunk-down)

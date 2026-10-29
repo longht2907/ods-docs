@@ -10,6 +10,7 @@ import {
 import { notFound } from 'next/navigation';
 import { getMDXComponents } from '@/components/mdx';
 import type { Metadata } from 'next';
+import type { ComponentProps } from 'react';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { getPageImageUrl, getPageMarkdownUrl, gitConfig } from '@/lib/shared';
 
@@ -20,10 +21,17 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
+  const toc = page.data.full
+    ? page.data.toc
+    : page.data.toc.filter((item) => item.depth <= 2 && item._step == null);
+  const mdxComponents = getMDXComponents({
+    // this allows you to link to other pages with relative file paths
+    a: createRelativeLink(source, page),
+  }) as unknown as ComponentProps<typeof MDX>['components'];
 
   return (
     <DocsPage
-      toc={page.data.toc}
+      toc={toc}
       full={page.data.full}
       tableOfContent={{ enabled: !page.data.full, style: 'clerk' }}
       tableOfContentPopover={{ enabled: !page.data.full, style: 'clerk' }}
@@ -38,12 +46,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
         />
       </div>
       <DocsBody>
-        <MDX
-          components={getMDXComponents({
-            // this allows you to link to other pages with relative file paths
-            a: createRelativeLink(source, page),
-          })}
-        />
+        <MDX components={mdxComponents} />
       </DocsBody>
     </DocsPage>
   );

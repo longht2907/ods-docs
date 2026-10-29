@@ -16,6 +16,7 @@ import {
 import { getAnnouncements } from '../_lib/announcements';
 
 import { AutoIndex } from '../_components/auto-index';
+import { ReviewQuestion } from '../_components/review-question';
 
 interface PageProps {
   params: Promise<{ slug?: string[] }>;
@@ -32,17 +33,20 @@ export default async function Page(props: PageProps) {
     params.slug?.length === 1 && params.slug[0] === 'announcements';
   const announcements =
     isHome || isAnnouncementArchive ? getAnnouncements() : [];
+  const toc = page.data.full
+    ? page.data.toc
+    : page.data.toc.filter((item) => item.depth <= 2 && item._step == null);
 
   return (
     <DocsPage
-      toc={page.data.toc}
+      toc={toc}
       full={page.data.full}
       tableOfContent={{ enabled: !page.data.full, style: 'clerk' }}
       tableOfContentPopover={{ enabled: !page.data.full, style: 'clerk' }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
-      <DocsBody>
+      <DocsBody className="ods-internal-article">
         {isHome && <LatestAnnouncements announcements={announcements} />}
         {isAnnouncementArchive && (
           <AnnouncementArchive announcements={announcements} />
@@ -53,6 +57,7 @@ export default async function Page(props: PageProps) {
             AutoIndex: (props: any) => (
               <AutoIndex currentUrl={page.url} {...props} />
             ),
+            ReviewQuestion,
           })}
         />
       </DocsBody>

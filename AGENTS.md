@@ -9,7 +9,7 @@ Ngắn gọn có chủ đích: mọi thứ kiểm tra được bằng máy đề
 Documentation Platform cho ODS trên Next.js + Fumadocs + MDX.
 
 - `/docs/**` — công khai, khách hàng và nhân viên đọc được.
-- `/internal/**` — nội bộ, bắt buộc đăng nhập.
+- `/internal/**` — nội bộ, target chỉ cho phép từ office WAN hoặc VPN công ty.
 - Deploy: Next.js `standalone` trong Docker, Caddy làm reverse proxy.
 
 ## Không được phá vỡ
@@ -19,17 +19,22 @@ Documentation Platform cho ODS trên Next.js + Fumadocs + MDX.
 3. Search công khai chỉ index nguồn public.
 4. `/internal/**` và `/api/search/internal/**` phải được `proxy.ts` bảo vệ.
 5. Không đưa `/internal/**` vào sitemap, `llms.txt` hay search công khai.
-6. Không đổi `output: 'standalone'` thành `output: 'export'`. Auth cần server.
+6. Không đổi `output: 'standalone'` thành `output: 'export'`. Runtime network gate cần server.
 7. `Caddyfile` phải giữ `Cache-Control: private, no-store` cho `/internal`.
 8. Không commit secret (mật khẩu, token, key) và dữ liệu cá nhân khách hàng ở bất kỳ đâu. IP hạ tầng và bảng đầu số chỉ được ghi trong `content/internal/**/knowledge-base/**` (ADR-006).
+9. `public/media/**` chỉ chứa asset được phép public. Internal media phải nằm ngoài `public/` và chỉ được phục vụ qua route đã được bảo vệ.
 
 Muốn thay đổi bất kỳ mục nào ở trên: dừng lại, hỏi Human.
+
+Network gate theo ADR-007 chưa được triển khai. Cho đến khi có task runtime riêng
+và bằng chứng kiểm chứng, production phải tiếp tục fail-closed; tuyệt đối không bật
+`ODS_INTERNAL_DEV_OPEN=true` để thay thế Caddy allowlist.
 
 ## Quy tắc code
 
 - Thay đổi nhỏ, đúng phạm vi được giao. Không refactor lan rộng.
 - Trước khi thêm dependency: kiểm tra dependency hiện có, giải thích lý do.
-- Với API Next.js / Fumadocs / Auth.js: đọc version trong `package.json` và types thật trong `node_modules`. **Không đoán từ trí nhớ** — các thư viện này đổi API thường xuyên.
+- Với API Next.js / Fumadocs: đọc version trong `package.json` và types thật trong `node_modules`. **Không đoán từ trí nhớ** — các thư viện này đổi API thường xuyên.
 - Luôn đọc `DECISIONS.md` trước khi đề xuất hoặc thực hiện thay đổi kiến trúc.
 - Không tự deploy production, không đổi secret / DNS / OAuth.
 

@@ -20,14 +20,14 @@ description: "Hướng dẫn tải và cài Nextcloud Desktop Client trên Windo
 
     Mở trang tải Desktop Client, chọn bản dành cho Windows và lưu tệp `.msi` vào thư mục **Downloads**. Tên tệp có dạng `Nextcloud-3.x.x-x64.msi`.
 
-    *Kết quả: Installer Windows xuất hiện trong thư mục tải xuống.*
+    <ExpectedResult>Installer Windows xuất hiện trong thư mục tải xuống.</ExpectedResult>
   </Step>
   <Step>
     ### Khởi chạy installer
 
     Nhấp đúp tệp `.msi`. Nếu Windows hiển thị User Account Control, kiểm tra tên ứng dụng rồi chọn **Yes** để cho phép cài đặt.
 
-    *Kết quả: Nextcloud Setup Wizard mở ra.*
+    <ExpectedResult>Nextcloud Setup Wizard mở ra.</ExpectedResult>
   </Step>
   <Step>
     ### Xác nhận tùy chọn cài đặt
@@ -36,7 +36,7 @@ description: "Hướng dẫn tải và cài Nextcloud Desktop Client trên Windo
 
     ![Nextcloud Setup Wizard ở màn hình Ready to install với nút Install](/media/cloudfile/05-may-tinh-di-dong/desktop-client/windows-uac.png)
 
-    *Kết quả: Wizard bắt đầu cài Desktop Client vào máy.*
+    <ExpectedResult>Wizard bắt đầu cài Desktop Client vào máy.</ExpectedResult>
   </Step>
   <Step>
     ### Hoàn tất và mở ứng dụng
@@ -45,7 +45,7 @@ description: "Hướng dẫn tải và cài Nextcloud Desktop Client trên Windo
 
     ![Màn hình hoàn tất Nextcloud Setup Wizard với tùy chọn Launch Nextcloud](/media/cloudfile/05-may-tinh-di-dong/desktop-client/windows-cai-dat-hoan-tat.png)
 
-    *Kết quả: Biểu tượng Nextcloud xuất hiện trong system tray và Setup Wizard đăng nhập mở ra.*
+    <ExpectedResult>Biểu tượng Nextcloud xuất hiện trong system tray và Setup Wizard đăng nhập mở ra.</ExpectedResult>
   </Step>
 </Steps>
 
@@ -57,35 +57,35 @@ description: "Hướng dẫn tải và cài Nextcloud Desktop Client trên Windo
 
     Mở trang tải Desktop Client, chọn bản dành cho macOS và lưu tệp `.pkg`. Chọn đúng bản Intel hoặc Apple Silicon theo loại chip của máy.
 
-    *Kết quả: Installer macOS xuất hiện trong thư mục **Downloads**.*
+    <ExpectedResult>Installer macOS xuất hiện trong thư mục **Downloads**.</ExpectedResult>
   </Step>
   <Step>
     ### Mở tệp cài đặt
 
     Nhấp đúp tệp `.pkg`. Nếu Gatekeeper chặn ứng dụng, Control-click tệp, chọn **Open** rồi xác nhận **Open** trong hộp thoại.
 
-    *Kết quả: Nextcloud Installer mở ra.*
+    <ExpectedResult>Nextcloud Installer mở ra.</ExpectedResult>
   </Step>
   <Step>
     ### Chạy Nextcloud Installer
 
     Chọn **Continue**, đọc và chấp nhận License Agreement, chọn ổ cài đặt rồi chọn **Install**. Nhập mật khẩu người dùng macOS khi hệ thống yêu cầu xác thực cài phần mềm.
 
-    *Kết quả: Nextcloud được cài vào thư mục **Applications**.*
+    <ExpectedResult>Nextcloud được cài vào thư mục **Applications**.</ExpectedResult>
   </Step>
   <Step>
     ### Cấp quyền cần thiết
 
     Mở **System Settings** → **Privacy & Security** → **Full Disk Access**, thêm `Nextcloud.app` và bật quyền. Nếu muốn nhận thông báo, mở **Notifications** và bật thông báo cho Nextcloud.
 
-    *Kết quả: Desktop Client có quyền truy cập tệp và hiển thị thông báo theo lựa chọn của bạn.*
+    <ExpectedResult>Desktop Client có quyền truy cập tệp và hiển thị thông báo theo lựa chọn của bạn.</ExpectedResult>
   </Step>
   <Step>
     ### Khởi chạy Desktop Client
 
     Mở **Finder** → **Applications**, sau đó nhấp đúp `Nextcloud.app`.
 
-    *Kết quả: Biểu tượng Nextcloud xuất hiện trên Menu Bar và Setup Wizard đăng nhập mở ra.*
+    <ExpectedResult>Biểu tượng Nextcloud xuất hiện trên Menu Bar và Setup Wizard đăng nhập mở ra.</ExpectedResult>
   </Step>
 </Steps>
 

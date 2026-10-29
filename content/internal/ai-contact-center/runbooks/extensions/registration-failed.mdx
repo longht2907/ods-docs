@@ -1,47 +1,85 @@
 ---
 title: Máy nhánh không đăng ký được
-description: Khung xử lý sự cố máy nhánh không đăng ký được với hệ thống.
+description: Runbook L1 kiểm tra máy nhánh SIP trên IP Phone, Softphone và ODS Phone khi không thể đăng ký với tổng đài.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
+  Nội dung dưới đây là khung xử lý đề xuất để Human hiệu chỉnh. L1 không yêu cầu khách hàng gửi mật khẩu SIP và không tự reset tài khoản, đổi Server SIP hoặc thay đổi cấu hình tổng đài khi chưa có yêu cầu hợp lệ.
 </Callout>
+
+## Phạm vi L1
+
+Áp dụng khi một hoặc một nhóm máy nhánh hiển thị `Unregistered`, `Register Failed`, `No Service` hoặc không chuyển sang trạng thái sẵn sàng trên IP Phone, Softphone hay ứng dụng ODS Phone.
+
+Mục tiêu của L1 là xác định lỗi nằm ở thông tin tài khoản, thiết bị, mạng khách hàng hay dịch vụ tổng đài trước khi chuyển L2.
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Thiết bị không hiển thị trạng thái `Registered` hoặc liên tục đăng ký lại.
+- Máy nhánh không nhận/gọi được và ứng dụng báo lỗi kết nối tài khoản SIP.
+- Chỉ một thiết bị lỗi, nhiều thiết bị cùng mạng lỗi hoặc toàn bộ máy nhánh của khách hàng cùng lỗi.
 
-## Cần hỏi KH
+### Phân nhánh nhanh
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
+| --- | --- | --- |
+| Chỉ một máy nhánh lỗi, máy khác cùng mạng vẫn hoạt động | Ưu tiên kiểm tra account hoặc thiết bị | Đối chiếu thông số SIP, trạng thái mạng và số thiết bị đang đăng nhập |
+| Nhiều máy nhánh cùng văn phòng lỗi, 4G/5G đăng ký được | Ưu tiên kiểm tra mạng khách hàng | Ghi nhận Router/Firewall/DNS và chuyển quản trị mạng nếu cần |
+| Một máy nhánh lỗi trên cả Wi-Fi và 4G/5G | Có thể liên quan account hoặc trạng thái trên PBX | Kiểm tra trạng thái dịch vụ rồi chuyển L2 kèm thời điểm lỗi |
+| Toàn bộ máy nhánh của một hoặc nhiều tenant cùng lỗi | Có thể là sự cố dịch vụ diện rộng | Dừng thay đổi endpoint và chuyển cấp ngay |
 
-## Kiểm tra
+## Cần hỏi khách hàng
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+- Mã dịch vụ, số máy nhánh và loại thiết bị: IP Phone, Softphone hay ODS Phone.
+- Thời điểm bắt đầu lỗi, thông báo chính xác và ảnh chụp trạng thái đã che thông tin nhạy cảm.
+- Một hay nhiều máy nhánh bị ảnh hưởng; các máy nhánh khác cùng mạng có hoạt động không.
+- Gần đây có đổi mật khẩu SIP, Router/Firewall, đường truyền, Wi-Fi hoặc cài lại ứng dụng không.
+- Thiết bị đang dùng mạng văn phòng, Wi-Fi gia đình hay 4G/5G.
 
-## Xử lý
+## Kiểm tra L1
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+1. Xác nhận dịch vụ và máy nhánh còn tồn tại, đúng khách hàng và không ở trạng thái bị tạm ngưng theo nguồn tra cứu được cấp quyền.
+2. Yêu cầu khách hàng đối chiếu **Số máy nhánh**, **Server SIP**, **Port** và **Transport** với thông tin quản trị; không đọc hoặc gửi lại mật khẩu qua kênh không an toàn.
+3. Kiểm tra thiết bị có Internet, ngày giờ hệ thống đúng và không bật chế độ máy bay/VPN ngoài dự kiến.
+4. Thử chuyển Softphone/ODS Phone giữa Wi-Fi và 4G/5G để phân biệt lỗi mạng với lỗi tài khoản.
+5. Nếu là IP Phone, kiểm tra thiết bị nhận IP, Gateway và DNS; không factory reset trong bước L1.
+6. Kiểm tra một tài khoản có đang được đăng nhập đồng thời trên nhiều thiết bị hay không nếu chính sách hệ thống có giới hạn đăng ký.
 
-## Chuyển cấp
+## Xử lý trong phạm vi L1
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Khởi động lại ứng dụng hoặc thiết bị đầu cuối sau khi đã lưu bằng chứng trạng thái lỗi.
+- Nhập lại thông số SIP từ nguồn quản trị đã xác minh; không sao chép credential vào ticket.
+- Cấp lại quyền mạng/microphone cho ứng dụng và tắt VPN cá nhân nếu phép thử cho thấy VPN gây lỗi.
+- Hướng dẫn khách hàng kiểm tra Firewall/Router khi tài khoản đăng ký được trên 4G nhưng không đăng ký được ở mạng văn phòng.
+- Chỉ reset mật khẩu SIP khi có quy trình xác thực người yêu cầu và quyền thao tác được Human xác nhận.
+
+## Điểm dừng và chuyển cấp
+
+- Toàn bộ máy nhánh của một khách hàng hoặc nhiều khách hàng cùng mất đăng ký.
+- Thông số đã đúng nhưng hệ thống vẫn trả lỗi xác thực hoặc không có phản hồi từ Server SIP.
+- Cần kiểm tra SIP trace, firewall phía hạ tầng, giới hạn registration hoặc trạng thái PBX/Core.
+- Cần thay đổi Server SIP, Port, Transport, tenant hoặc cấu hình tổng đài.
+
+## Dữ liệu chuyển cấp
+
+- Ticket, mã dịch vụ, máy nhánh, loại thiết bị/phiên bản ứng dụng và loại mạng đang dùng.
+- Thời điểm lỗi kèm múi giờ, thông báo lỗi, kết quả thử Wi-Fi so với 4G/5G.
+- Trạng thái các máy nhánh khác cùng hệ thống và các bước L1 đã thực hiện.
+- Log hoặc screenshot phải che password, token, số điện thoại và dữ liệu không liên quan.
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận máy nhánh chưa đăng ký được. Anh/chị vui lòng cung cấp số máy nhánh, loại thiết bị, thời điểm lỗi và ảnh thông báo đã che thông tin mật; không gửi mật khẩu SIP qua ticket.
 
-## Nguyên nhân đã gặp
+> **Chuyển cấp:** ODS đã hoàn tất kiểm tra thiết bị và kết nối cơ bản. Trường hợp cần kiểm tra sâu trạng thái đăng ký trên hệ thống, chúng tôi đã chuyển đội chuyên trách kèm dữ liệu chẩn đoán.
 
-Chưa có dữ liệu đã xác minh.
+## Nguyên nhân thường gặp và tra cứu
 
-## Tra cứu liên quan
+- Sai số máy nhánh, Server SIP, Port, Transport hoặc mật khẩu SIP.
+- Thiết bị mất Internet/DNS, Firewall chặn kết nối hoặc VPN làm thay đổi đường đi.
+- Tài khoản bị đăng nhập đồng thời vượt giới hạn hoặc dịch vụ bị tạm ngưng.
 
-- [Bảng IP hạ tầng core](/internal/ai-contact-center/knowledge-base/core-infrastructure)
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
-
+- [Cấu hình IP Phone Yealink](/docs/ai-contact-center/portal/may-nhanh/ip-phone/cau-hinh-yealink-t19x-t30x)
+- [Cài đặt Softphone Zoiper](/docs/ai-contact-center/portal/may-nhanh/softphone/cai-dat-zoiper-may-tinh)
+- [Cài đặt ODS Phone Android](/docs/ai-contact-center/portal/may-nhanh/mobile-app/cai-dat-ods-phone-android)
+- [Cài đặt ODS Phone iOS](/docs/ai-contact-center/portal/may-nhanh/mobile-app/cai-dat-ods-phone-ios)

@@ -15,7 +15,9 @@ description: Dàn ý chẩn đoán và xử lý case máy nhánh không thực h
 
 **Cần bổ sung:** Cách ODS phân loại phạm vi ảnh hưởng và mức độ P1–P4 cho sự cố gọi ra.
 
-> **[Q-outbound-failed-1]** Dấu hiệu hoặc mã lỗi nào thường được ODS dùng để xác nhận case “không gọi ra được”?
+<ReviewQuestion id="Q-outbound-failed-1">
+  Dấu hiệu hoặc mã lỗi nào thường được ODS dùng để xác nhận case “không gọi ra được”?
+</ReviewQuestion>
 
 ## Cần hỏi KH
 
@@ -26,7 +28,9 @@ description: Dàn ý chẩn đoán và xử lý case máy nhánh không thực h
 
 **Cần bổ sung:** Các trường bắt buộc trên ticket và quy tắc che/mã hóa số điện thoại khi ghi nhận case.
 
-> **[Q-outbound-failed-2]** Ngoài số gọi, số bị gọi và thời điểm, ODS yêu cầu khách hàng cung cấp thêm dữ liệu nào cho case gọi ra?
+<ReviewQuestion id="Q-outbound-failed-2">
+  Ngoài số gọi, số bị gọi và thời điểm, ODS yêu cầu khách hàng cung cấp thêm dữ liệu nào cho case gọi ra?
+</ReviewQuestion>
 
 ## Kiểm tra
 
@@ -38,7 +42,9 @@ description: Dàn ý chẩn đoán và xử lý case máy nhánh không thực h
 
 **Cần bổ sung:** Tên hệ thống nội bộ, đường dẫn tra cứu và phạm vi lệnh/công cụ L1, L2 được phép dùng.
 
-> **[Q-outbound-failed-3]** ODS kiểm tra quyền gọi ra, outbound route, CDR và trạng thái trunk tại công cụ nào, theo thứ tự nào?
+<ReviewQuestion id="Q-outbound-failed-3">
+  ODS kiểm tra quyền gọi ra, outbound route, CDR và trạng thái trunk tại công cụ nào, theo thứ tự nào?
+</ReviewQuestion>
 
 ## Xử lý
 
@@ -49,7 +55,9 @@ description: Dàn ý chẩn đoán và xử lý case máy nhánh không thực h
 
 **Cần bổ sung:** Thao tác nào L1 được tự thực hiện, thao tác nào cần L2 hoặc phê duyệt thay đổi.
 
-> **[Q-outbound-failed-4]** Với từng nguyên nhân thường gặp, ODS cho phép L1 xử lý trực tiếp đến bước nào?
+<ReviewQuestion id="Q-outbound-failed-4">
+  Với từng nguyên nhân thường gặp, ODS cho phép L1 xử lý trực tiếp đến bước nào?
+</ReviewQuestion>
 
 ## Chuyển cấp
 
@@ -59,7 +67,9 @@ description: Dàn ý chẩn đoán và xử lý case máy nhánh không thực h
 
 **Cần bổ sung:** Nhóm nhận chuyển cấp, kênh chung, SLA và quy tắc thu thập/chia sẻ log hoặc pcap của ODS.
 
-> **[Q-outbound-failed-5]** Case gọi ra được chuyển cho L2, NOC hay vendor trong từng điều kiện nào?
+<ReviewQuestion id="Q-outbound-failed-5">
+  Case gọi ra được chuyển cho L2, NOC hay vendor trong từng điều kiện nào?
+</ReviewQuestion>
 
 ## Trả lời mẫu
 
@@ -69,7 +79,9 @@ description: Dàn ý chẩn đoán và xử lý case máy nhánh không thực h
 
 **Cần bổ sung:** Cách xưng hô, tên thương hiệu và trạng thái ticket chuẩn trong mẫu phản hồi của ODS.
 
-> **[Q-outbound-failed-6]** ODS có mẫu tiếp nhận và mẫu xác nhận xử lý chuẩn nào cho sự cố gọi ra?
+<ReviewQuestion id="Q-outbound-failed-6">
+  ODS có mẫu tiếp nhận và mẫu xác nhận xử lý chuẩn nào cho sự cố gọi ra?
+</ReviewQuestion>
 
 ## Nguyên nhân đã gặp
 
@@ -79,7 +91,9 @@ description: Dàn ý chẩn đoán và xử lý case máy nhánh không thực h
 
 **Cần bổ sung:** Chỉ Human điền case thật đã được phép lưu và loại bỏ dữ liệu nhận diện khách hàng.
 
-> **[Q-outbound-failed-7]** Có những ticket đã đóng nào có thể dùng để tổng hợp nguyên nhân gọi ra thất bại mà không chứa dữ liệu bị cấm?
+<ReviewQuestion id="Q-outbound-failed-7">
+  Có những ticket đã đóng nào có thể dùng để tổng hợp nguyên nhân gọi ra thất bại mà không chứa dữ liệu bị cấm?
+</ReviewQuestion>
 
 ## Tra cứu liên quan
 
@@ -88,10 +102,14 @@ description: Dàn ý chẩn đoán và xử lý case máy nhánh không thực h
 
 **Cần bổ sung:** Xác nhận bốn trang trên đã đủ cho luồng gọi ra hay cần thêm tài liệu nội bộ khác.
 
-> **[Q-outbound-failed-8]** Runbook gọi ra cần liên kết thêm trang tra cứu nào?
+<ReviewQuestion id="Q-outbound-failed-8">
+  Runbook gọi ra cần liên kết thêm trang tra cứu nào?
+</ReviewQuestion>
 
 ## Cập nhật lần cuối
 
 **Cần bổ sung:** Ngày duyệt gần nhất và vai trò chịu trách nhiệm cập nhật runbook.
 
-> **[Q-common-10]** Vai trò nào phê duyệt và duy trì nội dung Support Wiki?
+<ReviewQuestion id="Q-common-10">
+  Vai trò nào phê duyệt và duy trì nội dung Support Wiki?
+</ReviewQuestion>

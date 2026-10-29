@@ -44,8 +44,10 @@ full: true
   <ApiReferenceCode>
     ## Ví dụ request
 
-    <Tabs items={['cURL (TTS)', 'cURL (Base64)', 'Node.js', 'Python']} groupId="api-lang" persist>
-      <Tab value="cURL (TTS)">
+    <Tabs items={['cURL', 'Node.js', 'Python']} groupId="api-lang" persist>
+      <Tab value="cURL">
+        **Text-to-Speech (TTS)**
+
 ```bash
 curl -X POST "https://apiai.cloudfone.vn/api/Audio/CreateTTSAudio" \
   -H "Content-Type: application/json" \
@@ -59,8 +61,9 @@ curl -X POST "https://apiai.cloudfone.vn/api/Audio/CreateTTSAudio" \
     "Content": "Chào bạn, ODS xin gửi lời chúc sức khỏe và thành công đến quý doanh nghiệp."
   }'
 ```
-      </Tab>
-      <Tab value="cURL (Base64)">
+
+        **Tải tệp Base64**
+
 ```bash
 curl -X POST "https://apiai.cloudfone.vn/api/Audio/CreateTTSAudio" \
   -H "Content-Type: application/json" \

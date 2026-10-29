@@ -15,7 +15,9 @@ description: Dàn ý chẩn đoán và xử lý case khách hàng không nhận 
 
 **Cần bổ sung:** Dấu hiệu, mã lỗi và quy tắc phân mức độ ODS dùng cho sự cố gọi vào.
 
-> **[Q-inbound-failed-1]** ODS phân biệt “nhà mạng chưa đưa cuộc gọi vào” với “hệ thống đã nhận nhưng không chuyển tới đích” bằng dấu hiệu nào?
+<ReviewQuestion id="Q-inbound-failed-1">
+  ODS phân biệt “nhà mạng chưa đưa cuộc gọi vào” với “hệ thống đã nhận nhưng không chuyển tới đích” bằng dấu hiệu nào?
+</ReviewQuestion>
 
 ## Cần hỏi KH
 
@@ -26,7 +28,9 @@ description: Dàn ý chẩn đoán và xử lý case khách hàng không nhận 
 
 **Cần bổ sung:** Trường ticket bắt buộc và cách ghi đầu số/số gọi phù hợp chính sách dữ liệu của ODS.
 
-> **[Q-inbound-failed-2]** Case gọi vào cần khách hàng cung cấp thêm thông tin nào ngoài hai số, thời điểm và đích mong đợi?
+<ReviewQuestion id="Q-inbound-failed-2">
+  Case gọi vào cần khách hàng cung cấp thêm thông tin nào ngoài hai số, thời điểm và đích mong đợi?
+</ReviewQuestion>
 
 ## Kiểm tra
 
@@ -38,7 +42,9 @@ description: Dàn ý chẩn đoán và xử lý case khách hàng không nhận 
 
 **Cần bổ sung:** Công cụ tra inbound route, CDR, SIP trace và quyền truy cập theo vai trò.
 
-> **[Q-inbound-failed-3]** ODS tra cứu đầu số, inbound route và log cuộc gọi đến trên những hệ thống nào?
+<ReviewQuestion id="Q-inbound-failed-3">
+  ODS tra cứu đầu số, inbound route và log cuộc gọi đến trên những hệ thống nào?
+</ReviewQuestion>
 
 ## Xử lý
 
@@ -49,7 +55,9 @@ description: Dàn ý chẩn đoán và xử lý case khách hàng không nhận 
 
 **Cần bổ sung:** Quyền thay đổi inbound route, IVR, queue và phương án rollback chuẩn của ODS.
 
-> **[Q-inbound-failed-4]** L1 được phép xử lý trực tiếp những lỗi gọi vào nào và thao tác nào bắt buộc chuyển L2?
+<ReviewQuestion id="Q-inbound-failed-4">
+  L1 được phép xử lý trực tiếp những lỗi gọi vào nào và thao tác nào bắt buộc chuyển L2?
+</ReviewQuestion>
 
 ## Chuyển cấp
 
@@ -59,7 +67,9 @@ description: Dàn ý chẩn đoán và xử lý case khách hàng không nhận 
 
 **Cần bổ sung:** Nhóm nhận theo lớp lỗi, kênh chung, SLA và quy định gửi dữ liệu cho nhà mạng.
 
-> **[Q-inbound-failed-5]** Điều kiện nào chuyển case gọi vào cho L2, NOC hoặc nhà mạng?
+<ReviewQuestion id="Q-inbound-failed-5">
+  Điều kiện nào chuyển case gọi vào cho L2, NOC hoặc nhà mạng?
+</ReviewQuestion>
 
 ## Trả lời mẫu
 
@@ -69,7 +79,9 @@ description: Dàn ý chẩn đoán và xử lý case khách hàng không nhận 
 
 **Cần bổ sung:** Mẫu phản hồi và trạng thái ticket chuẩn của ODS.
 
-> **[Q-inbound-failed-6]** ODS có mẫu tiếp nhận và mẫu xác nhận xử lý chuẩn nào cho sự cố gọi vào?
+<ReviewQuestion id="Q-inbound-failed-6">
+  ODS có mẫu tiếp nhận và mẫu xác nhận xử lý chuẩn nào cho sự cố gọi vào?
+</ReviewQuestion>
 
 ## Nguyên nhân đã gặp
 
@@ -79,7 +91,9 @@ description: Dàn ý chẩn đoán và xử lý case khách hàng không nhận 
 
 **Cần bổ sung:** Chỉ Human điền case thật đã được phép lưu và loại bỏ dữ liệu nhận diện khách hàng.
 
-> **[Q-inbound-failed-7]** Có những ticket đã đóng nào có thể dùng để tổng hợp nguyên nhân gọi vào thất bại mà không chứa dữ liệu bị cấm?
+<ReviewQuestion id="Q-inbound-failed-7">
+  Có những ticket đã đóng nào có thể dùng để tổng hợp nguyên nhân gọi vào thất bại mà không chứa dữ liệu bị cấm?
+</ReviewQuestion>
 
 ## Tra cứu liên quan
 
@@ -88,10 +102,14 @@ description: Dàn ý chẩn đoán và xử lý case khách hàng không nhận 
 
 **Cần bổ sung:** Xác nhận link về outbound rules có cần giữ cho case gọi vào hay thay bằng trang inbound routing trong tương lai.
 
-> **[Q-inbound-failed-8]** Runbook gọi vào cần giữ hoặc bổ sung những trang tra cứu nào?
+<ReviewQuestion id="Q-inbound-failed-8">
+  Runbook gọi vào cần giữ hoặc bổ sung những trang tra cứu nào?
+</ReviewQuestion>
 
 ## Cập nhật lần cuối
 
 **Cần bổ sung:** Ngày duyệt gần nhất và vai trò chịu trách nhiệm cập nhật runbook.
 
-> **[Q-common-10]** Vai trò nào phê duyệt và duy trì nội dung Support Wiki?
+<ReviewQuestion id="Q-common-10">
+  Vai trò nào phê duyệt và duy trì nội dung Support Wiki?
+</ReviewQuestion>

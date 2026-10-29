@@ -1,47 +1,76 @@
 ---
 title: Không nghe / tải được ghi âm
-description: Khung xử lý sự cố không phát hoặc tải được file ghi âm.
+description: Runbook L1 xử lý file ghi âm đã hiển thị nhưng không phát, không tải hoặc không có âm thanh.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
+  Ghi âm là dữ liệu nhạy cảm. Không tải về thiết bị cá nhân, gửi qua ứng dụng chat hoặc chia sẻ ngoài người dùng đã được phân quyền.
 </Callout>
+
+## Phạm vi L1
+
+Áp dụng khi bản ghi có trên Portal nhưng nút phát/tải lỗi, file không mở được, phát im lặng hoặc người dùng bị từ chối quyền truy cập.
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Nút Play quay liên tục, báo lỗi hoặc không phát âm thanh.
+- Download trả lỗi, file 0 byte/không mở được hoặc link hết hiệu lực.
+- Chỉ một người dùng, một trình duyệt hay nhiều bản ghi cùng bị ảnh hưởng.
 
-## Cần hỏi KH
+### Phân nhánh nhanh
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
+| --- | --- | --- |
+| Chỉ một trình duyệt lỗi, cửa sổ riêng tư hoạt động | Cache, cookie hoặc extension | Xóa site data riêng của Portal và thử lại |
+| Chỉ một người dùng nhận 403 | Có thể thiếu quyền recording | Đối chiếu với user cùng role và chuyển quản trị tenant |
+| Nhiều người dùng nhận 404/5xx | Có thể lỗi link, API media hoặc storage | Thu Request ID/HTTP status và chuyển L2 |
+| File tải được nhưng phát im lặng | Có thể file không có audio hoặc track lỗi | Kiểm tra dung lượng/thời lượng; không tự convert file gốc |
+| Chỉ máy khách không có tiếng, nội dung âm thanh khác cũng lỗi | Thiết bị output hoặc hệ điều hành | Chọn lại output, bỏ mute và kiểm tra âm lượng |
 
-## Kiểm tra
+## Cần hỏi khách hàng
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+- Call-ID/thời điểm, tenant, trình duyệt/thiết bị và thông báo lỗi.
+- File có hiển thị dung lượng/thời lượng không; Play và Download cùng lỗi hay chỉ một.
+- Người dùng khác có quyền tương đương nghe được không.
+- Một file hay nhiều file/khoảng thời gian bị ảnh hưởng.
 
-## Xử lý
+## Kiểm tra L1
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+1. Xác nhận file hiện diện và người dùng đúng tenant/quyền.
+2. Thử cửa sổ riêng tư hoặc trình duyệt được hỗ trợ; kiểm tra tab có bị mute.
+3. Kiểm tra thiết bị output, âm lượng hệ điều hành và một nội dung âm thanh khác.
+4. So sánh Play với Download theo quyền được cấp; không lưu file trên thiết bị cá nhân.
+5. Ghi nhận HTTP status/Request ID nếu công cụ trình duyệt cho phép và đã che URL ký số.
 
-## Chuyển cấp
+## Xử lý trong phạm vi L1
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Chọn lại thiết bị âm thanh, bỏ mute và thử trình duyệt được hỗ trợ.
+- Xóa dữ liệu site riêng của Portal nếu lỗi do session/cache; đăng nhập lại theo luồng chính thức.
+- Yêu cầu quản trị viên tenant kiểm tra quyền nếu chỉ một người dùng lỗi.
+- Không convert/chỉnh sửa file gốc hoặc chia sẻ link ghi âm để né quyền.
+
+## Điểm dừng và chuyển cấp
+
+- Nhiều người dùng/file cùng lỗi hoặc file có dung lượng bất thường.
+- Server trả 403/404/5xx dù quyền đúng; link ký số hết hạn bất thường.
+- File phát được nhưng im lặng/hỏng, cần kiểm tra nội dung media hoặc storage.
+
+## Dữ liệu chuyển cấp
+
+- Tenant, Call-ID, thời điểm, trình duyệt/OS và phạm vi.
+- Play/Download result, mã HTTP/Request ID và kết quả người dùng đối chứng.
+- Không đính kèm file/link có quyền truy cập nếu chưa được phép.
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận file ghi âm không phát hoặc tải được. Anh/chị vui lòng cung cấp Call-ID, thời điểm, trình duyệt và ảnh lỗi; không gửi file ghi âm qua kênh ngoài.
 
-## Nguyên nhân đã gặp
+> **Đã xử lý L1:** ODS đã kiểm tra quyền, trình duyệt và thiết bị âm thanh. Trường hợp còn lỗi đã được chuyển kiểm tra file/storage.
 
-Chưa có dữ liệu đã xác minh.
+## Nguyên nhân thường gặp và tra cứu
 
-## Tra cứu liên quan
+- Sai thiết bị âm thanh, tab bị mute, cache/session hoặc thiếu quyền.
+- Link hết hạn, file hỏng/0 byte hoặc storage/API phục vụ media lỗi.
 
-- [Bảng IP hạ tầng core](/internal/ai-contact-center/knowledge-base/core-infrastructure)
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
-
+- [Lịch sử cuộc gọi](/docs/ai-contact-center/portal/tong-dai/lich-su-cuoc-goi)
+- [Mất ghi âm](/internal/ai-contact-center/runbooks/recordings/missing-recordings)

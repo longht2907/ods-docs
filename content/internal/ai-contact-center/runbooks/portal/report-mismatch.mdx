@@ -1,47 +1,76 @@
 ---
 title: Báo cáo sai số liệu
-description: Khung xử lý trường hợp số liệu báo cáo Portal không khớp.
+description: Runbook L1 đối soát bộ lọc, múi giờ và cách tính khi báo cáo Portal không khớp lịch sử cuộc gọi.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
+  Không sửa dữ liệu báo cáo hoặc cam kết sai lệch hệ thống trước khi đối chiếu cùng bộ lọc, múi giờ và định nghĩa chỉ số.
 </Callout>
+
+## Phạm vi L1
+
+Áp dụng khi tổng cuộc gọi, trạng thái, thời lượng, nhân viên/nhóm hoặc file Excel không khớp với lịch sử cuộc gọi hay kỳ vọng khách hàng.
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Tổng số cuộc gọi vào/ra/nhỡ khác giữa hai màn hình hoặc file export.
+- Một cuộc gọi xuất hiện nhiều dòng hoặc không xuất hiện trong báo cáo.
+- Thời lượng/trạng thái/nhân viên xử lý khác với khách hàng kỳ vọng.
 
-## Cần hỏi KH
+### Phân nhánh nhanh
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
+| --- | --- | --- |
+| Tổng lệch nhưng Call-ID mẫu vẫn đúng | Có thể khác filter, timezone hoặc cách cộng | Đồng bộ điều kiện và định nghĩa chỉ số trước khi chuyển cấp |
+| Một cuộc gọi có nhiều dòng | Có thể đang xem call leg/chuyển tiếp | So với chế độ tổng quát và giải thích cấp dữ liệu |
+| Portal đúng nhưng file export khác | File cũ, filter export hoặc job xuất dữ liệu | Xuất lại khoảng nhỏ với cùng điều kiện |
+| Cùng Call-ID nhưng trạng thái/thời lượng khác | Có khả năng mapping hoặc aggregation lỗi | Chuyển L2 kèm ảnh hai nguồn và Call-ID |
+| Nhiều báo cáo ngừng cập nhật cùng thời điểm | Có thể là pipeline dữ liệu diện rộng | Ghi nhận mốc cuối có dữ liệu và chuyển cấp ngay |
 
-## Kiểm tra
+## Cần hỏi khách hàng
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+- Tên báo cáo, tenant, khoảng thời gian, múi giờ và toàn bộ bộ lọc.
+- Chỉ số/cột nào lệch, giá trị kỳ vọng/thực tế và file export nếu có.
+- Hai đến ba mẫu Call-ID/số đã che dữ liệu cùng thời điểm.
+- Khách hàng đang so `Tổng quát cuộc gọi` hay chi tiết từng call leg.
 
-## Xử lý
+## Kiểm tra L1
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+1. Áp lại cùng khoảng thời gian, múi giờ, hướng gọi, nhân viên/nhóm và trạng thái.
+2. So lịch sử ở chế độ tổng quát với báo cáo; call leg/chuyển tiếp có thể tạo nhiều dòng chi tiết.
+3. Kiểm tra ngày bắt đầu/kết thúc, ranh giới ngày và thời điểm cuộc gọi hoàn tất.
+4. Đối chiếu mẫu Call-ID thay vì chỉ tổng số.
+5. Xuất lại khoảng thời gian nhỏ để loại trừ timeout hoặc file cũ.
 
-## Chuyển cấp
+## Xử lý trong phạm vi L1
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Đồng bộ bộ lọc/múi giờ và giải thích khác biệt giữa call session với call leg.
+- Chọn đúng chế độ tổng quát/chi tiết theo mục đích đối soát.
+- Chia nhỏ kỳ export nếu tập dữ liệu lớn; giữ file gốc để so sánh.
+- Không chỉnh sửa trực tiếp dữ liệu hoặc kết luận mất CDR khi chưa có Call-ID mẫu.
+
+## Điểm dừng và chuyển cấp
+
+- Cùng bộ lọc và Call-ID nhưng dữ liệu Portal/CDR/export vẫn khác nhau.
+- Báo cáo không cập nhật diện rộng, thiếu dữ liệu theo chu kỳ hoặc export lỗi lặp lại.
+- Cần truy vấn database, kiểm tra ETL/aggregation hoặc định nghĩa nghiệp vụ chưa rõ.
+
+## Dữ liệu chuyển cấp
+
+- URL/tên báo cáo, tenant, filter, múi giờ và thời điểm chạy báo cáo.
+- File export đã loại bỏ dữ liệu không liên quan; Call-ID và kết quả đối chiếu từng mẫu.
+- Ảnh hai màn hình cùng bộ lọc và mô tả cách tính khách hàng mong đợi.
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận số liệu báo cáo chưa khớp. Anh/chị vui lòng cung cấp tên báo cáo, khoảng thời gian, múi giờ, bộ lọc và một số Call-ID mẫu để đối chiếu.
 
-## Nguyên nhân đã gặp
+> **Đã đối chiếu:** ODS đã đồng bộ bộ lọc và chế độ hiển thị tổng quát/chi tiết. Anh/chị vui lòng kiểm tra lại báo cáo với cùng điều kiện.
 
-Chưa có dữ liệu đã xác minh.
+## Nguyên nhân thường gặp và tra cứu
 
-## Tra cứu liên quan
+- Khác múi giờ/bộ lọc hoặc so call session với từng call leg.
+- Export cũ, kỳ dữ liệu quá lớn hoặc cuộc gọi chưa hoàn tất tại thời điểm thống kê.
 
-Chưa có tài liệu liên quan bổ sung.
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
-
+- [Lịch sử cuộc gọi](/docs/ai-contact-center/portal/tong-dai/lich-su-cuoc-goi)
+- [Thống kê và báo cáo cuộc gọi](/docs/ai-contact-center/portal/tong-dai/thong-ke-bao-cao-cuoc-goi)

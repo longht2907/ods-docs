@@ -21,7 +21,7 @@ description: "Hướng dẫn tạo, bảo vệ, kiểm tra và thu hồi liên k
 
     ![Biểu tượng chia sẻ bên cạnh một tệp trong danh sách Files](/media/cloudfile/04-chia-se-phan-quyen/mo-menu-chia-se-cong-khai.png)
 
-    *Kết quả: Bảng thông tin của mục được chọn mở tại thẻ **Sharing**.*
+    <ExpectedResult>Bảng thông tin của mục được chọn mở tại thẻ **Sharing**.</ExpectedResult>
   </Step>
   <Step>
     ### Tạo public link
@@ -30,7 +30,7 @@ description: "Hướng dẫn tạo, bảo vệ, kiểm tra và thu hồi liên k
 
     ![Bảng Sharing với nút Create public link được đánh dấu](/media/cloudfile/04-chia-se-phan-quyen/tao-public-link.png)
 
-    *Kết quả: CloudFile tạo một liên kết chia sẻ để tiếp tục cấu hình.*
+    <ExpectedResult>CloudFile tạo một liên kết chia sẻ để tiếp tục cấu hình.</ExpectedResult>
   </Step>
   <Step>
     ### Chọn quyền truy cập
@@ -39,7 +39,7 @@ description: "Hướng dẫn tạo, bảo vệ, kiểm tra và thu hồi liên k
 
     ![Danh sách quyền của public link gồm View only, Allow upload and editing, File request và Custom permissions](/media/cloudfile/04-chia-se-phan-quyen/cau-hinh-quyen-public-link.png)
 
-    *Kết quả: Liên kết chỉ cung cấp các thao tác đã được chọn.*
+    <ExpectedResult>Liên kết chỉ cung cấp các thao tác đã được chọn.</ExpectedResult>
   </Step>
   <Step>
     ### Bật mật khẩu
@@ -48,7 +48,7 @@ description: "Hướng dẫn tạo, bảo vệ, kiểm tra và thu hồi liên k
 
     ![Tùy chọn Set password và trường Password của public link](/media/cloudfile/04-chia-se-phan-quyen/dat-mat-khau-public-link.png)
 
-    *Kết quả: Người mở liên kết phải nhập mật khẩu trước khi truy cập dữ liệu.*
+    <ExpectedResult>Người mở liên kết phải nhập mật khẩu trước khi truy cập dữ liệu.</ExpectedResult>
   </Step>
   <Step>
     ### Đặt ngày hết hạn
@@ -57,14 +57,14 @@ description: "Hướng dẫn tạo, bảo vệ, kiểm tra và thu hồi liên k
 
     ![Tùy chọn Set expiration date với trường chọn ngày hết hạn](/media/cloudfile/04-chia-se-phan-quyen/dat-ngay-het-han.png)
 
-    *Kết quả: Liên kết chỉ hoạt động đến ngày đã đặt.*
+    <ExpectedResult>Liên kết chỉ hoạt động đến ngày đã đặt.</ExpectedResult>
   </Step>
   <Step>
     ### Sao chép và kiểm tra liên kết
 
     Chọn biểu tượng sao chép bên cạnh **Share link**. Liên kết có dạng `https://[URL_DOMAIN_CLOUD_CUA_BAN]/s/abc123xyz`. Mở một cửa sổ riêng tư/ẩn danh để kiểm tra mật khẩu, quyền và ngày hết hạn trước khi gửi.
 
-    *Kết quả: Liên kết hoạt động với đúng mức bảo vệ và quyền truy cập đã cấu hình.*
+    <ExpectedResult>Liên kết hoạt động với đúng mức bảo vệ và quyền truy cập đã cấu hình.</ExpectedResult>
   </Step>
 </Steps>
 
@@ -78,7 +78,7 @@ description: "Hướng dẫn tạo, bảo vệ, kiểm tra và thu hồi liên k
 
     Chọn tệp hoặc thư mục, mở thẻ **Sharing** và tìm liên kết cần thu hồi.
 
-    *Kết quả: Các public link hiện có của dữ liệu được hiển thị.*
+    <ExpectedResult>Các public link hiện có của dữ liệu được hiển thị.</ExpectedResult>
   </Step>
   <Step>
     ### Chọn Unshare
@@ -87,7 +87,7 @@ description: "Hướng dẫn tạo, bảo vệ, kiểm tra và thu hồi liên k
 
     ![Menu của public link với tùy chọn Unshare](/media/cloudfile/04-chia-se-phan-quyen/vo-hieu-hoa-public-link.png)
 
-    *Kết quả: Liên kết cũ ngừng hoạt động và không thể tiếp tục truy cập dữ liệu.*
+    <ExpectedResult>Liên kết cũ ngừng hoạt động và không thể tiếp tục truy cập dữ liệu.</ExpectedResult>
   </Step>
 </Steps>
 

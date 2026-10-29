@@ -1,48 +1,77 @@
 ---
 title: Chiến dịch không chạy
-description: Khung xử lý sự cố chiến dịch gọi tự động không bắt đầu hoặc dừng ngoài dự kiến.
+description: Runbook L1 kiểm tra điều kiện đầu vào khi chiến dịch Auto Call không bắt đầu hoặc dừng ngoài dự kiến.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
+  Tài liệu Portal hiện chỉ xác nhận trạng thái “Đang chờ gọi”; Pause/Resume/Stop, retry và giới hạn kênh chưa có đặc tả. L1 không tự khởi chạy lại hoặc sửa chiến dịch đang hoạt động.
 </Callout>
+
+## Phạm vi L1
+
+Áp dụng khi chiến dịch không phát sinh cuộc gọi tại thời gian dự kiến, đứng ở trạng thái chờ hoặc dừng trước khi xử lý hết danh sách.
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Đã tới lịch nhưng không có cuộc gọi/CDR mới.
+- Chiến dịch ở `Đang chờ gọi` kéo dài hoặc tiến độ không tăng.
+- Một chiến dịch lỗi trong khi chiến dịch khác vẫn chạy, hoặc tất cả cùng dừng.
 
-## Cần hỏi KH
+### Phân nhánh nhanh
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
+| --- | --- | --- |
+| Chưa tới lịch hoặc sai múi giờ | Lỗi cấu hình lịch | Xác nhận lịch/múi giờ với người có quyền trước khi chỉnh |
+| Danh bạ hợp lệ sau lọc bằng 0 | Không có đầu vào để tạo cuộc gọi | Sửa dữ liệu nguồn theo quy trình đã duyệt |
+| CDR có cuộc gọi nhưng UI không tăng tiến độ | Có thể giao diện/report cập nhật chậm | Refresh, đối chiếu CDR và ghi thời điểm cập nhật cuối |
+| Không có CDR dù đầu vào đầy đủ | Có thể scheduler/queue/worker không tạo job | Không restart chiến dịch; chuyển L2 kèm campaign ID |
+| Nhiều campaign/tenant cùng đứng | Có thể sự cố hệ thống diện rộng | Chuyển cấp ngay và tránh thao tác tạo campaign trùng |
 
-## Kiểm tra
+## Cần hỏi khách hàng
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+- Tenant, tên/ID chiến dịch, thời gian bắt đầu dự kiến và múi giờ.
+- Trạng thái đang hiển thị, thời điểm cập nhật cuối và phạm vi danh bạ.
+- File âm thanh/kịch bản, đầu số gọi ra và thay đổi gần nhất.
+- Chiến dịch đã từng chạy chưa; chiến dịch khác cùng tenant có hoạt động không.
 
-## Xử lý
+## Kiểm tra L1
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+1. Đối chiếu lịch, múi giờ và trạng thái với cấu hình chiến dịch.
+2. Xác nhận chiến dịch có danh bạ hợp lệ, nội dung/kịch bản và đầu số gọi ra.
+3. Kiểm tra bộ lọc danh bạ có loại hết liên hệ hoặc danh sách trống không.
+4. Kiểm tra CDR/báo cáo xem đã có cuộc gọi nhưng giao diện chưa cập nhật hay chưa.
+5. So sánh với một chiến dịch hoạt động cùng tenant; không tự thay đổi số kênh/retry.
 
-## Chuyển cấp
+## Xử lý trong phạm vi L1
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Sửa lịch/múi giờ hoặc dữ liệu đầu vào chỉ khi chiến dịch chưa chạy và người yêu cầu có quyền.
+- Hướng dẫn bổ sung danh bạ/nội dung còn thiếu theo guide Portal.
+- Refresh/đăng nhập lại để loại trừ trạng thái giao diện cũ.
+- Không nhân bản hoặc khởi chạy lại chiến dịch có thể tạo cuộc gọi trùng.
+
+## Điểm dừng và chuyển cấp
+
+- Điều kiện đầu vào đầy đủ nhưng không có job/cuộc gọi phát sinh.
+- Nhiều chiến dịch/tenant cùng dừng hoặc có dấu hiệu queue/worker lỗi.
+- Cần can thiệp scheduler, campaign state, channel limit, retry hoặc database.
+
+## Dữ liệu chuyển cấp
+
+- Tenant, campaign ID, lịch/múi giờ, trạng thái và thời điểm cập nhật cuối.
+- Số lượng liên hệ hợp lệ, đầu số, nội dung/kịch bản và kết quả CDR.
+- Screenshot đã che dữ liệu liên hệ; không đính kèm toàn bộ danh bạ.
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận chiến dịch chưa phát sinh cuộc gọi. Anh/chị vui lòng cung cấp ID chiến dịch, lịch/múi giờ, trạng thái và ảnh cấu hình đã che dữ liệu liên hệ.
 
-## Nguyên nhân đã gặp
+> **Chuyển cấp:** Các điều kiện đầu vào đã được đối chiếu nhưng chiến dịch chưa tạo cuộc gọi. ODS đã chuyển đội chuyên trách kiểm tra scheduler/worker.
 
-Chưa có dữ liệu đã xác minh.
+## Nguyên nhân thường gặp và tra cứu
 
-## Tra cứu liên quan
+- Sai lịch/múi giờ, danh bạ trống/bị lọc hết, thiếu nội dung hoặc đầu số.
+- Campaign state, scheduler/worker hoặc giới hạn kênh cần L2 kiểm tra.
 
-- [Rule gọi ra (Outbound Rules)](/internal/ai-contact-center/knowledge-base/outbound-rules)
-- [Bảng IP hạ tầng core](/internal/ai-contact-center/knowledge-base/core-infrastructure)
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
+- [Thiết lập Auto Call](/docs/ai-contact-center/portal/autocall/thiet-lap-chien-dich/goi-tu-dong-autocall)
+- [Lịch chạy và báo cáo](/docs/ai-contact-center/portal/autocall/lich-va-bao-cao)
 

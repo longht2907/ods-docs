@@ -19,21 +19,21 @@ description: "Hướng dẫn kiểm tra, thiết lập và quản lý hạn mứ
 
     Vào trang **Accounts** hoặc **Users** trong khu vực quản trị.
 
-    *Kết quả: Danh sách người dùng và cột **Quota** hoặc **Used** xuất hiện.*
+    <ExpectedResult>Danh sách người dùng và cột **Quota** hoặc **Used** xuất hiện.</ExpectedResult>
   </Step>
   <Step>
     ### Đọc mức sử dụng
 
     Quan sát dung lượng đã dùng, hạn mức và thanh trạng thái trên từng dòng. Nguồn GitBook mô tả thanh đỏ là dấu hiệu quota sắp đầy hoặc đã đầy.
 
-    *Kết quả: Bạn xác định được các tài khoản cần kiểm tra.*
+    <ExpectedResult>Bạn xác định được các tài khoản cần kiểm tra.</ExpectedResult>
   </Step>
   <Step>
     ### Sắp xếp danh sách
 
     Chọn tiêu đề **Used** hoặc **Quota** để sắp xếp từ cao xuống thấp nếu giao diện hỗ trợ.
 
-    *Kết quả: Các tài khoản sử dụng nhiều dung lượng xuất hiện trước.*
+    <ExpectedResult>Các tài khoản sử dụng nhiều dung lượng xuất hiện trước.</ExpectedResult>
   </Step>
 </Steps>
 
@@ -45,21 +45,21 @@ description: "Hướng dẫn kiểm tra, thiết lập và quản lý hạn mứ
 
     Tại trang quản lý người dùng, mở phần cài đặt và tìm **Default Quota**.
 
-    *Kết quả: Mức quota mặc định dành cho tài khoản mới được hiển thị.*
+    <ExpectedResult>Mức quota mặc định dành cho tài khoản mới được hiển thị.</ExpectedResult>
   </Step>
   <Step>
     ### Chọn mức mặc định
 
     Chọn mức phù hợp với chính sách lưu trữ của doanh nghiệp.
 
-    *Kết quả: Tài khoản mới sẽ nhận mức mặc định khi không được cấp mức riêng.*
+    <ExpectedResult>Tài khoản mới sẽ nhận mức mặc định khi không được cấp mức riêng.</ExpectedResult>
   </Step>
   <Step>
     ### Điều chỉnh quota cá nhân
 
     Tìm người dùng, mở trường **Quota**, chọn mức có sẵn hoặc **Other** để nhập giá trị khác nếu được hỗ trợ.
 
-    *Kết quả: Hạn mức riêng của người dùng được cập nhật.*
+    <ExpectedResult>Hạn mức riêng của người dùng được cập nhật.</ExpectedResult>
   </Step>
 </Steps>
 
@@ -71,21 +71,21 @@ description: "Hướng dẫn kiểm tra, thiết lập và quản lý hạn mứ
 
     Kiểm tra tài khoản đã chạm hạn mức và đối chiếu lỗi upload hoặc đồng bộ mà người dùng báo cáo.
 
-    *Kết quả: Xác định quota là nguyên nhân của sự cố.*
+    <ExpectedResult>Xác định quota là nguyên nhân của sự cố.</ExpectedResult>
   </Step>
   <Step>
     ### Yêu cầu dọn dữ liệu
 
     Hướng dẫn người dùng xóa tệp không còn cần và kiểm tra **Deleted files**. Theo nguồn GitBook, dữ liệu trong thùng rác vẫn có thể được tính vào quota.
 
-    *Kết quả: Dung lượng sử dụng giảm nếu dữ liệu đã được xóa vĩnh viễn.*
+    <ExpectedResult>Dung lượng sử dụng giảm nếu dữ liệu đã được xóa vĩnh viễn.</ExpectedResult>
   </Step>
   <Step>
     ### Tăng quota khi được phê duyệt
 
     Nếu dữ liệu vẫn cần cho công việc, cập nhật quota lên mức đã được duyệt.
 
-    *Kết quả: Người dùng có thêm dung lượng để tiếp tục upload hoặc đồng bộ.*
+    <ExpectedResult>Người dùng có thêm dung lượng để tiếp tục upload hoặc đồng bộ.</ExpectedResult>
   </Step>
 </Steps>
 

@@ -1,47 +1,77 @@
 ---
 title: Mất ghi âm
-description: Khung xử lý sự cố không tìm thấy file ghi âm cuộc gọi.
+description: Runbook L1 phân biệt cuộc gọi không có CDR, không được ghi âm hoặc file ghi âm chưa xuất hiện trên Portal.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
+  Không cam kết khôi phục file trước khi xác định file có từng được tạo hay không. Không tải/chia sẻ ghi âm ra kênh ngoài ticket đã được phép.
 </Callout>
+
+## Phạm vi L1
+
+Áp dụng khi khách hàng tìm thấy hoặc không tìm thấy cuộc gọi nhưng không thấy nút/file ghi âm tương ứng.
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Có CDR nhưng không có biểu tượng hoặc đường dẫn ghi âm.
+- Một số cuộc gọi có ghi âm, một số cuộc gọi không có.
+- Ghi âm xuất hiện chậm hoặc mất theo một khoảng thời gian/nhóm máy nhánh.
 
-## Cần hỏi KH
+### Phân nhánh nhanh
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
+| --- | --- | --- |
+| Không có CDR | Chưa thể kết luận lỗi recording | Chuyển sang kiểm tra luồng gọi hoặc dữ liệu CDR |
+| Có CDR nhưng cuộc gọi không được trả lời | Có thể không thuộc điều kiện tạo recording | Đối chiếu recording policy đã được xác nhận |
+| Có CDR, có thời lượng thoại, chỉ một route không có file | Có thể policy/MixMonitor không áp dụng đúng route | Lấy mẫu đối chứng cùng extension và chuyển L2 |
+| File xuất hiện sau một khoảng trễ | Có thể là processing/upload hậu kỳ | Ghi nhận thời gian trễ và so với SLA đã duyệt |
+| Nhiều tenant cùng mất recording | Có thể là storage hoặc processing diện rộng | Dừng thay đổi quyền/filter và chuyển cấp ngay |
 
-## Kiểm tra
+## Cần hỏi khách hàng
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+- Tenant, Call-ID hoặc số gọi/số nhận đã che dữ liệu, thời điểm/múi giờ.
+- Hướng gọi, máy nhánh/queue và cuộc gọi có kết nối đàm thoại không.
+- Một hay nhiều cuộc gọi bị ảnh hưởng; khoảng thời gian bắt đầu/kết thúc.
+- Người dùng có quyền xem ghi âm và trước đây có xem được không.
 
-## Xử lý
+## Kiểm tra L1
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+1. Tìm CDR bằng Call-ID/thời điểm; nếu không có CDR, xử lý như lỗi luồng gọi/dữ liệu.
+2. Xác nhận cuộc gọi đã trả lời và có thời lượng thoại; cuộc gọi không kết nối có thể không tạo ghi âm.
+3. Kiểm tra bộ lọc, tenant, quyền người dùng và trạng thái hiển thị ghi âm.
+4. So sánh một cuộc gọi có ghi âm và một cuộc gọi lỗi cùng máy nhánh/queue.
+5. Ghi nhận độ trễ từ khi cuộc gọi kết thúc tới lúc file xuất hiện; không tự đặt SLA.
 
-## Chuyển cấp
+## Xử lý trong phạm vi L1
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Sửa bộ lọc/quyền hiển thị nếu có căn cứ và người thực hiện có thẩm quyền.
+- Chờ xử lý hậu kỳ trong khoảng thời gian do quy trình ODS xác nhận; không hứa thời gian khi chưa có SLA.
+- Nếu chỉ một kịch bản không ghi âm, ghi rõ route/queue/extension để L2 kiểm tra policy.
+- Không tạo file thay thế hoặc lấy ghi âm của cuộc gọi khác.
+
+## Điểm dừng và chuyển cấp
+
+- Cuộc gọi đã trả lời, có CDR nhưng file không được tạo sau thời gian xử lý đã duyệt.
+- Nhiều cuộc gọi/tenant cùng mất ghi âm hoặc dung lượng lưu trữ có cảnh báo.
+- Cần kiểm tra recording policy, MixMonitor, storage, upload job hoặc database mapping.
+
+## Dữ liệu chuyển cấp
+
+- Tenant, Call-ID, hướng gọi, máy nhánh/queue và thời điểm/múi giờ.
+- Kết quả CDR, thời lượng, quyền người dùng và một mẫu đối chứng hoạt động.
+- Phạm vi/thời gian ảnh hưởng; không đính kèm audio thật nếu chưa được phép.
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận chưa thấy ghi âm của cuộc gọi. Anh/chị vui lòng cung cấp Call-ID hoặc thời điểm, hướng gọi và máy nhánh; không gửi nội dung ghi âm qua kênh không được phép.
 
-## Nguyên nhân đã gặp
+> **Chuyển cấp:** Cuộc gọi có CDR nhưng file ghi âm chưa xuất hiện. ODS đã chuyển đội chuyên trách kiểm tra luồng tạo và lưu trữ file.
 
-Chưa có dữ liệu đã xác minh.
+## Nguyên nhân thường gặp và tra cứu
 
-## Tra cứu liên quan
+- Cuộc gọi không được trả lời, sai bộ lọc/quyền hoặc file đang xử lý hậu kỳ.
+- Policy ghi âm không áp dụng cho route; lỗi storage/upload/mapping cần L2.
 
-- [Bảng IP hạ tầng core](/internal/ai-contact-center/knowledge-base/core-infrastructure)
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
+- [Lịch sử cuộc gọi](/docs/ai-contact-center/portal/tong-dai/lich-su-cuoc-goi)
+- [Không nghe / tải được ghi âm](/internal/ai-contact-center/runbooks/recordings/playback-failed)
 

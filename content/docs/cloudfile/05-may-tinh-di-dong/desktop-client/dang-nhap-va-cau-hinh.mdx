@@ -18,7 +18,7 @@ description: "Kết nối Nextcloud Desktop Client với CloudFile và chọn c�
 
     Trên Windows, tìm **Nextcloud** trong Start Menu hoặc chọn biểu tượng trên system tray. Trên macOS, mở `Nextcloud.app` trong **Applications** hoặc chọn biểu tượng trên Menu Bar.
 
-    *Kết quả: Cửa sổ **Add Nextcloud account** xuất hiện.*
+    <ExpectedResult>Cửa sổ **Add Nextcloud account** xuất hiện.</ExpectedResult>
   </Step>
   <Step>
     ### Bắt đầu đăng nhập
@@ -27,14 +27,14 @@ description: "Kết nối Nextcloud Desktop Client với CloudFile và chọn c�
 
     ![Cửa sổ Add Nextcloud account với nút Log in](/media/cloudfile/05-may-tinh-di-dong/desktop-client/desktop-client-welcome.png)
 
-    *Kết quả: Desktop Client hiển thị trường nhập địa chỉ server.*
+    <ExpectedResult>Desktop Client hiển thị trường nhập địa chỉ server.</ExpectedResult>
   </Step>
   <Step>
     ### Nhập domain CloudFile
 
     Nhập chính xác `https://[URL_DOMAIN_CLOUD_CUA_BAN]` rồi chọn **Next**. Không thêm `/index.php`, `/login` hoặc đường dẫn ứng dụng khác.
 
-    *Kết quả: Desktop Client xác minh server và mở trình duyệt mặc định.*
+    <ExpectedResult>Desktop Client xác minh server và mở trình duyệt mặc định.</ExpectedResult>
   </Step>
   <Step>
     ### Đăng nhập trên trình duyệt
@@ -43,7 +43,7 @@ description: "Kết nối Nextcloud Desktop Client với CloudFile và chọn c�
 
     ![Trang Connect to your account với domain và tên thiết bị đã ẩn danh](/media/cloudfile/05-may-tinh-di-dong/desktop-client/dang-nhap-trinh-duyet.png)
 
-    *Kết quả: Trình duyệt chuyển sang màn hình cấp quyền cho Desktop Client.*
+    <ExpectedResult>Trình duyệt chuyển sang màn hình cấp quyền cho Desktop Client.</ExpectedResult>
   </Step>
   <Step>
     ### Cấp quyền cho thiết bị
@@ -52,7 +52,7 @@ description: "Kết nối Nextcloud Desktop Client với CloudFile và chọn c�
 
     ![Trang Account access với tài khoản và tên thiết bị mẫu đã ẩn danh](/media/cloudfile/05-may-tinh-di-dong/desktop-client/cap-quyen-desktop-client.png)
 
-    *Kết quả: Trình duyệt báo kết nối thành công và Desktop Client chuyển sang cấu hình thư mục.*
+    <ExpectedResult>Trình duyệt báo kết nối thành công và Desktop Client chuyển sang cấu hình thư mục.</ExpectedResult>
   </Step>
 </Steps>
 
@@ -69,21 +69,21 @@ description: "Kết nối Nextcloud Desktop Client với CloudFile và chọn c�
 
     Chọn **Virtual Files** hoặc **Sync everything** theo nhu cầu. Nếu giao diện không có Virtual Files, tiếp tục với các tùy chọn đồng bộ mà client hiển thị.
 
-    *Kết quả: Desktop Client xác định phạm vi dữ liệu cần hiển thị hoặc tải về.*
+    <ExpectedResult>Desktop Client xác định phạm vi dữ liệu cần hiển thị hoặc tải về.</ExpectedResult>
   </Step>
   <Step>
     ### Chọn thư mục local
 
     Giữ thư mục mặc định `Nextcloud`/`CloudFile` hoặc chọn vị trí khác trên ổ đĩa. Trên Windows, nguồn minh họa đường dẫn dạng `C:\Users\[TenBan]\Nextcloud`; trên macOS/Linux dùng thư mục trong home directory.
 
-    *Kết quả: Một vị trí local được chọn làm đầu đồng bộ trên máy tính.*
+    <ExpectedResult>Một vị trí local được chọn làm đầu đồng bộ trên máy tính.</ExpectedResult>
   </Step>
   <Step>
     ### Hoàn tất kết nối
 
     Chọn **Connect** và để ứng dụng bắt đầu đồng bộ. Không tắt máy hoặc ngắt mạng khi trạng thái vẫn báo đang xử lý.
 
-    *Kết quả: Tài khoản xuất hiện trong Desktop Client và thư mục CloudFile được tạo trên máy.*
+    <ExpectedResult>Tài khoản xuất hiện trong Desktop Client và thư mục CloudFile được tạo trên máy.</ExpectedResult>
   </Step>
 </Steps>
 

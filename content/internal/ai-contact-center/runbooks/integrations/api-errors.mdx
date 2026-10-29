@@ -1,47 +1,77 @@
 ---
 title: API trả lỗi
-description: Khung xử lý sự cố API trả mã lỗi hoặc phản hồi không như kỳ vọng.
+description: Runbook L1 thu thập request/response an toàn và phân loại lỗi 4xx, 5xx hoặc timeout khi tích hợp API ODS.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
+  Không yêu cầu khách hàng gửi token đầy đủ. Không retry thao tác tạo/sửa/xóa nếu chưa xác nhận idempotency vì có thể tạo dữ liệu hoặc cuộc gọi trùng.
 </Callout>
+
+## Phạm vi L1
+
+Áp dụng khi API trả HTTP error, timeout, response không đúng kỳ vọng hoặc chỉ lỗi trên một môi trường/endpoint.
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- HTTP 400/401/403/404/409/429, 5xx hoặc timeout.
+- Response body có mã lỗi nhưng khách hàng chưa xác định nguyên nhân.
+- Cùng request trước đây hoạt động nhưng hiện thất bại hoặc chỉ lỗi production.
 
-## Cần hỏi KH
+### Phân nhánh nhanh
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
+| --- | --- | --- |
+| `400` hoặc `422` | Request/payload không hợp lệ | Đối chiếu field, kiểu dữ liệu và encoding với API Reference |
+| `401` hoặc `403` | Authentication, credential hoặc permission | Kiểm tra môi trường/quyền; không yêu cầu gửi token đầy đủ |
+| `404` | Sai endpoint/resource hoặc resource không tồn tại | Đối chiếu base URL, path và ID tài nguyên |
+| `409` | Xung đột trạng thái hoặc dữ liệu đã tồn tại | Không retry mù; kiểm tra trạng thái resource trước |
+| `429` | Vượt rate limit | Tôn trọng `Retry-After`; giảm nhịp gọi thay vì tăng retry |
+| `5xx` hoặc timeout | Lỗi dịch vụ/network; mutation có thể đã được xử lý | Lưu Request ID và kiểm tra kết quả trước khi retry |
 
-## Kiểm tra
+## Cần hỏi khách hàng
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+- Endpoint, HTTP method, môi trường, thời điểm/múi giờ và Request/Correlation ID.
+- Status code, response body và request body đã che credential/PII.
+- Tần suất, phạm vi và thay đổi gần nhất ở code/config/network.
+- Request là đọc dữ liệu hay mutation; đã retry bao nhiêu lần.
 
-## Xử lý
+## Kiểm tra L1
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+1. Đối chiếu endpoint/method/header/content type và field bắt buộc với API Reference.
+2. Kiểm tra credential có tồn tại/hết hạn/đúng môi trường nhưng không sao chép giá trị vào ticket.
+3. Phân loại: 4xx thường thuộc request/auth/quyền; 429 thuộc giới hạn; 5xx/timeout cần phía dịch vụ.
+4. So request lỗi với request thành công đã sanitize, gồm kiểu dữ liệu và encoding.
+5. Kiểm tra DNS/TLS/network khi không nhận được HTTP response.
 
-## Chuyển cấp
+## Xử lý trong phạm vi L1
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Sửa endpoint/method/header/payload khi sai khác rõ với tài liệu đã công bố.
+- Làm mới credential theo quy trình chính thức nếu hết hạn; không gửi token qua chat.
+- Với 429, tuân thủ `Retry-After` nếu response có cung cấp; không tăng vòng lặp retry.
+- Chỉ retry GET/read an toàn; mutation cần idempotency key hoặc xác nhận chưa tạo dữ liệu.
+
+## Điểm dừng và chuyển cấp
+
+- Request hợp lệ vẫn 5xx/timeout hoặc nhiều khách hàng cùng lỗi.
+- Response contract khác tài liệu, dữ liệu đã được tạo nhưng client nhận timeout.
+- Cần trace service/database, kiểm tra rate limit/quyền hoặc khôi phục dữ liệu.
+
+## Dữ liệu chuyển cấp
+
+- Endpoint/method/environment, timestamp, status, Request ID và latency.
+- Sanitized headers/body/response; thay token bằng `[REDACTED]`.
+- Số lần retry và bằng chứng kiểm tra dữ liệu đã/ chưa được tạo.
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận API trả lỗi. Vui lòng cung cấp endpoint, method, thời điểm, status code, Request ID và request/response đã che token cùng dữ liệu cá nhân.
 
-## Nguyên nhân đã gặp
+> **Chuyển cấp:** Request đã được đối chiếu với tài liệu nhưng lỗi vẫn tái hiện. ODS đã chuyển đội API kiểm tra theo Request ID; tạm thời không retry mutation để tránh dữ liệu trùng.
 
-Chưa có dữ liệu đã xác minh.
+## Nguyên nhân thường gặp và tra cứu
 
-## Tra cứu liên quan
+- Sai endpoint/method/header/payload, credential hết hạn hoặc thiếu quyền.
+- Rate limit, network/TLS, service 5xx hoặc timeout sau khi backend đã xử lý.
 
-Chưa có tài liệu liên quan bổ sung.
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
+- [API Reference AI Contact Center](/docs/ai-contact-center/api)
 

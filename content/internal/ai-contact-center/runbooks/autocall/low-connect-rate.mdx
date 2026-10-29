@@ -1,48 +1,76 @@
 ---
 title: Tỉ lệ kết nối thấp
-description: Khung xử lý tình trạng chiến dịch gọi tự động có tỉ lệ kết nối thấp.
+description: Runbook L1 khoanh vùng dữ liệu số, thời gian gọi, nhà mạng và cấu hình khi Auto Call có tỉ lệ kết nối thấp.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
+  Không tự điều chỉnh retry, số kênh đồng thời hoặc thay đầu số để tăng tỉ lệ. Các thay đổi này có thể ảnh hưởng chi phí, tải hệ thống và chính sách chống spam.
 </Callout>
+
+## Phạm vi L1
+
+Áp dụng khi chiến dịch vẫn chạy nhưng phần lớn cuộc gọi bận, không bắt máy, không kết nối hoặc kết thúc sớm hơn kỳ vọng.
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Tỉ lệ trả lời giảm so với chiến dịch/kỳ trước.
+- Một nhóm nhà mạng/đầu số đích có lỗi cao bất thường.
+- Nhiều cuộc gọi kết thúc với cùng trạng thái hoặc thời lượng rất ngắn.
 
-## Cần hỏi KH
+### Phân nhánh nhanh
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
+| --- | --- | --- |
+| Tỷ lệ `failed` cao kèm nhiều số sai định dạng | Chất lượng dữ liệu đầu vào | Kiểm tra mẫu và chuẩn hóa danh sách theo quy trình |
+| `busy`/`no-answer` phân bố đều | Có thể liên quan thời điểm và hành vi người nhận | So sánh cùng tệp ở khung giờ khác, không cam kết tỷ lệ |
+| Lỗi tập trung ở một nhà mạng | Có thể route/carrier rejection | Thu mẫu Call-ID theo nhà mạng và chuyển Carrier/L2 |
+| Gọi thủ công cùng số cũng không kết nối | Không chỉ là thuật toán Auto Call | Đối chiếu Trunk/đầu số và trạng thái thuê bao đích |
+| Tỷ lệ giảm đột ngột sau thay đổi campaign | Có thể liên quan cấu hình hoặc nguồn dữ liệu mới | Ghi rõ thay đổi, không tự tăng retry/concurrency |
 
-## Kiểm tra
+## Cần hỏi khách hàng
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+- Tenant, campaign ID, đầu số nguồn, thời gian/múi giờ và tỉ lệ kỳ vọng/thực tế.
+- Quy mô danh sách, nguồn dữ liệu và thay đổi gần nhất.
+- Phân bố trạng thái: answered, busy, no-answer, failed theo báo cáo hiện có.
+- Một số mẫu Call-ID đã che dữ liệu và nhà mạng đích.
 
-## Xử lý
+## Kiểm tra L1
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+1. Xác nhận cách tính tỉ lệ và cùng khoảng thời gian/bộ lọc khi so sánh.
+2. Phân nhóm kết quả theo trạng thái và nhà mạng, không chỉ nhìn tổng phần trăm.
+3. Kiểm tra định dạng số, số trùng/rỗng/không hợp lệ trên mẫu nhỏ.
+4. Đối chiếu khung giờ gọi, đầu số nguồn và giới hạn nhà mạng đã biết.
+5. Thử gọi thủ công một số mẫu theo quy trình được phép để tách dữ liệu khỏi Trunk.
 
-## Chuyển cấp
+## Xử lý trong phạm vi L1
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Chuẩn hóa danh sách và loại bản ghi sai/trùng theo quy trình dữ liệu đã duyệt.
+- Giải thích khác biệt giữa `không bắt máy`, `bận` và `không kết nối`.
+- Đề nghị khách hàng kiểm tra khung giờ/tệp đối tượng; không cam kết tỉ lệ kinh doanh.
+- Không retry hàng loạt hoặc tăng concurrency nếu chưa đánh giá tác động.
+
+## Điểm dừng và chuyển cấp
+
+- Tỉ lệ lỗi tăng đột ngột trên danh sách đã kiểm chứng.
+- Lỗi tập trung theo nhà mạng/đầu số hoặc mã SIP/carrier rejection.
+- Cần phân tích dialer, retry policy, concurrency, AMD hoặc chất lượng Trunk.
+
+## Dữ liệu chuyển cấp
+
+- Campaign ID, đầu số, thời gian, quy mô và bảng phân bố trạng thái.
+- Mẫu Call-ID theo từng nhóm kết quả; không gửi toàn bộ danh bạ.
+- So sánh với chiến dịch/kỳ hoạt động bình thường cùng điều kiện.
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận tỉ lệ kết nối của chiến dịch thấp. Anh/chị vui lòng cung cấp ID, khoảng thời gian, đầu số và phân bố trạng thái cuộc gọi để khoanh vùng.
 
-## Nguyên nhân đã gặp
+> **Chuyển cấp:** ODS đã kiểm tra dữ liệu mẫu và bộ lọc. Trường hợp cần phân tích dialer/nhà mạng đã được chuyển đội chuyên trách.
 
-Chưa có dữ liệu đã xác minh.
+## Nguyên nhân thường gặp và tra cứu
 
-## Tra cứu liên quan
+- Danh sách sai/trùng, khung giờ không phù hợp hoặc thuê bao không bắt máy.
+- Giới hạn nhà mạng, đầu số bị hạn chế hoặc dialer/retry/concurrency cần L2.
 
-- [Rule gọi ra (Outbound Rules)](/internal/ai-contact-center/knowledge-base/outbound-rules)
-- [Bảng IP hạ tầng core](/internal/ai-contact-center/knowledge-base/core-infrastructure)
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
-
+- [Lịch chạy và báo cáo](/docs/ai-contact-center/portal/autocall/lich-va-bao-cao)
+- [Đầu số bị chặn / báo spam](/internal/ai-contact-center/runbooks/carriers/number-blocked)

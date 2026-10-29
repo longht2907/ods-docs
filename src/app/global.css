@@ -389,6 +389,115 @@ html > body[data-scroll-locked] {
   gap: 2rem;
 }
 
+/* Documentation reading rhythm: keep prose readable while allowing media and data to use the column. */
+.prose > :where(p, ul, ol),
+.fd-step > :where(p, ul, ol) {
+  max-inline-size: 72ch;
+}
+
+.ods-docs-figure {
+  display: block;
+  margin-block: 1.5rem 2rem;
+}
+
+.ods-docs-figure [data-rmiz-content] {
+  display: block;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  margin-inline: auto;
+}
+
+.ods-docs-figure img {
+  margin: 0;
+}
+
+.ods-docs-figure-caption {
+  display: block;
+  max-inline-size: 72ch;
+  margin: 0.625rem auto 0;
+  color: color-mix(in oklab, var(--color-fd-muted-foreground) 80%, var(--color-fd-foreground));
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.ods-expected-result {
+  display: grid;
+  gap: 0.125rem;
+  margin-block: 1rem 0;
+  padding-block: 0.625rem;
+  padding-inline-start: 1rem;
+  border-inline-start: 1px solid color-mix(in oklab, var(--color-fd-primary) 55%, var(--color-fd-border));
+  color: color-mix(in oklab, var(--color-fd-muted-foreground) 80%, var(--color-fd-foreground));
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.ods-expected-result-label {
+  color: var(--color-fd-foreground);
+  font-weight: 600;
+}
+
+/* Internal review notes stay distinct from approved operational instructions. */
+.ods-internal-article > :where(h2, h3) {
+  text-wrap: balance;
+}
+
+.ods-review-question {
+  display: grid;
+  gap: 0.5rem;
+  max-inline-size: 72ch;
+  margin-block: 1rem 1.5rem;
+  padding: 0.875rem 1rem;
+  border: 1px dashed color-mix(in oklab, var(--color-fd-border) 75%, var(--color-fd-muted-foreground));
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--color-fd-muted) 32%, transparent);
+  color: var(--color-fd-muted-foreground);
+}
+
+.ods-review-question-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.375rem 1rem;
+  color: var(--color-fd-foreground);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.ods-review-question-heading code {
+  padding: 0;
+  background: transparent;
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.ods-review-question-body > :first-child {
+  margin-block-start: 0;
+}
+
+.ods-review-question-body > :last-child {
+  margin-block-end: 0;
+}
+
+.ods-review-question-body {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 767px) {
+  :where(.prose, .ods-api-grid-main, .ods-api-grid-response) table:has(th:nth-child(3)) {
+    min-inline-size: 38rem;
+  }
+
+  :where(.prose, .ods-api-grid-main, .ods-api-grid-response) table:has(th:nth-child(4)) {
+    min-inline-size: 46rem;
+  }
+}
+
 @media (min-width: 1280px) {
   .ods-api-grid {
     grid-template-columns: minmax(0, 1fr) minmax(380px, 460px);
@@ -426,7 +535,6 @@ html > body[data-scroll-locked] {
 div[style*="--callout-color"] {
   border-radius: 0.75rem !important;
   border: 1px solid var(--color-fd-border) !important;
-  border-left: 3.5px solid var(--callout-color) !important;
   background-color: color-mix(in oklab, var(--callout-color) 4%, var(--color-fd-card)) !important;
   box-shadow: none !important;
   padding: 0.875rem 1rem !important;

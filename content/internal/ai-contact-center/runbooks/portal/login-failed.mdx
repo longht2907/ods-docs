@@ -1,47 +1,76 @@
 ---
 title: Không đăng nhập được
-description: Khung xử lý sự cố người dùng không đăng nhập được Portal.
+description: Runbook L1 xử lý người dùng không đăng nhập được Portal ODS mà không thu thập mật khẩu.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
+  Tuyệt đối không yêu cầu khách hàng gửi password, OTP hoặc token. Chỉ mở khóa/reset theo quy trình xác thực người yêu cầu và quyền thao tác được Human duyệt.
 </Callout>
+
+## Phạm vi L1
+
+Áp dụng khi Portal không mở, đăng nhập bị từ chối, tài khoản bị khóa hoặc người dùng vào được nhưng không thấy đúng doanh nghiệp/chức năng.
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Trang không tải, redirect lặp, màn hình trắng hoặc lỗi trình duyệt.
+- Portal báo sai thông tin đăng nhập, tài khoản không tồn tại/bị khóa.
+- Đăng nhập thành công nhưng sai tenant hoặc thiếu menu/quyền.
 
-## Cần hỏi KH
+### Phân nhánh nhanh
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
+| --- | --- | --- |
+| Portal không mở trên nhiều tài khoản/mạng | Có thể là lỗi DNS, TLS hoặc dịch vụ | Ghi nhận URL, thời điểm, mã lỗi và chuyển đội ứng dụng |
+| Chỉ một tài khoản bị từ chối | Account, trạng thái khóa hoặc thông tin đăng nhập | Xác minh username và dùng luồng reset chính thức nếu đủ điều kiện |
+| Cửa sổ riêng tư đăng nhập được | Cache, cookie hoặc extension trình duyệt | Xóa riêng site data của Portal và thử lại |
+| Đăng nhập được nhưng thiếu menu | Vấn đề role/permission, không phải authentication | Chuyển quản trị tenant hoặc đội có quyền phân quyền |
+| Đăng nhập vào sai doanh nghiệp | Sai tenant hoặc mapping tài khoản | Không chỉnh thủ công; ghi tenant hiện tại/mong đợi và chuyển cấp |
 
-## Kiểm tra
+## Cần hỏi khách hàng
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+- URL đang truy cập, email/username (không gửi password), thời điểm và ảnh lỗi.
+- Trình duyệt/thiết bị; một hay nhiều tài khoản bị ảnh hưởng.
+- Có đổi mật khẩu, nhân sự, quyền hoặc tenant gần đây không.
+- Lỗi trên mọi mạng/trình duyệt hay chỉ một môi trường.
 
-## Xử lý
+## Kiểm tra L1
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+1. Xác nhận đúng URL Portal và tình trạng truy cập Internet/DNS.
+2. Kiểm tra lỗi trên cửa sổ riêng tư hoặc trình duyệt được hỗ trợ để loại trừ cache/extension.
+3. Xác nhận Caps Lock, layout bàn phím và thời gian thiết bị; không quan sát password.
+4. Kiểm tra trạng thái tài khoản/tenant/quyền bằng công cụ L1 được cấp phép.
+5. Khoanh vùng một tài khoản, một tenant hay nhiều khách hàng.
 
-## Chuyển cấp
+## Xử lý trong phạm vi L1
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Xóa dữ liệu site riêng của Portal hoặc thử cửa sổ riêng tư; không xóa toàn bộ dữ liệu trình duyệt nếu chưa cần.
+- Hướng dẫn dùng luồng quên mật khẩu chính thức nếu Portal có hỗ trợ và người dùng đã được xác thực.
+- Chuyển người quản trị tenant khi vấn đề là quyền/menu, không tự cấp quyền.
+- Không mở khóa/reset thủ công ngoài quy trình đã duyệt.
+
+## Điểm dừng và chuyển cấp
+
+- Nhiều tài khoản/tenant không truy cập được hoặc Portal trả 5xx/redirect loop.
+- Tài khoản đúng nhưng trạng thái/quyền không đồng bộ.
+- Cần mở khóa, thay email, đổi tenant hoặc truy vết authentication log.
+
+## Dữ liệu chuyển cấp
+
+- URL, email/username, tenant, thời điểm/múi giờ và mã lỗi/Request ID.
+- Trình duyệt/OS, kết quả cửa sổ riêng tư/mạng khác và phạm vi ảnh hưởng.
+- Screenshot phải che token, cookie và dữ liệu khách hàng khác.
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận anh/chị chưa đăng nhập được Portal. Vui lòng gửi URL, email đăng nhập, thời điểm và ảnh lỗi; không gửi password hoặc OTP.
 
-## Nguyên nhân đã gặp
+> **Chuyển cấp:** Kiểm tra trình duyệt và tài khoản cơ bản đã hoàn tất. ODS đã chuyển đội chuyên trách kiểm tra trạng thái xác thực/quyền của tài khoản.
 
-Chưa có dữ liệu đã xác minh.
+## Nguyên nhân thường gặp và tra cứu
 
-## Tra cứu liên quan
+- Sai URL/thông tin đăng nhập, cache/extension, tài khoản khóa hoặc quyền tenant thay đổi.
+- Sự cố Portal/authentication diện rộng cần đội ứng dụng xử lý.
 
-Chưa có tài liệu liên quan bổ sung.
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
+- [Truy cập Portal ODS](/docs/ai-contact-center/portal)
 

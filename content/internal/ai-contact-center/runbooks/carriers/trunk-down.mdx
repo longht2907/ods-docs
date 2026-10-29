@@ -1,48 +1,80 @@
 ---
 title: Trunk SIP lỗi
-description: Khung xử lý sự cố trunk SIP mất kết nối hoặc không hoạt động.
+description: Runbook L1 khoanh vùng sự cố Trunk SIP hoặc đầu số không gọi vào, gọi ra hay cả hai chiều.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
+  L1 chỉ thu thập bằng chứng và đối chiếu phạm vi. Không reload Trunk, đổi route, IP hoặc credential khi chưa có quyền và phương án rollback.
 </Callout>
+
+## Phạm vi L1
+
+Áp dụng khi một đầu số/Trunk không nhận cuộc gọi, không gọi ra hoặc lỗi đồng thời nhiều máy nhánh. Mục tiêu là phân biệt lỗi endpoint, PBX, định tuyến hay nhà mạng.
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Tất cả máy nhánh không gọi ra qua cùng đầu số/route.
+- Cuộc gọi vào không tới PBX, IVR hoặc đích mong đợi.
+- CDR có mã SIP lỗi, cuộc gọi kết thúc ngay hoặc không có bản ghi.
 
-## Cần hỏi KH
+### Phân nhánh nhanh
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
+| --- | --- | --- |
+| Gọi nội bộ bình thường, mọi cuộc gọi ra cùng đầu số đều lỗi | Nghi Trunk, route hoặc nhà mạng | Lấy mẫu CDR/SIP code và chuyển Carrier/L2 |
+| Cuộc gọi vào không có CDR | Có thể chưa tới PBX | Thu thập mẫu từ thuê bao gọi, thời điểm và chuyển Carrier/L2 |
+| Có CDR nhưng không tới đúng IVR/máy nhánh | Có thể liên quan route hoặc call flow | Đối chiếu lịch, IVR và đích đã duyệt |
+| Chỉ một máy nhánh lỗi | Không đủ bằng chứng kết luận Trunk | Chuyển sang runbook endpoint hoặc hướng gọi tương ứng |
+| Chỉ lỗi tới một nhà mạng/nhóm số | Có thể là định tuyến hoặc carrier rejection | Lấy tối thiểu hai mẫu cùng nhóm và một mẫu đối chứng |
 
-## Kiểm tra
+## Cần hỏi khách hàng
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+- Mã dịch vụ, đầu số, hướng gọi lỗi và phạm vi máy nhánh.
+- Số gọi, số được gọi, thời điểm/múi giờ và thông báo nghe thấy.
+- Lỗi với mọi nhà mạng/đích gọi hay chỉ một nhóm số.
+- Thay đổi gần nhất ở route, lịch làm việc, IVR, Firewall hoặc Internet.
 
-## Xử lý
+## Kiểm tra L1
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+1. Kiểm tra nhiều máy nhánh và một cuộc gọi nội bộ để loại trừ endpoint.
+2. Tra CDR bằng số mẫu/thời gian; ghi nhận có hay không có bản ghi.
+3. Đối chiếu đầu số, route và lịch hoạt động theo cấu hình đã duyệt, không tự chỉnh.
+4. Khoanh vùng một đầu số, một nhà mạng, một tenant hay nhiều khách hàng.
+5. Ghi nhận mã SIP/Call-ID nếu công cụ L1 cho phép; không thu thập credential Trunk.
 
-## Chuyển cấp
+## Xử lý trong phạm vi L1
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Thử bằng máy nhánh đã biết hoạt động và một số đích khác.
+- Sửa lỗi nhập số/quy tắc quay số phía người dùng khi có tài liệu đối chiếu.
+- Nếu chỉ một máy nhánh lỗi, chuyển về runbook endpoint.
+- Nếu route/lịch sai, chuyển người có quyền và ghi rõ cấu hình hiện tại/mong đợi.
+
+## Điểm dừng và chuyển cấp
+
+- Không thấy cuộc gọi vào hoặc mọi cuộc gọi ra cùng Trunk đều lỗi.
+- Nhiều đầu số/khách hàng cùng lỗi hoặc mã SIP 5xx/timeout lặp lại.
+- Cần SIP trace, trạng thái peering, thay route, reload Trunk hay làm việc nhà mạng.
+- Nghi ngờ nghẽn kênh, hết hạn dịch vụ hoặc thay đổi whitelist IP.
+
+## Dữ liệu chuyển cấp
+
+- Mã dịch vụ, đầu số, hướng gọi, phạm vi và thời điểm/múi giờ.
+- Hai đến ba mẫu cuộc gọi đã che dữ liệu, Call-ID/mã SIP và trạng thái CDR.
+- Kết quả gọi nội bộ, gọi qua số/nhà mạng khác và thay đổi gần nhất.
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận đầu số/luồng Trunk có dấu hiệu bất thường. Anh/chị vui lòng cung cấp số gọi, số được gọi, thời điểm và hướng gọi lỗi để đối chiếu nhật ký.
 
-## Nguyên nhân đã gặp
+> **Chuyển cấp:** Lỗi không giới hạn ở một máy nhánh. ODS đã chuyển đội chuyên trách kiểm tra Trunk/định tuyến với các mẫu cuộc gọi đã thu thập.
 
-Chưa có dữ liệu đã xác minh.
+## Nguyên nhân thường gặp và tra cứu
 
-## Tra cứu liên quan
+- Sai quy tắc quay số, route/lịch không khớp hoặc endpoint bị hiểu nhầm là lỗi Trunk.
+- Mất peering, nhà mạng từ chối, nghẽn kênh hoặc whitelist IP thay đổi.
 
-- [Rule gọi ra (Outbound Rules)](/internal/ai-contact-center/knowledge-base/outbound-rules)
-- [Bảng IP hạ tầng core](/internal/ai-contact-center/knowledge-base/core-infrastructure)
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
+- [Không gọi ra được](/internal/ai-contact-center/runbooks/calls/outbound-failed)
+- [Không nhận cuộc gọi đến](/internal/ai-contact-center/runbooks/calls/inbound-failed)
+- [Rule gọi ra](/internal/ai-contact-center/knowledge-base/outbound-rules)
+- [Giới hạn nhà mạng](/internal/ai-contact-center/knowledge-base/carrier-limitations)
 

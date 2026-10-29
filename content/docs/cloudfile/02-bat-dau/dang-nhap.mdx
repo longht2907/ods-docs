@@ -21,7 +21,7 @@ description: "Hướng dẫn đăng nhập Web Portal, bảo vệ tài khoản t
 
     ![Màn hình đăng nhập CloudFile với các trường tài khoản và mật khẩu để trống](/media/cloudfile/02-bat-dau/man-hinh-dang-nhap-cloudfile.png)
 
-    *Kết quả: Màn hình đăng nhập hiển thị trường Account name or email, Password và nút Log in.*
+    <ExpectedResult>Màn hình đăng nhập hiển thị trường Account name or email, Password và nút Log in.</ExpectedResult>
   </Step>
   <Step>
     ### Nhập thông tin tài khoản
@@ -30,28 +30,28 @@ description: "Hướng dẫn đăng nhập Web Portal, bảo vệ tài khoản t
 
     **Keep me logged in** giúp duy trì trạng thái đăng nhập cho những lần truy cập sau. Chỉ bật tùy chọn này trên máy tính cá nhân an toàn; không bật trên máy tính công cộng hoặc thiết bị của người khác.
 
-    *Kết quả: Hệ thống xác thực tài khoản và mở không gian làm việc CloudFile.*
+    <ExpectedResult>Hệ thống xác thực tài khoản và mở không gian làm việc CloudFile.</ExpectedResult>
   </Step>
   <Step>
     ### Đổi mật khẩu ban đầu
 
     Chọn **Avatar** ở góc trên bên phải, mở **Settings** → **Security**. Tại mục **Password**, nhập mật khẩu hiện tại và mật khẩu mới.
 
-    *Kết quả: Tài khoản sử dụng mật khẩu mới thay cho mật khẩu được cấp ban đầu.*
+    <ExpectedResult>Tài khoản sử dụng mật khẩu mới thay cho mật khẩu được cấp ban đầu.</ExpectedResult>
   </Step>
   <Step>
     ### Kích hoạt xác thực hai bước
 
     Trong trang **Security**, tìm **Two-Factor Authentication** và bật **TOTP**. Dùng Google Authenticator hoặc Microsoft Authenticator quét mã QR, sau đó nhập mã xác thực từ điện thoại.
 
-    *Kết quả: 2FA được kích hoạt cho tài khoản CloudFile.*
+    <ExpectedResult>2FA được kích hoạt cho tài khoản CloudFile.</ExpectedResult>
   </Step>
   <Step>
     ### Đăng xuất khi kết thúc
 
     Chọn **Avatar** ở góc trên bên phải và chọn **Log out**, đặc biệt khi bạn đang sử dụng thiết bị không thuộc sở hữu của mình.
 
-    *Kết quả: Phiên làm việc CloudFile được đóng.*
+    <ExpectedResult>Phiên làm việc CloudFile được đóng.</ExpectedResult>
   </Step>
 </Steps>
 

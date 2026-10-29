@@ -29,7 +29,7 @@ import {
   UserCheck,
   Users,
 } from 'lucide-react';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import type { MDXComponents } from 'mdx/types';
 import {
   ApiReferenceBottom,
@@ -42,9 +42,16 @@ import { ApiEndpoint } from '@/components/docs/api-endpoint';
 import { ClickToCallFlow } from '@/components/docs/click-to-call-flow';
 import { ClickToCallV2Flow } from '@/components/docs/click-to-call-v2-flow';
 import { ApiArchitectureOverview } from '@/components/docs/api-architecture-overview';
+import { StartCampaignFlow } from '@/components/docs/start-campaign-flow';
 import { CustomerFlowDiagram } from '@/components/docs/customer-flow-diagram';
 import { DocsProductDirectory } from '@/components/docs/docs-product-directory';
 import { ProcessFlowchart } from '@/components/flowchart';
+
+const {
+  img: defaultImageComponent,
+  ...defaultMdxComponentsWithoutImage
+} = defaultMdxComponents;
+void defaultImageComponent;
 
 const cardIcons = {
   Activity,
@@ -82,16 +89,44 @@ function Card({ icon, ...props }: ComponentProps<typeof FumadocsCard>) {
   return <FumadocsCard icon={iconNode} {...props} />;
 }
 
+function DocsImage({ alt = '', src, ...props }: ComponentProps<'img'>) {
+  const zoomSrc =
+    src instanceof Blob
+      ? undefined
+      : (src as unknown as ComponentProps<typeof ImageZoom>['src']);
+
+  return (
+    <span className="ods-docs-figure">
+      <ImageZoom alt={alt} src={zoomSrc} {...props} />
+      {alt ? (
+        <span className="ods-docs-figure-caption" aria-hidden="true">
+          {alt}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+function ExpectedResult({ children }: { children: ReactNode }) {
+  return (
+    <p className="ods-expected-result">
+      <span className="ods-expected-result-label">Kết quả mong đợi</span>
+      <span>{children}</span>
+    </p>
+  );
+}
+
 export function getMDXComponents(components?: MDXComponents) {
   return {
-    ...defaultMdxComponents,
+    ...defaultMdxComponentsWithoutImage,
     ...TabsComponents,
     ...StepsComponents,
     Accordion,
     Accordions,
-    img: (props) => <ImageZoom {...(props as any)} />,
+    img: (props: ComponentProps<'img'>) => <DocsImage {...props} />,
     Callout,
     Card,
+    ExpectedResult,
     ApiEndpoint,
     ApiReferenceLayout,
     ApiReferenceMain,
@@ -103,6 +138,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ClickToCallFlow,
     ClickToCallV2Flow,
     ApiArchitectureOverview,
+    StartCampaignFlow,
     ProcessFlowchart,
     ...components,
   } satisfies MDXComponents;

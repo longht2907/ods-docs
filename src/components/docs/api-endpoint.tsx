@@ -60,7 +60,7 @@ export function ApiEndpoint({ method, url, className = '' }: ApiEndpointProps) {
         type="button"
         onClick={handleCopy}
         aria-label="Sao chép URL endpoint"
-        className="group relative inline-flex shrink-0 items-center justify-center rounded-md border border-fd-border bg-fd-background p-1.5 text-fd-muted-foreground transition-all hover:bg-fd-accent hover:text-fd-foreground focus-visible:outline-2 focus-visible:outline-fd-primary focus-visible:outline-offset-2"
+        className="group relative inline-flex size-10 shrink-0 items-center justify-center rounded-md border border-fd-border bg-fd-background text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-foreground focus-visible:outline-2 focus-visible:outline-fd-primary focus-visible:outline-offset-2 sm:size-9"
       >
         {copied ? (
           <Check className="size-4 text-emerald-500 transition-transform scale-110" />

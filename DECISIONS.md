@@ -93,7 +93,7 @@ Tài liệu này lưu trữ các quyết định kiến trúc quan trọng của
 ## ADR-006: Nội dung internal trong repository public
 
 - **Ngày quyết định**: 2026-10-06
-- **Trạng thái**: Đã áp dụng (Chấp thuận)
+- **Trạng thái**: Được ADR-007 thay thế một phần về repository visibility và access model
 - **Bối cảnh**:
   - Repository của Documentation Platform là public. Cơ chế đăng nhập tại `/internal` chỉ bảo vệ website khi chạy, không thể che nội dung đã commit khỏi người đọc Git hoặc lịch sử repository.
   - Support Wiki cần lưu thông tin vận hành phục vụ tra cứu nội bộ, trong đó có thể bao gồm IP hạ tầng và bảng đầu số thật.
@@ -106,3 +106,48 @@ Tài liệu này lưu trữ các quyết định kiến trúc quan trọng của
 - **Hệ quả**:
   - Không được dùng `/internal` làm nơi lưu secret hoặc dữ liệu cá nhân chỉ vì route yêu cầu đăng nhập.
   - Giới hạn TASK-014 chỉ tạo template là phạm vi triển khai của task, không phải chính sách cấm bổ sung IP hạ tầng hoặc bảng đầu số thật trong các task sau.
+
+---
+
+## ADR-007: Private repository và Network-gated Support Wiki
+
+- **Ngày quyết định**: 2026-10-28
+- **Trạng thái**: Chấp thuận — chờ triển khai và xác minh production
+- **Bối cảnh**:
+  - `/internal/**` là Support Wiki read-only, chưa cần RBAC hoặc audit theo từng user.
+  - Công ty đã có VPN cấp riêng cho nhân viên; VPN client NAT qua cùng WAN công ty.
+  - Việc tự vận hành local account, password, OTP, Session và user database tạo thêm
+    chi phí bảo mật, backup và hỗ trợ người dùng nhưng chưa mang lại giá trị cần thiết
+    cho use case hiện tại.
+  - Media đặt dưới `public/` luôn có URL public sau khi deploy, dù repository là private.
+- **Quyết định**:
+  1. **Repository mục tiêu là private**: Human chuyển và xác minh visibility trên
+     GitHub. Quyết định này không tự động thay đổi external repository setting.
+  2. **Network-gated access**: `/internal/**`, `/api/search/internal/**` và
+     `/api/media/internal/**` chỉ được phép đi qua Caddy khi source IP thuộc office
+     WAN allowlist. Nhân viên từ xa phải kết nối VPN công ty và NAT qua WAN đó.
+  3. **Không có application identity ở giai đoạn này**: Không triển khai local
+     account, password, OTP, password reset, application Session, user database
+     hoặc RBAC trong Next.js.
+  4. **Defense in depth**: Caddy là L7 network gate; Next.js Proxy tiếp tục
+     fail-closed và chỉ được mở bằng trusted gateway assertion sau khi có task triển
+     khai, test và nghiệm thu riêng. `ODS_INTERNAL_DEV_OPEN` vẫn chỉ dành cho local
+     development và bị cấm trong production.
+  5. **Tách media theo trust zone**: `public/media/**` chỉ chứa asset được phép
+     public. Internal media phải nằm ngoài `public/` và chỉ được phục vụ qua route
+     đã dùng cùng network authorization với `/internal/**`.
+  6. **Giữ kiểm soát nội dung**: Private repository và network access không thay
+     thế content review. Cấm commit secret, credential, token, private key và dữ
+     liệu cá nhân khách hàng ở mọi vị trí.
+- **Trạng thái triển khai tại thời điểm quyết định**:
+  - `src/proxy.ts` vẫn mặc định trả `401` cho internal request.
+  - Repository visibility chưa được xác minh từ local checkout.
+  - Caddy allowlist, trusted gateway assertion, `private-media/internal/**` và
+    `/api/media/internal/**` chưa được triển khai.
+- **Hệ quả**:
+  - Nhân viên không đăng nhập lại trên website; quyền truy cập được cấp hoặc thu hồi
+    ở VPN/network layer.
+  - Mô hình này không cung cấp audit theo từng người và không chống được thiết bị
+    đã được cấp VPN nhưng bị chiếm quyền.
+  - Nếu bổ sung Cloudflare/CDN, split-tunnel, RBAC hoặc per-user audit, phải có ADR
+    mới để xác định cách tin cậy client IP và identity.

@@ -1,47 +1,77 @@
 ---
 title: Webhook không nhận được
-description: Khung xử lý sự cố hệ thống đích không nhận được Webhook.
+description: Runbook L1 khoanh vùng cấu hình endpoint, khả năng tiếp nhận và phản hồi khi hệ thống đích không nhận Webhook.
 ---
 
-<Callout title="Đang soạn" type="warn">
-  Các bước kiểm tra và xử lý chi tiết sẽ được bổ sung sau khi có nguồn vận hành đã duyệt.
+<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
+  Không phát lại sự kiện nếu chưa hiểu idempotency phía nhận. Không yêu cầu secret chữ ký hoặc token đầy đủ trong ticket.
 </Callout>
+
+## Phạm vi L1
+
+Áp dụng khi hệ thống khách hàng không thấy một hoặc nhiều Webhook, nhận chậm, nhận trùng hoặc ODS ghi nhận delivery thất bại.
 
 ## Triệu chứng
 
-Mô tả dấu hiệu có thể quan sát và phạm vi ảnh hưởng.
+- Sự kiện phát sinh nhưng endpoint khách hàng không có request/log.
+- Chỉ một event type lỗi hoặc mọi Webhook cùng lỗi.
+- Endpoint nhận request nhưng trả 4xx/5xx/timeout hoặc xử lý trùng.
 
-## Cần hỏi KH
+### Phân nhánh nhanh
 
-- Thời điểm bắt đầu xảy ra.
-- Phạm vi người dùng hoặc dịch vụ bị ảnh hưởng.
-- Thay đổi gần nhất trước khi xuất hiện sự cố.
+| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
+| --- | --- | --- |
+| Không có delivery record phía ODS | Event chưa phát sinh, chưa subscribe hoặc lỗi producer | Xác minh event/subscription rồi chuyển đội tích hợp nếu cần |
+| Có delivery nhưng access log phía nhận trống | DNS/TLS/Firewall/WAF hoặc sai URL | Kiểm tra endpoint và hạ tầng nhận; không tự suy đoán allowlist |
+| Endpoint trả 4xx | Request bị ứng dụng từ chối | Đối chiếu auth, signature, method và schema đã công bố |
+| Endpoint trả 5xx hoặc timeout | Handler phía nhận lỗi/chậm | Dùng Request ID và log để khoanh vùng; chưa replay |
+| Endpoint trả 2xx nhưng dữ liệu không xuất hiện | Xử lý bất đồng bộ hoặc logic ứng dụng phía nhận | Kiểm tra queue/application log và khóa idempotency |
+| Nhận cùng event nhiều lần | Retry hoặc xử lý thiếu idempotency | Không xóa bằng chứng; chuyển đội tích hợp để đối chiếu event ID |
 
-## Kiểm tra
+## Cần hỏi khách hàng
 
-Liệt kê các bước kiểm tra theo thứ tự an toàn, từ ít tác động đến chuyên sâu.
+- Tenant, event type, thời điểm/múi giờ và ID đối tượng/sự kiện đã che dữ liệu.
+- Endpoint domain/path đã che query secret; môi trường test/production.
+- HTTP status/log phía nhận, thay đổi DNS/TLS/Firewall gần nhất.
+- Có nhận event khác không; hệ thống có cơ chế chống trùng/idempotency không.
 
-## Xử lý
+## Kiểm tra L1
 
-Ghi các bước khắc phục đã được xác minh và điều kiện rollback nếu có.
+1. Xác nhận event thực sự phát sinh và loại event đã được cấu hình/đăng ký.
+2. Kiểm tra endpoint dùng HTTPS hợp lệ, DNS resolve và không trỏ localhost/private address ngoài thiết kế.
+3. Yêu cầu khách hàng kiểm tra access log trước application log để phân biệt không tới với xử lý lỗi.
+4. Ghi nhận status/latency/Request ID từ delivery log nếu L1 được cấp quyền.
+5. Kiểm tra thay đổi Firewall/WAF, certificate hoặc redirect; không tự suy đoán IP allowlist.
 
-## Chuyển cấp
+## Xử lý trong phạm vi L1
 
-Nêu điều kiện chuyển L2 hoặc đội chuyên trách và dữ liệu phải đính kèm.
+- Sửa URL/event subscription khi sai khác rõ và người yêu cầu có quyền.
+- Hướng dẫn endpoint trả response thành công nhanh rồi xử lý bất đồng bộ nếu đặc tả hỗ trợ.
+- Kiểm tra handler trên môi trường test bằng payload đã sanitize khi có công cụ được duyệt.
+- Không replay event production trước khi xác nhận tác động và idempotency.
+
+## Điểm dừng và chuyển cấp
+
+- ODS không tạo delivery, nhiều tenant/event cùng lỗi hoặc delivery log 5xx/timeout lặp lại.
+- Endpoint trả 2xx nhưng khách hàng không ghi nhận dữ liệu.
+- Cần replay, kiểm tra signing secret, retry policy, queue/worker hoặc IP allowlist.
+
+## Dữ liệu chuyển cấp
+
+- Tenant, event type/ID, timestamp, endpoint host/path và environment.
+- Delivery status, latency, Request ID; sanitized payload/response.
+- Kết quả DNS/TLS/access log và xác nhận idempotency trước khi đề nghị replay.
 
 ## Trả lời mẫu
 
-Bổ sung mẫu phản hồi sau khi nội dung được phê duyệt.
+> **Tiếp nhận:** ODS đã ghi nhận hệ thống đích chưa nhận Webhook. Vui lòng cung cấp event type, thời điểm, endpoint host/path và access log đã che secret/token.
 
-## Nguyên nhân đã gặp
+> **Chuyển cấp:** Cấu hình endpoint đã được đối chiếu. ODS đã chuyển đội tích hợp kiểm tra delivery; chưa replay sự kiện để tránh xử lý trùng.
 
-Chưa có dữ liệu đã xác minh.
+## Nguyên nhân thường gặp và tra cứu
 
-## Tra cứu liên quan
+- Sai URL/event subscription, DNS/TLS/Firewall/WAF chặn hoặc handler timeout.
+- Delivery queue/retry/signature cần đội tích hợp kiểm tra.
 
-Chưa có tài liệu liên quan bổ sung.
-
-## Cập nhật lần cuối
-
-Chưa cập nhật.
-
+- [API Reference AI Contact Center](/docs/ai-contact-center/api)
+- [API trả lỗi](/internal/ai-contact-center/runbooks/integrations/api-errors)

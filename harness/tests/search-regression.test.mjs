@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import { execSync, spawn } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import net from 'node:net';
+import { spawnStandaloneServer } from './helpers/standalone-server.mjs';
 import {
   getSearchClientOptions,
   getSearchRouteScope,
@@ -110,12 +111,8 @@ async function main() {
   const env = { ...process.env };
   delete env.ODS_INTERNAL_DEV_OPEN;
 
-  const isWin = process.platform === 'win32';
-  const server = spawn('npx', ['next', 'start', '-p', String(port)], {
+  const server = spawnStandaloneServer(port, {
     env,
-    shell: true,
-    detached: !isWin,
-    stdio: ['ignore', 'pipe', 'pipe'],
   });
 
   let output = '';

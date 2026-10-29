@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnStandaloneServer } from './helpers/standalone-server.mjs';
 
 const desktopWidths = [1280, 1440];
 const mobileWidths = [360, 390];
@@ -629,14 +630,10 @@ async function main() {
   const configuredBaseUrl = process.env.HOME_V4_BASE_URL?.replace(/\/$/, '');
   const appPort = configuredBaseUrl ? null : await getFreePort();
   const baseUrl = configuredBaseUrl ?? `http://127.0.0.1:${appPort}`;
-  const isWindows = process.platform === 'win32';
   const server = configuredBaseUrl
     ? null
-    : spawn('npx', ['next', 'start', '-p', String(appPort)], {
-        env: { ...process.env, ODS_INTERNAL_DEV_OPEN: undefined },
-        shell: true,
-        detached: !isWindows,
-        stdio: ['ignore', 'pipe', 'pipe'],
+    : spawnStandaloneServer(appPort, {
+        unsetEnv: ['ODS_INTERNAL_DEV_OPEN'],
       });
   let serverOutput = '';
   server?.stdout.on('data', (chunk) => { serverOutput += chunk.toString(); });
@@ -760,17 +757,24 @@ async function main() {
         { name: 'prefers-reduced-motion', value: 'reduce' },
       ],
     });
-    assert(
-      await evaluate(
-        client,
-        `(() => {
+    const reducedMotion = await evaluate(
+      client,
+      `(async () => {
+          await new Promise(requestAnimationFrame);
+          await new Promise(requestAnimationFrame);
           const item = document.querySelector('[data-core-product]').closest('div[class*="orbitItem"]');
-          return getComputedStyle(document.querySelector('[data-orbit-float]')).animationName === 'none' &&
-            getComputedStyle(document.querySelector('[data-orbit-connection] i')).animationName === 'none' &&
-            Number.parseFloat(getComputedStyle(item).opacity) === 1;
+          return {
+            floatAnimation: getComputedStyle(document.querySelector('[data-orbit-float]')).animationName,
+            signalAnimation: getComputedStyle(document.querySelector('[data-orbit-connection] i')).animationName,
+            itemOpacity: Number.parseFloat(getComputedStyle(item).opacity),
+          };
         })()`,
-      ),
-      'Reduced Motion chưa tắt floating/signal hoặc chưa hiển thị nội dung ngay.',
+    );
+    assert(
+      reducedMotion.floatAnimation === 'none' &&
+        reducedMotion.signalAnimation === 'none' &&
+        reducedMotion.itemOpacity === 1,
+      `Reduced Motion chưa tắt floating/signal hoặc chưa hiển thị nội dung ngay: ${JSON.stringify(reducedMotion)}.`,
     );
     await setTheme(client, 'light');
     await testInteractions(client);

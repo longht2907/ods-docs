@@ -33,6 +33,7 @@ Trang chủ hiện tại chưa bám sát mockup `ODS-Platform-Documentation-V4.h
 - `src/components/home/home-search-trigger.tsx` — search trigger riêng cho hero, dùng nguyên dialog và hotkey Fumadocs.
 - `src/components/home/hero-ecosystem.tsx` — artwork hero, anchor navigation và kiểm soát pause/resume motion.
 - `harness/tests/home-v4-regression.test.mjs` — kiểm tra runtime, responsive, interaction, accessibility cơ bản và screenshot.
+- `harness/tests/helpers/standalone-server.mjs` — khởi chạy đúng artifact `output: 'standalone'` cho các regression test production.
 
 ### Sửa đổi:
 
@@ -42,6 +43,10 @@ Trang chủ hiện tại chưa bám sát mockup `ODS-Platform-Documentation-V4.h
 - `src/components/navigation/docs-mega-menu.tsx` — dropdown tài liệu sản phẩm gọn, một cột và dùng registry hiện có.
 - `src/lib/home-content.ts` — model nội dung typed và kiểm chứng link public bằng Fumadocs source.
 - `package.json` — thêm lệnh regression homepage vào chuỗi nghiệm thu task.
+- `harness/tests/api-ui-regression.test.mjs` — dùng standalone test server nhất quán với Docker runtime.
+- `harness/tests/routes.test.mjs` — dùng standalone test server nhất quán với Docker runtime.
+- `harness/tests/search-regression.test.mjs` — dùng standalone test server nhất quán với Docker runtime.
+- `harness/tests/home-v4-regression.test.mjs` — dùng standalone test server nhất quán với Docker runtime.
 - `tasks/TASK-030-home-v4-1.md` — task spec và trạng thái thực hiện.
 
 ### Xóa:
@@ -80,6 +85,8 @@ Trang chủ hiện tại chưa bám sát mockup `ODS-Platform-Documentation-V4.h
 - [ ] Thư viện không còn filter trộn nhiều chiều; tổng tài liệu hiển thị khớp danh sách tuyển chọn.
 - [ ] Khối tích hợp chỉ có API Reference và Webhook & Popup, ghi rõ phạm vi AI Contact Center, không có tab hoặc bước giả.
 - [ ] Mega menu sản phẩm, Fumadocs search, click trigger, `Cmd/Ctrl+K`, Escape và focus-visible hoạt động.
+- [ ] Regression test xác nhận `/docs`, AI Contact Center và CloudFile khởi tạo đúng Search scope theo route sau khi dialog đã mount.
+- [ ] Production regression harness chạy `.next/standalone/server.js`, không gọi `next start` trái với cấu hình `output: 'standalone'`.
 - [ ] Link nội bộ trên homepage tồn tại và public search không lộ `/internal`.
 - [ ] Screenshot full page desktop dark/light và mobile được tạo trong `.harness/reports/`.
 - [ ] `git diff --check` chạy qua.

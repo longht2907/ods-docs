@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnStandaloneServer } from './helpers/standalone-server.mjs';
 
 const pages = [
   '/docs/ai-contact-center/api/tong-dai/cuoc-goi/click-to-call',
@@ -13,6 +14,7 @@ const pages = [
 const desktopWidths = [1280, 1440, 1920];
 const mobileWidths = [390, 768];
 const height = 900;
+let navigationSequence = 0;
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -160,11 +162,16 @@ async function evaluate(client, expression) {
 }
 
 async function navigate(client, url) {
+  const marker = `ods-api-navigation-${navigationSequence += 1}`;
+  await evaluate(client, `window[${JSON.stringify(marker)}] = true`);
   await client.send('Page.navigate', { url });
   for (let attempt = 0; attempt < 100; attempt += 1) {
     const ready = await evaluate(
       client,
-      `document.readyState === 'complete' && Boolean(document.querySelector('[data-api-sticky-panel]'))`,
+      `location.href === ${JSON.stringify(url)} &&
+        !window[${JSON.stringify(marker)}] &&
+        document.readyState === 'complete' &&
+        Boolean(document.querySelector('[data-api-sticky-panel]'))`,
     );
     if (ready) return;
     await delay(100);
@@ -173,16 +180,61 @@ async function navigate(client, url) {
 }
 
 async function navigateReady(client, url, selector) {
+  const marker = `ods-api-navigation-${navigationSequence += 1}`;
+  await evaluate(client, `window[${JSON.stringify(marker)}] = true`);
   await client.send('Page.navigate', { url });
   for (let attempt = 0; attempt < 100; attempt += 1) {
     const ready = await evaluate(
       client,
-      `document.readyState === 'complete' && Boolean(document.querySelector(${JSON.stringify(selector)}))`,
+      `location.href === ${JSON.stringify(url)} &&
+        !window[${JSON.stringify(marker)}] &&
+        document.readyState === 'complete' &&
+        Boolean(document.querySelector(${JSON.stringify(selector)}))`,
     );
     if (ready) return;
     await delay(100);
   }
   throw new Error(`Trang không render selector ${selector}: ${url}`);
+}
+
+async function openSearchDialog(client) {
+  const isReady = () => evaluate(
+    client,
+    `(() => {
+      const dialog = document.getElementById('fd-search-dialog-content');
+      return Boolean(
+        dialog &&
+        !dialog.hasAttribute('data-closed') &&
+        document.querySelector('[data-fd-search-dialog-input]') &&
+        document.querySelector('#ods-search-scope')
+      );
+    })()`,
+  );
+
+  if (await isReady()) return;
+
+  for (let hotkeyAttempt = 0; hotkeyAttempt < 8; hotkeyAttempt += 1) {
+    await evaluate(
+      client,
+      `window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))`,
+    );
+    for (let renderAttempt = 0; renderAttempt < 10; renderAttempt += 1) {
+      if (await isReady()) return;
+      await delay(50);
+    }
+  }
+
+  const state = await evaluate(
+    client,
+    `({
+      pathname: location.pathname,
+      dialogState: document.getElementById('fd-search-dialog-content')?.getAttribute('data-state') ?? null,
+      dialogClosed: document.getElementById('fd-search-dialog-content')?.hasAttribute('data-closed') ?? null,
+      hasInput: Boolean(document.querySelector('[data-fd-search-dialog-input]')),
+      hasScope: Boolean(document.querySelector('#ods-search-scope')),
+    })`,
+  );
+  throw new Error(`Ctrl+K không mở Search dialog: ${JSON.stringify(state)}`);
 }
 
 async function setViewport(client, width) {
@@ -321,19 +373,7 @@ async function testInteractions(client, baseUrl) {
 async function testSearchDialog(client, baseUrl) {
   await setViewport(client, 1440);
   await navigateReady(client, `${baseUrl}/docs`, 'body');
-  await evaluate(
-    client,
-    `window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))`,
-  );
-
-  for (let attempt = 0; attempt < 40; attempt += 1) {
-    if (await evaluate(client, `Boolean(document.querySelector('[data-fd-search-dialog-input]'))`)) break;
-    await delay(50);
-  }
-  assert(
-    await evaluate(client, `Boolean(document.querySelector('[data-fd-search-dialog-input]'))`),
-    'Ctrl+K không mở Search dialog',
-  );
+  await openSearchDialog(client);
   assert(
     await evaluate(client, `document.querySelector('#ods-search-scope')?.value === 'all'`),
     'Route /docs không mặc định phạm vi Tất cả sản phẩm',
@@ -481,11 +521,7 @@ async function testSearchDialog(client, baseUrl) {
     'Escape không đóng Search dialog',
   );
 
-  await evaluate(
-    client,
-    `window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))`,
-  );
-  await delay(100);
+  await openSearchDialog(client);
   await setSearch('webhook');
   let headingReady = false;
   for (let attempt = 0; attempt < 80; attempt += 1) {
@@ -508,11 +544,7 @@ async function testSearchDialog(client, baseUrl) {
   assert(await evaluate(client, `location.hash.length > 1`), 'Click heading Search không điều hướng tới anchor');
 
   await navigateReady(client, `${baseUrl}/docs`, 'body');
-  await evaluate(
-    client,
-    `window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))`,
-  );
-  await delay(100);
+  await openSearchDialog(client);
   await setSearch('cloudfile');
   for (let attempt = 0; attempt < 80; attempt += 1) {
     if (await evaluate(client, `document.querySelectorAll('.ods-search-result').length > 0`)) break;
@@ -539,17 +571,17 @@ async function testSearchDialog(client, baseUrl) {
   assert(await evaluate(client, `location.pathname !== '/docs'`), 'Enter không chọn active Search item');
 
   await navigateReady(client, `${baseUrl}${pages[0]}`, '[data-api-sticky-panel]');
-  await evaluate(
+  await openSearchDialog(client);
+  const aiRouteScope = await evaluate(
     client,
-    `window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))`,
+    `({
+      pathname: location.pathname,
+      scope: document.querySelector('#ods-search-scope')?.value ?? null,
+    })`,
   );
-  await delay(150);
   assert(
-    await evaluate(
-      client,
-      `document.querySelector('#ods-search-scope')?.value === 'ai-contact-center'`,
-    ),
-    'Route AI Contact Center không mặc định đúng product scope',
+    aiRouteScope.scope === 'ai-contact-center',
+    `Route AI Contact Center không mặc định đúng product scope: ${JSON.stringify(aiRouteScope)}`,
   );
 
   await evaluate(
@@ -580,14 +612,17 @@ async function testSearchDialog(client, baseUrl) {
     `document.querySelector('[aria-label="Đóng tìm kiếm"]')?.click()`,
   );
   await navigateReady(client, `${baseUrl}/docs/cloudfile`, 'body');
-  await evaluate(
+  await openSearchDialog(client);
+  const cloudfileRouteScope = await evaluate(
     client,
-    `window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))`,
+    `({
+      pathname: location.pathname,
+      scope: document.querySelector('#ods-search-scope')?.value ?? null,
+    })`,
   );
-  await delay(150);
   assert(
-    await evaluate(client, `document.querySelector('#ods-search-scope')?.value === 'cloudfile'`),
-    'Route CloudFile không mặc định đúng product scope',
+    cloudfileRouteScope.scope === 'cloudfile',
+    `Route CloudFile không mặc định đúng product scope: ${JSON.stringify(cloudfileRouteScope)}`,
   );
 
   return { stableMs, warmStableMs, ...race };
@@ -596,12 +631,8 @@ async function testSearchDialog(client, baseUrl) {
 async function main() {
   const appPort = await getFreePort();
   const baseUrl = `http://127.0.0.1:${appPort}`;
-  const isWindows = process.platform === 'win32';
-  const server = spawn('npx', ['next', 'start', '-p', String(appPort)], {
-    env: { ...process.env, ODS_INTERNAL_DEV_OPEN: undefined },
-    shell: true,
-    detached: !isWindows,
-    stdio: ['ignore', 'pipe', 'pipe'],
+  const server = spawnStandaloneServer(appPort, {
+    unsetEnv: ['ODS_INTERNAL_DEV_OPEN'],
   });
   let serverOutput = '';
   server.stdout.on('data', (chunk) => { serverOutput += chunk.toString(); });

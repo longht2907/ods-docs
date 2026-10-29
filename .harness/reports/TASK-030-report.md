@@ -6,7 +6,7 @@
 - Worktree: `E:\Project\ods-docs-v4-1`
 - Task status: `in-progress`
 - Commit: chưa tạo
-- Pull Request / CI: chưa thực hiện; không đặt `done` trước khi PR CI xanh
+- Pull Request: `#32` đang mở; các sửa lỗi regression trong báo cáo này chưa commit/push và chưa có CI mới
 - Dịch vụ kiểm tra: `http://localhost:3010/`, HTTP 200 sau khi khởi động lại
 
 ## Kết quả triển khai
@@ -32,6 +32,7 @@
 - `src/app/(home)/home.module.css`
 - `src/components/home/home-search-trigger.tsx`
 - `harness/tests/home-v4-regression.test.mjs`
+- `harness/tests/helpers/standalone-server.mjs`
 - `tasks/TASK-030-home-v4-1.md`
 - `.harness/reports/TASK-030-report.md`
 - `.harness/reports/assets/TASK-030/*.png`
@@ -43,6 +44,9 @@
 - `src/components/home/solution-orbit.tsx`
 - `src/lib/home-content.ts`
 - `package.json`
+- `harness/tests/api-ui-regression.test.mjs`
+- `harness/tests/routes.test.mjs`
+- `harness/tests/search-regression.test.mjs`
 
 `next-env.d.ts` đã được trả về đúng nội dung của `HEAD`, không nằm trong TASK-030.
 
@@ -51,7 +55,6 @@
 ### Home UI regression
 
 ```powershell
-$env:HOME_V4_BASE_URL='http://localhost:3010'
 npm run test:home-ui
 ```
 
@@ -65,6 +68,16 @@ Kết quả: **PASS**.
 - Click search, `Ctrl+K`, query có kết quả, empty state, Escape và public-only search scope đều đạt.
 - Không có link `/internal`, control thiếu accessible name hoặc copy/status giả bị cấm.
 - Screenshot harness được sửa race condition khi điều hướng lặp lại cùng URL; mỗi lượt dùng query riêng để chỉ chụp sau navigation hoàn tất.
+- Reduced Motion chờ style recalculation qua hai animation frames trước khi đọc computed style; chạy riêng PASS 2/2 lần.
+
+### API UI và standalone harness
+
+- Assertion scope thất bại không phải do mapping route: khi tái hiện, `location.pathname` đã đúng nhưng `#ods-search-scope` là `null` vì dialog chưa mount.
+- Primitive điều hướng nay xác nhận document mới bằng URL đích và navigation marker, tránh đọc selector còn tồn tại trên trang API cũ.
+- Hotkey `Ctrl+K` được retry có giới hạn đến khi React hydration gắn listener; open state yêu cầu dialog không có `data-closed`.
+- Kỳ vọng scope giữ nguyên: `/docs` → `all`, AI Contact Center → `ai-contact-center`, CloudFile → `cloudfile`.
+- `test:api-ui` PASS 3/3 lần liên tiếp sau sửa.
+- Production regression tests chạy `.next/standalone/server.js` và copy `public`/`.next/static` giống Docker runtime; không còn cảnh báo dùng `next start` với `output: 'standalone'`.
 
 ### Repository gates
 
@@ -89,7 +102,7 @@ npm run verify:task
 
 `https://docs.example.test` chỉ là non-loopback origin tạm trong process local để production build kiểm chứng metadata; không được ghi vào `.env` hoặc config.
 
-Kết quả tổng: **FAIL tại regression ngoài phạm vi Home**.
+Kết quả tổng: **PASS**.
 
 - `types:check`: PASS.
 - `check:env`: PASS.
@@ -98,12 +111,8 @@ Kết quả tổng: **FAIL tại regression ngoài phạm vi Home**.
 - `check:scope`: PASS.
 - `next build`: PASS; route `/` prerender static.
 - `test:routes`: PASS 21/21; `/internal/**` và `/api/search/internal/**` tiếp tục trả 401.
-- `test:api-ui`: FAIL với output `Tab Python không được khôi phục trên trang StartCampaign`.
-- Chuỗi dừng tại đây theo shell `&&`; không sửa/nới API test vì ngoài phạm vi TASK-030.
-
-Các gate nằm sau điểm dừng được chạy riêng:
-
-- `test:home-ui`: PASS.
+- `test:api-ui`: PASS; desktop/mobile, tab persistence, search scope theo route, keyboard và race checks đạt.
+- `test:home-ui`: PASS; 8 tổ hợp viewport/theme và 4 screenshot đạt.
 - `test:search`: PASS; extraction, grouping, anchors, Vietnamese/API keywords và public/internal boundary đạt.
 - `test:internal-content`: PASS; 21 flows, 76 valid step links, internal vẫn 401.
 - `test:flowchart`: PASS; 12 route/viewport/theme cases và geometry/anchor checks trên 21 process pages.
@@ -141,8 +150,8 @@ Kết quả final: `[]` — không có warning.
 
 ## Giới hạn còn lại
 
-- Chưa commit, push, mở Pull Request hoặc chạy PR CI.
+- Chưa commit hoặc push các sửa lỗi regression hiện tại; PR `#32` chưa có CI cho diff mới.
 - Task tiếp tục `in-progress`; `commit: ""` được giữ nguyên.
-- `verify:task` chưa xanh do `test:api-ui` hiện hữu thất bại ngoài phạm vi Home.
+- `verify:task` local đã xanh; vẫn phải chờ PR CI xanh trước khi đổi task sang `done`.
 - Không deploy production và không xác minh production origin.
 - Hai Node test hiện hữu in warning `MODULE_TYPELESS_PACKAGE_JSON`; các test tương ứng vẫn PASS.

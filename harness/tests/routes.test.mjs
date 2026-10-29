@@ -4,8 +4,9 @@
  * chạy các test route public/internal và tự tắt server khi kết thúc.
  */
 
-import { spawn, execSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import net from 'node:net';
+import { spawnStandaloneServer } from './helpers/standalone-server.mjs';
 
 function getFreePort() {
   return new Promise((resolve, reject) => {
@@ -124,12 +125,8 @@ async function main() {
   const env = { ...process.env };
   delete env.ODS_INTERNAL_DEV_OPEN;
 
-  const isWin = process.platform === 'win32';
-  const serverProc = spawn('npx', ['next', 'start', '-p', String(port)], {
+  const serverProc = spawnStandaloneServer(port, {
     env,
-    shell: true,
-    detached: !isWin,
-    stdio: ['ignore', 'pipe', 'pipe'],
   });
 
   let serverOutput = '';

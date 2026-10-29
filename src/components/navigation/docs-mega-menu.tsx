@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
+import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRight,
   BookOpen,
@@ -9,159 +10,136 @@ import {
   ChevronDown,
   Cloud,
   FileText,
+  Layers3,
   Library,
-  Mail,
+  LifeBuoy,
   PhoneCall,
-  Sparkles,
 } from 'lucide-react';
-import { docsProducts } from '@/lib/docs-products';
+import { docsProducts, type DocsProductIcon } from '@/lib/docs-products';
+
+const productIcons: Record<DocsProductIcon, LucideIcon> = {
+  phone: PhoneCall,
+  cloud: Cloud,
+  server: Layers3,
+  managed: LifeBuoy,
+  license: Braces,
+};
 
 export function DocsMegaMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const menuId = useId();
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') setIsOpen(false);
+    if (!isOpen) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      setIsOpen(false);
+      triggerRef.current?.focus();
     }
-    function handleClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+
+    function handlePointerDown(event: PointerEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('pointerdown', handlePointerDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('pointerdown', handlePointerDown);
     };
   }, [isOpen]);
 
+  const closeMenu = () => setIsOpen(false);
+
   return (
-    <div ref={menuRef} className="relative inline-block text-left">
-      {/* Trigger Button */}
+    <div ref={menuRef} className="relative inline-block text-left" data-docs-menu>
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring ${
+        onClick={() => setIsOpen((open) => !open)}
+        className={`inline-flex min-h-9 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring ${
           isOpen
-            ? 'bg-fd-accent text-fd-foreground shadow-sm'
+            ? 'bg-fd-accent text-fd-foreground'
             : 'text-fd-muted-foreground hover:bg-fd-accent/60 hover:text-fd-foreground'
         }`}
         aria-expanded={isOpen}
         aria-haspopup="true"
+        aria-controls={menuId}
+        data-docs-menu-trigger
       >
         <BookOpen className="size-3.5 text-orange-500" aria-hidden="true" />
-        <span>Tài liệu Sản phẩm</span>
+        <span>Tài liệu sản phẩm</span>
         <ChevronDown
-          className={`size-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`size-3.5 transition-transform duration-150 motion-reduce:transition-none ${isOpen ? 'rotate-180' : ''}`}
           aria-hidden="true"
         />
       </button>
 
-      {/* Floating Panel: Tinh gọn, trực quan, chuyên biệt cho Tài liệu */}
       {isOpen && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-[580px] origin-top-left rounded-2xl border border-fd-border/80 bg-fd-popover/95 p-4 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150">
-          <div className="flex items-center justify-between border-b border-fd-border/60 pb-3">
-            <div>
-              <p className="text-xs font-bold text-fd-foreground">
-                Không gian Tài liệu Kỹ thuật
-              </p>
-              <p className="text-[11px] text-fd-muted-foreground">
-                Chọn sản phẩm để mở hướng dẫn sử dụng và tài liệu tích hợp API
-              </p>
-            </div>
-            <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-[10px] font-bold text-orange-600 dark:text-orange-400">
-              <Sparkles className="size-3" />
-              ODS Docs Hub
-            </span>
-          </div>
-
-          {/* Grid các không gian tài liệu */}
-          <div className="mt-3.5 grid grid-cols-2 gap-3">
-            {docsProducts.map((product) => {
-              const isAcc = product.slug === 'ai-contact-center';
+        <div className="absolute left-0 top-full z-50 w-[min(380px,calc(100vw-2rem))] pt-2">
+          <div
+            id={menuId}
+            className="rounded-xl border border-fd-border bg-fd-popover p-2 text-fd-popover-foreground shadow-xl animate-in fade-in slide-in-from-top-1 duration-150 motion-reduce:animate-none"
+            data-docs-menu-panel
+          >
+            {docsProducts.map((product, index) => {
+              const ProductIcon = productIcons[product.icon];
               return (
-                <div
+                <section
                   key={product.slug}
-                  className="flex flex-col justify-between rounded-xl border border-fd-border/70 bg-fd-card/60 p-3 transition-all hover:border-orange-500/40 hover:bg-fd-accent/30"
+                  className={index === 0 ? 'px-2 py-2.5' : 'border-t border-fd-border px-2 py-2.5'}
                 >
-                  <div>
-                    {/* Header sản phẩm */}
-                    <div className="flex items-center justify-between pb-2 border-b border-fd-border/40">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`grid size-7 place-items-center rounded-lg ${
-                            isAcc
-                              ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
-                              : 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
-                          }`}
-                        >
-                          {isAcc ? (
-                            <PhoneCall className="size-3.5" />
-                          ) : (
-                            <Cloud className="size-3.5" />
-                          )}
-                        </span>
-                        <div>
-                          <p className="text-xs font-bold text-fd-foreground">
-                            {product.name}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
-                        Sẵn sàng
-                      </span>
-                    </div>
-
-                    {/* Entry links */}
-                    <div className="mt-2.5 space-y-1.5">
-                      {product.entries.map((entry) => (
-                        <Link
-                          key={entry.href}
-                          href={entry.href}
-                          onClick={() => setIsOpen(false)}
-                          className="group/entry flex items-center justify-between rounded-lg border border-fd-border/50 bg-fd-background/90 px-2.5 py-1.5 text-[11px] font-medium text-fd-foreground transition-all hover:border-orange-500/40 hover:bg-orange-500/5 hover:text-orange-600 dark:hover:text-orange-400"
-                        >
-                          <div className="flex items-center gap-2 truncate">
-                            {entry.icon === 'api' ? (
-                              <Braces className="size-3 text-orange-500" />
-                            ) : (
-                              <FileText className="size-3 text-sky-500" />
-                            )}
-                            <span className="truncate">{entry.label}</span>
-                          </div>
-                          <ArrowRight className="size-3 opacity-0 transition-opacity group-hover/entry:opacity-100" />
-                        </Link>
-                      ))}
-                    </div>
+                  <h2 className="flex items-center gap-2 text-xs font-bold text-fd-foreground">
+                    <ProductIcon className="size-3.5 text-fd-muted-foreground" aria-hidden="true" />
+                    {product.shortName}
+                  </h2>
+                  <div className="mt-1.5">
+                    {product.entries.map((entry) => (
+                      <Link
+                        key={entry.href}
+                        href={entry.href}
+                        onClick={closeMenu}
+                        className="group flex min-h-11 items-center gap-2 rounded-md px-2 text-xs font-medium text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-foreground focus-visible:bg-fd-accent focus-visible:text-fd-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+                        data-docs-menu-entry
+                      >
+                        {entry.icon === 'api' ? (
+                          <Braces className="size-3.5 text-orange-500" aria-hidden="true" />
+                        ) : (
+                          <FileText className="size-3.5 text-sky-500" aria-hidden="true" />
+                        )}
+                        <span>{entry.label}</span>
+                        <ArrowRight
+                          className="ml-auto size-3.5 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                          aria-hidden="true"
+                        />
+                      </Link>
+                    ))}
                   </div>
-                </div>
+                </section>
               );
             })}
-          </div>
 
-          {/* Bottom Bar: Quick links */}
-          <div className="mt-4 flex items-center justify-between border-t border-fd-border/60 pt-3 text-[11px]">
-            <Link
-              href="/docs"
-              onClick={() => setIsOpen(false)}
-              className="inline-flex items-center gap-1.5 font-bold text-fd-foreground hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
-            >
-              <Library className="size-3.5 text-orange-500" />
-              <span>Duyệt tất cả tài liệu (/docs)</span>
-              <ArrowRight className="size-3" />
-            </Link>
-
-            <a
-              href="mailto:support@ods.vn"
-              className="inline-flex items-center gap-1 text-fd-muted-foreground hover:text-fd-foreground transition-colors"
-            >
-              <Mail className="size-3" />
-              <span>Hỗ trợ kỹ thuật</span>
-            </a>
+            <div className="border-t border-fd-border px-2 pt-2">
+              <Link
+                href="/docs"
+                onClick={closeMenu}
+                className="group flex min-h-11 items-center gap-2 rounded-md px-2 text-xs font-bold text-fd-foreground transition-colors hover:bg-fd-accent focus-visible:bg-fd-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+                data-docs-menu-entry
+              >
+                <Library className="size-3.5 text-orange-500" aria-hidden="true" />
+                <span>Duyệt tất cả tài liệu</span>
+                <ArrowRight
+                  className="ml-auto size-3.5 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                  aria-hidden="true"
+                />
+              </Link>
+            </div>
           </div>
         </div>
       )}

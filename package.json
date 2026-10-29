@@ -15,10 +15,11 @@
     "check:env": "node harness/linters/env-guard.mjs",
     "test:routes": "node harness/tests/routes.test.mjs",
     "test:api-ui": "node harness/tests/api-ui-regression.test.mjs",
+    "test:home-ui": "node harness/tests/home-v4-regression.test.mjs",
     "test:search": "node --experimental-strip-types harness/tests/search-regression.test.mjs",
     "verify:code": "npm run types:check && npm run check:env && npm run check:links && npm run guard",
     "verify": "npm run verify:code && npm run build",
-    "verify:task": "npm run verify:code && npm run check:scope && npm run build && npm run test:routes && npm run test:api-ui && npm run test:search && npm run test:internal-content && npm run test:flowchart",
+    "verify:task": "npm run verify:code && npm run check:scope && npm run build && npm run test:routes && npm run test:api-ui && npm run test:home-ui && npm run test:search && npm run test:internal-content && npm run test:flowchart",
     "media:package": "node scripts/package-media.mjs",
     "test:internal-content": "node --experimental-strip-types harness/tests/internal-content.test.mjs",
     "test:flowchart": "node harness/tests/flowchart-regression.test.mjs"

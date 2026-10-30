@@ -83,6 +83,7 @@ export default function OdsSearchDialog(props: SharedProps) {
     : query.data === 'empty' || query.data === undefined
       ? null
       : query.data;
+  const pageCount = items?.filter((item) => item.type === 'page').length ?? 0;
 
   const Empty = () => (
     <div className="ods-search-state" role="status" aria-live="polite">
@@ -150,8 +151,18 @@ export default function OdsSearchDialog(props: SharedProps) {
               </option>
             ))}
           </select>
+          {pageCount > 0 ? (
+            <output className="ods-search-count" aria-live="polite">
+              {pageCount} bài phù hợp
+            </output>
+          ) : null}
         </div>
         <SearchDialogList items={items} Empty={Empty} Item={Item} aria-label="Kết quả tìm kiếm" />
+        <div className="ods-search-help" aria-hidden="true">
+          <span><kbd>↑</kbd><kbd>↓</kbd> Di chuyển</span>
+          <span><kbd>Enter</kbd> Mở</span>
+          <span><kbd>Esc</kbd> Đóng</span>
+        </div>
       </SearchDialogContent>
     </SearchDialog>
   );

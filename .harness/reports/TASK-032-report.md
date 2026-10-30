@@ -3,9 +3,42 @@
 ## Trạng thái
 
 - Branch: `task/TASK-032-search-performance-isolation`
-- Task: `done` — PR #34 CI `verify` xanh cho commit triển khai `77c9dcc`.
+- Task: `in-progress` — PR #34 được mở lại để bổ sung Search result UX theo nghiệm thu trực tiếp của Human.
 - Môi trường đo: Windows 10.0.19045, Node.js 22.23.4, Next.js 16.4.3,
   125 public MDX và 80 internal MDX.
+
+## Bổ sung Search result UX theo nghiệm thu Human
+
+Hai vùng tiếp tục dùng chung `OdsSearchDialog` và renderer Fumadocs, nhưng giữ endpoint/index
+độc lập. Đợt bổ sung này sửa khả năng quét kết quả mà không thay đổi trust boundary:
+
+- Keyword dùng màu cam có nền nhẹ và underline nhất quán ở `/docs` và `/internal`, gồm
+  Light/Dark; không còn phụ thuộc primary color của route.
+- Inline code trong snippet được làm phẳng trước khi render. Trường hợp thực tế
+  `` `487 Cancel` `` nay trả `487 <mark>Cancel</mark>` thay vì tìm đúng nhưng không highlight.
+- Page title có hierarchy rõ hơn; item đang chọn bằng bàn phím có nền và focus inset rõ.
+- Thanh scope hiển thị số bài phù hợp. Desktop có trợ giúp `↑`/`↓`, `Enter`, `Esc`; mobile
+  ẩn footer trợ giúp để giữ không gian kết quả và không tràn ngang.
+- Giữ nguyên debounce 100 ms, cache, cancellation, giới hạn 6 page/2 snippet, URL/schema,
+  product/service tag, internal cache header và production fail-closed.
+
+Kiểm chứng bổ sung:
+
+| Lệnh / kiểm tra | Kết quả |
+| --- | --- |
+| `npm run types:check` | PASS |
+| `npm run test:search` | PASS — có regression cho keyword trong inline code |
+| `npm run build` | PASS — 462/462 static pages, standalone |
+| `npm run test:api-ui` | PASS — desktop 1280/1440/1920, mobile 390/768, Light/Dark; count/highlight/focus/keyboard/overflow đạt |
+| Impeccable detector | PASS — `[]`, không có finding trên Search component/CSS |
+| `ODS_DOCS_SITE_URL=https://ods-docs-ci.invalid; npm run verify:task` | PASS — toàn bộ route/UI/search/internal-content/flowchart suite |
+| Runtime internal `cancel` | PASS — inline code được highlight, URL chỉ thuộc `/internal/ai-contact-center/**` |
+
+Lần chạy `test:api-ui` riêng đầu tiên dừng ở regression tab persistence có tính timing. Lần
+chạy tiếp theo phát hiện assertion Search mới đọc selected item trước `ArrowDown`; Human đã duyệt
+sửa assertion lấy trạng thái sau thao tác. Lần chạy riêng sau đó và toàn bộ `verify:task` đều PASS.
+Warm query `máy nhánh` trong full suite ổn định sau 190 ms; cold query không được dùng để tuyên
+bố cải thiện latency vì gồm startup/compile của standalone test.
 
 ## Kết luận và root cause
 

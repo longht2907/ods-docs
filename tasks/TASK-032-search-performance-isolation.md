@@ -1,7 +1,7 @@
 ---
-status: done
+status: in-progress
 branch: task/TASK-032-search-performance-isolation
-commit: 77c9dcc
+commit: ""
 verified-by: npm run verify:task
 ---
 
@@ -21,6 +21,8 @@ localhost; cần tách cold compile, debounce, API/index, network và render tr�
 - Sửa bottleneck có bằng chứng, xử lý request cũ và trạng thái loading/error đúng.
 - Gắn `Cache-Control: private, no-store, must-revalidate` cho response internal Search.
 - Bổ sung regression test và báo cáo số đo trước–sau có thể chạy lại.
+- Đồng nhất trải nghiệm đọc kết quả giữa public Docs và Support Wiki: highlight rõ,
+  nhận diện keyword trong inline code, hiển thị số bài phù hợp và trợ giúp bàn phím.
 
 ## Phạm vi (Scope)
 
@@ -35,6 +37,7 @@ localhost; cần tách cold compile, debounce, API/index, network và render tr�
 
 - `package.json` — thêm lệnh benchmark, không thêm dependency.
 - `src/components/search-dialog.tsx` — lifecycle query/scope và cancellation nếu baseline xác nhận.
+- `src/app/global.css` — hierarchy, highlight, trạng thái chọn và responsive của Search dialog.
 - `src/lib/search-results.ts` — contract response private/no-store và service scope internal.
 - `src/app/api/search/internal/route.ts` — header private/no-store và filter theo service tag.
 - `harness/tests/search-regression.test.mjs` — boundary, cache header và contract endpoint.
@@ -79,6 +82,8 @@ Public UI không được cung cấp scope internal. Production tiếp tục fai
 - [x] `npm run verify:task` PASS với output thật trong báo cáo nghiệm thu.
 - [x] `/internal` chỉ hiển thị service scope nội bộ và mặc định theo service của route hiện tại.
 - [x] Mọi service scope tại `/internal` gọi `/api/search/internal` với tag tương ứng.
+- [x] `/docs` và `/internal` có highlight dễ quét, kể cả keyword trong inline code.
+- [x] Search hiển thị số bài phù hợp, keyboard help desktop và không tràn ngang mobile.
 
 ## Điều kiện dừng
 

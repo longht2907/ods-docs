@@ -453,15 +453,22 @@ async function testSearchDialog(client, baseUrl) {
       const text = dialog?.textContent ?? '';
       const results = [...document.querySelectorAll('.ods-search-result')];
       const pageCount = results.filter((item) => item.dataset.resultType === 'page').length;
+      const highlight = document.querySelector('.ods-search-result .text-fd-primary.underline');
       const selectedBefore = results.findIndex((item) => item.getAttribute('aria-selected') === 'true');
       dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await new Promise(requestAnimationFrame);
       await new Promise(requestAnimationFrame);
       const selectedAfter = results.findIndex((item) => item.getAttribute('aria-selected') === 'true');
+      const selectedResult = selectedAfter >= 0 ? results[selectedAfter] : null;
       return {
         text,
         pageCount,
         resultCount: results.length,
+        countText: document.querySelector('.ods-search-count')?.textContent?.trim() ?? '',
+        helpText: document.querySelector('.ods-search-help')?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+        highlightColor: highlight ? getComputedStyle(highlight).color : '',
+        highlightBackground: highlight ? getComputedStyle(highlight).backgroundColor : '',
+        selectedShadow: selectedResult ? getComputedStyle(selectedResult).boxShadow : '',
         selectedBefore,
         selectedAfter,
         horizontalOverflow: dialog.scrollWidth > dialog.clientWidth,
@@ -474,6 +481,10 @@ async function testSearchDialog(client, baseUrl) {
   assert(abortedWebhook, 'Request webhook cũ không bị AbortController hủy');
   assert(race.pageCount <= 8, `Search dialog render ${race.pageCount} bài`);
   assert(race.resultCount <= 32, `Search dialog render ${race.resultCount} items`);
+  assert(race.countText === `${race.pageCount} bài phù hợp`, `Search count sai: ${race.countText}`);
+  assert(/Di chuyển.*Mở.*Đóng/.test(race.helpText), `Thiếu trợ giúp bàn phím: ${race.helpText}`);
+  assert(race.highlightColor && race.highlightBackground !== 'rgba(0, 0, 0, 0)', 'Keyword highlight chưa có màu/nền rõ ràng');
+  assert(race.selectedShadow && race.selectedShadow !== 'none', 'Kết quả đang chọn chưa có visual focus rõ ràng');
   assert(!race.horizontalOverflow, 'Search dialog bị tràn ngang');
   assert(race.selectedAfter !== race.selectedBefore, 'ArrowDown không đổi active Search item');
 

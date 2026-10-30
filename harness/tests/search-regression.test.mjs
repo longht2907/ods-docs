@@ -8,7 +8,26 @@ import {
   getSearchClientOptions,
   getSearchRouteScope,
   getSearchScopeOptions,
+  prepareSearchResults,
 } from '../../src/lib/search-results.ts';
+
+const inlineCodeHighlight = prepareSearchResults([
+  {
+    id: 'inline-code-highlight',
+    type: 'page',
+    content: 'Mã ngắt `487 Cancel`',
+    breadcrumbs: ['Tổng đài'],
+    url: '/internal/ai-contact-center/runbooks/calls/example',
+  },
+], 'cancel');
+assert(
+  inlineCodeHighlight[0]?.content.includes('<mark>Cancel</mark>'),
+  'Search chưa highlight keyword nằm trong inline code',
+);
+assert(
+  !inlineCodeHighlight[0]?.content.includes('`'),
+  'Search result còn giữ backtick làm keyword khó đọc',
+);
 
 const queries = [
   'nhân viên',

@@ -102,7 +102,25 @@ export function getSearchClientOptions(scope: SearchScope, pathname: string): Se
 function cleanSearchContent(content: string): string {
   return content
     .replace(/\*\*([^*]+?)\s*\*\*/g, '$1')
-    .replace(/__([^_]+?)\s*__/g, '$1');
+    .replace(/__([^_]+?)\s*__/g, '$1')
+    .replace(/`([^`\n]+)`/g, '$1');
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function highlightMissingQuery(content: string, query: string): string {
+  const normalizedQuery = query.trim();
+  if (!normalizedQuery) return content;
+
+  const queryPattern = new RegExp(escapeRegExp(normalizedQuery), 'giu');
+  return content
+    .split(/(<mark>[\s\S]*?<\/mark>)/giu)
+    .map((segment) => segment.startsWith('<mark>')
+      ? segment
+      : segment.replace(queryPattern, '<mark>$&</mark>'))
+    .join('');
 }
 
 function searchableText(content: string): string {
@@ -142,7 +160,10 @@ export function prepareSearchResults(results: SortedResult[], query: string): So
     .map((group, position) => ({ group, position, priority: getGroupPriority(group, query) }))
     .sort((left, right) => right.priority - left.priority || left.position - right.position)
     .flatMap(({ group }) => group)
-    .map((item) => ({ ...item, content: cleanSearchContent(item.content) }));
+    .map((item) => ({
+      ...item,
+      content: highlightMissingQuery(cleanSearchContent(item.content), query),
+    }));
 
   return limitSearchResults(prioritized);
 }

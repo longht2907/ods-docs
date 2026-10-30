@@ -21,6 +21,8 @@ import {
   getSearchClientOptions,
   getSearchRouteScope,
   getSearchScopeOptions,
+  isInternalSearchPath,
+  parseInternalSearchServiceTag,
   parseSearchProductTag,
   type SearchScope,
 } from '@/lib/search-results';
@@ -52,11 +54,11 @@ export default function OdsSearchDialog(props: SharedProps) {
   const coordinator = useMemo(createSearchRequestCoordinator, []);
   const client = useMemo(
     () => createAbortableSearchClient({
-      ...getSearchClientOptions(scope),
+      ...getSearchClientOptions(scope, pathname),
       cache,
       coordinator,
     }),
-    [cache, coordinator, scope],
+    [cache, coordinator, pathname, scope],
   );
   const { search, setSearch, query } = useDocsSearch({ client, delayMs: 100 });
 
@@ -64,7 +66,7 @@ export default function OdsSearchDialog(props: SharedProps) {
     coordinator.abort();
     setScope(routeScope);
     setSearch('');
-    if (routeScope !== 'internal') clearInternalSearchCache(cache);
+    if (!isInternalSearchPath(pathname)) clearInternalSearchCache(cache);
   }, [cache, coordinator, pathname, routeScope, setSearch]);
 
   useEffect(() => {
@@ -135,8 +137,10 @@ export default function OdsSearchDialog(props: SharedProps) {
               const value = event.currentTarget.value;
               if (value === 'all' || value === 'internal') setScope(value);
               else {
-                const product = parseSearchProductTag(value);
-                if (product) setScope(product);
+                const selectedScope = isInternalSearchPath(pathname)
+                  ? parseInternalSearchServiceTag(value)
+                  : parseSearchProductTag(value);
+                if (selectedScope) setScope(selectedScope);
               }
             }}
           >

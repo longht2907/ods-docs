@@ -4,10 +4,17 @@ export const SEARCH_PAGE_LIMIT = 6;
 export const SEARCH_SNIPPET_LIMIT = 2;
 export const SEARCH_ENGINE_RESULT_LIMIT = SEARCH_PAGE_LIMIT * (SEARCH_SNIPPET_LIMIT + 1);
 export const SEARCH_PRODUCT_TAGS = ['ai-contact-center', 'cloudfile'] as const;
+export const INTERNAL_SEARCH_SERVICE_TAGS = [
+  'ai-contact-center',
+  'data-center',
+  'network',
+  'software-license',
+] as const;
 export const INTERNAL_SEARCH_CACHE_CONTROL = 'private, no-store, must-revalidate';
 
 export type SearchProductTag = (typeof SEARCH_PRODUCT_TAGS)[number];
-export type SearchScope = SearchProductTag | 'all' | 'internal';
+export type InternalSearchServiceTag = (typeof INTERNAL_SEARCH_SERVICE_TAGS)[number];
+export type SearchScope = SearchProductTag | InternalSearchServiceTag | 'all' | 'internal';
 
 export interface SearchScopeOption {
   value: SearchScope;
@@ -16,7 +23,7 @@ export interface SearchScopeOption {
 
 export interface SearchClientOptions {
   api: '/api/search' | '/api/search/internal';
-  tag?: SearchProductTag;
+  tag?: SearchProductTag | InternalSearchServiceTag;
 }
 
 export function createInternalSearchResponse(results: SortedResult[]): Response {
@@ -34,12 +41,21 @@ const publicScopeOptions: ReadonlyArray<SearchScopeOption> = [
 ];
 
 const internalScopeOptions: ReadonlyArray<SearchScopeOption> = [
-  { value: 'internal', label: 'Tài liệu nội bộ' },
-  ...publicScopeOptions,
+  { value: 'internal', label: 'Tất cả tài liệu nội bộ' },
+  { value: 'ai-contact-center', label: 'Tổng đài' },
+  { value: 'data-center', label: 'Data Center' },
+  { value: 'network', label: 'Network' },
+  { value: 'software-license', label: 'License phần mềm' },
 ];
 
 export function parseSearchProductTag(value: string | null): SearchProductTag | undefined {
   return SEARCH_PRODUCT_TAGS.find((tag) => tag === value);
+}
+
+export function parseInternalSearchServiceTag(
+  value: string | null,
+): InternalSearchServiceTag | undefined {
+  return INTERNAL_SEARCH_SERVICE_TAGS.find((tag) => tag === value);
 }
 
 export function getSearchProductTag(pathname: string): SearchProductTag | undefined {
@@ -48,12 +64,20 @@ export function getSearchProductTag(pathname: string): SearchProductTag | undefi
   );
 }
 
+export function getInternalSearchServiceTag(
+  pathname: string,
+): InternalSearchServiceTag | undefined {
+  return INTERNAL_SEARCH_SERVICE_TAGS.find(
+    (tag) => pathname === `/internal/${tag}` || pathname.startsWith(`/internal/${tag}/`),
+  );
+}
+
 export function isInternalSearchPath(pathname: string): boolean {
   return pathname === '/internal' || pathname.startsWith('/internal/');
 }
 
 export function getSearchRouteScope(pathname: string): SearchScope {
-  if (isInternalSearchPath(pathname)) return 'internal';
+  if (isInternalSearchPath(pathname)) return getInternalSearchServiceTag(pathname) ?? 'internal';
   return getSearchProductTag(pathname) ?? 'all';
 }
 
@@ -61,11 +85,17 @@ export function getSearchScopeOptions(pathname: string): ReadonlyArray<SearchSco
   return isInternalSearchPath(pathname) ? internalScopeOptions : publicScopeOptions;
 }
 
-export function getSearchClientOptions(scope: SearchScope): SearchClientOptions {
-  if (scope === 'internal') return { api: '/api/search/internal' };
+export function getSearchClientOptions(scope: SearchScope, pathname: string): SearchClientOptions {
+  if (isInternalSearchPath(pathname)) {
+    return {
+      api: '/api/search/internal',
+      tag: scope === 'internal' ? undefined : parseInternalSearchServiceTag(scope),
+    };
+  }
+
   return {
     api: '/api/search',
-    tag: scope === 'all' ? undefined : scope,
+    tag: scope === 'all' || scope === 'internal' ? undefined : parseSearchProductTag(scope),
   };
 }
 

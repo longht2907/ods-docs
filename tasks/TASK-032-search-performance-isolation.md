@@ -1,7 +1,7 @@
 ---
-status: done
+status: in-progress
 branch: task/TASK-032-search-performance-isolation
-commit: 99fdd6a
+commit: ""
 verified-by: npm run verify:task
 ---
 
@@ -16,7 +16,8 @@ localhost; cần tách cold compile, debounce, API/index, network và render tr�
 ## Mục tiêu
 
 - Đo Search trong `next dev` và production standalone bằng cùng query set.
-- Giữ nguyên contract scope đã chốt tại TASK-027 và ranh giới ADR-001/ADR-007.
+- Sửa contract TASK-027 theo phản hồi Human: scope dịch vụ trong `/internal` phải tiếp tục
+  dùng internal index, không chuyển sang tài liệu public `/docs`.
 - Sửa bottleneck có bằng chứng, xử lý request cũ và trạng thái loading/error đúng.
 - Gắn `Cache-Control: private, no-store, must-revalidate` cho response internal Search.
 - Bổ sung regression test và báo cáo số đo trước–sau có thể chạy lại.
@@ -34,8 +35,8 @@ localhost; cần tách cold compile, debounce, API/index, network và render tr�
 
 - `package.json` — thêm lệnh benchmark, không thêm dependency.
 - `src/components/search-dialog.tsx` — lifecycle query/scope và cancellation nếu baseline xác nhận.
-- `src/lib/search-results.ts` — contract response private/no-store có thể regression test.
-- `src/app/api/search/internal/route.ts` — header private/no-store cho mọi response.
+- `src/lib/search-results.ts` — contract response private/no-store và service scope internal.
+- `src/app/api/search/internal/route.ts` — header private/no-store và filter theo service tag.
 - `harness/tests/search-regression.test.mjs` — boundary, cache header và contract endpoint.
 - `harness/tests/api-ui-regression.test.mjs` — race, error/empty, scope transition và request cancellation.
 
@@ -58,8 +59,11 @@ localhost; cần tách cold compile, debounce, API/index, network và render tr�
 | `/docs/**` / Tất cả sản phẩm | `/api/search` | public | không |
 | `/docs/**` / AI Contact Center | `/api/search` | public | `ai-contact-center` |
 | `/docs/**` / CloudFile | `/api/search` | public | `cloudfile` |
-| `/internal/**` / Tài liệu nội bộ | `/api/search/internal` | internal | không |
-| `/internal/**` / scope public | `/api/search` | public | theo lựa chọn |
+| `/internal/**` / Tất cả tài liệu nội bộ | `/api/search/internal` | internal | không |
+| `/internal/ai-contact-center/**` | `/api/search/internal` | internal | `ai-contact-center` |
+| `/internal/data-center/**` | `/api/search/internal` | internal | `data-center` |
+| `/internal/network/**` | `/api/search/internal` | internal | `network` |
+| `/internal/software-license/**` | `/api/search/internal` | internal | `software-license` |
 
 Public UI không được cung cấp scope internal. Production tiếp tục fail-closed cho
 `/internal/**` và `/api/search/internal/**`; benchmark không tạo bypass production.
@@ -73,6 +77,8 @@ Public UI không được cung cấp scope internal. Production tiếp tục fai
 - [x] Đổi scope hoặc route hủy/bỏ qua request cũ và không giữ kết quả sai trust zone.
 - [x] Keyboard, Enter, Esc, focus và mobile overflow tiếp tục hoạt động.
 - [x] `npm run verify:task` PASS với output thật trong báo cáo nghiệm thu.
+- [x] `/internal` chỉ hiển thị service scope nội bộ và mặc định theo service của route hiện tại.
+- [x] Mọi service scope tại `/internal` gọi `/api/search/internal` với tag tương ứng.
 
 ## Điều kiện dừng
 

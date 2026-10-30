@@ -3,7 +3,7 @@
 ## Trạng thái
 
 - Branch: `task/TASK-032-search-performance-isolation`
-- Task: `done` — Pull Request #34 đã có CI `verify` xanh cho commit triển khai `99fdd6a`.
+- Task: `in-progress` — mở lại theo phản hồi Human về service scope trong `/internal`.
 - Môi trường đo: Windows 10.0.19045, Node.js 22.23.4, Next.js 16.4.3,
   125 public MDX và 80 internal MDX.
 
@@ -19,7 +19,7 @@ không phải Search API warm hay production runtime:
 - Standalone baseline public nằm trong khoảng 6–13 ms median tùy scope; internal
   production tiếp tục 401 fail-closed.
 
-Hai vấn đề độc lập đã được sửa:
+Ba vấn đề độc lập đã được sửa:
 
 1. `fumadocs-core/useDocsSearch` chỉ đánh dấu task cũ là interrupted; `fetchClient`
    vẫn để request cũ chạy đến hết. `src/lib/search-client.ts` bổ sung
@@ -27,6 +27,11 @@ Hai vấn đề độc lập đã được sửa:
    unmount hoặc đổi route.
 2. Response 200 của `/api/search/internal` trước đây không có `Cache-Control`.
    Route nay trả `private, no-store, must-revalidate` cho cả empty và result response.
+3. `internalScopeOptions` đã nối trực tiếp `publicScopeOptions`, còn
+   `getSearchClientOptions()` chỉ chọn endpoint theo tên scope. Vì vậy chọn một dịch vụ tại
+   `/internal` đã gọi `/api/search` và trả kết quả `/docs`. Scope internal nay được tạo từ các
+   service thực có trong `content/internal`; pathname chọn service mặc định và mọi lựa chọn đều
+   gọi `/api/search/internal` với tag internal tương ứng.
 
 Không thay index, debounce 100 ms, giới hạn page/snippet hoặc phạm vi dữ liệu vì
 benchmark không chứng minh các phần đó là bottleneck production.
@@ -49,7 +54,7 @@ Search dialog
 | UI/scope | `src/components/search-dialog.tsx` / `OdsSearchDialog` | Scope theo route, query reset khi đổi route, request được abort |
 | Client | `src/lib/search-client.ts` / `createAbortableSearchClient` | Cache URL, abort request cũ, không fetch query rỗng |
 | Public API | `src/app/api/search/route.ts` | Chỉ import `source`, tag public được allowlist |
-| Internal API | `src/app/api/search/internal/route.ts` | Chỉ import `internalSource`, private/no-store response |
+| Internal API | `src/app/api/search/internal/route.ts` | Chỉ import `internalSource`, filter service tag, private/no-store response |
 | Index | Fumadocs `createFromSource` | WeakMap cache theo loader; không rebuild mỗi warm request |
 | Gate | `src/proxy.ts` | `/internal/**` và `/api/search/internal/**` vẫn fail-closed production |
 
@@ -61,8 +66,11 @@ Search dialog
 | `/docs` / AI Contact Center | `/api/search?tag=ai-contact-center` | PASS |
 | `/docs` / CloudFile | `/api/search?tag=cloudfile` | PASS |
 | `/docs` UI | Không có scope internal | PASS |
-| `/internal` / Tài liệu nội bộ | `/api/search/internal`, internal source | PASS trong dev authorized |
-| `/internal` / scope public | `/api/search` với public tag | PASS |
+| `/internal` / Tất cả tài liệu nội bộ | `/api/search/internal`, toàn internal source | PASS trong dev authorized |
+| `/internal/ai-contact-center/**` | `/api/search/internal?tag=ai-contact-center` | PASS — 14 items, 0 URL ngoài scope |
+| `/internal/data-center/**` | `/api/search/internal?tag=data-center` | PASS — 15 items, 0 URL ngoài scope |
+| `/internal/network/**` | `/api/search/internal?tag=network` | PASS — 15 items, 0 URL ngoài scope |
+| `/internal/software-license/**` | `/api/search/internal?tag=software-license` | PASS — 9 items, 0 URL ngoài scope |
 | Public query `sngrep` | Không trả dữ liệu internal | PASS, 0 result |
 | Public `tag=internal` | Không bypass source | PASS, 0 internal result |
 | Direct internal production | 401 với mọi query/tag/scope | PASS |
@@ -137,7 +145,8 @@ Production warm vẫn nhanh; p95 outlier sau sửa xuất hiện dưới tải l
 | `ODS_DOCS_SITE_URL=https://docs.ods.vn; npm run verify:task` | PASS — build 462/462 và toàn bộ test suite |
 | Impeccable detector trên `src/components/search-dialog.tsx` | PASS — không có finding từ source scan |
 | `git diff --check` | PASS |
-| PR #34 CI `verify` | PASS — 2m08s, run `41022239139` |
+| Local dev service-scope API | PASS — 4 service tags, 0 URL ngoài scope; public internal canary = 0 |
+| PR #34 CI `verify` trước phản hồi | PASS — run `41022239139`; chờ CI mới sau push |
 
 Hai lần chạy `verify:task` đầu dừng ở production metadata validation vì thiếu
 `ODS_DOCS_SITE_URL`, sau đó vì dùng loopback origin. Lần chạy cuối dùng origin HTTPS chỉ

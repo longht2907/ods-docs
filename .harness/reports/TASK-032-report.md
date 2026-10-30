@@ -3,7 +3,7 @@
 ## Trạng thái
 
 - Branch: `task/TASK-032-search-performance-isolation`
-- Task: `in-progress` — chỉ chuyển `done` sau khi Pull Request CI xanh.
+- Task: `done` — Pull Request #34 đã có CI `verify` xanh cho commit triển khai `99fdd6a`.
 - Môi trường đo: Windows 10.0.19045, Node.js 22.23.4, Next.js 16.4.3,
   125 public MDX và 80 internal MDX.
 
@@ -137,6 +137,7 @@ Production warm vẫn nhanh; p95 outlier sau sửa xuất hiện dưới tải l
 | `ODS_DOCS_SITE_URL=https://docs.ods.vn; npm run verify:task` | PASS — build 462/462 và toàn bộ test suite |
 | Impeccable detector trên `src/components/search-dialog.tsx` | PASS — không có finding từ source scan |
 | `git diff --check` | PASS |
+| PR #34 CI `verify` | PASS — 2m08s, run `41022239139` |
 
 Hai lần chạy `verify:task` đầu dừng ở production metadata validation vì thiếu
 `ODS_DOCS_SITE_URL`, sau đó vì dùng loopback origin. Lần chạy cuối dùng origin HTTPS chỉ

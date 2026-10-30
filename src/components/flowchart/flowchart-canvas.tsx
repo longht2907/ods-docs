@@ -22,16 +22,23 @@ export function FlowchartCanvas({ data, className = '' }: CanvasProps) {
 
   const computedNodes: Record<string, ComputedNode> = {};
 
+  // Tính chiều cao lớn nhất của từng hàng để căn giữa trục ngang chuẩn xác
+  const rowHeights: Record<number, number> = {};
+  data.nodes.forEach((n) => {
+    const h = Math.max(n.height || NODE_HEIGHT, wrapLabel(n.label).length * 18 + (n.subLabel ? wrapLabel(n.subLabel, 32).length * 15 + 24 : 24));
+    rowHeights[n.row] = Math.max(rowHeights[n.row] || 0, h);
+  });
+
   data.nodes.forEach((n) => {
     const w = n.width || NODE_WIDTH;
     const h = Math.max(n.height || NODE_HEIGHT, wrapLabel(n.label).length * 18 + (n.subLabel ? wrapLabel(n.subLabel, 32).length * 15 + 24 : 24));
-    // Căn giữa mỗi cột
+    // Căn giữa mỗi cột và căn giữa theo tâm hàng
     const cx = padLeft + (n.col + colOffset) * COL_SPACING + COL_SPACING / 2;
-    const cy = padTop + (n.row - minRow) * ROW_SPACING + h / 2;
+    const rowCenterY = padTop + (n.row - minRow) * ROW_SPACING + (rowHeights[n.row] || NODE_HEIGHT) / 2;
     computedNodes[n.id] = {
       ...n,
       x: cx - w / 2,
-      y: cy - h / 2,
+      y: rowCenterY - h / 2,
       w,
       h,
     };
@@ -106,7 +113,19 @@ export function FlowchartCanvas({ data, className = '' }: CanvasProps) {
       return `M ${p1.x} ${p1.y} H ${p2.x} V ${p2.y}`;
     }
 
-    if (fromPort === 'top' && (toPort === 'right' || toPort === 'left')) {
+    if (fromPort === 'top' && toPort === 'right') {
+      const r = Math.min(14, Math.abs(p1.y - p2.y) / 2, Math.abs(p1.x - p2.x) / 2);
+      if (p1.x > p2.x && p1.y > p2.y && r > 2) {
+        return `M ${p1.x} ${p1.y} L ${p1.x} ${p2.y + r} Q ${p1.x} ${p2.y} ${p1.x - r} ${p2.y} L ${p2.x} ${p2.y}`;
+      }
+      return `M ${p1.x} ${p1.y} V ${p2.y} H ${p2.x}`;
+    }
+
+    if (fromPort === 'top' && toPort === 'left') {
+      const r = Math.min(14, Math.abs(p1.y - p2.y) / 2, Math.abs(p1.x - p2.x) / 2);
+      if (p1.x < p2.x && p1.y > p2.y && r > 2) {
+        return `M ${p1.x} ${p1.y} L ${p1.x} ${p2.y + r} Q ${p1.x} ${p2.y} ${p1.x + r} ${p2.y} L ${p2.x} ${p2.y}`;
+      }
       return `M ${p1.x} ${p1.y} V ${p2.y} H ${p2.x}`;
     }
 
@@ -189,6 +208,19 @@ export function FlowchartCanvas({ data, className = '' }: CanvasProps) {
         >
           <path d="M 0 1.5 L 8 5 L 0 8.5 z" className="fill-amber-600 dark:fill-amber-400" />
         </marker>
+
+        {/* Mũi tên xanh dương (Nhánh Vòng lặp / Loop) */}
+        <marker
+          id={`${prefix}-arrow-loop`}
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" className="fill-blue-600 dark:fill-blue-400" />
+        </marker>
       </defs>
 
       {/* RENDER EDGES (ĐƯỜNG NỐI) */}
@@ -246,10 +278,15 @@ export function FlowchartCanvas({ data, className = '' }: CanvasProps) {
             markerEnd = `url(#${prefix}-arrow-no)`;
             labelBgClass = 'fill-amber-500/15 stroke-amber-500/40';
             labelTextClass = 'fill-amber-900 dark:fill-amber-200 font-semibold';
+          } else if (edge.variant === 'loop') {
+            strokeClass = 'stroke-blue-500/80 dark:stroke-blue-400/80';
+            markerEnd = `url(#${prefix}-arrow-loop)`;
+            labelBgClass = 'fill-blue-500/15 stroke-blue-500/40';
+            labelTextClass = 'fill-blue-800 dark:fill-blue-200 font-semibold';
           }
 
-          const labelW = edge.label ? Math.max(edge.label.length * 8 + 24, 64) : 0;
-          const labelH = 28;
+          const labelW = edge.label ? Math.min(Math.max(edge.label.length * 7.5 + 18, 56), 110) : 0;
+          const labelH = 26;
 
           return (
             <g key={`edge-${idx}`}>

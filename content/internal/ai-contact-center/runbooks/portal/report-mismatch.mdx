@@ -1,76 +1,147 @@
 ---
-title: Báo cáo sai số liệu
-description: Runbook L1 đối soát bộ lọc, múi giờ và cách tính khi báo cáo Portal không khớp lịch sử cuộc gọi.
+title: Lệch số liệu báo cáo
+description: Runbook L1 đối soát bộ lọc, múi giờ, phân biệt Call Session và Call Leg khi số liệu báo cáo thống kê không khớp trên Portal ODS.
 ---
 
-<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
-  Không sửa dữ liệu báo cáo hoặc cam kết sai lệch hệ thống trước khi đối chiếu cùng bộ lọc, múi giờ và định nghĩa chỉ số.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Phạm vi L1
+Áp dụng khi quản trị viên hoặc giám sát viên (Supervisor) phản ánh **số liệu báo cáo thống kê trên Portal có sự chênh lệch**:
+- Tổng số lượng cuộc gọi trên màn hình Dashboard tổng quan không khớp với tổng số dòng trong màn hình Lịch sử cuộc gọi (CDR).
+- Xuất file Excel báo cáo ra có số lượng cuộc gọi hoặc tổng thời lượng đàm thoại khác với số liệu xem trực tiếp trên web.
+- Một cuộc gọi thực tế bị tính thành nhiều dòng, hoặc cuộc gọi có phát sinh nhưng không tìm thấy trong báo cáo thống kê nhân viên.
 
-Áp dụng khi tổng cuộc gọi, trạng thái, thời lượng, nhân viên/nhóm hoặc file Excel không khớp với lịch sử cuộc gọi hay kỳ vọng khách hàng.
+### Phân biệt với các sự cố gần giống
+- **Không đăng nhập được Portal**: Xem [Không đăng nhập được](/internal/ai-contact-center/runbooks/portal/login-failed).
+- **Cuộc gọi có bản ghi nhưng thiếu file nghe lại ghi âm**: Xem [Thiếu file ghi âm](/internal/ai-contact-center/runbooks/recordings/missing-recordings).
 
-## Triệu chứng
+---
 
-- Tổng số cuộc gọi vào/ra/nhỡ khác giữa hai màn hình hoặc file export.
-- Một cuộc gọi xuất hiện nhiều dòng hoặc không xuất hiện trong báo cáo.
-- Thời lượng/trạng thái/nhân viên xử lý khác với khách hàng kỳ vọng.
+## 2. Tiếp nhận và kiểm tra nhanh
 
-### Phân nhánh nhanh
+L1 cần phân biệt các nguyên nhân phổ biến gây hiểu nhầm về số liệu:
 
-| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
-| --- | --- | --- |
-| Tổng lệch nhưng Call-ID mẫu vẫn đúng | Có thể khác filter, timezone hoặc cách cộng | Đồng bộ điều kiện và định nghĩa chỉ số trước khi chuyển cấp |
-| Một cuộc gọi có nhiều dòng | Có thể đang xem call leg/chuyển tiếp | So với chế độ tổng quát và giải thích cấp dữ liệu |
-| Portal đúng nhưng file export khác | File cũ, filter export hoặc job xuất dữ liệu | Xuất lại khoảng nhỏ với cùng điều kiện |
-| Cùng Call-ID nhưng trạng thái/thời lượng khác | Có khả năng mapping hoặc aggregation lỗi | Chuyển L2 kèm ảnh hai nguồn và Call-ID |
-| Nhiều báo cáo ngừng cập nhật cùng thời điểm | Có thể là pipeline dữ liệu diện rộng | Ghi nhận mốc cuối có dữ liệu và chuyển cấp ngay |
+| Hiện tượng quan sát | Nguyên nhân cốt lõi | Hướng giải thích / Xử lý |
+| :--- | :--- | :--- |
+| **1 cuộc gọi hiển thị thành 2 - 3 dòng trong báo cáo** | Cuộc gọi có chuyển tiếp (Transfer) hoặc đổ chuông qua nhiều máy nhánh trong nhóm (Ring Group). Mỗi chặng là 1 **Call Leg**. | Giải thích cho khách hàng chế độ xem *Phiên tổng quát (Call Session)* so với *Chặng chi tiết (Call Leg)*. |
+| **Tổng số cuộc gọi bị thiếu khi xem hôm nay** | Pipeline tổng hợp báo cáo (Aggregation Job) chạy định kỳ theo chu kỳ (ví dụ mỗi 15-30 phút). | Nhắc khách hàng cuộc gọi vừa mới kết thúc có thể cần vài phút để đồng bộ vào Dashboard tổng hợp. |
+| **Lệch số liệu giữa 2 người xem cùng một lúc** | Hai người dùng đang chọn bộ lọc khác nhau (khác múi giờ, khác nhánh phòng ban hoặc sót điều kiện lọc). | Đồng bộ lại chính xác từng tiêu chí bộ lọc. |
+| **Số liệu trên web đúng nhưng file Excel xuất ra bị trắng/lệch** | Khoảng thời gian xuất quá dài (vượt giới hạn dòng Excel) hoặc job xuất file bị timeout. | Hướng dẫn chia nhỏ khoảng thời gian khi xuất file (ví dụ xuất theo từng tuần). |
 
-## Cần hỏi khách hàng
+---
 
-- Tên báo cáo, tenant, khoảng thời gian, múi giờ và toàn bộ bộ lọc.
-- Chỉ số/cột nào lệch, giá trị kỳ vọng/thực tế và file export nếu có.
-- Hai đến ba mẫu Call-ID/số đã che dữ liệu cùng thời điểm.
-- Khách hàng đang so `Tổng quát cuộc gọi` hay chi tiết từng call leg.
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra L1
+Thu thập thông tin theo 2 nhóm:
 
-1. Áp lại cùng khoảng thời gian, múi giờ, hướng gọi, nhân viên/nhóm và trạng thái.
-2. So lịch sử ở chế độ tổng quát với báo cáo; call leg/chuyển tiếp có thể tạo nhiều dòng chi tiết.
-3. Kiểm tra ngày bắt đầu/kết thúc, ranh giới ngày và thời điểm cuộc gọi hoàn tất.
-4. Đối chiếu mẫu Call-ID thay vì chỉ tổng số.
-5. Xuất lại khoảng thời gian nhỏ để loại trừ timeout hoặc file cũ.
+### Thông tin tối thiểu bắt buộc
+1. **Tên màn hình / Báo cáo đang xem:** Báo cáo tổng quan Dashboard, Báo cáo chi tiết cuộc gọi, hay Báo cáo năng suất nhân viên?
+2. **Khoảng thời gian & Múi giờ đang chọn:** Từ ngày giờ nào đến ngày giờ nào (ví dụ: `00:00 01/10/2026` đến `23:59 05/10/2026`)?
+3. **Chỉ số bị lệch:** Lệch tổng số cuộc gọi, lệch cuộc gọi nhỡ hay lệch thời lượng đàm thoại (chênh lệch bao nhiêu cuộc/phút)?
+4. **Mẫu 1 - 2 mã cuộc gọi (`[CALL_ID]`):** Mã cuộc gọi cụ thể mà khách hàng thấy xuất hiện sai hoặc bị thiếu?
 
-## Xử lý trong phạm vi L1
+### Thông tin bổ sung (Hỏi khi cần)
+- Khách hàng đang đối chiếu giữa 2 màn hình nào trên Portal, hoặc đối chiếu số liệu Portal với phần mềm CRM bên ngoài?
+- Gửi kèm file Excel xuất ra (nếu lỗi liên quan đến file xuất).
 
-- Đồng bộ bộ lọc/múi giờ và giải thích khác biệt giữa call session với call leg.
-- Chọn đúng chế độ tổng quát/chi tiết theo mục đích đối soát.
-- Chia nhỏ kỳ export nếu tập dữ liệu lớn; giữ file gốc để so sánh.
-- Không chỉnh sửa trực tiếp dữ liệu hoặc kết luận mất CDR khi chưa có Call-ID mẫu.
+---
 
-## Điểm dừng và chuyển cấp
+## 4. Checklist kiểm tra an toàn cho L1
 
-- Cùng bộ lọc và Call-ID nhưng dữ liệu Portal/CDR/export vẫn khác nhau.
-- Báo cáo không cập nhật diện rộng, thiếu dữ liệu theo chu kỳ hoặc export lỗi lặp lại.
-- Cần truy vấn database, kiểm tra ETL/aggregation hoặc định nghĩa nghiệp vụ chưa rõ.
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-## Dữ liệu chuyển cấp
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Đồng bộ toàn bộ tiêu chí bộ lọc** | L1 đối chiếu | Áp lại đúng: Thời gian, Hướng gọi (Vào/Ra/Nội bộ), Máy nhánh/Nhóm, Trạng thái | Số liệu hiển thị khớp với màn hình khách hàng | Khách hàng chọn nhầm trạng thái (VD chỉ lọc `Answered` nên thiếu cuộc gọi nhỡ): Hướng dẫn chọn lại `Tất cả`. |
+| **2. Kiểm tra ranh giới ngày & Múi giờ** | L1 đối chiếu | Xem cài đặt múi giờ trên Portal (GMT+7) và mốc giờ bắt đầu/kết thúc | Chọn tròn ngày từ `00:00:00` đến `23:59:59` | Chọn kết thúc lúc `00:00:00` ngày cuối (bị mất nguyên ngày cuối cùng): Chọn lại đến `23:59:59`. |
+| **3. Phân biệt Call Session và Call Leg** | L1 giải thích | Xem cuộc gọi mẫu có chuyển máy từ nhánh A sang nhánh B không | Nếu xem theo Leg thì nhánh A và B mỗi nhánh tính 1 chặng | Khách hàng muốn đếm theo phiên thực tế: Hướng dẫn chuyển chế độ xem sang *Lịch sử cuộc gọi tổng quát*. |
+| **4. Thử nghiệm xuất lại file với khoảng thời gian ngắn** | L1 thực hiện | Thử xuất file Excel trong phạm vi 1 ngày có cuộc gọi mẫu | File xuất đầy đủ các cột, số liệu khớp màn hình | File xuất bị thiếu dòng hoặc báo lỗi server: Job xuất file gặp sự cố. |
+| **5. Tra cứu trực tiếp mã cuộc gọi mẫu trên CDR** | L1 tra cứu | Tìm theo mã `[CALL_ID]` trong hệ thống | Cuộc gọi có tồn tại đầy đủ thông số thời lượng | Cuộc gọi hoàn toàn không có trong CDR: Cuộc gọi chưa từng kết nối tới tổng đài ODS. |
 
-- URL/tên báo cáo, tenant, filter, múi giờ và thời điểm chạy báo cáo.
-- File export đã loại bỏ dữ liệu không liên quan; Call-ID và kết quả đối chiếu từng mẫu.
-- Ảnh hai màn hình cùng bộ lọc và mô tả cách tính khách hàng mong đợi.
+---
 
-## Trả lời mẫu
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-> **Tiếp nhận:** ODS đã ghi nhận số liệu báo cáo chưa khớp. Anh/chị vui lòng cung cấp tên báo cáo, khoảng thời gian, múi giờ, bộ lọc và một số Call-ID mẫu để đối chiếu.
+<Steps>
+  <Step title="Phân biệt bản chất giữa Call Session và Call Leg cho khách hàng">
+    - **Phiên cuộc gọi tổng thể (Call Session):** Đại diện cho 1 lần khách hàng bấm gọi tới hotline (hoặc nhân viên gọi ra ngoài). Nếu khách chỉ gọi 1 lần thì Session luôn bằng **1**.
+    - **Các nhánh cuộc gọi con (Call Legs):** Một phiên cuộc gọi có thể sinh ra nhiều nhánh con:
+      + *Nhóm đổ chuông (Ring Group):* Khách gọi vào đổ chuông đồng thời 4 máy nhánh, 1 nhân viên nghe máy ➔ Ghi nhận **1 Session thành công** và **4 Call Legs** (1 Leg `ANSWERED` của người nghe và 3 Legs `CANCEL/NO ANSWER` của các máy còn lại).
+      + *Chuyển máy (Call Transfer):* Nhân viên A nghe máy rồi chuyển tiếp sang nhân viên B ➔ Ghi nhận **1 Session** nhưng gồm **2 Call Legs** nối tiếp nhau.
+    - **Khuyến nghị:** Nếu đối chiếu với phần mềm CRM bên ngoài, hướng dẫn khách hàng chọn báo cáo theo cấp **Call Session** để số lượng khớp nhau 100%.
+  </Step>
 
-> **Đã đối chiếu:** ODS đã đồng bộ bộ lọc và chế độ hiển thị tổng quát/chi tiết. Anh/chị vui lòng kiểm tra lại báo cáo với cùng điều kiện.
+  <Step title="Chuẩn hóa khung giờ và múi giờ khi lọc dữ liệu">
+    - Hướng dẫn khách hàng chọn ngày kết thúc kèm mốc giờ `23:59:59` để không bị sót các cuộc gọi phát sinh trong buổi chiều tối của ngày cuối cùng.
+    - Đảm bảo múi giờ hiển thị của tài khoản đang chọn đúng `GMT+7 (Asia/Ho_Chi_Minh)`.
+  </Step>
 
-## Nguyên nhân thường gặp và tra cứu
+  <Step title="Tối ưu thao tác khi xuất file Excel báo cáo lớn">
+    - Đối với các doanh nghiệp có sản lượng cuộc gọi lớn (trên 10.000 cuộc/ngày), hướng dẫn khách hàng chia nhỏ khoảng thời gian xuất dữ liệu theo từng tuần hoặc từng ngày để tránh job xử lý file bị quá hạn timeout.
+  </Step>
+</Steps>
 
-- Khác múi giờ/bộ lọc hoặc so call session với từng call leg.
-- Export cũ, kỳ dữ liệu quá lớn hoặc cuộc gọi chưa hoàn tất tại thời điểm thống kê.
+---
 
-- [Lịch sử cuộc gọi](/docs/ai-contact-center/portal/tong-dai/lich-su-cuoc-goi)
-- [Thống kê và báo cáo cuộc gọi](/docs/ai-contact-center/portal/tong-dai/thong-ke-bao-cao-cuoc-goi)
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket lên L2 / Đội phát triển Dữ liệu (Data Engineering) khi:
+
+- [ ] **Báo cáo ngừng cập nhật diện rộng:** Toàn bộ dữ liệu báo cáo của tất cả khách hàng bị đứng yên, không có số liệu mới từ một mốc thời gian cụ thể (nghi vấn đứt pipeline ETL).
+- [ ] **Cùng bộ lọc nhưng số liệu web và file xuất khác nhau hoàn toàn:** Chênh lệch số liệu lớn trên cùng một tập dữ liệu đã chuẩn hóa.
+- [ ] **Lỗi tính toán sai công thức:** Thời lượng đàm thoại bị tính âm, hoặc tổng thời lượng không bằng tổng các máy nhánh con cộng lại.
+- [ ] **Mất dữ liệu CDR diện rộng:** Cuộc gọi đã đàm thoại thành công nhưng hàng loạt bản ghi không xuất hiện trong cơ sở dữ liệu.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Lệch số liệu báo cáo Portal (Report Mismatch)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Tên báo cáo bị lệch: [Báo cáo năng suất nhân viên / Dashboard tổng quan]
+- Khoảng thời gian lọc: [00:00 01/10/2026 đến 23:59 05/10/2026 GMT+7]
+
+[CHI TIẾT CHÊNH LỆCH]:
+- Số liệu trên màn hình Dashboard: [1.250 cuộc gọi]
+- Số liệu trên file Excel xuất ra: [1.180 cuộc gọi] (Lệch 70 cuộc)
+- Mã cuộc gọi mẫu bị thiếu trong báo cáo: [CALL_ID_1], [CALL_ID_2]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Bộ lọc: [Đã đồng bộ đúng khoảng thời gian, đúng múi giờ GMT+7]
+2. Tra cứu CDR: [Các mã cuộc gọi mẫu đều có trên CDR với trạng thái ANSWERED]
+3. Thử nghiệm xuất lại: [Vẫn bị thiếu 70 cuộc gọi trong file xuất]
+
+[NỘI DUNG CẦN L2 / DATA TEAM HỖ TRỢ]:
+- Kiểm tra pipeline tổng hợp dữ liệu báo cáo của tenant [TENANT_ID].
+- Kiểm tra truy vấn aggregation của báo cáo [TÊN_BÁO_CÁO].
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và xin thông tin đối soát
+> *"Dạ ODS đã tiếp nhận phản ánh về việc số liệu báo cáo có sự chênh lệch. Để đối soát dữ liệu chuẩn xác nhất, anh/chị vui lòng chia sẻ giúp em: Khoảng thời gian cụ thể mình đang chọn lọc trên báo cáo, và gửi kèm giúp em 1 - 2 mã cuộc gọi mẫu (kèm số điện thoại và thời điểm gọi) mà mình thấy bị thiếu hoặc hiển thị sai nhé ạ. Em cảm ơn anh/chị!"*
+
+### Mẫu 2: Giải thích khác biệt giữa Call Session và Call Leg
+> *"Dạ qua kiểm tra các cuộc gọi mẫu, các cuộc gọi này được đổ chuông qua nhóm chuyển tiếp nhiều máy nhánh. Khi xem ở màn hình Tổng quan, hệ thống tính là 1 cuộc gọi thành công duy nhất; còn khi xuất chi tiết từng máy nhánh, hệ thống sẽ tách thành từng chặng đổ chuông độc lập. Anh/chị có thể chọn chế độ xem 'Phiên cuộc gọi tổng quát' để số liệu khớp hoàn toàn với số cuộc gọi thực tế nhé ạ."*
+
+### Mẫu 3: Thông báo chuyển cấp chuyên sâu
+> *"Dạ em đã kiểm tra các mã cuộc gọi mẫu của mình đều tồn tại đầy đủ trên hệ thống lịch sử cuộc gọi. Do phần hiển thị trên bảng thống kê đang bị chậm đồng bộ dữ liệu, em đã chuyển thông tin tới đội ngũ Kỹ sư Dữ liệu để kiểm tra tiến trình cập nhật báo cáo ngay cho mình ạ."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Chạy lại báo cáo với cùng điều kiện:** Nhập lại các tiêu chí bộ lọc, bấm Tìm kiếm/Xuất báo cáo.
+2. **Đối chiếu số lượng tổng:** Xác nhận tổng số cuộc gọi và thời lượng khớp hoàn toàn giữa màn hình web và file xuất ra.
+3. **Kiểm tra sự xuất hiện của các mã cuộc gọi mẫu:** Đảm bảo các cuộc gọi mẫu trước đó bị thiếu nay đã xuất hiện đầy đủ trong bảng thống kê.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Báo cáo thiếu toàn bộ cuộc gọi sau 17h ngày cuối | Bộ lọc thời gian kết thúc chọn mặc định là 00:00:00 thay vì 23:59:59 | Chỉnh lại giờ kết thúc thành 23:59:59 | Số liệu cập nhật đầy đủ toàn bộ các cuộc gọi trong ngày | `#TK-EXAMPLE` |
+

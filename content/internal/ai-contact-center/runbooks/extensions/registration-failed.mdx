@@ -1,85 +1,167 @@
 ---
 title: Máy nhánh không đăng ký được
-description: Runbook L1 kiểm tra máy nhánh SIP trên IP Phone, Softphone và ODS Phone khi không thể đăng ký với tổng đài.
+description: Runbook L1 tiếp nhận, phân loại kết nối, kiểm tra dải IP WAN văn phòng (Fail2ban), mạng nội bộ và xử lý sự cố máy nhánh không đăng ký được với tổng đài.
 ---
 
-<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
-  Nội dung dưới đây là khung xử lý đề xuất để Human hiệu chỉnh. L1 không yêu cầu khách hàng gửi mật khẩu SIP và không tự reset tài khoản, đổi Server SIP hoặc thay đổi cấu hình tổng đài khi chưa có yêu cầu hợp lệ.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Phạm vi L1
+Áp dụng khi điện thoại viên hoặc quản trị viên phản ánh **máy nhánh không kết nối được vào tổng đài**:
+- Thiết bị hiển thị thông báo trạng thái lỗi: `Unregistered`, `Register Failed`, `No Service`, `Request Timeout`, `403 Forbidden`, hoặc `401 Unauthorized` liên tục.
+- Ứng dụng Softphone (Zoiper, ODS Phone Mobile) hiển thị chấm đỏ hoặc báo lỗi kết nối tài khoản.
+- Điện thoại viên không thể nhận cuộc gọi đến và không thể bấm gọi ra (máy nhánh không khả dụng).
+- **Cả văn phòng đồng loạt mất kết nối:** Toàn bộ máy nhánh trong văn phòng cùng Offline dù máy tính ở nhà hoặc bật 4G vẫn kết nối bình thường.
 
-Áp dụng khi một hoặc một nhóm máy nhánh hiển thị `Unregistered`, `Register Failed`, `No Service` hoặc không chuyển sang trạng thái sẵn sàng trên IP Phone, Softphone hay ứng dụng ODS Phone.
+### Phân biệt với các sự cố gần giống
+- **Máy nhánh báo Registered nhưng gọi ra ngắt ngay**: Xem [Không gọi ra được](/internal/ai-contact-center/runbooks/calls/outbound-failed).
+- **Máy nhánh nghe gọi được nhưng âm thanh mất một chiều / chập chờn**: Xem [Âm thanh một chiều / rè / chập chờn](/internal/ai-contact-center/runbooks/calls/one-way-audio).
+- **Sự cố điện thoại bàn IP Phone (mạng LAN, DND, handset)**: Xem [Sự cố IP Phone](/internal/ai-contact-center/runbooks/extensions/ip-phone).
+- **Sự cố Softphone máy tính (chọn loa mic, DTMF, VPN)**: Xem [Sự cố Softphone PC](/internal/ai-contact-center/runbooks/extensions/softphone).
+- **Sự cố ứng dụng di động ODS Phone (không push, không hiện cuộc gọi)**: Xem [Sự cố ODS Phone Mobile](/internal/ai-contact-center/runbooks/extensions/ods-phone-app).
 
-Mục tiêu của L1 là xác định lỗi nằm ở thông tin tài khoản, thiết bị, mạng khách hàng hay dịch vụ tổng đài trước khi chuyển L2.
+---
 
-## Triệu chứng
+## 2. Tiếp nhận và kiểm tra nhanh
 
-- Thiết bị không hiển thị trạng thái `Registered` hoặc liên tục đăng ký lại.
-- Máy nhánh không nhận/gọi được và ứng dụng báo lỗi kết nối tài khoản SIP.
-- Chỉ một thiết bị lỗi, nhiều thiết bị cùng mạng lỗi hoặc toàn bộ máy nhánh của khách hàng cùng lỗi.
+Khi tiếp nhận phản ánh, L1 cần phân nhánh nhanh tình huống dựa trên phạm vi thiết bị:
 
-### Phân nhánh nhanh
+| Tình huống phân loại | Nhận định ban đầu | Hướng kiểm tra nhanh L1 |
+| :--- | :--- | :--- |
+| **Nhiều máy nhánh cùng văn phòng cùng Offline**, nhưng bật 4G thì đăng ký được | Dải IP WAN tĩnh của văn phòng khách hàng bị chặn bởi Firewall `Fail2ban` của ODS, hoặc Router văn phòng chặn SIP. | Lấy IP WAN qua `ifconfig.me`, kiểm tra danh sách chặn IP trên ODS, hướng dẫn chạy lệnh `tracert`. |
+| **Chỉ 1 máy nhánh lỗi**, các máy khác cùng mạng văn phòng vẫn Online | Lỗi cục bộ tài khoản, gõ sai mật khẩu, thiết bị hoặc phần mềm đầu cuối. | Kiểm tra thông số tài khoản, khởi động lại app/IP Phone, thử trên 4G. |
+| **1 máy nhánh bị Offline trên cả mạng LAN, Wi-Fi và 4G/5G** | Khả năng cao do thông số SIP bị sai, tài khoản bị tạm khóa hoặc chưa kích hoạt. | Kiểm tra trạng thái máy nhánh trên Portal quản trị ODS. |
+| **Toàn bộ máy nhánh của tenant hoặc nhiều tenant cùng mất đăng ký** | Khả năng cao là sự cố hạ tầng Core PBX, SBC hoặc DNS tổng đài. | **Dừng checklist L1 ngay lập tức** và mở kênh chuyển cấp khẩn cấp. |
 
-| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
-| --- | --- | --- |
-| Chỉ một máy nhánh lỗi, máy khác cùng mạng vẫn hoạt động | Ưu tiên kiểm tra account hoặc thiết bị | Đối chiếu thông số SIP, trạng thái mạng và số thiết bị đang đăng nhập |
-| Nhiều máy nhánh cùng văn phòng lỗi, 4G/5G đăng ký được | Ưu tiên kiểm tra mạng khách hàng | Ghi nhận Router/Firewall/DNS và chuyển quản trị mạng nếu cần |
-| Một máy nhánh lỗi trên cả Wi-Fi và 4G/5G | Có thể liên quan account hoặc trạng thái trên PBX | Kiểm tra trạng thái dịch vụ rồi chuyển L2 kèm thời điểm lỗi |
-| Toàn bộ máy nhánh của một hoặc nhiều tenant cùng lỗi | Có thể là sự cố dịch vụ diện rộng | Dừng thay đổi endpoint và chuyển cấp ngay |
+> [!IMPORTANT]
+> **Dấu hiệu chuyển cấp ngay lập tức**: Khi nhận được phản ánh từ nhiều khách hàng khác nhau cùng lúc báo mất đăng ký máy nhánh, hoặc kiểm tra thấy dịch vụ tổng đài khách hàng bị gián đoạn toàn bộ, L1 không thực hiện thao tác kiểm tra lẻ từng thiết bị mà chuyển cấp ngay theo [Mục 6](#6-khi-nào-dừng-và-chuyển-cấp).
 
-## Cần hỏi khách hàng
+---
 
-- Mã dịch vụ, số máy nhánh và loại thiết bị: IP Phone, Softphone hay ODS Phone.
-- Thời điểm bắt đầu lỗi, thông báo chính xác và ảnh chụp trạng thái đã che thông tin nhạy cảm.
-- Một hay nhiều máy nhánh bị ảnh hưởng; các máy nhánh khác cùng mạng có hoạt động không.
-- Gần đây có đổi mật khẩu SIP, Router/Firewall, đường truyền, Wi-Fi hoặc cài lại ứng dụng không.
-- Thiết bị đang dùng mạng văn phòng, Wi-Fi gia đình hay 4G/5G.
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra L1
+Thu thập thông tin theo 2 nhóm để chẩn đoán chính xác:
 
-1. Xác nhận dịch vụ và máy nhánh còn tồn tại, đúng khách hàng và không ở trạng thái bị tạm ngưng theo nguồn tra cứu được cấp quyền.
-2. Yêu cầu khách hàng đối chiếu **Số máy nhánh**, **Server SIP**, **Port** và **Transport** với thông tin quản trị; không đọc hoặc gửi lại mật khẩu qua kênh không an toàn.
-3. Kiểm tra thiết bị có Internet, ngày giờ hệ thống đúng và không bật chế độ máy bay/VPN ngoài dự kiến.
-4. Thử chuyển Softphone/ODS Phone giữa Wi-Fi và 4G/5G để phân biệt lỗi mạng với lỗi tài khoản.
-5. Nếu là IP Phone, kiểm tra thiết bị nhận IP, Gateway và DNS; không factory reset trong bước L1.
-6. Kiểm tra một tài khoản có đang được đăng nhập đồng thời trên nhiều thiết bị hay không nếu chính sách hệ thống có giới hạn đăng ký.
+### Thông tin tối thiểu bắt buộc
+1. **Số máy nhánh (`[EXT]`):** Máy nhánh nào đang gặp sự cố (ví dụ: `101`, `102`)?
+2. **Loại thiết bị & Ứng dụng:**
+   - IP Phone để bàn (hãng Yealink, Grandstream, Fanvil)?
+   - Softphone cài máy tính (Zoiper, MicroSIP, ODS Phone PC)?
+   - Ứng dụng di động (ODS Phone Mobile trên iOS/Android)?
+   - Hay WebRTC Widget nhúng trong CRM?
+3. **Môi trường mạng:** Thiết bị đang kết nối qua cáp mạng LAN văn phòng, Wi-Fi văn phòng, Wi-Fi gia đình hay 4G/5G?
+4. **Địa chỉ IP WAN văn phòng:** Hướng dẫn khách hàng truy cập `https://ifconfig.me` để lấy địa chỉ IP công cộng của văn phòng.
+5. **Thông báo lỗi hiển thị:** Mã lỗi hoặc dòng chữ hiển thị trên màn hình thiết bị/ứng dụng là gì?
 
-## Xử lý trong phạm vi L1
+### Thông tin bổ sung (Hỏi khi cần)
+- Có thay đổi gì gần đây không (đổi mật khẩu máy nhánh, đổi nhà mạng Internet văn phòng, thay mới modem/router Wi-Fi)?
+- Nếu là softphone trên điện thoại/máy tính, thử chuyển sang mạng 4G/5G cá nhân xem có đăng ký được không?
 
-- Khởi động lại ứng dụng hoặc thiết bị đầu cuối sau khi đã lưu bằng chứng trạng thái lỗi.
-- Nhập lại thông số SIP từ nguồn quản trị đã xác minh; không sao chép credential vào ticket.
-- Cấp lại quyền mạng/microphone cho ứng dụng và tắt VPN cá nhân nếu phép thử cho thấy VPN gây lỗi.
-- Hướng dẫn khách hàng kiểm tra Firewall/Router khi tài khoản đăng ký được trên 4G nhưng không đăng ký được ở mạng văn phòng.
-- Chỉ reset mật khẩu SIP khi có quy trình xác thực người yêu cầu và quyền thao tác được Human xác nhận.
+---
 
-## Điểm dừng và chuyển cấp
+## 4. Checklist kiểm tra an toàn cho L1
 
-- Toàn bộ máy nhánh của một khách hàng hoặc nhiều khách hàng cùng mất đăng ký.
-- Thông số đã đúng nhưng hệ thống vẫn trả lỗi xác thực hoặc không có phản hồi từ Server SIP.
-- Cần kiểm tra SIP trace, firewall phía hạ tầng, giới hạn registration hoặc trạng thái PBX/Core.
-- Cần thay đổi Server SIP, Port, Transport, tenant hoặc cấu hình tổng đài.
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-## Dữ liệu chuyển cấp
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra trạng thái Tenant & Máy nhánh** | L1 tra cứu | Xem trên Portal quản trị ODS xem tenant và máy nhánh có đang kích hoạt không | Dịch vụ `Active`, máy nhánh tồn tại và bật quyền sử dụng | Dịch vụ `Suspended` (tạm ngưng cước/hợp đồng): Chuyển thông tin cho bộ phận CSKH. Máy nhánh bị `Disable`: Bật lại nếu có yêu cầu. |
+| **2. Kiểm tra IP WAN bị chặn (Fail2ban)** | L1 tra cứu | Lấy IP WAN khách hàng từ `ifconfig.me`, đối chiếu trên bảng chặn Firewall PBX | IP WAN không nằm trong danh sách Blacklist | **IP WAN bị chặn**: Do trong văn phòng có thiết bị gõ sai pass nhiều lần ➔ Mở khóa IP trên Firewall và hướng dẫn tìm máy gõ sai pass. |
+| **3. Đối chiếu thông số cấu hình SIP** | L1 & Khách hàng | So khớp Domain/Server SIP, Port, Transport, Extension (Không đọc/gửi mật khẩu qua chat) | Khớp chính xác với thông số trên Portal ODS | Khách hàng nhập nhầm Domain, sai Extension hoặc chọn nhầm Transport: Hướng dẫn sửa lại đúng thông số chuẩn. |
+| **4. Thử nghiệm đổi môi trường mạng (Chéo mạng)** | Khách hàng | Nếu dùng Softphone/ODS Phone, tắt Wi-Fi văn phòng và bật 4G/5G trên điện thoại | Đăng ký thành công trên 4G/5G | **Lỗi do mạng văn phòng**: IP WAN văn phòng bị chặn hoặc Modem đang bật `SIP ALG`. |
+| **5. Kiểm tra kết nối tầng mạng (Tracert)** | L1 Remote / KH | Chạy lệnh `tracert [IP_WAN_PBX]` từ máy tính văn phòng | Gói tin đi thẳng tới tổng đài qua các hop mạng bình thường | Gói tin bị chặn đứng ngay tại hop mạng nhà mạng hoặc Router văn phòng: Lỗi định tuyến ISP. |
 
-- Ticket, mã dịch vụ, máy nhánh, loại thiết bị/phiên bản ứng dụng và loại mạng đang dùng.
-- Thời điểm lỗi kèm múi giờ, thông báo lỗi, kết quả thử Wi-Fi so với 4G/5G.
-- Trạng thái các máy nhánh khác cùng hệ thống và các bước L1 đã thực hiện.
-- Log hoặc screenshot phải che password, token, số điện thoại và dữ liệu không liên quan.
+---
 
-## Trả lời mẫu
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-> **Tiếp nhận:** ODS đã ghi nhận máy nhánh chưa đăng ký được. Anh/chị vui lòng cung cấp số máy nhánh, loại thiết bị, thời điểm lỗi và ảnh thông báo đã che thông tin mật; không gửi mật khẩu SIP qua ticket.
+L1 hướng dẫn khách hàng các bước xử lý cơ bản, không làm mất dữ liệu:
 
-> **Chuyển cấp:** ODS đã hoàn tất kiểm tra thiết bị và kết nối cơ bản. Trường hợp cần kiểm tra sâu trạng thái đăng ký trên hệ thống, chúng tôi đã chuyển đội chuyên trách kèm dữ liệu chẩn đoán.
+<Steps>
+  <Step title="Xử lý sự cố dải IP WAN văn phòng bị chặn bởi Firewall (Fail2ban)">
+    - **Cơ chế:** Khi một nhân viên trong văn phòng cài đặt sai mật khẩu SIP trên điện thoại bàn hoặc softphone, thiết bị sẽ liên tục gửi bản tin đăng ký sai lên máy chủ. Hệ thống phòng vệ `Fail2ban` của ODS PBX sẽ tự động khóa tạm thời **toàn bộ địa chỉ IP WAN của văn phòng đó** để chống tấn công dò quét mật khẩu (Brute-force).
+    - **Thao tác:**
+      1. Hướng dẫn khách hàng vào `https://ifconfig.me` đọc địa chỉ IP WAN công cộng.
+      2. L1 tra cứu hoặc báo L2 gỡ IP đó khỏi danh sách chặn tạm thời trên Firewall PBX.
+      3. Nhắc IT khách hàng kiểm tra xem máy tính/thiết bị nào trong mạng vừa mới cài đặt hoặc đổi mật khẩu gần đây để sửa lại mật khẩu đúng, tránh bị khóa lại sau 5 phút.
+  </Step>
 
-## Nguyên nhân thường gặp và tra cứu
+  <Step title="Khởi động lại ứng dụng hoặc thiết bị đầu cuối">
+    - **Với Softphone (Zoiper, MicroSIP, ODS Phone):** Tắt hẳn ứng dụng (thoát khỏi khay hệ thống hoặc đa nhiệm) rồi mở lại.
+    - **Với IP Phone:** Rút dây nguồn (hoặc dây mạng PoE) đợi 10 giây rồi cắm lại để thiết bị xin cấp lại địa chỉ IP (DHCP) và gửi lại bản tin SIP REGISTER.
+    - *Lưu ý an toàn:* Tuyệt đối **không bấm nút Factory Reset** trên IP Phone vì sẽ xóa sạch tài khoản và cấu hình của máy.
+  </Step>
 
-- Sai số máy nhánh, Server SIP, Port, Transport hoặc mật khẩu SIP.
-- Thiết bị mất Internet/DNS, Firewall chặn kết nối hoặc VPN làm thay đổi đường đi.
-- Tài khoản bị đăng nhập đồng thời vượt giới hạn hoặc dịch vụ bị tạm ngưng.
+  <Step title="Sửa lại thông số SIP hiển thị sai">
+    - Nếu phát hiện khách hàng gõ thừa khoảng trắng, sai ký tự hoa/thường trong Domain SIP, hoặc gõ sai số máy nhánh: Hướng dẫn nhập lại chính xác.
+    - *Quy tắc bảo mật:* Nếu nghi ngờ sai mật khẩu SIP, L1 chỉ hướng dẫn quản trị viên khách hàng tự vào Portal để đổi lại mật khẩu mới, không nhận mật khẩu từ khách hàng và không gửi mật khẩu dạng văn bản rõ qua ticket/chat.
+  </Step>
 
-- [Cấu hình IP Phone Yealink](/docs/ai-contact-center/portal/may-nhanh/ip-phone/cau-hinh-yealink-t19x-t30x)
-- [Cài đặt Softphone Zoiper](/docs/ai-contact-center/portal/may-nhanh/softphone/cai-dat-zoiper-may-tinh)
-- [Cài đặt ODS Phone Android](/docs/ai-contact-center/portal/may-nhanh/mobile-app/cai-dat-ods-phone-android)
-- [Cài đặt ODS Phone iOS](/docs/ai-contact-center/portal/may-nhanh/mobile-app/cai-dat-ods-phone-ios)
+  <Step title="Khuyến nghị IT khách hàng kiểm tra SIP ALG trên Router">
+    - Nếu đăng ký qua 4G/5G thành công nhưng kết nối qua Wi-Fi/LAN văn phòng thất bại: Giải thích cho khách hàng nhờ IT nội bộ kiểm tra tính năng `SIP ALG` trên router và tắt đi (SIP ALG thường làm biến dạng header bản tin SIP khiến đăng ký thất bại).
+  </Step>
+</Steps>
+
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket lên L2/Hạ tầng Core khi:
+
+- [ ] **Nhiều máy nhánh cùng lỗi:** Sự cố ảnh hưởng diện rộng trên toàn bộ công ty khách hàng.
+- [ ] **Thông số SIP hoàn toàn chính xác nhưng vẫn báo lỗi:** Đã đối chiếu đúng Domain, Port, Extension, đã đổi mật khẩu mới trên Portal nhưng PBX vẫn trả về `401 Unauthorized` hoặc không phản hồi.
+- [ ] **Nghi vấn IP văn phòng bị chặn tạm thời (Fail2ban/Blacklist):** Sau nhiều lần nhập sai mật khẩu, toàn bộ IP tĩnh văn phòng của khách hàng không thể kết nối tới Server SIP của ODS.
+- [ ] **Lỗi phía Server PBX:** Bản tin đăng ký gửi lên nhưng hệ thống trả về mã `500 Server Internal Error` hoặc timeout phía tổng đài.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Máy nhánh không đăng ký được SIP (Registration Failed)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+- Phạm vi ảnh hưởng: [1 máy nhánh / Toàn bộ tenant / Nhóm máy nhánh]
+
+[CHI TIẾT MÁY NHÁNH & THIẾT BỊ]:
+- Số máy nhánh: [EXT]
+- Loại thiết bị: [Yealink T30P / Zoiper PC / ODS Phone App / ODSPhone Widget]
+- IP WAN văn phòng khách hàng (lấy từ ifconfig.me): [IP_WAN]
+- Môi trường thử nghiệm: [LAN văn phòng / Wi-Fi / 4G]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Trạng thái Tenant trên Portal: [Active / Bình thường]
+2. Đối chiếu thông số SIP: [Domain, Port, Ext đều chuẩn]
+3. Thử nghiệm đổi sang 4G: [4G đăng ký được / 4G cũng lỗi tương tự]
+4. Kiểm tra Fail2ban: [Nghi vấn IP WAN văn phòng bị chặn do gõ sai pass]
+5. Mã lỗi hiển thị: [VD: 408 Request Timeout / 401 Unauthorized liên tục]
+
+[NỘI DUNG CẦN L2 HỖ TRỢ]:
+- Kiểm tra và gỡ chặn IP WAN [IP_WAN] trên Firewall PBX / Fail2ban.
+- Kiểm tra SIP trace bản tin REGISTER từ máy nhánh [EXT].
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Hướng dẫn lấy IP WAN kiểm tra chặn mạng
+> *"Dạ ODS đã tiếp nhận thông tin về việc toàn bộ máy nhánh tại văn phòng chưa kết nối được vào tổng đài. Hiện tượng này thường xảy ra khi có một thiết bị trong công ty nhập sai mật khẩu nhiều lần khiến hệ thống bảo mật tự động khóa tạm thời đường truyền IP của văn phòng. Anh/chị truy cập nhanh trang `https://ifconfig.me` và gửi giúp em dãy số IP hiển thị trên màn hình để kỹ thuật mở khóa kết nối ngay nhé ạ!"*
+
+### Mẫu 2: Hướng dẫn kiểm tra cơ bản
+> *"Dạ anh/chị vui lòng thử tắt hẳn ứng dụng softphone (hoặc khởi động lại điện thoại bàn bằng cách rút cắm lại nguồn) giúp em nhé ạ. Nếu đang dùng ứng dụng trên điện thoại, anh/chị thử tắt Wi-Fi văn phòng và bật 4G xem máy nhánh có hiển thị chấm xanh (sẵn sàng) không giúp em nha."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Quan sát trạng thái trên thiết bị:** Màn hình IP Phone hiển thị biểu tượng điện thoại sẵn sàng / Softphone hiển thị icon xanh lá (`Registered`).
+2. **Kiểm tra trên Portal ODS:** Trạng thái máy nhánh chuyển sang `Online` / `Registered` kèm IP và User-Agent cập nhật.
+3. **Thực hiện cuộc gọi thử:** Bấm gọi thử sang một máy nhánh nội bộ khác để xác nhận luồng tín hiệu thoại hoạt động bình thường cả 2 chiều.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Cả văn phòng 20 máy nhánh đồng loạt mất kết nối SIP | Một nhân viên mới nhập sai mật khẩu Zoiper 10 lần khiến IP WAN bị Fail2ban chặn | Gỡ IP WAN trên Firewall PBX và đổi lại mật khẩu chuẩn cho nhân viên | Toàn bộ 20 máy nhánh Online trở lại | `#TK-FAIL2BAN-01` |
+| *Template* | Máy nhánh 102 báo Request Timeout khi cắm cáp LAN | Dây mạng văn phòng bị lỏng đầu cáp, IP Phone không nhận IP | Khách hàng cắm lại chắc chắn đầu mạng, IP Phone nhận IP DHCP | Đăng ký thành công, gọi nội bộ tốt | `#TK-EXAMPLE` |

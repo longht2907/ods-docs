@@ -1,77 +1,151 @@
 ---
-title: Webhook không nhận được
-description: Runbook L1 khoanh vùng cấu hình endpoint, khả năng tiếp nhận và phản hồi khi hệ thống đích không nhận Webhook.
+title: Không nhận được Webhook sự kiện
+description: Runbook L1 tiếp nhận, kiểm tra cấu hình URL, phân loại mã phản hồi delivery và xử lý sự cố hệ thống khách hàng không nhận được Webhook từ ODS.
 ---
 
-<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
-  Không phát lại sự kiện nếu chưa hiểu idempotency phía nhận. Không yêu cầu secret chữ ký hoặc token đầy đủ trong ticket.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Phạm vi L1
+Áp dụng khi kỹ sư phần mềm hoặc khách hàng tích hợp CRM phản ánh **không nhận được Webhook sự kiện cuộc gọi**:
+- Cuộc gọi kết thúc nhưng CRM không nhận được Webhook để lưu lịch sử cuộc gọi và file ghi âm.
+- Cuộc gọi đổ chuông nhưng màn hình CRM không tự động mở cửa sổ thông tin khách hàng (Screen Popup).
+- Phía ODS hiển thị đã gửi Webhook nhưng máy chủ CRM của khách hàng báo không thấy gói tin nào tới.
 
-Áp dụng khi hệ thống khách hàng không thấy một hoặc nhiều Webhook, nhận chậm, nhận trùng hoặc ODS ghi nhận delivery thất bại.
+### Phân biệt với các sự cố gần giống
+- **Gọi API từ CRM sang ODS báo lỗi**: Xem [Lỗi tích hợp API](/internal/ai-contact-center/runbooks/integrations/api-errors).
+- **Thiếu file ghi âm cuộc gọi trong Portal**: Xem [Thiếu file ghi âm](/internal/ai-contact-center/runbooks/recordings/missing-recordings).
 
-## Triệu chứng
+---
 
-- Sự kiện phát sinh nhưng endpoint khách hàng không có request/log.
-- Chỉ một event type lỗi hoặc mọi Webhook cùng lỗi.
-- Endpoint nhận request nhưng trả 4xx/5xx/timeout hoặc xử lý trùng.
+## 2. Tiếp nhận và kiểm tra nhanh
 
-### Phân nhánh nhanh
+L1 cần phân định nhanh lỗi xuất phát từ phía gửi (ODS) hay phía nhận (Máy chủ khách hàng):
 
-| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
-| --- | --- | --- |
-| Không có delivery record phía ODS | Event chưa phát sinh, chưa subscribe hoặc lỗi producer | Xác minh event/subscription rồi chuyển đội tích hợp nếu cần |
-| Có delivery nhưng access log phía nhận trống | DNS/TLS/Firewall/WAF hoặc sai URL | Kiểm tra endpoint và hạ tầng nhận; không tự suy đoán allowlist |
-| Endpoint trả 4xx | Request bị ứng dụng từ chối | Đối chiếu auth, signature, method và schema đã công bố |
-| Endpoint trả 5xx hoặc timeout | Handler phía nhận lỗi/chậm | Dùng Request ID và log để khoanh vùng; chưa replay |
-| Endpoint trả 2xx nhưng dữ liệu không xuất hiện | Xử lý bất đồng bộ hoặc logic ứng dụng phía nhận | Kiểm tra queue/application log và khóa idempotency |
-| Nhận cùng event nhiều lần | Retry hoặc xử lý thiếu idempotency | Không xóa bằng chứng; chuyển đội tích hợp để đối chiếu event ID |
+| Tình huống kiểm tra | Nhận định kỹ thuật ban đầu | Hướng xử lý L1 |
+| :--- | :--- | :--- |
+| **ODS có lịch sử bắn Webhook, mã phản hồi `200 OK`** | Webhook đã gửi thành công tới máy chủ khách hàng; dữ liệu không hiển thị do lỗi logic xử lý ngầm trong code CRM. | Hướng dẫn khách hàng kiểm tra Application Log và hàng đợi (Queue) nội bộ. |
+| **ODS có lịch sử bắn Webhook, mã phản hồi `4xx` hoặc `5xx`** | Máy chủ khách hàng nhận được gói tin nhưng ứng dụng khách hàng từ chối hoặc bị lỗi code. | Khách hàng kiểm tra code xử lý tại Endpoint nhận Webhook. |
+| **ODS báo `Timeout` / `Connection Refused`** | ODS không thể kết nối tới máy chủ khách hàng (sai tên miền, chứng chỉ SSL hết hạn hoặc Firewall chặn IP ODS). | Khách hàng kiểm tra DNS, chứng chỉ HTTPS và Firewall server. |
+| **Trên ODS hoàn toàn không có lịch sử gửi Webhook** | Sự kiện chưa phát sinh, chưa bật cấu hình Webhook hoặc lỗi tiến trình Event Producer phía ODS. | Kiểm tra cấu hình Webhook trên Portal ODS hoặc chuyển cấp L2. |
 
-## Cần hỏi khách hàng
+---
 
-- Tenant, event type, thời điểm/múi giờ và ID đối tượng/sự kiện đã che dữ liệu.
-- Endpoint domain/path đã che query secret; môi trường test/production.
-- HTTP status/log phía nhận, thay đổi DNS/TLS/Firewall gần nhất.
-- Có nhận event khác không; hệ thống có cơ chế chống trùng/idempotency không.
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra L1
+Thu thập thông tin theo 2 nhóm:
 
-1. Xác nhận event thực sự phát sinh và loại event đã được cấu hình/đăng ký.
-2. Kiểm tra endpoint dùng HTTPS hợp lệ, DNS resolve và không trỏ localhost/private address ngoài thiết kế.
-3. Yêu cầu khách hàng kiểm tra access log trước application log để phân biệt không tới với xử lý lỗi.
-4. Ghi nhận status/latency/Request ID từ delivery log nếu L1 được cấp quyền.
-5. Kiểm tra thay đổi Firewall/WAF, certificate hoặc redirect; không tự suy đoán IP allowlist.
+### Thông tin tối thiểu bắt buộc
+1. **Loại sự kiện bị thiếu (Event Type):** Sự kiện đổ chuông (`RINGING`), bắt máy (`ANSWERED`), kết thúc (`END_CALL`) hay tất cả sự kiện?
+2. **Đường dẫn Webhook URL đã đăng ký:** Đường dẫn URL nhận sự kiện (ví dụ: `https://crm.example.com/api/webhook`)?
+3. **Mã cuộc gọi mẫu (`[CALL_ID]`):** Cuộc gọi cụ thể nào không nhận được Webhook (kèm mốc thời gian)?
+4. **Access Log máy chủ:** Phía máy chủ khách hàng có ghi nhận request nào từ ODS tại thời điểm cuộc gọi không?
 
-## Xử lý trong phạm vi L1
+### Thông tin bổ sung (Hỏi khi cần)
+- Máy chủ nhận Webhook có bật tường lửa (WAF/Cloudflare) hoặc giới hạn dải IP truy cập không?
+- Endpoint nhận Webhook có yêu cầu chứng thực đặc biệt (Bearer Token, Basic Auth, IP Whitelist) không?
 
-- Sửa URL/event subscription khi sai khác rõ và người yêu cầu có quyền.
-- Hướng dẫn endpoint trả response thành công nhanh rồi xử lý bất đồng bộ nếu đặc tả hỗ trợ.
-- Kiểm tra handler trên môi trường test bằng payload đã sanitize khi có công cụ được duyệt.
-- Không replay event production trước khi xác nhận tác động và idempotency.
+---
 
-## Điểm dừng và chuyển cấp
+## 4. Checklist kiểm tra an toàn cho L1
 
-- ODS không tạo delivery, nhiều tenant/event cùng lỗi hoặc delivery log 5xx/timeout lặp lại.
-- Endpoint trả 2xx nhưng khách hàng không ghi nhận dữ liệu.
-- Cần replay, kiểm tra signing secret, retry policy, queue/worker hoặc IP allowlist.
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-## Dữ liệu chuyển cấp
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra cấu hình Webhook trên Portal** | L1 tra cứu | Xem mục Tích hợp Webhook của tenant trên Portal ODS | Đang bật (`Active`), URL đúng chuẩn HTTPS | Webhook bị tắt (`Disable`) hoặc URL chứa ký tự lạ/trỏ `localhost`: Bật lại hoặc cập nhật URL chuẩn. |
+| **2. Tra cứu Nhật ký gửi Webhook (Delivery Log)** | L1 tra cứu | Tìm theo mã cuộc gọi `[CALL_ID]` trong lịch sử gửi Webhook | Có bản ghi gửi, HTTP status nhận về là `200 OK` | **Nhận mã 500 hoặc Timeout**: Máy chủ khách hàng gặp lỗi hoặc chặn kết nối. |
+| **3. Kiểm tra tính hợp lệ của Webhook URL** | L1 kiểm tra | Dùng trình duyệt/công cụ kiểm tra mở thử URL nhận Webhook | Tên miền phân giải đúng IP, SSL hợp lệ | Báo lỗi chứng chỉ bảo mật (SSL Expired) hoặc tên miền không tồn tại: Khách hàng sửa lại server. |
+| **4. Đối chiếu sự kiện kích hoạt (Trigger)** | L1 đối chiếu | Kiểm tra loại cuộc gọi khách hàng test có đúng luồng cấu hình | Cuộc gọi thực sự phát sinh và khớp kịch bản Webhook | Khách hàng test cuộc gọi nội bộ trong khi Webhook chỉ cấu hình cho cuộc gọi ra/vào. |
+| **5. Trình duyệt chặn Screen Pop trên CRM** | Khách hàng | Kiểm tra góc phải thanh địa chỉ (URL) trình duyệt Chrome/Edge | Không có biểu tượng cảnh báo pop-up | **Có biểu tượng cửa sổ bị chặn (Pop-up blocked)**: Trình duyệt chặn mở cửa sổ popup khách hàng ➔ Chọn "Luôn cho phép". |
+| **6. Kiểm tra thời gian phản hồi (Response Latency)** | L1 đọc log | Xem thời gian máy chủ khách hàng phản hồi gói Webhook | Phản hồi nhanh dưới 1 - 2 giây | Phản hồi quá lâu (>5 giây) dẫn đến tổng đài ODS tự ngắt kết nối do quá hạn timeout. |
 
-- Tenant, event type/ID, timestamp, endpoint host/path và environment.
-- Delivery status, latency, Request ID; sanitized payload/response.
-- Kết quả DNS/TLS/access log và xác nhận idempotency trước khi đề nghị replay.
+---
 
-## Trả lời mẫu
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-> **Tiếp nhận:** ODS đã ghi nhận hệ thống đích chưa nhận Webhook. Vui lòng cung cấp event type, thời điểm, endpoint host/path và access log đã che secret/token.
+<Steps>
+  <Step title="Mở khóa tính năng Chặn cửa sổ bật lên (Pop-up Blocked) trên trình duyệt">
+    - Khi điện thoại đổ chuông mà màn hình CRM không tự động bật thông tin khách hàng (Screen Pop):
+      1. Hướng dẫn nhân viên nhìn lên thanh địa chỉ của trình duyệt (Chrome/Edge/Cốc Cốc).
+      2. Nếu thấy biểu tượng chiếc cửa sổ có dấu X đỏ hiển thị thông báo *"Đã chặn cửa sổ bật lên"* (Pop-up blocked).
+      3. Bấm vào biểu tượng đó -> Chọn **Luôn cho phép cửa sổ bật lên và liên kết chuyển hướng từ trang web này (Always allow pop-ups)** -> Bấm **Xong** và tải lại trang CRM.
+  </Step>
 
-> **Chuyển cấp:** Cấu hình endpoint đã được đối chiếu. ODS đã chuyển đội tích hợp kiểm tra delivery; chưa replay sự kiện để tránh xử lý trùng.
+  <Step title="Khuyến nghị kiến trúc xử lý Webhook bất đồng bộ (Asynchronous)">
+    - Nếu máy chủ khách hàng xử lý logic quá nặng (bóc tách file ghi âm, phân tích cơ sở dữ liệu) khiến request bị timeout: Hướng dẫn lập trình viên đối tác cấu hình endpoint trả ngay mã `200 OK` cho ODS trong vòng 500ms, sau đó đẩy dữ liệu vào hàng đợi (Queue / Worker) nội bộ để xử lý ngầm.
+  </Step>
 
-## Nguyên nhân thường gặp và tra cứu
+  <Step title="Cập nhật URL Webhook chính xác">
+    - Nếu khách hàng đổi sang máy chủ mới hoặc thay đổi đường dẫn API: Hướng dẫn quản trị viên khách hàng tự vào Portal cập nhật lại URL mới và bấm Lưu cấu hình.
+  </Step>
 
-- Sai URL/event subscription, DNS/TLS/Firewall/WAF chặn hoặc handler timeout.
-- Delivery queue/retry/signature cần đội tích hợp kiểm tra.
+  <Step title="Cung cấp danh sách IP máy chủ phát Webhook của ODS">
+    - Nếu máy chủ khách hàng chặn tường lửa (WAF/Cloudflare): Cung cấp danh sách địa chỉ IP tĩnh phát Webhook của ODS (theo tài liệu nội bộ đã duyệt) để IT khách hàng đưa vào danh sách IP Whitelist.
+  </Step>
+</Steps>
 
-- [API Reference AI Contact Center](/docs/ai-contact-center/api)
-- [API trả lỗi](/internal/ai-contact-center/runbooks/integrations/api-errors)
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket lên L2 / Đội phát triển Hệ thống khi:
+
+- [ ] **Tiến trình gửi Webhook phía ODS bị treo:** Cuộc gọi đã kết thúc hàng giờ nhưng hàng đợi Webhook của ODS không kích hoạt gửi gói tin đi.
+- [ ] **Lỗi diện rộng:** Toàn bộ khách hàng đang dùng tính năng Webhook đều bị gián đoạn nhận sự kiện.
+- [ ] **Mất mát dữ liệu sự kiện:** Cần kiểm tra log hàng đợi tin nhắn (Message Queue / RabbitMQ / Kafka) để khôi phục hoặc phát lại các sự kiện bị sót.
+- [ ] **Lỗi chữ ký xác thực Webhook (Signature Mismatch):** Phía ODS và khách hàng bị lệch thuật toán mã hóa hash HMAC-SHA256.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Không nhận được Webhook sự kiện cuộc gọi
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- URL Webhook đã đăng ký: [https://crm.example.com/webhook]
+- Loại sự kiện bị thiếu: [Tất cả sự kiện / Sự kiện kết thúc cuộc gọi END_CALL]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[CHI TIẾT CUỘC GỌI MẪU]:
+- Mã cuộc gọi (Call-ID): [CALL_ID]
+- Thời điểm cuộc gọi kết thúc: [HH:MM:SS]
+- Nhật ký Delivery Log trên Portal ODS: [Không có bản ghi gửi / Gửi thất bại HTTP 504]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Cấu hình Webhook trên Portal: [Đang bật Active, URL đúng chuẩn HTTPS]
+2. Kiểm tra tên miền endpoint: [Tên miền phân giải tốt, chứng chỉ SSL còn hạn]
+3. Phía máy chủ khách hàng: [Access log khách hàng không nhận được request từ ODS]
+
+[NỘI DUNG CẦN L2 / DEV HỖ TRỢ]:
+- Kiểm tra worker phát sự kiện Webhook của tenant [TENANT_ID].
+- Kiểm tra hàng đợi gửi Webhook có bị tồn đọng (backlog) không.
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và xin thông tin
+> *"Dạ ODS đã tiếp nhận thông tin về việc hệ thống CRM chưa nhận được Webhook sự kiện cuộc gọi. Để hỗ trợ đối soát nhật ký gửi tin, anh/chị vui lòng cung cấp giúp em: Đường dẫn URL đang cấu hình nhận Webhook, mã cuộc gọi thử nghiệm (hoặc số máy nhánh và thời điểm gọi) để em kiểm tra log chi tiết ạ. Em cảm ơn anh/chị!"*
+
+### Mẫu 2: Phản hồi khi máy chủ khách hàng trả mã lỗi
+> *"Dạ qua kiểm tra nhật ký gửi Webhook từ hệ thống ODS, tại thời điểm cuộc gọi [CALL_ID] kết thúc, ODS đã gửi request tới URL của mình nhưng máy chủ phía anh/chị đang phản hồi về mã lỗi HTTP [500 Internal Error / 404 Not Found]. Anh/chị vui lòng nhờ đội ngũ kỹ thuật phần mềm kiểm tra lại nhật ký lỗi tại Endpoint nhận tin giúp em nhé ạ."*
+
+### Mẫu 3: Thông báo chuyển cấp chuyên sâu
+> *"Dạ em đã kiểm tra cấu hình URL Webhook của doanh nghiệp mình hoàn toàn chính xác. Do gói tin sự kiện đang bị chậm trễ từ tiến trình xử lý hàng đợi của tổng đài, em đã chuyển thông tin tới đội ngũ Kỹ sư Hệ thống để kiểm tra luồng phân phối và hỗ trợ ngay ạ."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Thực hiện cuộc gọi thử nghiệm:** Bấm gọi 1 cuộc gọi test, để máy đổ chuông, bắt máy đàm thoại và gác máy.
+2. **Kiểm tra trên CRM khách hàng:** Xác nhận thông tin popup hiển thị đúng lúc đổ chuông và bản ghi cuộc gọi cập nhật đầy đủ vào CRM ngay khi gác máy.
+3. **Đối chiếu Delivery Log trên Portal ODS:** Trạng thái gửi chuyển sang màu xanh với mã `200 OK` và độ trễ dưới 2 giây.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Webhook báo Timeout sau 10 giây | Server CRM khách hàng tải đồng thời file ghi âm trong cùng luồng Webhook | Khách hàng sửa code sang trả 200 OK trước rồi tải file ngầm | Webhook phản hồi trong 300ms, không còn timeout | `#TK-EXAMPLE` |
+

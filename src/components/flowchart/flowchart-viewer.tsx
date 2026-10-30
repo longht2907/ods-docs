@@ -19,13 +19,18 @@ export function FlowchartViewer({ data }: { data: FlowchartData }) {
   const closeButton = useRef<HTMLButtonElement>(null);
   const drag = useRef<{ id: number; x: number; y: number; left: number; top: number } | null>(null);
   const size = flowchartSize(data);
-  const firstNode = data.nodes.find((node) => node.type === 'start') || data.nodes[0];
-  const entryX = size.padLeft + (firstNode.col + Math.abs(size.minCol)) * COL_SPACING + COL_SPACING / 2;
+  const minNodeCol = Math.min(...data.nodes.map((node) => node.col));
+  const maxNodeCol = Math.max(...data.nodes.map((node) => node.col));
+  const colOffset = Math.abs(size.minCol);
+  const leftColCenter = size.padLeft + (minNodeCol + colOffset) * COL_SPACING + COL_SPACING / 2;
+  const rightColCenter = size.padLeft + (maxNodeCol + colOffset) * COL_SPACING + COL_SPACING / 2;
+  const contentCenterX = (leftColCenter + rightColCenter) / 2;
+
   useEffect(() => {
     setReady(true);
     const box = inlineViewport.current;
-    if (box) box.scrollLeft = Math.max(0, entryX - box.clientWidth / 2);
-  }, [entryX]);
+    if (box) box.scrollLeft = Math.max(0, contentCenterX - box.clientWidth / 2);
+  }, [contentCenterX]);
   useEffect(() => {
     if (!open) return;
     // Base UI reserves a stable root scrollbar gutter while locked. Use the actual
@@ -35,16 +40,16 @@ export function FlowchartViewer({ data }: { data: FlowchartData }) {
     window.addEventListener('resize', resize);
     const frame = requestAnimationFrame(() => {
       const box = viewport.current;
-      if (box) box.scrollLeft = Math.max(0, entryX - box.clientWidth / 2);
+      if (box) box.scrollLeft = Math.max(0, contentCenterX - box.clientWidth / 2);
     });
     return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); };
-  }, [open, entryX]);
+  }, [open, contentCenterX]);
 
   function reset() {
     setScale(1);
     requestAnimationFrame(() => {
       const box = viewport.current;
-      if (box) box.scrollTo(Math.max(0, entryX - box.clientWidth / 2), 0);
+      if (box) box.scrollTo(Math.max(0, contentCenterX - box.clientWidth / 2), 0);
     });
   }
 

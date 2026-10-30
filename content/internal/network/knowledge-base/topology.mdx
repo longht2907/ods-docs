@@ -15,33 +15,7 @@ Tài liệu này mô tả sơ đồ kiến trúc phân tầng hệ thống mạn
 
 Hạ tầng mạng ODS được thiết kế theo mô hình phân cấp 3 lớp tiêu chuẩn:
 
-```text
-               ┌────────────────────────────────────────────────────────┐
-               │           CÁC HƯỚNG KẾT NỐI ISP & TRANSIT              │
-               │   [FPT]  [VTN/VNPT]  [VNIX]  [HTC]  [FPT-GIA-1/2]     │
-               └──────────────────────────┬─────────────────────────────┘
-                                          │ BGP Peering / Uplink
-                                          ▼
-               ┌────────────────────────────────────────────────────────┐
-               │                     TẦNG ROUTER CORE                   │
-               │         [Core 1]  ───  [Core Nix]  ───  [Core Limit]    │
-               └──────────────────────────┬─────────────────────────────┘
-                                          │ 10Gbps / 40Gbps Trunk
-                                          ▼
-               ┌────────────────────────────────────────────────────────┐
-               │               TẦNG DISTRIBUTION SWITCH (DSW)           │
-               │                 [DSW 6]   ───   [DSW 7]                │
-               └──────────────────────────┬─────────────────────────────┘
-                                          │ 1Gbps / 10Gbps Trunk
-                                          ▼
-               ┌────────────────────────────────────────────────────────┐
-               │                 TẦNG ACCESS SWITCH (ASW)               │
-               │           [ASW Tủ 1]   [ASW Tủ 2]   [ASW Tủ n...]      │
-               └──────────────────────────┬─────────────────────────────┘
-                                          │ Cáp mạng RJ45 / Direct Attach
-                                          ▼
-                               [Máy chủ của Khách hàng]
-```
+<NetworkTopologyDiagram />
 
 ---
 

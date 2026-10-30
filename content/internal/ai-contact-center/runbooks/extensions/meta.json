@@ -1,8 +1,9 @@
 {
-  "title": "Máy nhánh",
+  "title": "Máy nhánh & Thiết bị",
   "pages": [
     "registration-failed",
-    "softphone-issues"
+    "ip-phone",
+    "softphone",
+    "ods-phone-app"
   ]
 }
-

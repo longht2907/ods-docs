@@ -1,76 +1,142 @@
 ---
-title: Tỉ lệ kết nối thấp
-description: Runbook L1 khoanh vùng dữ liệu số, thời gian gọi, nhà mạng và cấu hình khi Auto Call có tỉ lệ kết nối thấp.
+title: Tỷ lệ kết nối chiến dịch thấp
+description: Runbook L1 khoanh vùng chất lượng tệp số, phân tích mã trạng thái CDR, đối soát nhà mạng và hướng dẫn xử lý khi chiến dịch Auto Call có tỷ lệ nghe máy thấp.
 ---
 
-<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
-  Không tự điều chỉnh retry, số kênh đồng thời hoặc thay đầu số để tăng tỉ lệ. Các thay đổi này có thể ảnh hưởng chi phí, tải hệ thống và chính sách chống spam.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Phạm vi L1
+Áp dụng khi người quản trị chiến dịch Auto Call phản ánh **tỷ lệ cuộc gọi bắt máy (Connect Rate / Answered Rate) thấp bất thường**:
+- Chiến dịch vẫn đang quay số nhưng tỷ lệ cuộc gọi thành công thấp hơn nhiều so với các chiến dịch trước đây (ví dụ: chỉ đạt dưới 10% - 15%).
+- Số lượng cuộc gọi kết thúc với trạng thái `Bận` (Busy), `Không trả lời` (No Answer) hoặc `Thất bại` (Failed) chiếm tỷ lệ áp đảo.
+- Nghi vấn đầu số gọi ra bị nhà mạng chặn hoặc tệp số điện thoại gặp vấn đề về chất lượng kết nối.
 
-Áp dụng khi chiến dịch vẫn chạy nhưng phần lớn cuộc gọi bận, không bắt máy, không kết nối hoặc kết thúc sớm hơn kỳ vọng.
+### Phân biệt với các sự cố gần giống
+- **Chiến dịch hoàn toàn không phát sinh cuộc gọi**: Xem [Chiến dịch không chạy](/internal/ai-contact-center/runbooks/autocall/campaign-not-running).
+- **Đầu số bị nhà mạng từ chối kết nối hoặc gắn nhãn spam**: Xem [Đầu số bị chặn / báo spam](/internal/ai-contact-center/runbooks/carriers/number-blocked).
+- **Cuộc gọi kết nối được nhưng bị mất tiếng một chiều**: Xem [Âm thanh một chiều / rè](/internal/ai-contact-center/runbooks/calls/one-way-audio).
 
-## Triệu chứng
+---
 
-- Tỉ lệ trả lời giảm so với chiến dịch/kỳ trước.
-- Một nhóm nhà mạng/đầu số đích có lỗi cao bất thường.
-- Nhiều cuộc gọi kết thúc với cùng trạng thái hoặc thời lượng rất ngắn.
+## 2. Tiếp nhận và kiểm tra nhanh
 
-### Phân nhánh nhanh
+L1 cần hướng dẫn khách hàng bóc tách tỷ lệ theo từng trạng thái cụ thể thay vì chỉ nhìn vào một con số phần trăm chung:
 
-| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
-| --- | --- | --- |
-| Tỷ lệ `failed` cao kèm nhiều số sai định dạng | Chất lượng dữ liệu đầu vào | Kiểm tra mẫu và chuẩn hóa danh sách theo quy trình |
-| `busy`/`no-answer` phân bố đều | Có thể liên quan thời điểm và hành vi người nhận | So sánh cùng tệp ở khung giờ khác, không cam kết tỷ lệ |
-| Lỗi tập trung ở một nhà mạng | Có thể route/carrier rejection | Thu mẫu Call-ID theo nhà mạng và chuyển Carrier/L2 |
-| Gọi thủ công cùng số cũng không kết nối | Không chỉ là thuật toán Auto Call | Đối chiếu Trunk/đầu số và trạng thái thuê bao đích |
-| Tỷ lệ giảm đột ngột sau thay đổi campaign | Có thể liên quan cấu hình hoặc nguồn dữ liệu mới | Ghi rõ thay đổi, không tự tăng retry/concurrency |
+| Nhóm trạng thái kết thúc | Ý nghĩa kỹ thuật | Hướng phân tích sơ bộ |
+| :--- | :--- | :--- |
+| **`NO ANSWER` (Đổ chuông không nghe)** | Cuộc gọi đổ chuông bình thường đến điện thoại người nhận nhưng người nhận không bắt máy. | Do hành vi người dùng, tệp khách hàng lạ hoặc gọi vào khung giờ bận rộn. |
+| **`BUSY` (Máy bận)** | Thuê bao đang trong cuộc gọi khác hoặc bấm nút từ chối cuộc gọi (dập máy). | Khách hàng chủ động từ chối nghe máy. |
+| **`FAILED` / `INVALID` (Thất bại)** | Số điện thoại sai định dạng, thuê bao không tồn tại hoặc nhà mạng viễn thông từ chối kết nối. | Chất lượng tệp số điện thoại đầu vào kém hoặc dải số bị nhà mạng chặn. |
+| **Lỗi tập trung ở 1 nhà mạng đối phương** | Chỉ thuê bao Viettel hoặc chỉ thuê bao VinaPhone bị lỗi `Failed` hàng loạt. | Khả năng cao do nghẽn định tuyến hoặc chính sách chặn từ nhà mạng đó. |
 
-## Cần hỏi khách hàng
+---
 
-- Tenant, campaign ID, đầu số nguồn, thời gian/múi giờ và tỉ lệ kỳ vọng/thực tế.
-- Quy mô danh sách, nguồn dữ liệu và thay đổi gần nhất.
-- Phân bố trạng thái: answered, busy, no-answer, failed theo báo cáo hiện có.
-- Một số mẫu Call-ID đã che dữ liệu và nhà mạng đích.
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra L1
+Thu thập thông tin theo 2 nhóm:
 
-1. Xác nhận cách tính tỉ lệ và cùng khoảng thời gian/bộ lọc khi so sánh.
-2. Phân nhóm kết quả theo trạng thái và nhà mạng, không chỉ nhìn tổng phần trăm.
-3. Kiểm tra định dạng số, số trùng/rỗng/không hợp lệ trên mẫu nhỏ.
-4. Đối chiếu khung giờ gọi, đầu số nguồn và giới hạn nhà mạng đã biết.
-5. Thử gọi thủ công một số mẫu theo quy trình được phép để tách dữ liệu khỏi Trunk.
+### Thông tin tối thiểu bắt buộc
+1. **Mã chiến dịch (`[CAMPAIGN_ID]`):** Tên và mã chiến dịch đang chạy?
+2. **Số liệu thống kê hiện tại:** Tỷ lệ thành công đang đạt bao nhiêu %, và tỷ lệ kỳ vọng trước đây là bao nhiêu?
+3. **Phân bố trạng thái:** Số lượng cụ thể các cuộc gọi `Answered`, `No Answer`, `Busy`, `Failed` trên báo cáo?
+4. **Nguồn gốc tệp danh bạ:** Tệp số điện thoại này thu thập từ nguồn nào (khách hàng cũ thân thiết, khách hàng đăng ký form hay tệp data lạnh bên ngoài)?
 
-## Xử lý trong phạm vi L1
+### Thông tin bổ sung (Hỏi khi cần)
+- Đầu số gọi ra của chiến dịch là đầu số cố định, di động hay đầu số Voice Brandname?
+- Khung giờ thực hiện chiến dịch là lúc mấy giờ trong ngày?
 
-- Chuẩn hóa danh sách và loại bản ghi sai/trùng theo quy trình dữ liệu đã duyệt.
-- Giải thích khác biệt giữa `không bắt máy`, `bận` và `không kết nối`.
-- Đề nghị khách hàng kiểm tra khung giờ/tệp đối tượng; không cam kết tỉ lệ kinh doanh.
-- Không retry hàng loạt hoặc tăng concurrency nếu chưa đánh giá tác động.
+---
 
-## Điểm dừng và chuyển cấp
+## 4. Checklist kiểm tra an toàn cho L1
 
-- Tỉ lệ lỗi tăng đột ngột trên danh sách đã kiểm chứng.
-- Lỗi tập trung theo nhà mạng/đầu số hoặc mã SIP/carrier rejection.
-- Cần phân tích dialer, retry policy, concurrency, AMD hoặc chất lượng Trunk.
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-## Dữ liệu chuyển cấp
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Bóc tách tỷ lệ theo từng nhà mạng** | L1 tra cứu | Xem báo cáo phân tích theo nhà mạng đích (Viettel, Vina, Mobi) | Tỷ lệ thành công phân bố tương đương giữa các mạng | **1 nhà mạng có tỷ lệ Failed vọt cao (>80%)**: Nhà mạng đó đang chặn dải đầu số. |
+| **2. Kiểm tra tính hợp lệ của tệp số mẫu** | L1 đối chiếu | Lấy ngẫu nhiên 5 số điện thoại có trạng thái `Failed` | Đầu số hợp lệ (10 số, đầu 03x, 07x, 08x, 09x) | Chứa nhiều số ảo, số cố định cũ 11 số chưa chuyển đổi, hoặc số sai mã vùng. |
+| **3. Gọi thủ công thử nghiệm đối chứng** | Khách hàng / L1 | Dùng máy nhánh gọi thủ công thử tới 2 số điện thoại trong danh sách | Thuê bao đổ chuông bình thường | Thuê bao báo "Số máy không có thực" hoặc "Tạm thời không liên lạc được": Tệp số điện thoại chất lượng kém. |
+| **4. Kiểm tra mã lỗi SIP trên CDR** | L1 tra cứu | Xem trường mã phản hồi SIP của các cuộc gọi `Failed` | Trả về mã ngắt bình thường (`486 Busy`, `487 Cancel`) | Trả về mã `503 Service Unavailable` hoặc `603 Decline`: Lỗi từ nhà mạng viễn thông. |
+| **5. Đối chiếu khung giờ phát cuộc gọi** | L1 đối chiếu | Xem thời gian chạy chiến dịch | Nằm trong khung giờ vàng (`09:00 - 11:00`, `14:30 - 16:30`) | Gọi vào giờ nghỉ trưa (12h - 13h30) hoặc sáng sớm: Người nhận có xu hướng dập máy cao. |
 
-- Campaign ID, đầu số, thời gian, quy mô và bảng phân bố trạng thái.
-- Mẫu Call-ID theo từng nhóm kết quả; không gửi toàn bộ danh bạ.
-- So sánh với chiến dịch/kỳ hoạt động bình thường cùng điều kiện.
+---
 
-## Trả lời mẫu
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-> **Tiếp nhận:** ODS đã ghi nhận tỉ lệ kết nối của chiến dịch thấp. Anh/chị vui lòng cung cấp ID, khoảng thời gian, đầu số và phân bố trạng thái cuộc gọi để khoanh vùng.
+1. **Tư vấn chuẩn hóa chất lượng dữ liệu danh bạ:**
+   - Hướng dẫn khách hàng lọc bỏ các số điện thoại không đúng định dạng 10 chữ số trước khi tải lên chiến dịch.
+   - Với tệp số điện thoại đã lâu không liên lạc, khuyến nghị gửi tin nhắn SMS ZNS chăm sóc trước để tăng độ nhận diện.
 
-> **Chuyển cấp:** ODS đã kiểm tra dữ liệu mẫu và bộ lọc. Trường hợp cần phân tích dialer/nhà mạng đã được chuyển đội chuyên trách.
+2. **Tối ưu hóa khung giờ gọi tự động:**
+   - Tư vấn khách hàng điều chỉnh khung giờ phát sóng vào các khung giờ người dùng thuận tiện nghe máy nhất (Sáng từ 09h00 - 11h00, Chiều từ 14h30 - 16h30), tránh gọi vào đầu giờ sáng hoặc giờ nghỉ trưa.
 
-## Nguyên nhân thường gặp và tra cứu
+3. **Cấu hình thời gian đổ chuông hợp lý (Ring Timeout):**
+   - Đảm bảo thời gian đổ chuông cài đặt tối thiểu từ 25 - 35 giây để người nhận kịp cầm máy nghe điện thoại. Nếu đặt thời gian chuông quá ngắn (dưới 15 giây), hệ thống sẽ tự ngắt trước khi người dùng kịp bắt máy.
 
-- Danh sách sai/trùng, khung giờ không phù hợp hoặc thuê bao không bắt máy.
-- Giới hạn nhà mạng, đầu số bị hạn chế hoặc dialer/retry/concurrency cần L2.
+---
 
-- [Lịch chạy và báo cáo](/docs/ai-contact-center/portal/autocall/lich-va-bao-cao)
-- [Đầu số bị chặn / báo spam](/internal/ai-contact-center/runbooks/carriers/number-blocked)
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket lên L2 / Bộ phận Quản lý Nhà mạng khi:
+
+- [ ] **Tỷ lệ lỗi tập trung hoàn toàn vào một nhà mạng lớn:** Toàn bộ cuộc gọi gọi sang mạng Viettel hoặc MobiFone đều trả về mã `503` hoặc `603 Decline` (dấu hiệu bị nhà mạng chặn dải số).
+- [ ] **Mã lỗi kỹ thuật bất thường trên diện rộng:** Tỷ lệ `Failed` tăng vọt trên cả các tệp khách hàng quen thuộc đã được kiểm chứng trước đó.
+- [ ] **Nghi vấn đầu số bị khóa chiều gọi ra:** Tổng đài viễn thông từ chối phát lệnh gọi đối với đầu số của chiến dịch.
+- [ ] **Cần kiểm tra thuật toán phát hiện trả lời tự động (AMD - Answering Machine Detection):** Hệ thống hiểu nhầm lời chào người thật thành hộp thư thoại và tự ngắt cuộc gọi.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Tỷ lệ kết nối chiến dịch Auto Call thấp bất thường
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Mã chiến dịch (Campaign ID): [CAMPAIGN_ID]
+- Đầu số gọi ra: [CALLER_ID]
+- Tỷ lệ bắt máy thực tế: [12%] (Kỳ vọng trước đây: [45%])
+
+[PHÂN BỐ TRẠNG THÁI CUỘC GỌI]:
+- Tổng số cuộc gọi đã phát: [3.000 cuộc]
+- Đàm thoại thành công (Answered): [360 cuộc - 12%]
+- Đổ chuông không nghe (No Answer): [800 cuộc - 26%]
+- Thuê bao bận (Busy): [640 cuộc - 21%]
+- Lỗi kết nối (Failed): [1.200 cuộc - 40%] (Tập trung chủ yếu mạng Viettel với mã SIP 603)
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Định dạng số: [Đã kiểm tra mẫu 10 số, đúng định dạng số di động]
+2. Gọi thử thủ công: [Dùng số ngoài gọi vào thuê bao vẫn đổ chuông]
+3. Mã lỗi SIP: [Nhận mã SIP 603 Decline liên tục từ nhà mạng đối phương]
+
+[NỘI DUNG CẦN L2 / CARRIER TEAM HỖ TRỢ]:
+- Kiểm tra luồng Trunk của đầu số [CALLER_ID] sang mạng Viettel.
+- Xác minh xem đầu số có đang bị nhà mạng đích chặn tạm thời không.
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và phân tích số liệu
+> *"Dạ ODS đã tiếp nhận phản ánh về tỷ lệ kết nối của chiến dịch [CAMPAIGN_ID]. Qua phân tích biểu đồ trạng thái trên hệ thống, hiện tại phần lớn các cuộc gọi chưa thành công là do trạng thái Người nhận không bắt máy (No Answer) và Bấm bận (Busy). Điều này thường phụ thuộc vào thói quen nghe máy của tệp khách hàng và khung giờ gọi. Anh/chị có thể tham khảo điều chỉnh khung giờ phát sóng sang buổi chiều từ 14h30 - 16h30 để cải thiện tỷ lệ bắt máy nhé ạ."*
+
+### Mẫu 2: Phản hồi khi phát hiện lỗi từ tệp danh bạ
+> *"Dạ qua kiểm tra ngẫu nhiên các cuộc gọi báo Thất bại (Failed), em nhận thấy trong tệp số tải lên có nhiều số điện thoại đã ngưng hoạt động hoặc sai định dạng mã vùng cũ. Anh/chị vui lòng cho lọc lại tệp danh sách sạch trước khi tải lên chiến dịch tiếp theo để tối ưu chi phí và tỷ lệ kết nối tốt nhất nha."*
+
+### Mẫu 3: Thông báo chuyển cấp chuyên sâu
+> *"Dạ em ghi nhận tỷ lệ lỗi kết nối đang tập trung bất thường khi gọi sang các thuê bao của nhà mạng [TÊN_NHÀ_MẠNG]. Em đã chuyển toàn bộ mẫu cuộc gọi lỗi tới đội ngũ Kỹ thuật và Nhà mạng ODS để kiểm tra lại luồng định tuyến viễn thông cho đầu số của mình ngay ạ."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Kiểm tra tỷ lệ trên mẻ gọi thử nghiệm:** Tạo một mẻ gọi thử nghiệm với tệp danh bạ chuẩn (khoảng 50 - 100 số đối chứng).
+2. **Quan sát phân bố trạng thái:** Xác nhận tỷ lệ cuộc gọi kết nối thành công (`ANSWERED`) tăng trở lại mức thông thường, không còn hiện tượng rớt lỗi `Failed` hàng loạt.
+3. **Đối chiếu mã phản hồi:** Các cuộc gọi không thành công chỉ gồm các lý do tự nhiên (`NO ANSWER`, `USER BUSY`).
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Tỷ lệ Failed đạt 70% khi gọi sang Viettel | Nhà mạng Viettel siết chính sách chặn tần suất đầu số | Phối hợp nhà mạng cập nhật hồ sơ định danh đầu số | Tỷ lệ Failed giảm về dưới 5%, kết nối bình thường | `#TK-EXAMPLE` |
+

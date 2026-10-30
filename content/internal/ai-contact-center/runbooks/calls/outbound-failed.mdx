@@ -1,115 +1,144 @@
 ---
 title: Không gọi ra được
-description: Dàn ý chẩn đoán và xử lý case máy nhánh không thực hiện được cuộc gọi ra.
+description: Runbook L1 tiếp nhận, phân loại, kiểm tra an toàn và xử lý sự cố máy nhánh không thực hiện được cuộc gọi ra ngoài (di động, cố định).
 ---
 
-<Callout title="Dàn ý — chờ bổ sung" type="warn">
-  Mục ghi *(đề xuất)* là gợi ý cần xác nhận. Mục **Cần bổ sung** là thông tin riêng của ODS. Câu hỏi xem tại file câu hỏi TASK-018.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Triệu chứng
+Áp dụng khi điện thoại viên phản ánh **không thể thực hiện cuộc gọi ra các số điện thoại trong nước (di động, cố định)**:
+- Bấm số gọi nhưng cuộc gọi ngắt ngay lập tức sau 1 tiếng tút bận nhanh, hoặc nghe câu thông báo lỗi thoại từ hệ thống/nhà mạng.
+- Màn hình Softphone / IP Phone báo lỗi kết nối cuộc gọi (ví dụ: `Call Failed`, `Forbidden`, `Not Found`, `Service Unavailable`).
+- Nhân viên bấm gọi đi nhưng trên Portal lịch sử cuộc gọi (CDR) hoàn toàn không phát sinh bản ghi nào.
 
-- Khách hàng báo bấm gọi nhưng cuộc gọi không thiết lập, bị ngắt ngay hoặc nghe thông báo lỗi. *(đề xuất)*
-- Sự cố có thể chỉ xảy ra với một máy nhánh, một nhóm số đích, một tenant hoặc toàn bộ cuộc gọi ra. *(đề xuất)*
-- Ghi nhận mã SIP, thông báo trên softphone/IP phone hoặc tín hiệu thoại nếu người dùng nhìn thấy hay nghe được. *(đề xuất)*
+### Phân biệt với các sự cố gần giống
+- **Không gọi được số nước ngoài**: Xem [Sự cố gọi hướng Quốc tế](/internal/ai-contact-center/runbooks/calls/international-calls).
+- **Cài đặt chuyển tiếp cuộc gọi ra số di động cá nhân thất bại**: Xem [Sự cố Chuyển tiếp cuộc gọi](/internal/ai-contact-center/runbooks/calls/call-forwarding).
+- **Máy nhánh chưa đăng ký (`Unregistered`/`Offline`)**: Xem [Máy nhánh không đăng ký được](/internal/ai-contact-center/runbooks/extensions/registration-failed).
+- **Cuộc gọi kết nối được nhưng không nghe tiếng**: Xem [Âm thanh một chiều / Mất tiếng](/internal/ai-contact-center/runbooks/calls/one-way-audio).
+- **Cuộc gọi đang đàm thoại thì bị ngắt**: Xem [Cuộc gọi bị rớt giữa chừng](/internal/ai-contact-center/runbooks/calls/dropped-calls).
 
-**Cần bổ sung:** Cách ODS phân loại phạm vi ảnh hưởng và mức độ P1–P4 cho sự cố gọi ra.
+---
 
-<ReviewQuestion id="Q-outbound-failed-1">
-  Dấu hiệu hoặc mã lỗi nào thường được ODS dùng để xác nhận case “không gọi ra được”?
-</ReviewQuestion>
+## 2. Tiếp nhận và kiểm tra nhanh
 
-## Cần hỏi KH
+Khi tiếp nhận phản ánh, L1 cần nhanh chóng phân loại theo 4 nhóm trường hợp:
 
-- Máy nhánh hoặc tài khoản thực hiện cuộc gọi; không ghi credential. *(đề xuất)*
-- Số bị gọi, thời điểm xảy ra kèm múi giờ và kết quả nghe/nhìn thấy. *(đề xuất)*
-- Lỗi xảy ra với mọi số hay chỉ một đầu số, nhà mạng hoặc loại đích. *(đề xuất)*
-- Có tái hiện được không; thiết bị, softphone, mạng truy cập và thay đổi gần nhất là gì. *(đề xuất)*
+| Tình huống phân loại | Nguyên nhân kỹ thuật cốt lõi | Hướng kiểm tra nhanh L1 |
+| :--- | :--- | :--- |
+| **Gọi ra số nào cũng ngắt ngay, có thông báo cước** | Tài khoản cước viễn thông trả trước của khách hàng với nhà mạng/ODS đã hết số dư. | Kiểm tra số dư tài khoản cước trên Portal và báo quản trị viên nạp cước. |
+| **Chỉ 1 máy nhánh lỗi, các máy khác gọi bình thường** | Máy nhánh bị giới hạn quyền gọi (**Class of Service chỉ cho gọi nội bộ**) hoặc bị lỗi phần mềm đầu cuối. | Kiểm tra nhóm quyền máy nhánh trên Portal; khởi động lại ứng dụng. |
+| **Bấm số từ CRM thì ngắt, bấm tay trên bàn phím thì được** | Số điện thoại copy từ CRM bị dính ký tự lạ, khoảng trắng hoặc tiền tố quốc tế `+84` không tương thích. | Hướng dẫn chuẩn hóa định dạng số thành 10 chữ số thuần túy (VD `090...`). |
+| **Toàn bộ công ty không gọi ra được bất kỳ số nào** | Kênh kết nối SIP Trunk giữa ODS và nhà mạng viễn thông bị mất tín hiệu hoặc lỗi Core PBX. | **Dừng checklist L1 ngay lập tức** và mở kênh chuyển cấp khẩn cấp. |
 
-**Cần bổ sung:** Các trường bắt buộc trên ticket và quy tắc che/mã hóa số điện thoại khi ghi nhận case.
+---
 
-<ReviewQuestion id="Q-outbound-failed-2">
-  Ngoài số gọi, số bị gọi và thời điểm, ODS yêu cầu khách hàng cung cấp thêm dữ liệu nào cho case gọi ra?
-</ReviewQuestion>
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra
+Thu thập thông tin theo 2 nhóm để tránh hỏi dồn dập khiến khách hàng khó chịu:
 
-1. Xác nhận thiết bị có mạng ổn định, đúng tài khoản và máy nhánh đang đăng ký. *(đề xuất)*
-2. Đối chiếu quyền gọi ra, định dạng số và rule định tuyến phù hợp với loại số đích. *(đề xuất)*
-3. Tìm CDR hoặc log theo thời điểm và hai số để xác định cuộc gọi có vào hệ thống hay không. *(đề xuất)*
-4. Kiểm tra trạng thái trunk và phản hồi SIP trước khi kết luận lỗi thuộc nhà mạng. *(đề xuất)*
-5. Có thể tham khảo `pjsip show endpoints`, `pjsip show contacts`, CDR, log, `sngrep` hoặc RTP debug. *(đề xuất — cần xác nhận công cụ thực tế ODS)*
+### Thông tin tối thiểu bắt buộc
+1. **Số máy nhánh gọi đi (`[EXT]`):** Máy nhánh nào đang thực hiện cuộc gọi (ví dụ: `101`, `102`)?
+2. **Số điện thoại bị gọi (`[CALLEE]`):** Số đích cụ thể bị lỗi (số di động mạng nào hay số cố định)?
+3. **Mốc thời gian xảy ra:** Thời điểm gần nhất vừa thực hiện cuộc gọi bị lỗi (kèm phút/giây)?
+4. **Tín hiệu quan sát:**
+   - Trên màn hình hiển thị mã lỗi gì (`Forbidden`, `Declined`, `404 Not Found`)?
+   - Trong tai nghe nghe thấy gì (tiếng tút bận nhanh, im lặng hoàn toàn hay câu thông báo thoại viễn thông)?
 
-**Cần bổ sung:** Tên hệ thống nội bộ, đường dẫn tra cứu và phạm vi lệnh/công cụ L1, L2 được phép dùng.
+### Thông tin bổ sung (Hỏi khi cần khoanh vùng)
+- Thiết bị đang dùng là IP Phone cứng (Yealink, Grandstream), Softphone PC (Zoiper) hay ODS Phone Mobile?
+- Các máy nhánh bên cạnh gọi ra số đó hoặc số khác có được không?
 
-<ReviewQuestion id="Q-outbound-failed-3">
-  ODS kiểm tra quyền gọi ra, outbound route, CDR và trạng thái trunk tại công cụ nào, theo thứ tự nào?
-</ReviewQuestion>
+---
 
-## Xử lý
+## 4. Checklist kiểm tra an toàn cho L1
 
-- Nếu chỉ một thiết bị mất đăng ký: xử lý kết nối hoặc cấu hình thiết bị theo quy trình đã duyệt, rồi gọi thử lại. *(đề xuất)*
-- Nếu số sai định dạng hoặc không khớp rule: chuẩn hóa số hoặc điều chỉnh rule sau khi có phê duyệt thay đổi. *(đề xuất)*
-- Nếu máy nhánh thiếu quyền: cấp đúng quyền theo yêu cầu đã được xác minh, không mở rộng ngoài phạm vi cần thiết. *(đề xuất)*
-- Nếu trunk hoặc nhà mạng từ chối: lưu mã SIP, Call-ID và chuyển đúng nhóm phụ trách thay vì thử thay đổi lặp lại. *(đề xuất)*
+Kỹ sư L1 thực hiện tuần tự các bước kiểm tra quan sát (Read-only):
 
-**Cần bổ sung:** Thao tác nào L1 được tự thực hiện, thao tác nào cần L2 hoặc phê duyệt thay đổi.
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra trạng thái máy nhánh** | L1 tra cứu | Xem trên Portal máy nhánh `[EXT]` | Máy nhánh báo `Online / Registered` | Báo `Offline`: Xem [Máy nhánh không đăng ký được](/internal/ai-contact-center/runbooks/extensions/registration-failed). |
+| **2. Kiểm tra định dạng số gọi** | L1 đối chiếu | So sánh số khách bấm với quy tắc quay số tenant | Đúng 10 chữ số di động (VD `090...`) hoặc đủ mã vùng | Bấm thiếu số, thừa khoảng trắng, dính tiền tố `+84`: Hướng dẫn nhập lại chuẩn. |
+| **3. Kiểm tra số dư cước viễn thông** | L1 tra cứu | Xem số dư tài khoản cước của tenant trên Portal | Tài khoản cước viễn thông còn số dư khả dụng | Số dư = 0đ hoặc hết hạn mức cước: Báo quản trị viên nạp tiền cước. |
+| **4. Kiểm tra quyền gọi (Class of Service)** | L1 tra cứu | Xem nhóm quyền Outbound Route của máy nhánh trên Portal | Được phép gọi Di động / Liên tỉnh | Bị giới hạn chỉ gọi nội bộ: Xác nhận với quản trị viên tenant để phân quyền. |
+| **5. Tra cứu CDR (Lịch sử cuộc gọi)** | L1 tra cứu | Tìm kiếm theo `[EXT]` và thời điểm cuộc gọi trên Portal | Có bản ghi cuộc gọi (ghi nhận mã lỗi SIP) | **Không có CDR**: Cuộc gọi chưa tới được PBX (lỗi softphone/mạng nội bộ). |
 
-<ReviewQuestion id="Q-outbound-failed-4">
-  Với từng nguyên nhân thường gặp, ODS cho phép L1 xử lý trực tiếp đến bước nào?
-</ReviewQuestion>
+---
 
-## Chuyển cấp
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-- Chuyển cấp khi lỗi ảnh hưởng nhiều tenant, toàn bộ cuộc gọi ra, trunk không sẵn sàng hoặc đã hết checklist L1 nhưng chưa xác định được nguyên nhân. *(đề xuất)*
-- Đính kèm ticket, thời điểm kèm múi giờ, số gọi/bị gọi đã xử lý an toàn, Call-ID, mã SIP, phạm vi ảnh hưởng và các bước đã thử. *(đề xuất)*
-- Chỉ đính kèm log/pcap đã loại bỏ credential và dữ liệu không liên quan. *(đề xuất)*
+<Steps>
+  <Step title="Chuẩn hóa định dạng số điện thoại quay số">
+    - Nếu khách hàng copy-paste từ CRM bị thừa khoảng trắng, dấu chấm, dấu gạch nối hoặc tiền tố quốc tế `+84`: Hướng dẫn nhập số thuần túy định dạng chuẩn (ví dụ: `0901234567`).
+    - Nếu công ty có cấu hình bấm `9` hoặc `0` để xin đường ra ngoài: Nhắc khách hàng bấm đúng tiền tố theo quy ước nội bộ.
+  </Step>
 
-**Cần bổ sung:** Nhóm nhận chuyển cấp, kênh chung, SLA và quy tắc thu thập/chia sẻ log hoặc pcap của ODS.
+  <Step title="Kiểm tra và kích hoạt quyền gọi ra ngoài trên Portal">
+    Nếu máy nhánh bị giới hạn chỉ gọi nội bộ:
+    1. Đăng nhập Portal quản trị ODS với quyền quản trị viên tenant.
+    2. Vào mục **Cấu hình máy nhánh (Extensions)** -> Chọn máy nhánh `[EXT]`.
+    3. Tại mục **Quyền gọi ra (Outbound Route / Class of Service)** -> Chọn quyền `Gọi Di động & Toàn quốc (Mobile & National)`.
+    4. Bấm **Lưu cấu hình** và nhắc nhân viên thử gọi lại.
+  </Step>
 
-<ReviewQuestion id="Q-outbound-failed-5">
-  Case gọi ra được chuyển cho L2, NOC hay vendor trong từng điều kiện nào?
-</ReviewQuestion>
+  <Step title="Xử lý thông báo thoại từ nhà mạng viễn thông">
+    - Nếu nghe thông báo: *"Thuê bao quý khách vừa gọi hiện không liên lạc được..."* hoặc *"Số máy quý khách vừa gọi không đúng..."* ➔ Nguyên nhân từ phía thuê bao nhận cuộc gọi hoặc mạng di động của người nhận, giải thích cho nhân viên thử gọi sang một số di động khác để đối chứng.
+    - Nếu nghe thông báo: *"Tài khoản của quý khách không đủ để thực hiện cuộc gọi..."* ➔ Báo quản trị viên tenant nạp cước viễn thông trả trước.
+  </Step>
+</Steps>
 
-## Trả lời mẫu
+---
 
-> **Tiếp nhận:** ODS đã ghi nhận tình trạng không gọi ra được. Anh/chị vui lòng cung cấp máy nhánh, số đích, thời điểm xảy ra và thông báo lỗi để đội ngũ kiểm tra. *(đề xuất)*
+## 6. Khi nào dừng và chuyển cấp?
 
-> **Đã xử lý:** ODS đã hoàn tất bước xử lý và kiểm tra lại luồng gọi ra. Anh/chị vui lòng thực hiện một cuộc gọi thử và phản hồi kết quả trên ticket. *(đề xuất)*
+Dừng xử lý ngay và mở ticket chuyển cấp cho L2/NOC/PBX Core khi:
 
-**Cần bổ sung:** Cách xưng hô, tên thương hiệu và trạng thái ticket chuẩn trong mẫu phản hồi của ODS.
+- [ ] **Sự cố diện rộng:** Có từ 2 máy nhánh trở lên thuộc cùng một hoặc nhiều tenant cùng báo không gọi ra được.
+- [ ] **Lỗi phía Trunk/Nhà mạng:** CDR ghi nhận mã lỗi phản hồi từ phía trunk nhà mạng (`503 Service Unavailable`, `500 Server Internal Error`, `SIP 403 Forbidden` từ Carrier).
+- [ ] **Không có CDR trên hệ thống:** Máy nhánh hiển thị `Online`, bấm gọi đúng số nhưng PBX hoàn toàn không nhận được bản tin SIP INVITE sau khi đã khởi động lại app.
+- [ ] **Yêu cầu can thiệp cấu hình:** Cần sửa Outbound Route, sửa Dialplan, cấu hình SIP Trunk hoặc can thiệp hạ tầng Core.
 
-<ReviewQuestion id="Q-outbound-failed-6">
-  ODS có mẫu tiếp nhận và mẫu xác nhận xử lý chuẩn nào cho sự cố gọi ra?
-</ReviewQuestion>
+---
 
-## Nguyên nhân đã gặp
+## 7. Mẫu ticket chuyển cấp
 
-| Ngày | Nguyên nhân | Cách xử lý | Ticket |
-|---|---|---|---|
-| | | | |
+```markdown
+[TÓM TẮT SỰ CỐ]: Máy nhánh không gọi ra ngoài được (Outbound Call Failed)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Số máy nhánh gọi đi: [EXT]
+- Số điện thoại bị gọi: [CALLEE] (Ví dụ: 0903xxxxxx)
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
 
-**Cần bổ sung:** Chỉ Human điền case thật đã được phép lưu và loại bỏ dữ liệu nhận diện khách hàng.
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Trạng thái máy nhánh: [Online trên Portal]
+2. Định dạng số: [Đã chuẩn hóa 10 chữ số di động 090...]
+3. Quyền máy nhánh (Class of Service): [Đã mở quyền di động toàn quốc]
+4. Số dư tài khoản cước: [Còn đủ số dư khả dụng]
+5. Lịch sử CDR: [Có CDR mã SIP XXX / Hoàn toàn không có CDR]
 
-<ReviewQuestion id="Q-outbound-failed-7">
-  Có những ticket đã đóng nào có thể dùng để tổng hợp nguyên nhân gọi ra thất bại mà không chứa dữ liệu bị cấm?
-</ReviewQuestion>
+[NỘI DUNG CẦN L2 HỖ TRỢ]:
+- Kiểm tra SIP trace bản tin INVITE gửi tới SIP Trunk nhà mạng xem lý do Carrier từ chối.
+- Rà soát trạng thái kết nối SIP Trunk của tenant [TENANT_ID].
+```
 
-## Tra cứu liên quan
+---
 
-- [Rule gọi ra (Outbound Rules)](/internal/ai-contact-center/knowledge-base/outbound-rules)
-- [Bảng IP hạ tầng core](/internal/ai-contact-center/knowledge-base/core-infrastructure)
+## 8. Mẫu phản hồi khách hàng
 
-**Cần bổ sung:** Xác nhận bốn trang trên đã đủ cho luồng gọi ra hay cần thêm tài liệu nội bộ khác.
+### Mẫu: Hướng dẫn chuẩn hóa số bấm gọi
+> *"Dạ em đã kiểm tra trạng thái máy nhánh [EXT] trên hệ thống đang hoạt động bình thường. Khi thực hiện cuộc gọi, anh/chị lưu ý nhập số theo chuẩn 10 chữ số thuần túy (ví dụ `0901234567`), không thêm dấu cách hay tiền tố `+84` giúp em nhé ạ. Nếu mình copy số từ CRM thì thử gõ tay lại số trên bàn phím rồi bấm gọi xem có đổ chuông không nha!"*
 
-<ReviewQuestion id="Q-outbound-failed-8">
-  Runbook gọi ra cần liên kết thêm trang tra cứu nào?
-</ReviewQuestion>
+---
 
-## Cập nhật lần cuối
+## 9. Xác nhận khôi phục
 
-**Cần bổ sung:** Ngày duyệt gần nhất và vai trò chịu trách nhiệm cập nhật runbook.
+1. **Cuộc gọi thử nghiệm kết nối thành công:** Hướng dẫn nhân viên bấm gọi vào một số di động cá nhân, xác nhận cuộc gọi đổ chuông và đàm thoại được 2 chiều trong ít nhất 15-30 giây.
+2. **Kiểm tra nhật ký CDR:** Trên Portal xuất hiện bản ghi cuộc gọi mới với trạng thái `ANSWERED` và thời lượng đàm thoại (`Duration > 0`).
 
-<ReviewQuestion id="Q-common-10">
-  Vai trò nào phê duyệt và duy trì nội dung Support Wiki?
-</ReviewQuestion>
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Máy nhánh 101 bấm gọi số di động bị ngắt ngay lập tức | Máy nhánh bị gán nhầm nhóm quyền chỉ cho phép gọi nội bộ | Đổi nhóm quyền máy nhánh trên Portal sang quyền gọi Toàn quốc | Gọi di động thành công | `#TK-EXAMPLE` |
+| *Template* | Bấm gọi từ CRM bị báo lỗi Failed | Số điện thoại trên CRM chứa ký tự gạch nối và dấu cách (VD: 090-123 456) | Lọc bỏ ký tự lạ trước khi đẩy lệnh gọi | Cuộc gọi khởi tạo mượt mà | `#TK-OUTBOUND-01` |

@@ -1,0 +1,225 @@
+---
+title: Ứng dụng ODS Phone Mobile
+description: Runbook L1 xử lý lỗi không nhận cuộc gọi, không hiện popup màn hình, không push notification, crash ứng dụng và quy trình test call chuẩn cho ODS Phone.
+---
+
+## 1. Khi nào dùng bài này?
+
+Áp dụng khi điện thoại viên hoặc khách hàng sử dụng **ứng dụng ODS Phone trên điện thoại thông minh (iOS hoặc Android)** gặp sự cố:
+- Có cuộc gọi đến nhưng điện thoại **không đổ chuông, không nhận được thông báo đẩy (Push Notification)** khi tắt app hoặc khóa màn hình.
+- Điện thoại có rung hoặc chuông nhưng **không hiển thị giao diện cuộc gọi ra màn hình** để bấm nút Nghe máy (đặc biệt phổ biến trên Android).
+- Bấm gọi đi nhưng cuộc gọi ngắt ngay hoặc không kết nối, kiểm tra trên lịch sử cuộc gọi (CDR) của Portal **hoàn toàn không thấy bản ghi nào phát sinh**.
+- Ứng dụng bị đơ, treo hoặc tự động văng ra ngoài (crash) khi mở hoặc khi có cuộc gọi tới.
+- Đàm thoại nhưng đối phương không nghe thấy tiếng do chưa cấp quyền Microphone cho ứng dụng.
+
+### Phân biệt ranh giới lỗi để tránh nhầm lẫn
+- **Lỗi quyền Micro/Loa trên thiết bị (Thuộc bài này)**: Ứng dụng chưa được cấp quyền Microphone trong cài đặt hệ điều hành (`Settings -> Apps -> ODS Phone -> Permissions`), ghi âm thử bằng máy cũng không nhận mic.
+- **Lỗi mất tiếng đàm thoại một chiều do hạ tầng mạng**: Quyền mic trên app đã bật đầy đủ, ghi âm tốt, gọi nội bộ nghe rõ nhưng gọi ra ngoài bị mất tiếng do Router bật SIP ALG hoặc Firewall chặn dải cổng RTP UDP. Xem [Âm thanh một chiều / rè](/internal/ai-contact-center/runbooks/calls/one-way-audio).
+- **Lỗi trên điện thoại bàn IP Phone cứng**: Xem [Sự cố IP Phone](/internal/ai-contact-center/runbooks/extensions/ip-phone).
+- **Lỗi trên Softphone máy tính PC/Mac**: Xem [Sự cố Softphone PC](/internal/ai-contact-center/runbooks/extensions/softphone).
+
+---
+
+## 2. Tiếp nhận và kiểm tra nhanh
+
+Khi tiếp nhận phản ánh về ODS Phone Mobile, L1 phân loại nhanh theo 4 nhóm triệu chứng điển hình:
+
+| Triệu chứng quan sát | Nguyên nhân cốt lõi | Hướng xử lý nhanh |
+| :--- | :--- | :--- |
+| **Mở app thì nhận cuộc gọi bình thường, nhưng khóa màn hình/tắt app thì không nhận được** | Dịch vụ Push Notification (FCM trên Android / APNs trên iOS) bị chặn bởi chế độ **Tiết kiệm pin** hoặc hệ điều hành tắt ngầm ứng dụng. | Cấu hình Pin sang chế độ `Không hạn chế (Unrestricted)` và cho phép chạy ngầm. |
+| **Điện thoại đổ chuông/rung nhưng không thấy nút bấm nghe máy (Màn hình vẫn ở màn hình khóa hoặc app khác)** | Trên Android: Chưa cấp quyền **Xuất hiện trên cùng (Display over other apps)** hoặc **Thông báo toàn màn hình (Full-screen intent)**. | Bật quyền hiển thị trên các ứng dụng khác trong Cài đặt Android. |
+| **Bấm gọi đi ngắt ngay, trên Portal CDR không có log** | App bị crash tiến trình gọi ngầm, lỗi token phiên hoặc xung đột Wi-Fi nội bộ. | Đổi sang mạng 4G/5G, đăng xuất tài khoản và quét lại mã QR code. |
+| **Cuộc gọi kết nối nhưng bên kia không nghe tiếng** | Hệ điều hành chưa cấp quyền truy cập **Microphone** cho ứng dụng ODS Phone. | Vào Cài đặt ứng dụng -> Cấp quyền Micro sang `Luôn cho phép`. |
+
+---
+
+## 3. Thông tin cần hỏi khách hàng
+
+Thu thập thông tin theo 2 nhóm:
+
+### Thông tin tối thiểu bắt buộc
+1. **Số máy nhánh (`[EXT]`):** Máy nhánh đang cài trên điện thoại?
+2. **Hệ điều hành & Dòng máy:** Điện thoại iPhone (iOS phiên bản mấy) hay Android (hãng Samsung, Xiaomi, Oppo, Vivo...)?
+3. **Triệu chứng chính xác:** Không reo khi khóa máy, không hiện màn hình nghe, hay app bị tự thoát?
+4. **Môi trường kết nối:** Đang dùng mạng Wi-Fi văn phòng hay mạng dữ liệu di động 4G/5G?
+
+### Thông tin bổ sung (Hỏi khi cần)
+- Phiên bản ứng dụng ODS Phone đang cài là phiên bản bao nhiêu (xem trong mục Cài đặt của app)?
+- Các đồng nghiệp khác dùng cùng dòng máy điện thoại đó có bị hiện tượng tương tự không?
+
+---
+
+## 4. Checklist kiểm tra an toàn cho L1
+
+Kỹ sư L1 hướng dẫn khách hàng kiểm tra tuần tự các thiết lập hệ điều hành:
+
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Quyền Micro** | Khách hàng | Cài đặt điện thoại -> *Ứng dụng* -> *ODS Phone* -> *Quyền* | Đặt là `Cho phép khi dùng ứng dụng` | Đang bị `Từ chối`: Bật lại quyền Micro để đàm thoại nghe được tiếng. |
+| **2. Quyền hiển thị đè (Android)** | Khách hàng | Cài đặt quyền ứng dụng -> *Xuất hiện trên cùng* (hoặc *Pop-up*) | Trạng thái `Bật (Allow)` | Đang `Tắt`: Màn hình không bật giao diện khi có cuộc gọi đến -> Bật lên. |
+| **3. Tiết kiệm pin** | Khách hàng | Mục Pin của ODS Phone trên điện thoại | Chọn `Không hạn chế (Unrestricted)` | Đang bật *Tối ưu hóa*: Hệ điều hành tự ngắt kết nối Push khi khóa máy -> Chọn lại *Không hạn chế*. |
+| **4. Thử nghiệm trên 4G/5G** | Khách hàng | Tắt kết nối Wi-Fi văn phòng, bật 4G/5G trên điện thoại | Máy nhánh hiển thị chấm xanh `Online` | Đổi sang 4G gọi tốt: Mạng Wi-Fi văn phòng bị chặn cổng SIP hoặc xung đột DNS. |
+| **5. Tra cứu CDR trên Portal** | L1 tra cứu | Xem lịch sử cuộc gọi của máy nhánh `[EXT]` | Có bản ghi cuộc gọi gửi lên tổng đài | **Không có CDR**: Lệnh gọi chưa rời khỏi thiết bị (do crash tiến trình app hoặc lỗi mạng). |
+
+---
+
+## 5. Hướng xử lý chuẩn cho ODS Phone
+
+Khi ứng dụng gặp xung đột, crash hoặc không push được cuộc gọi, L1 hướng dẫn khách hàng thực hiện quy trình xử lý chuẩn sau:
+
+### Quy trình cài đặt lại & Quét mã QR Code
+
+<Steps>
+  <Step title="Đăng xuất tài khoản (Logout)">
+    Mở ứng dụng ODS Phone -> Vào biểu tượng **Cài đặt (Settings)** -> Chọn **Đăng xuất (Logout)** để hủy phiên kết nối hiện tại.
+  </Step>
+
+  <Step title="Gỡ cài đặt hoàn toàn (Xóa app)">
+    Xóa ứng dụng ODS Phone khỏi điện thoại nhằm dọn dẹp sạch toàn bộ cache dữ liệu và token push notification cũ bị lỗi trong hệ điều hành.
+  </Step>
+
+  <Step title="Cài đặt lại từ kho ứng dụng chính thức">
+    - **Trên Android:** Mở Google Play Store, tìm kiếm `ODS Phone` và bấm **Cài đặt** bản mới nhất.
+    - **Trên iOS:** Mở App Store, tìm kiếm `ODS Phone` và bấm **Nhận / Cài đặt** bản mới nhất.
+  </Step>
+
+  <Step title="Đăng nhập tự động bằng mã QR Code">
+    Quản trị viên hoặc L1 mở thông tin máy nhánh trên Portal ODS để xuất mã QR Code cấu hình:
+    - Mở ứng dụng ODS Phone vừa cài đặt.
+    - Chấp thuận đầy đủ các quyền hệ thống yêu cầu khi mở lần đầu (**Microphone** và **Thông báo**).
+    - Chọn tính năng **Quét mã QR Code** trên màn hình đăng nhập để tự động nạp cấu hình máy nhánh (Domain, Port, Tài khoản) mà không cần nhập liệu thủ công.
+  </Step>
+</Steps>
+
+### Xử lý chuyên sâu theo hệ điều hành
+
+<Tabs items={['Android (Samsung, Xiaomi, Oppo, Vivo)', 'iOS (iPhone)']}>
+  <Tab value="Android (Samsung, Xiaomi, Oppo, Vivo)">
+    Do cơ chế quản lý pin nghiêm ngặt trên các dòng máy Android tùy biến (MIUI/HyperOS, ColorOS, One UI), cần cấu hình bổ sung 3 quyền sau:
+
+    1. **Bật Tự khởi chạy (Auto-start):**
+       - Vào *Bảo mật (Security)* -> *Quản lý tự khởi chạy (Auto-start)* -> Gạt mở cho phép ODS Phone tự chạy ngầm.
+    2. **Khóa ứng dụng trong màn hình đa nhiệm:**
+       - Mở giao diện đa nhiệm (danh sách ứng dụng đang chạy), vuốt giữ hoặc chạm vào biểu tượng ODS Phone -> Bấm biểu tượng chiếc **Ổ khóa** để hệ điều hành không giải phóng app khỏi bộ nhớ RAM khi dọn dẹp.
+    3. **Quyền hiển thị trên màn hình khóa (Full-screen intent):**
+       - Vào *Cài đặt* -> *Ứng dụng* -> *ODS Phone* -> *Thông báo* -> Cho phép hiển thị huy hiệu và bật hiển thị trên màn hình khóa.
+  </Tab>
+
+  <Tab value="iOS (iPhone)">
+    Hệ điều hành iOS quản lý thông báo đẩy qua dịch vụ Apple Push Notification service (APNs):
+
+    1. **Bật Làm mới ứng dụng trong nền (Background App Refresh):**
+       - Vào *Cài đặt (Settings)* -> *Cài đặt chung (General)* -> *Làm mới ứng dụng trong nền* -> Đảm bảo mục ODS Phone đang ở trạng thái **Bật**.
+    2. **Kiểm tra Chế độ Tập trung (Focus Mode):**
+       - Đảm bảo điện thoại không bật chế độ *Không làm phiền (Do Not Disturb)* hoặc chế độ tập trung có quy tắc chặn thông báo từ ứng dụng ODS Phone.
+    3. **Quyền Thông báo (Notifications):**
+       - Vào *Cài đặt* -> *ODS Phone* -> *Thông báo* -> Bật *Cho phép Thông báo*, kích hoạt đầy đủ 3 kiểu cảnh báo: *Màn hình khóa*, *Trung tâm thông báo*, và *Biểu ngữ*.
+  </Tab>
+</Tabs>
+
+---
+
+## 6. Quy trình Test Call kiểm chứng chuẩn 2 bước
+
+<Callout type="info">
+  **Nguyên tắc Test Call**: Bắt buộc thực hiện cuộc gọi thử nghiệm trực tiếp trên chính số máy nhánh đang gặp sự cố. Không suy đoán hoặc giả định trạng thái dựa trên máy nhánh khác.
+</Callout>
+
+Kỹ sư L1 hướng dẫn điện thoại viên thực hiện kiểm tra theo 2 bước nghiêm ngặt:
+
+<Steps>
+  <Step title="Bước 1: Test mở app trực tiếp (Foreground Test)">
+    Mở ứng dụng ODS Phone trên màn hình, xác nhận chấm trạng thái hiển thị màu xanh lá (`Online`).
+
+    - Dùng một số máy nhánh khác hoặc điện thoại di động gọi trực tiếp vào số máy nhánh này.
+    - Giữ chuông reo ít nhất **1 – 2 hồi chuông**.
+    - Bấm nút **Nghe máy** -> Thực hiện đàm thoại thử 2 chiều:
+      + Kiểm tra người gọi có nghe rõ giọng nói không (xác nhận quyền Microphone).
+      + Kiểm tra điện thoại viên có nghe rõ giọng người gọi không (xác nhận loa/tai nghe).
+    - Bấm nút **Gác máy** để kết thúc cuộc gọi bình thường.
+  </Step>
+
+  <Step title="Bước 2: Test khóa màn hình (Background / Push Notification Test)">
+    Bấm nút Home để thoát hẳn ứng dụng ra ngoài màn hình chính, sau đó bấm nút nguồn vật lý để **KHÓA HOÀN TOÀN MÀN HÌNH ĐIỆN THOẠI**.
+
+    - Dùng số khác gọi lại vào máy nhánh.
+    - **Quan sát thiết bị:**
+      + Màn hình điện thoại phải tự động sáng lên từ trạng thái khóa.
+      + Hiển thị giao diện cuộc gọi đến (Full-screen call screen hoặc popup notification).
+      + Phát chuông và rung đầy đủ.
+    - Bấm/trượt để **Nghe máy** ngay từ màn hình khóa -> Xác nhận đàm thoại 2 chiều bình thường.
+  </Step>
+</Steps>
+
+### Đánh giá kết quả kiểm chứng
+- **Đạt Bước 1 nhưng Hỏng Bước 2:** Quyền Micro và tài khoản SIP bình thường, nhưng dịch vụ Push Notification (FCM/APNs) hoặc quyền chạy ngầm trong cài đặt Pin đang bị chặn.
+- **Cả 2 bước đều đạt:** Ứng dụng ODS Phone đã hoạt động hoàn toàn ổn định và sẵn sàng tiếp nhận cuộc gọi vận hành thực tế.
+
+---
+
+## 7. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket cho L2 / Đội phát triển Ứng dụng Di động khi:
+
+- [ ] **Lỗi Push Notification diện rộng:** Toàn bộ người dùng iOS hoặc toàn bộ người dùng Android của tenant đều không nhận được cuộc gọi khi tắt app (nghi vấn chứng chỉ APNs của Apple hết hạn hoặc Firebase FCM gặp lỗi cấu hình).
+- [ ] **App crash ngay khi vừa mở:** Đã xóa app cài lại từ Store nhưng ứng dụng vẫn văng ra ngoài ngay lập tức trên dòng máy/phiên bản hệ điều hành cụ thể.
+- [ ] **Không quét được mã QR Code:** Ứng dụng báo lỗi mã QR không hợp lệ hoặc không tải được cấu hình máy nhánh từ máy chủ provisioning.
+- [ ] **Xung đột phiên bản mới:** Lỗi phát sinh đồng loạt ngay sau khi khách hàng nâng cấp lên phiên bản mới nhất của ODS Phone trên Store.
+
+---
+
+## 8. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Sự cố ứng dụng ODS Phone Mobile (iOS/Android)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Số máy nhánh: [EXT]
+- Dòng máy & Hệ điều hành: [Samsung Galaxy S23 - Android 14 / iPhone 15 - iOS 17.4]
+- Phiên bản ODS Phone: [vX.X.X]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[TRIỆU CHỨNG CỤ THỂ]:
+- [ ] Không nhận được Push Notification khi khóa màn hình (Bước 2 test call thất bại)
+- [ ] Đổ chuông nhưng không hiện popup nghe máy ra ngoài màn hình
+- [ ] Bấm gọi ra bị ngắt ngay, trên CDR không ghi nhận bản ghi
+- [ ] App bị crash tự động văng ra ngoài
+
+[KẾT QUẢ ĐÃ XỬ LÝ L1]:
+1. Quyền Microphone & Hiển thị trên cùng: [Đã cấp đầy đủ quyền]
+2. Cài đặt Pin: [Đã chuyển sang chế độ Không hạn chế]
+3. Quy trình cài lại app & quét QR: [Đã xóa app, cài lại từ Store và quét QR mới]
+4. Thử nghiệm trên 4G: [Đã test cả Wi-Fi và 4G vẫn gặp hiện tượng tương tự]
+
+[NỘI DUNG CẦN ĐỘI MOBILE APP HỖ TRỢ]:
+- Kiểm tra token Push Notification (FCM/APNs) của máy nhánh [EXT] trên server push.
+- Phân tích crash log ứng dụng trên dòng máy [TÊN_DÒNG_MÁY].
+```
+
+---
+
+## 9. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và xin thông tin thiết bị
+> *"Dạ ODS đã tiếp nhận phản ánh về việc ứng dụng ODS Phone trên máy nhánh [EXT] hoạt động chưa ổn định. Để hỗ trợ đúng theo dòng điện thoại của mình, anh/chị vui lòng chia sẻ giúp em: Mình đang dùng điện thoại iPhone hay Android (hãng gì), và hiện tượng cụ thể là khóa màn hình không nhận cuộc gọi hay chuông reo nhưng không thấy màn hình bấm nghe ạ? Em cảm ơn anh/chị!"*
+
+### Mẫu 2: Hướng dẫn cài lại app và quét QR Code
+> *"Dạ để khắc phục triệt để lỗi xung đột ứng dụng, anh/chị thao tác nhanh giúp em các bước sau nhé ạ:
+> 1. Xóa ứng dụng ODS Phone cũ trên máy đi.
+> 2. Lên App Store (hoặc CH Play) tải lại ứng dụng ODS Phone mới nhất.
+> 3. Mở app, cho phép đầy đủ quyền Micro và Thông báo.
+> 4. Chọn Quét mã QR và quét mã máy nhánh mà em gửi kèm dưới đây để đăng nhập tự động.
+> Sau đó anh/chị thử gọi thử nghiệm theo hướng dẫn bên dưới giúp em nha."*
+
+### Mẫu 3: Hướng dẫn test call 2 bước
+> *"Dạ sau khi cài đặt xong, anh/chị cùng em thực hiện bài kiểm tra 2 bước nhé ạ:
+> - Bước 1: Anh/chị mở sẵn ứng dụng trên màn hình, em dùng số khác gọi vào để mình nghe thử xem chuông reo và đàm thoại rõ không.
+> - Bước 2: Anh/chị bấm khóa màn hình điện thoại lại, em sẽ gọi tiếp 1 cuộc nữa để kiểm tra xem điện thoại có tự sáng màn hình và đổ chuông khi máy đang ngủ không nhé ạ."*
+
+---
+
+## 10. Xác nhận khôi phục
+
+1. **Vượt qua bài test call 2 bước:** Cả khi mở app và khi khóa màn hình, điện thoại đều sáng màn hình, đổ chuông to rõ và đàm thoại 2 chiều thông suốt.
+2. **Kiểm tra nhật ký CDR:** Trên Portal ODS xuất hiện đầy đủ các bản ghi cuộc gọi thử nghiệm với trạng thái `ANSWERED`.
+3. **Theo dõi ổn định:** Khách hàng sử dụng nhận cuộc gọi thực tế ổn định trong ngày mà không bị gián đoạn.
+

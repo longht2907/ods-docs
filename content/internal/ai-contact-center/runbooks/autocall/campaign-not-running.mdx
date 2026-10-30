@@ -1,77 +1,144 @@
 ---
-title: Chiến dịch không chạy
-description: Runbook L1 kiểm tra điều kiện đầu vào khi chiến dịch Auto Call không bắt đầu hoặc dừng ngoài dự kiến.
+title: Chiến dịch Auto Call không chạy
+description: Runbook L1 kiểm tra điều kiện đầu vào, lịch phát sóng, số kênh đồng thời và xử lý sự cố chiến dịch gọi tự động không khởi chạy hoặc đứng yên.
 ---
 
-<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
-  Tài liệu Portal hiện chỉ xác nhận trạng thái “Đang chờ gọi”; Pause/Resume/Stop, retry và giới hạn kênh chưa có đặc tả. L1 không tự khởi chạy lại hoặc sửa chiến dịch đang hoạt động.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Phạm vi L1
+Áp dụng khi người quản trị chiến dịch phản ánh **chiến dịch Auto Call không phát sinh cuộc gọi theo kế hoạch**:
+- Đã đến giờ hẹn bắt đầu nhưng chiến dịch vẫn ở trạng thái `Đang chờ gọi` (Pending) hoặc `Đang xử lý` mà không có cuộc gọi nào phát sinh.
+- Chiến dịch đang chạy bình thường thì đột ngột đứng yên, tiến độ phần trăm không tăng và không có bản ghi CDR mới.
+- Khách hàng đã tải lên tệp danh bạ và cấu hình kịch bản âm thanh nhưng hệ thống không kích hoạt quay số.
 
-Áp dụng khi chiến dịch không phát sinh cuộc gọi tại thời gian dự kiến, đứng ở trạng thái chờ hoặc dừng trước khi xử lý hết danh sách.
+### Phân biệt với các sự cố gần giống
+- **Chiến dịch vẫn gọi nhưng hầu hết cuộc gọi báo bận/không nghe máy**: Xem [Tỷ lệ kết nối thấp](/internal/ai-contact-center/runbooks/autocall/low-connect-rate).
+- **Đầu số gọi tự động bị nhà mạng chặn hoặc gắn cờ rác**: Xem [Đầu số bị chặn / báo spam](/internal/ai-contact-center/runbooks/carriers/number-blocked).
 
-## Triệu chứng
+---
 
-- Đã tới lịch nhưng không có cuộc gọi/CDR mới.
-- Chiến dịch ở `Đang chờ gọi` kéo dài hoặc tiến độ không tăng.
-- Một chiến dịch lỗi trong khi chiến dịch khác vẫn chạy, hoặc tất cả cùng dừng.
+## 2. Tiếp nhận và kiểm tra nhanh
 
-### Phân nhánh nhanh
+L1 cần kiểm tra nhanh các điều kiện tiên quyết của một chiến dịch:
 
-| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
-| --- | --- | --- |
-| Chưa tới lịch hoặc sai múi giờ | Lỗi cấu hình lịch | Xác nhận lịch/múi giờ với người có quyền trước khi chỉnh |
-| Danh bạ hợp lệ sau lọc bằng 0 | Không có đầu vào để tạo cuộc gọi | Sửa dữ liệu nguồn theo quy trình đã duyệt |
-| CDR có cuộc gọi nhưng UI không tăng tiến độ | Có thể giao diện/report cập nhật chậm | Refresh, đối chiếu CDR và ghi thời điểm cập nhật cuối |
-| Không có CDR dù đầu vào đầy đủ | Có thể scheduler/queue/worker không tạo job | Không restart chiến dịch; chuyển L2 kèm campaign ID |
-| Nhiều campaign/tenant cùng đứng | Có thể sự cố hệ thống diện rộng | Chuyển cấp ngay và tránh thao tác tạo campaign trùng |
+| Điều kiện kiểm tra | Trạng thái bình thường | Trạng thái bất thường & Nhận định |
+| :--- | :--- | :--- |
+| **Lịch thời gian chạy** | Nằm trong khung giờ cấu hình (VD: `08:30 - 11:30`). | Chưa tới giờ bắt đầu hoặc đã quá giờ kết thúc của chiến dịch. |
+| **Tệp danh bạ số điện thoại** | Có danh sách số hợp lệ sau khi hệ thống lọc trùng/sai định dạng. | Tệp số bằng 0 (toàn bộ số trong tệp bị sai định dạng 10 số hoặc đã gọi hết). |
+| **Kịch bản âm thanh (Audio / IVR)** | File ghi âm lời chào đã được phê duyệt và tải lên thành công. | Chưa chọn file âm thanh hoặc file âm thanh bị lỗi định dạng không phát được. |
+| **Đầu số gọi ra (Caller ID)** | Đầu số đang ở trạng thái hoạt động và còn hạn mức cước. | Đầu số bị khóa chiều hoặc tài khoản cước viễn thông bị cạn kiệt. |
+| **Phạm vi đứng yên** | Chỉ 1 chiến dịch cụ thể bị đứng. | **Tất cả chiến dịch của mọi khách hàng cùng đứng yên** (sự cố hàng đợi / Scheduler diện rộng). |
 
-## Cần hỏi khách hàng
+> [!IMPORTANT]
+> **Dấu hiệu chuyển cấp khẩn cấp**: Nếu toàn bộ các chiến dịch Auto Call của nhiều khách hàng khác nhau đều không phát sinh cuộc gọi dù đã đến giờ, đây là sự cố tiến trình lập lịch (Cron/Scheduler) hoặc hàng đợi (Queue Worker) của tổng đài bị treo. Chuyển cấp ngay theo [Mục 6](#6-khi-nào-dừng-và-chuyển-cấp).
 
-- Tenant, tên/ID chiến dịch, thời gian bắt đầu dự kiến và múi giờ.
-- Trạng thái đang hiển thị, thời điểm cập nhật cuối và phạm vi danh bạ.
-- File âm thanh/kịch bản, đầu số gọi ra và thay đổi gần nhất.
-- Chiến dịch đã từng chạy chưa; chiến dịch khác cùng tenant có hoạt động không.
+---
 
-## Kiểm tra L1
+## 3. Thông tin cần hỏi khách hàng
 
-1. Đối chiếu lịch, múi giờ và trạng thái với cấu hình chiến dịch.
-2. Xác nhận chiến dịch có danh bạ hợp lệ, nội dung/kịch bản và đầu số gọi ra.
-3. Kiểm tra bộ lọc danh bạ có loại hết liên hệ hoặc danh sách trống không.
-4. Kiểm tra CDR/báo cáo xem đã có cuộc gọi nhưng giao diện chưa cập nhật hay chưa.
-5. So sánh với một chiến dịch hoạt động cùng tenant; không tự thay đổi số kênh/retry.
+Thu thập thông tin theo 2 nhóm:
 
-## Xử lý trong phạm vi L1
+### Thông tin tối thiểu bắt buộc
+1. **Tên & Mã chiến dịch (`[CAMPAIGN_ID]`):** Tên chiến dịch cụ thể đang gặp sự cố?
+2. **Khung giờ cài đặt chạy:** Giờ bắt đầu và giờ kết thúc cài đặt là mấy giờ?
+3. **Quy mô danh bạ:** Danh sách tải lên có khoảng bao nhiêu số điện thoại?
+4. **Đầu số gọi ra:** Chiến dịch đang sử dụng đầu số nào để quay số tự động?
 
-- Sửa lịch/múi giờ hoặc dữ liệu đầu vào chỉ khi chiến dịch chưa chạy và người yêu cầu có quyền.
-- Hướng dẫn bổ sung danh bạ/nội dung còn thiếu theo guide Portal.
-- Refresh/đăng nhập lại để loại trừ trạng thái giao diện cũ.
-- Không nhân bản hoặc khởi chạy lại chiến dịch có thể tạo cuộc gọi trùng.
+### Thông tin bổ sung (Hỏi khi cần)
+- Chiến dịch này trước đây đã từng chạy thành công lần nào chưa?
+- Khi xem trên giao diện, tiến độ đang dừng ở bao nhiêu phần trăm (hoặc bao nhiêu cuộc gọi)?
 
-## Điểm dừng và chuyển cấp
+---
 
-- Điều kiện đầu vào đầy đủ nhưng không có job/cuộc gọi phát sinh.
-- Nhiều chiến dịch/tenant cùng dừng hoặc có dấu hiệu queue/worker lỗi.
-- Cần can thiệp scheduler, campaign state, channel limit, retry hoặc database.
+## 4. Checklist kiểm tra an toàn cho L1
 
-## Dữ liệu chuyển cấp
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-- Tenant, campaign ID, lịch/múi giờ, trạng thái và thời điểm cập nhật cuối.
-- Số lượng liên hệ hợp lệ, đầu số, nội dung/kịch bản và kết quả CDR.
-- Screenshot đã che dữ liệu liên hệ; không đính kèm toàn bộ danh bạ.
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra khung giờ và ngày chạy** | L1 đối chiếu | So sánh đồng hồ hệ thống ODS với cài đặt lịch của chiến dịch | Đúng ngày, đúng khung giờ làm việc | Chưa tới giờ chạy hoặc chiến dịch đặt lịch vào ngày nghỉ: Nhắc khách hàng kiểm tra lại lịch. |
+| **2. Tra cứu CDR thực tế** | L1 tra cứu | Xem lịch sử cuộc gọi lọc theo đầu số của chiến dịch | Hoàn toàn không có cuộc gọi nào phát sinh | **Có cuộc gọi trên CDR nhưng giao diện Dashboard không nhảy số**: Do giao diện thống kê bị chậm cập nhật. |
+| **3. Kiểm tra tính hợp lệ của tệp số điện thoại** | L1 tra cứu | Xem số lượng bản ghi hợp lệ (`Valid Contacts`) trong chiến dịch | Số lượng > 0 | `Valid Contacts = 0`: Tệp tải lên bị sai định dạng cột hoặc số điện thoại thiếu số 0. |
+| **4. Kiểm tra số kênh đồng thời (Concurrency Limit)** | L1 đối chiếu | Xem số kênh gọi đồng thời được cấp cho tenant | Kênh gọi > 0 và không bị chiếm dụng bởi chiến dịch khác | Đặt số kênh = 0 hoặc chiến dịch khác đang chiếm toàn bộ số kênh tối đa. |
+| **5. Kiểm tra tài khoản cước viễn thông** | L1 tra cứu | Kiểm tra số dư tài khoản cước trả trước của tenant | Số dư còn đủ tiền thực hiện cuộc gọi | Tài khoản hết tiền: Nhà mạng chặn phát cuộc gọi tự động. |
 
-## Trả lời mẫu
+---
 
-> **Tiếp nhận:** ODS đã ghi nhận chiến dịch chưa phát sinh cuộc gọi. Anh/chị vui lòng cung cấp ID chiến dịch, lịch/múi giờ, trạng thái và ảnh cấu hình đã che dữ liệu liên hệ.
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-> **Chuyển cấp:** Các điều kiện đầu vào đã được đối chiếu nhưng chiến dịch chưa tạo cuộc gọi. ODS đã chuyển đội chuyên trách kiểm tra scheduler/worker.
+1. **Chuẩn hóa tệp danh bạ liên hệ:**
+   - Hướng dẫn khách hàng kiểm tra file Excel tải lên: Cột số điện thoại phải là định dạng Text, có đúng 10 chữ số (bắt đầu bằng số `0`), không chứa ký tự chữ cái hay khoảng trắng.
 
-## Nguyên nhân thường gặp và tra cứu
+2. **Điều chỉnh khung giờ phát sóng hợp lệ:**
+   - Nếu chiến dịch bị dừng do quá khung giờ cài đặt (ví dụ đặt đến 11h30 và hiện tại là 11h45): Hướng dẫn quản trị viên khách hàng chỉnh lại khung giờ kết thúc sang buổi chiều (ví dụ: `14:00 - 17:00`) để hệ thống tiếp tục quay số.
 
-- Sai lịch/múi giờ, danh bạ trống/bị lọc hết, thiếu nội dung hoặc đầu số.
-- Campaign state, scheduler/worker hoặc giới hạn kênh cần L2 kiểm tra.
+3. **Tải lại giao diện thống kê:**
+   - Hướng dẫn người dùng nhấn tổ hợp phím `Ctrl + F5` để làm mới bộ nhớ đệm trình duyệt, kiểm tra lại tiến độ cuộc gọi mới nhất.
 
-- [Thiết lập Auto Call](/docs/ai-contact-center/portal/autocall/thiet-lap-chien-dich/goi-tu-dong-autocall)
-- [Lịch chạy và báo cáo](/docs/ai-contact-center/portal/autocall/lich-va-bao-cao)
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket lên L2 / Đội vận hành Auto Call khi:
+
+- [ ] **Lịch và danh bạ hoàn toàn chuẩn nhưng hệ thống không tạo cuộc gọi:** Đã qua hơn 15 phút so với giờ bắt đầu nhưng tiến trình Scheduler không kích hoạt.
+- [ ] **Tất cả chiến dịch của tenant cùng đứng yên:** Nghi vấn tiến trình quay số (Dialer Engine) của tenant bị nghẽn hàng đợi.
+- [ ] **Sự cố diện rộng toàn hệ thống:** Không có bất kỳ chiến dịch Auto Call nào của bất kỳ khách hàng nào hoạt động.
+- [ ] **Lỗi trạng thái chiến dịch bị kẹt trong Database:** Giao diện báo lỗi khi bấm tạm dừng hoặc tiếp tục chiến dịch.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Chiến dịch Auto Call không chạy (Campaign Not Running)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Mã chiến dịch (Campaign ID): [CAMPAIGN_ID]
+- Tên chiến dịch: [TÊN_CHIẾN_DỊCH]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[THÔNG SỐ CẤU HÌNH CHIẾN DỊCH]:
+- Cài đặt khung giờ: [08:30 - 11:30 GMT+7]
+- Số lượng danh bạ hợp lệ: [1.500 số điện thoại]
+- Đầu số gọi ra: [CALLER_ID]
+- Số kênh đồng thời: [5 kênh]
+- Trạng thái hiển thị trên Portal: [Đang chờ gọi / Running nhưng tiến độ 0%]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Kiểm tra CDR: [Không có cuộc gọi nào phát sinh từ đầu số]
+2. Kịch bản âm thanh: [File audio đã tải lên và nghe thử tốt]
+3. Số dư cước viễn thông: [Tài khoản còn đủ số dư]
+
+[NỘI DUNG CẦN L2 / DIALER TEAM HỖ TRỢ]:
+- Kiểm tra tiến trình Scheduler và hàng đợi quay số (Dialer Queue) của tenant [TENANT_ID].
+- Kiểm tra trạng thái worker xử lý Auto Call tại thời điểm [HH:MM].
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và xin thông tin
+> *"Dạ ODS đã tiếp nhận thông tin về việc chiến dịch [TÊN_CHIẾN_DỊCH] chưa phát sinh cuộc gọi. Để hỗ trợ kiểm tra tiến trình quay số nhanh nhất, anh/chị vui lòng chia sẻ giúp em: Khung giờ cài đặt của chiến dịch và số lượng số điện thoại hợp lệ trong danh sách tải lên nhé ạ. Em cảm ơn anh/chị!"*
+
+### Mẫu 2: Hướng dẫn kiểm tra khung giờ và định dạng số
+> *"Dạ qua kiểm tra sơ bộ, khung giờ chạy của chiến dịch đang được cài đặt kết thúc lúc [GIỜ_KẾT_THÚC] nên hệ thống đã tạm dừng quay số để đảm bảo quy định thời gian liên hệ. Anh/chị có thể vào mục Chỉnh sửa chiến dịch và nới rộng khung giờ kết thúc sang buổi chiều để hệ thống tự động quay số tiếp tục nhé ạ."*
+
+### Mẫu 3: Thông báo chuyển cấp chuyên sâu
+> *"Dạ em đã kiểm tra tệp danh bạ và cấu hình chiến dịch của mình hoàn toàn hợp lệ. Do tiến trình điều phối hàng đợi cuộc gọi tự động đang bị chậm trễ từ máy chủ, em đã chuyển mã chiến dịch tới đội ngũ Kỹ sư Hệ thống để kích hoạt luồng quay số ngay cho mình ạ."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Quan sát trạng thái chiến dịch:** Trạng thái chuyển sang `Đang chạy` và thanh tiến độ bắt đầu tăng dần.
+2. **Kiểm tra phát sinh CDR:** Trên màn hình Lịch sử cuộc gọi, xuất hiện liên tục các cuộc gọi mới với đầu số của chiến dịch.
+3. **Đối chiếu tỷ lệ hoàn thành:** Đảm bảo hệ thống phân phối cuộc gọi đều đặn theo đúng số kênh đồng thời đã đăng ký.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Chiến dịch có 2.000 số nhưng không gọi | File Excel có tiêu đề cột số điện thoại đặt sai tên quy định | Đổi lại tên cột thành 'phone' theo đúng file mẫu | Hệ thống nhận diện 2.000 số và phát cuộc gọi bình thường | `#TK-EXAMPLE` |
 

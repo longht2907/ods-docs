@@ -1,0 +1,163 @@
+---
+title: Tín hiệu chập chờn, giật tiếng, tiếng vọng
+description: Runbook L1 tiếp nhận, remote UltraViewer đo Ping/Packet Loss ra Internet và về PBX, xử lý Jitter, roaming Wi-Fi/4G và khắc phục tiếng vọng Echo.
+---
+
+## 1. Khi nào dùng bài này?
+
+Áp dụng khi điện thoại viên hoặc khách hàng phản ánh cuộc gọi **đã kết nối nhưng chất lượng âm thanh đàm thoại kém, không rõ ràng**:
+- **Tín hiệu chập chờn, giật tiếng, tiếng robot:** Giọng nói bị đứt quãng từng chữ, mất chữ, giật cục hoặc bị nghẹt tiếng như đang nói dưới nước.
+- **Trễ tiếng (Delay / Latency cao):** Hai bên nói chuyện bị trễ 1-2 giây dẫn đến việc liên tục nói chèn lên nhau.
+- **Tiếng vọng (Echo / Acoustic Feedback):** Người nói nghe thấy tiếng của chính mình bị vọng lại trong tai nghe sau 1 giây.
+- **Chập chờn khi di chuyển:** Nhân viên dùng ODS Phone App di động vừa đi lại trong văn phòng vừa gọi thì bị gián đoạn âm thanh.
+
+### Phân biệt với các sự cố gần giống
+- **Mất tiếng hoàn toàn 1 chiều hoặc 2 chiều do NAT/RTP**: Xem [Âm thanh một chiều / Mất tiếng](/internal/ai-contact-center/runbooks/calls/one-way-audio).
+- **Cuộc gọi đang đàm thoại bị ngắt đúng 30 giây**: Xem [Cuộc gọi bị rớt giữa chừng](/internal/ai-contact-center/runbooks/calls/dropped-calls).
+- **Chưa cấp quyền Microphone trên hệ điều hành**: Xem [Sự cố Softphone PC](/internal/ai-contact-center/runbooks/extensions/softphone) hoặc [Sự cố ODS Phone Mobile](/internal/ai-contact-center/runbooks/extensions/ods-phone-app).
+
+---
+
+## 2. Bản chất kỹ thuật: Đường truyền Internet và Giao thức UDP VoIP
+
+> [!IMPORTANT]
+> **Nguyên tắc kỹ thuật**: Cuộc gọi tổng đài ảo (VoIP/SIP) truyền gói tin âm thanh thoại qua giao thức **UDP (User Datagram Protocol)**.
+> Khác với xem video Youtube hay lướt web (dùng TCP có tải lại gói tin bị mất), **VoIP đòi hỏi thời gian thực và không bao giờ gửi lại gói tin bị mất**. Do đó:
+> - **Rớt gói tin (Packet Loss) > 2%:** Âm thanh bị mất chữ, nuốt từ, tiếng ngắt quãng như robot.
+> - **Độ trễ biến thiên (Jitter) > 30ms:** Các gói tin đến đích không đều đặn khiến bộ đệm âm thanh (Jitter Buffer) của thiết bị bị vỡ, gây giật tiếng.
+> - **Độ trễ trung bình (Latency/Ping) > 150ms:** Cuộc gọi bị delay, hai bên nói chuyện bị đè lên nhau.
+
+| Triệu chứng âm thanh | Nguyên nhân kỹ thuật cốt lõi | Hướng xử lý nhanh L1 |
+| :--- | :--- | :--- |
+| **Tiếng giật cục, ngắt quãng, như robot** | Mạng Internet văn phòng bị rớt gói (**Packet Loss**) hoặc Jitter cao do nghẽn băng thông. | Remote UltraViewer kiểm tra Ping 8.8.8.8 và Ping PBX; chuyển sang 4G test chéo. |
+| **Nói xong 1 giây sau nghe tiếng mình vọng lại** | Bên đối phương đang bật **Loa ngoài (Speakerphone/Loa laptop)** quá to khiến micro thu ngược tiếng. | Nhắc bên đối phương giảm âm lượng loa hoặc cắm tai nghe có dây chống ồn. |
+| **Dùng ODS Phone App trên điện thoại bị chập chờn** | Thiết bị đang chuyển vùng (Roaming) giữa các AP Wi-Fi hoặc sóng Wi-Fi 2.4GHz bị suy hao. | Đổi sang Wi-Fi **5GHz** hoặc chuyển hẳn sang dữ liệu di động **4G/5G**. |
+| **Chỉ 1 nhân viên bị rè tiếng chói tai** | Cổng USB máy tính bị thiếu nguồn hoặc dây cắm tai nghe bị đứt ngầm. | Cắm lại tai nghe sang cổng USB phía sau thùng máy PC; đổi tai nghe khác. |
+
+---
+
+## 3. Thông tin cần hỏi khách hàng
+
+Thu thập thông tin theo 2 nhóm:
+
+### Thông tin tối thiểu bắt buộc
+1. **Hiện tượng âm thanh cụ thể:** Giật tiếng robot, trễ tiếng (delay), hay bị tiếng vọng (echo)?
+2. **Số máy nhánh (`[EXT]`) & Số điện thoại đối phương:** Cuộc gọi bị lỗi diễn ra giữa 2 số nào?
+3. **Môi trường kết nối mạng:**
+   - Máy tính cắm dây mạng LAN hay bắt Wi-Fi văn phòng?
+   - Điện thoại di động dùng Wi-Fi hay mạng 4G/5G?
+4. **Thiết bị đàm thoại:** Dùng tai nghe chụp đầu USB chuyên dụng hay bật loa laptop/mic tích hợp?
+
+### Thông tin bổ sung (Hỏi khi cần khoanh vùng)
+- Thời điểm bị giật tiếng có phải là giờ cao điểm của văn phòng không (nhiều người cùng xem video/tải file nặng)?
+- Thử tắt Wi-Fi dùng mạng 4G/5G cá nhân gọi thử một cuộc thì âm thanh có to rõ không?
+
+---
+
+## 4. Checklist kiểm tra an toàn cho L1
+
+Kỹ sư L1 thực hiện kiểm tra tuần tự theo bảng sau:
+
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Phân lập bằng mạng 4G/5G** | Khách hàng | Đăng nhập trên ODS Phone Mobile và dùng 4G gọi thử | Đàm thoại 2 chiều trong trẻo, không giật | **4G gọi tốt nhưng mạng văn phòng bị giật**: Vấn đề 100% nằm ở đường truyền Internet văn phòng. |
+| **2. Đo tỷ lệ rớt gói ra Internet (Ping)** | L1 Remote | Remote UltraViewer/AnyDesk vào PC cùng mạng: `ping 8.8.8.8 -t` | `Time < 30ms`, rớt gói `0% loss` | Xuất hiện dòng `Request timed out`: Mạng Internet văn phòng bị suy hao/nghẽn băng thông. |
+| **3. Đo độ biến thiên Jitter về PBX** | L1 Remote | Chạy lệnh `ping [IP_WAN_PBX] -t` trên máy tính khách hàng | Ping đều đặn, chênh lệch (Jitter) < 20ms | Ping nhảy vọt liên tục (20ms -> 200ms -> 30ms): Jitter cao làm âm thanh bị giật tiếng. |
+| **4. Kiểm tra hiện tượng Tiếng vọng (Echo)** | Khách hàng | Xác nhận xem tiếng vọng là tiếng của ai | Không có tiếng vọng | Điện thoại viên nghe lại tiếng mình: Phía đối phương đang mở loa ngoài quá lớn. |
+| **5. Kiểm tra tai nghe & Cổng cắm USB** | Khách hàng | Rút tai nghe cắm sang cổng USB phía sau thùng máy PC | Âm thanh hết rè, vạch micro bắt nhạy | Vẫn rè: Dây tai nghe bị gãy ngầm hoặc hỏng màng loa. |
+
+---
+
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
+
+<Steps>
+  <Step title="Quy trình Remote đo đường truyền Internet người dùng (UltraViewer / AnyDesk)">
+    Khi khách hàng phản ánh âm thanh chập chờn, L1 xin phép remote vào máy tính nhân viên:
+    1. Bấm tổ hợp phím **Windows + R** -> Gõ `cmd` -> Bấm Enter.
+    2. Chạy lệnh đo rớt gói ra ngoài Internet:
+       ```cmd
+       ping 8.8.8.8 -t
+       ```
+       Quan sát liên tục trong khoảng 30 đến 50 gói tin. Nếu xuất hiện `Request timed out` ➔ Báo IT văn phòng kiểm tra Router hoặc đường truyền cáp quang của nhà mạng.
+    3. Chạy lệnh đo độ trễ và độ biến thiên Jitter về tổng đài ODS:
+       ```cmd
+       ping [IP_WAN_PBX] -t
+       ```
+       Nếu độ trễ nhảy vọt thất thường (ví dụ: `25ms -> 180ms -> 35ms -> 220ms`), giải thích cho khách hàng: Độ biến thiên trễ (**Jitter > 30ms**) khiến các gói tin âm thanh đến không đúng thứ tự, dẫn đến tiếng nói bị giật cục.
+  </Step>
+
+  <Step title="Tối ưu kết nối cho ứng dụng ODS Phone Mobile">
+    - **Ưu tiên Wi-Fi 5GHz:** Hướng dẫn nhân viên kết nối vào mạng Wi-Fi băng tần 5GHz thay vì 2.4GHz (băng tần 2.4GHz dễ bị nhiễu sóng bởi thiết bị văn phòng).
+    - **Tránh di chuyển khi đàm thoại:** Hướng dẫn nhân viên ngồi cố định tại bàn làm việc khi thực hiện cuộc gọi. Việc vừa đi vừa gọi giữa các tầng lầu khiến điện thoại roaming liên tục giữa các cục phát Access Point (AP), gây mất gói tin UDP.
+    - Nếu Wi-Fi văn phòng chập chờn, hướng dẫn tắt Wi-Fi và dùng trực tiếp dữ liệu di động **4G/5G**.
+  </Step>
+
+  <Step title="Xử lý triệt để hiện tượng Tiếng vọng (Echo / Feedback)">
+    - **Nguyên lý:** Khi điện thoại viên nghe lại chính tiếng của mình vọng lại, nguyên nhân **100% nằm ở phía đối phương**: Đối phương đang bật loa ngoài (Loa laptop / Speakerphone điện thoại) quá to, khiến micro thu lại chính âm thanh phát ra và gửi ngược về cho nhân viên.
+    - **Cách xử lý:** Nhân viên lịch sự đề nghị khách hàng: *"Dạ âm thanh đang bị dội tiếng một chút, anh/chị có thể giảm âm lượng loa ngoài hoặc cắm tai nghe giúp em để nghe rõ nhất nhé ạ"*.
+    - Điện thoại viên tại văn phòng bắt buộc sử dụng **Tai nghe chụp đầu chuyên dụng có chống ồn (ENC/Noise Canceling)**, tuyệt đối không bật loa ngoài máy tính.
+  </Step>
+</Steps>
+
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket cho L2 / Hạ tầng Mạng ODS khi:
+
+- [ ] **Ping từ mạng ngoài về máy chủ ODS PBX bị rớt gói diện rộng:** Nhiều khách hàng thuộc các nhà mạng khác nhau cùng báo ping về IP WAN PBX bị nhảy vọt hoặc rớt gói tin (nghi vấn nghẽn cổng kết nối Data Center hoặc bị tấn công DDoS).
+- [ ] **Lỗi suy hao luồng âm thanh từ phía Carrier Telco:** Mạng văn phòng khách hàng đạt chuẩn 100% (ping 8.8.8.8 rớt 0%), nhưng khi gọi qua một đầu số nhà mạng cụ thể thì âm thanh bị rè chói (lỗi luồng E1/SIP Trunk từ phía nhà mạng viễn thông).
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Tín hiệu âm thanh chập chờn / Mất gói tin (Audio Quality & Jitter)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Số máy nhánh: [EXT]
+- Số đối phương: [CALLEE / CALLER]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[HIỆN TƯỢNG ÂM THANH]:
+- [ ] Tiếng bị giật cục, ngắt quãng, như robot
+- [ ] Bị trễ tiếng (delay > 1-2 giây)
+- [ ] Bị tiếng vọng (Echo) liên tục
+
+[KẾT QUẢ ĐÃ REMOTE KIỂM TRA L1]:
+1. Thử nghiệm trên 4G: [4G gọi to rõ thông suốt / 4G cũng bị giật tương tự]
+2. Kết quả Ping 8.8.8.8: [Ping trung bình XXms, Packet Loss X%]
+3. Kết quả Ping IP PBX: [Ping trung bình XXms, Jitter biến thiên XXms]
+4. Thiết bị âm thanh: [Tai nghe Jabra USB Call Center chuyên dụng]
+
+[NỘI DUNG CẦN L2 / HẠ TẦNG HỖ TRỢ]:
+- Kiểm tra RTP packet loss và jitter thống kê trong RTCP report của cuộc gọi.
+- Kiểm tra đường truyền peering giữa ISP khách hàng [TÊN_ISP] và Data Center ODS.
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Giải thích nguyên nhân mạng chập chờn (Ping & Rớt gói)
+> *"Dạ ODS đã tiếp nhận thông tin về việc cuộc gọi trên máy nhánh [EXT] bị giật tiếng/chập chờn. Do cuộc gọi tổng đài truyền âm thanh thời gian thực qua mạng Internet nên rất nhạy cảm với độ ổn định của đường truyền, em xin phép UltraViewer/AnyDesk vào máy tính của mình để kiểm tra tốc độ và độ rớt gói tin về máy chủ tổng đài nhé ạ."*
+
+### Mẫu 2: Hướng dẫn xử lý tiếng vọng (Echo)
+> *"Dạ hiện tượng anh/chị nói chuyện mà nghe lại chính tiếng của mình thường xảy ra khi phía người nghe đang bật loa ngoài điện thoại/laptop quá lớn khiến mic thu ngược lại tiếng. Anh/chị có thể nhờ khách hàng giảm âm lượng loa ngoài hoặc cắm tai nghe để âm thanh trong trẻo nhất nha."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Kết quả đo mạng đạt chuẩn:** Ping 8.8.8.8 và Ping PBX rớt gói 0%, Jitter < 20ms.
+2. **Đàm thoại thử nghiệm 2 chiều:** Thực hiện cuộc gọi thử kéo dài ít nhất 1 phút, âm thanh trong trẻo, không giật tiếng robot, không bị delay và không có tiếng vọng.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Cuộc gọi bị giật tiếng như robot vào giờ cao điểm | Mạng Wi-Fi văn phòng bị rớt gói 5% do có máy tính tải file lớn | Chuyển máy tính cắm cáp mạng LAN trực tiếp | Ping ổn định dưới 20ms, đàm thoại thông suốt | `#TK-VOIP-01` |
+| *Template* | Điện thoại viên nghe tiếng của mình vọng lại | Khách hàng dùng điện thoại di động bật loa ngoài âm lượng tối đa | Điện thoại viên nhắc khách hàng giảm âm lượng loa ngoài | Hết hoàn toàn tiếng vọng | `#TK-ECHO-02` |
+

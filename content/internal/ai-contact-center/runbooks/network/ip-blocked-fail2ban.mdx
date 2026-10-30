@@ -1,0 +1,149 @@
+---
+title: Dải IP văn phòng bị chặn Firewall
+description: Runbook L1 tiếp nhận, lấy IP WAN công cộng qua ifconfig.me, kiểm tra lệnh tracert, cơ chế Fail2ban tự động khóa do nhập sai mật khẩu và quy trình mở khóa IP.
+---
+
+## 1. Khi nào dùng bài này?
+
+Áp dụng khi xảy ra tình huống **toàn bộ nhân viên ngồi tại văn phòng khách hàng đồng loạt không thể kết nối tới tổng đài ODS**:
+- Toàn bộ điện thoại bàn (IP Phone) và phần mềm Softphone trong văn phòng cùng chuyển sang chấm đỏ (`Offline`, `Registration Failed`, `Request Timeout`, `Connection Refused`).
+- Truy cập vào trang quản trị Portal ODS từ mạng văn phòng bị báo lỗi: `403 Forbidden`, `Access Denied` hoặc trang web xoay vòng rồi báo timeout.
+- **Dấu hiệu phân lập quan trọng:** Nếu nhân viên tắt Wi-Fi văn phòng và bật **4G/5G** trên điện thoại, hoặc nhân viên làm việc tại nhà (Work from home) thì đăng nhập và gọi điện hoàn toàn bình thường.
+
+### Phân biệt với các sự cố gần giống
+- **Chỉ 1 máy nhánh bị lỗi do sai tài khoản/mật khẩu**: Xem [Máy nhánh không đăng ký được](/internal/ai-contact-center/runbooks/extensions/registration-failed).
+- **Cả văn phòng mất mạng Internet toàn diện (không lướt web, không đọc báo được)**: Sự cố do đứt cáp quang hoặc hỏng Router văn phòng ➔ Khách hàng liên hệ nhà mạng Internet (ISP).
+- **Hạ tầng tổng đài Core PBX ODS bảo trì diện rộng**: Toàn bộ khách hàng ở mọi nơi đều không kết nối được ➔ Kênh thông báo NOC/SRE.
+
+---
+
+## 2. Bản chất kỹ thuật: Cơ chế phòng thủ tự động Fail2ban
+
+> [!IMPORTANT]
+> **Hiểu đúng nguyên lý bảo mật viễn thông**:
+> - Để bảo vệ tổng đài khỏi các cuộc tấn công dò quét mật khẩu tự động (Brute-force SIP Attack) có thể dẫn đến việc chiếm đoạt cước viễn thông, máy chủ ODS được trang bị hệ thống phòng thủ tường lửa **`Fail2ban`**.
+> - Khi trong văn phòng khách hàng có **dù chỉ 1 máy tính hoặc 1 điện thoại cài đặt sai mật khẩu SIP**, thiết bị đó sẽ liên tục gửi bản tin đăng ký sai (hàng chục lần/phút).
+> - Sau khi vượt ngưỡng vi phạm (thường là 5 - 10 lần nhập sai liên tiếp), hệ thống tường lửa sẽ tự động đưa **toàn bộ địa chỉ IP WAN công cộng của văn phòng đó vào danh sách đen (Blacklist / Drop traffic)**!
+> - Hậu quả: Mọi thiết bị khác trong văn phòng dùng chung đường truyền Internet đó đều sẽ bị chặn đứng kết nối tới máy chủ tổng đài.
+
+| Tình huống quan sát | Nhận định kỹ thuật | Hướng xử lý L1 |
+| :--- | :--- | :--- |
+| **Cả cty mất kết nối, đổi 4G thì Online** | 99% địa chỉ IP WAN công cộng của văn phòng bị khóa bởi `Fail2ban`. | Lấy IP WAN qua `ifconfig.me`, mở khóa IP trên Firewall PBX và tìm thiết bị gõ sai pass. |
+| **Mở khóa IP xong 5-10 phút sau lại bị chặn tiếp** | Thiết bị gõ sai mật khẩu vẫn đang bật ngầm và tiếp tục gửi bản tin sai lên server. | Hướng dẫn IT văn phòng tìm máy vừa cài app mới hoặc đổi mật khẩu gần đây để tắt/sửa. |
+| **Chạy lệnh `tracert` bị timeout ngay tại cửa ngõ ODS** | Gói tin đã rời khỏi nhà mạng khách hàng nhưng bị tường lửa ODS DROP không phản hồi. | Kiểm tra bảng IP Blacklist trên cụm Firewall ODS. |
+
+---
+
+## 3. Thông tin cần hỏi khách hàng
+
+Thu thập thông tin theo 2 nhóm:
+
+### Thông tin tối thiểu bắt buộc
+1. **Mã Tenant / Tên công ty (`[TENANT_ID]`):** Khách hàng nào đang bị sự cố?
+2. **Địa chỉ IP WAN công cộng của văn phòng:**
+   - Hướng dẫn nhân viên tại văn phòng mở trình duyệt truy cập: **`https://ifconfig.me`** (hoặc `https://ipinfo.io`).
+   - Đọc dãy số IP hiển thị trên màn hình (ví dụ: `118.69.123.45`).
+3. **Mốc thời gian bắt đầu bị mất kết nối:** Thời điểm cả văn phòng bị offline?
+4. **Kiểm tra chéo trên 4G:** Nhân viên dùng 4G cá nhân đăng nhập thử ODS Phone có kết nối được không?
+
+### Thông tin bổ sung (Hỏi khi cần)
+- Trong văn phòng hôm nay có nhân viên mới nào vừa cài đặt phần mềm gọi điện, hoặc có ai vừa đổi mật khẩu máy nhánh không?
+- Văn phòng có vừa mới thay đổi nhà mạng Internet (đổi sang gói mạng mới hoặc thay đổi Router) không?
+
+---
+
+## 4. Checklist kiểm tra an toàn cho L1
+
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
+
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Lấy địa chỉ IP WAN văn phòng** | Khách hàng | Mở trang `https://ifconfig.me` trên máy tính văn phòng | Lấy được dãy số IPv4 công cộng | Báo lỗi không mở được web: Mất mạng Internet toàn diện ➔ Lỗi đường truyền ISP. |
+| **2. Tra cứu IP trong danh sách chặn Fail2ban** | L1 tra cứu | Nhập địa chỉ IP WAN vào công cụ kiểm tra Blacklist của ODS | IP ở trạng thái `Clean / Allowed` | **IP nằm trong danh sách Banned**: Xác nhận 100% bị Fail2ban chặn ➔ Thực hiện quy trình gỡ chặn. |
+| **3. Kiểm tra lý do bị chặn (Ban Reason)** | L1 đọc log | Xem log chi tiết của Fail2ban trên hệ thống | Không có log | Ghi nhận máy nhánh `[EXT_X]` đăng ký sai mật khẩu 10 lần liên tiếp trong 1 phút. |
+| **4. Kiểm tra đường truyền bằng Tracert** | L1 / Khách hàng | Chạy lệnh `tracert [IP_WAN_PBX]` từ máy tính văn phòng | Đi qua các hop mạng bình thường | Gói tin đi qua hết hop mạng ISP nhưng dừng lại trước PBX: Bị Firewall ODS Drop. |
+
+---
+
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
+
+<Steps>
+  <Step title="Bước 1: Hướng dẫn khách hàng lấy địa chỉ IP WAN văn phòng">
+    Hướng dẫn nhân viên ngồi tại văn phòng thao tác nhanh:
+    1. Mở trình duyệt web bất kỳ (Chrome / Edge).
+    2. Nhập địa chỉ: `https://ifconfig.me` và bấm Enter.
+    3. Sao chép lại dãy số IP (ví dụ: `14.161.45.67`) và gửi cho kỹ sư L1 qua kênh hỗ trợ.
+  </Step>
+
+  <Step title="Bước 2: Mở khóa địa chỉ IP trên công cụ quản trị ODS">
+    1. Kỹ sư L1 đăng nhập vào công cụ quản trị bảo mật ODS (hoặc báo kênh L2/NOC trực ban).
+    2. Nhập địa chỉ IP WAN `[IP_WAN]` của khách hàng -> Bấm **Kiểm tra trạng thái (Check IP)**.
+    3. Nếu IP đang bị khóa: Xem tên máy nhánh vi phạm (ví dụ: máy nhánh `105`) -> Bấm nút **Gỡ chặn (Unban / Whitelist tạm thời)**.
+    4. Toàn bộ các thiết bị tại văn phòng sẽ tự động kết nối lại trong vòng 30 - 60 giây.
+  </Step>
+
+  <Step title="Bước 3: Xử lý tận gốc thiết bị gây ra lỗi gõ sai mật khẩu">
+    - **Cực kỳ quan trọng:** Nếu chỉ gỡ chặn IP mà không sửa mật khẩu trên thiết bị vi phạm, chỉ sau 5 phút máy đó sẽ lại gửi bản tin sai và IP của cả văn phòng sẽ **tiếp tục bị khóa lần 2**!
+    - L1 thông báo cho IT khách hàng: *"Bên em kiểm tra thấy máy nhánh [EXT_VI_PHAM] đang liên tục gửi sai mật khẩu. Anh/chị kiểm tra ngay máy tính của bạn dùng máy nhánh này, tắt ứng dụng đi hoặc vào Portal đổi lại mật khẩu mới chính xác nhé ạ"*.
+  </Step>
+</Steps>
+
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket cho L2 / Quản trị viên An ninh mạng khi:
+
+- [ ] **IP WAN liên tục bị khóa lại sau nhiều lần gỡ:** Khách hàng không xác định được thiết bị nào trong văn phòng đang phát tán bản tin sai.
+- [ ] **IP WAN của khách hàng là IP động (Dynamic IP):** Modem văn phòng tự động đổi IP liên tục khiến quy trình mở khóa cố định không hiệu quả.
+- [ ] **Yêu cầu thêm IP tĩnh văn phòng vào danh sách trắng vĩnh viễn (Permanent Whitelist):** Khách hàng doanh nghiệp lớn có IP tĩnh cố định yêu cầu đưa vào danh sách ngoại lệ không bao giờ bị khóa.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Dải IP WAN văn phòng bị chặn Fail2ban (IP Blocked)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Địa chỉ IP WAN văn phòng (lấy từ ifconfig.me): [IP_WAN]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+- Số lượng máy nhánh bị ảnh hưởng: [Toàn bộ máy nhánh tại văn phòng]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Thử nghiệm trên 4G: [4G đăng nhập và gọi điện bình thường]
+2. Tra cứu ifconfig.me: [Lấy được chính xác IP WAN: XX.XX.XX.XX]
+3. Lệnh Tracert: [Bị timeout tại hop mạng cửa ngõ PBX]
+4. Máy nhánh nghi vấn phát sinh lỗi: [EXT_VI_PHAM]
+
+[NỘI DUNG CẦN L2 / AN NINH HỖ TRỢ]:
+- Gỡ chặn IP WAN [IP_WAN] trên cụm tường lửa Fail2ban của PBX.
+- Cân nhắc thêm IP này vào danh sách Whitelist tạm thời trong 24h để khách hàng xử lý thiết bị nội bộ.
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Hướng dẫn lấy IP WAN để gỡ chặn khẩn cấp
+> *"Dạ ODS đã tiếp nhận thông tin về việc toàn bộ máy nhánh tại văn phòng công ty chưa kết nối được vào tổng đài. Hiện tượng này thường xảy ra khi hệ thống bảo mật tự động khóa tạm thời đường truyền IP của văn phòng do có thiết bị nội bộ gửi sai mật khẩu nhiều lần. Anh/chị ngồi tại văn phòng truy cập nhanh trang `https://ifconfig.me` và gửi giúp em dãy số IP hiển thị trên màn hình để kỹ thuật mở khóa kết nối ngay nhé ạ!"*
+
+### Mẫu 2: Nhắc nhở xử lý thiết bị gõ sai mật khẩu để tránh bị khóa lại
+> *"Dạ kỹ thuật ODS đã mở khóa kết nối cho dải IP văn phòng của mình rồi ạ. Tuy nhiên, hệ thống ghi nhận máy nhánh [EXT_VI_PHAM] đang nhập sai mật khẩu liên tục. Anh/chị nhờ bạn quản trị viên hoặc nhân viên dùng máy nhánh này kiểm tra tắt ứng dụng hoặc sửa lại đúng mật khẩu giúp em nhé, nếu để thiết bị tiếp tục gửi mật khẩu sai thì hệ thống sẽ tự động khóa lại đường truyền sau vài phút đó ạ!"*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Quan sát trạng thái máy nhánh:** Toàn bộ điện thoại bàn IP Phone và Softphone tại văn phòng chuyển từ chấm đỏ sang chấm xanh lá (`Online / Registered`).
+2. **Truy cập Portal thành công:** Mở trình duyệt web từ mạng văn phòng truy cập vào Portal ODS mượt mà, không còn bị báo `403 Forbidden` hay timeout.
+3. **Thực hiện cuộc gọi thử nghiệm:** Bấm gọi một cuộc gọi nội bộ và một cuộc gọi ra ngoài thành công 2 chiều.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Cả văn phòng 30 nhân viên mất kết nối SIP vào 8h30 sáng | Nhân viên thực tập mới cài Zoiper gõ sai pass 15 lần làm IP WAN bị chặn | Gỡ IP WAN trên Fail2ban và cấp lại mật khẩu chuẩn cho bạn thực tập | Toàn bộ 30 máy nhánh Online trở lại | `#TK-FAIL2BAN-01` |
+| *Template* | Khách hàng mới đổi sang đường truyền cáp quang mới bị mất kết nối | Dải IP mới rơi vào subnet bị đánh dấu rủi ro | L1 đối soát IP ifconfig.me và đưa vào danh sách an toàn | Kết nối ổn định thông suốt | `#TK-IP-NEW-02` |
+

@@ -1,76 +1,137 @@
 ---
-title: Không nghe / tải được ghi âm
-description: Runbook L1 xử lý file ghi âm đã hiển thị nhưng không phát, không tải hoặc không có âm thanh.
+title: Không nghe hoặc tải được ghi âm
+description: Runbook L1 tiếp nhận, phân loại lỗi trình duyệt, kiểm tra link ký số bảo mật và xử lý sự cố file ghi âm không phát được hoặc tải về bị lỗi.
 ---
 
-<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
-  Ghi âm là dữ liệu nhạy cảm. Không tải về thiết bị cá nhân, gửi qua ứng dụng chat hoặc chia sẻ ngoài người dùng đã được phân quyền.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Phạm vi L1
+Áp dụng khi bản ghi cuộc gọi trên Portal **đã hiển thị biểu tượng Ghi âm** nhưng người dùng không thể nghe hoặc tải file:
+- Bấm vào nút Play thì trình phát âm thanh quay tròn liên tục (loading spinner) hoặc báo lỗi `Error loading media`.
+- Bấm nút Tải xuống (Download) báo lỗi `403 Forbidden`, `404 Not Found`, hoặc tải về file rỗng `0 byte`.
+- File âm thanh vẫn phát, thanh thời gian vẫn chạy nhưng loa hoàn toàn không có tiếng (im lặng).
 
-Áp dụng khi bản ghi có trên Portal nhưng nút phát/tải lỗi, file không mở được, phát im lặng hoặc người dùng bị từ chối quyền truy cập.
+### Phân biệt với các sự cố gần giống
+- **Cuộc gọi hoàn toàn không có biểu tượng nút Ghi âm**: Xem [Thiếu file ghi âm](/internal/ai-contact-center/runbooks/recordings/missing-recordings).
+- **Điện thoại viên đàm thoại trực tiếp bị mất tiếng**: Xem [Âm thanh một chiều / rè](/internal/ai-contact-center/runbooks/calls/one-way-audio).
 
-## Triệu chứng
+---
 
-- Nút Play quay liên tục, báo lỗi hoặc không phát âm thanh.
-- Download trả lỗi, file 0 byte/không mở được hoặc link hết hiệu lực.
-- Chỉ một người dùng, một trình duyệt hay nhiều bản ghi cùng bị ảnh hưởng.
+## 2. Tiếp nhận và kiểm tra nhanh
 
-### Phân nhánh nhanh
+L1 cần phân loại nhanh theo phạm vi lỗi:
 
-| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
-| --- | --- | --- |
-| Chỉ một trình duyệt lỗi, cửa sổ riêng tư hoạt động | Cache, cookie hoặc extension | Xóa site data riêng của Portal và thử lại |
-| Chỉ một người dùng nhận 403 | Có thể thiếu quyền recording | Đối chiếu với user cùng role và chuyển quản trị tenant |
-| Nhiều người dùng nhận 404/5xx | Có thể lỗi link, API media hoặc storage | Thu Request ID/HTTP status và chuyển L2 |
-| File tải được nhưng phát im lặng | Có thể file không có audio hoặc track lỗi | Kiểm tra dung lượng/thời lượng; không tự convert file gốc |
-| Chỉ máy khách không có tiếng, nội dung âm thanh khác cũng lỗi | Thiết bị output hoặc hệ điều hành | Chọn lại output, bỏ mute và kiểm tra âm lượng |
+| Hiện tượng quan sát | Nhận định kỹ thuật ban đầu | Hướng xử lý L1 |
+| :--- | :--- | :--- |
+| **Chỉ 1 máy tính bị lỗi, máy khác cùng tài khoản nghe bình thường** | Do trình duyệt bị chặn âm thanh, tab bị Mute hoặc driver âm thanh máy tính. | Kiểm tra cài đặt trình duyệt và âm lượng máy tính. |
+| **Bấm Nghe được nhưng nút Tải xuống bị mờ hoặc báo 403** | Tài khoản chỉ được cấp quyền *Nghe trực tuyến*, bị chặn quyền *Tải file về máy*. | Giải thích chính sách phân quyền bảo mật cho khách hàng. |
+| **Báo lỗi 403 / 404 trên hàng loạt file ghi âm** | Đường link ký số bảo mật (Signed URL / Presigned URL) bị lỗi cấu hình hoặc hết hạn. | **Chuyển cấp L2 / Hạ tầng Storage.** |
+| **Tải về file 0 byte hoặc mở file báo lỗi hỏng định dạng** | File âm thanh trên máy chủ lưu trữ bị lỗi trong quá trình nén/upload. | Chuyển cấp L2 để kiểm tra file gốc trên Storage. |
 
-## Cần hỏi khách hàng
+---
 
-- Call-ID/thời điểm, tenant, trình duyệt/thiết bị và thông báo lỗi.
-- File có hiển thị dung lượng/thời lượng không; Play và Download cùng lỗi hay chỉ một.
-- Người dùng khác có quyền tương đương nghe được không.
-- Một file hay nhiều file/khoảng thời gian bị ảnh hưởng.
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra L1
+Thu thập thông tin theo 2 nhóm:
 
-1. Xác nhận file hiện diện và người dùng đúng tenant/quyền.
-2. Thử cửa sổ riêng tư hoặc trình duyệt được hỗ trợ; kiểm tra tab có bị mute.
-3. Kiểm tra thiết bị output, âm lượng hệ điều hành và một nội dung âm thanh khác.
-4. So sánh Play với Download theo quyền được cấp; không lưu file trên thiết bị cá nhân.
-5. Ghi nhận HTTP status/Request ID nếu công cụ trình duyệt cho phép và đã che URL ký số.
+### Thông tin tối thiểu bắt buộc
+1. **Mã cuộc gọi mẫu (`[CALL_ID]`):** Cuộc gọi cụ thể đang không nghe hoặc tải được?
+2. **Triệu chứng chính xác:** Nút Play quay liên tục, báo mã lỗi gì, hay tải về file không mở được?
+3. **Phạm vi lỗi:** Chỉ 1 file này bị hay tất cả các file ghi âm khác đều bị?
+4. **Trình duyệt & Thiết bị:** Khách hàng đang dùng trình duyệt gì (Chrome, Edge, Safari, Firefox)?
 
-## Xử lý trong phạm vi L1
+### Thông tin bổ sung (Hỏi khi cần)
+- Người dùng khác có cùng quyền trong công ty có mở nghe được file đó không?
+- Máy tính của nhân viên có phát được âm thanh từ các trang web khác (như YouTube) bình thường không?
 
-- Chọn lại thiết bị âm thanh, bỏ mute và thử trình duyệt được hỗ trợ.
-- Xóa dữ liệu site riêng của Portal nếu lỗi do session/cache; đăng nhập lại theo luồng chính thức.
-- Yêu cầu quản trị viên tenant kiểm tra quyền nếu chỉ một người dùng lỗi.
-- Không convert/chỉnh sửa file gốc hoặc chia sẻ link ghi âm để né quyền.
+---
 
-## Điểm dừng và chuyển cấp
+## 4. Checklist kiểm tra an toàn cho L1
 
-- Nhiều người dùng/file cùng lỗi hoặc file có dung lượng bất thường.
-- Server trả 403/404/5xx dù quyền đúng; link ký số hết hạn bất thường.
-- File phát được nhưng im lặng/hỏng, cần kiểm tra nội dung media hoặc storage.
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-## Dữ liệu chuyển cấp
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra trạng thái Mute của Tab trình duyệt** | Khách hàng | Nhìn lên thanh tab trình duyệt xem có biểu tượng chiếc loa bị gạch chéo không | Loa không bị tắt | Tab đang bị Mute: Chuột phải vào tab chọn *Bật âm thanh trang web (Unmute site)*. |
+| **2. Thử nghiệm trên Cửa sổ ẩn danh** | Khách hàng | Mở cửa sổ ẩn danh (Incognito), đăng nhập Portal và nghe thử | Nghe phát âm thanh bình thường | **Do xung đột Extension trình duyệt**: Tắt các tiện ích chặn quảng cáo/download. |
+| **3. Kiểm tra phân quyền Download của tài khoản** | L1 tra cứu | Xem nhóm quyền (Role) của tài khoản khách hàng trên Portal | Tài khoản có quyền `Download Recording` | Chỉ có quyền `Play`: Khách hàng không được phép tải theo chính sách công ty họ. |
+| **4. Kiểm tra mã lỗi mạng trên Developer Tools (F12)** | L1 / Khách hàng | Bấm F12 -> Tab *Network* -> Bấm nút Play/Download xem request file media | Trả về mã HTTP `200` hoặc `206 Partial Content` | Trả về mã `403 Forbidden` hoặc `404 Not Found`: Link ký số hoặc file trên S3 bị lỗi. |
+| **5. Nghe thử file trên tài khoản L1 (Nếu được phép)** | L1 thực hiện | Dùng công cụ kiểm tra nội bộ mở nghe thử 5 giây | Âm thanh phát rõ ràng | File nội bộ cũng báo lỗi tương tự: Lỗi từ cụm máy chủ lưu trữ. |
 
-- Tenant, Call-ID, thời điểm, trình duyệt/OS và phạm vi.
-- Play/Download result, mã HTTP/Request ID và kết quả người dùng đối chứng.
-- Không đính kèm file/link có quyền truy cập nếu chưa được phép.
+---
 
-## Trả lời mẫu
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-> **Tiếp nhận:** ODS đã ghi nhận file ghi âm không phát hoặc tải được. Anh/chị vui lòng cung cấp Call-ID, thời điểm, trình duyệt và ảnh lỗi; không gửi file ghi âm qua kênh ngoài.
+1. **Khắc phục lỗi trình duyệt chặn Autoplay:**
+   - Trên Chrome/Edge: Bấm vào biểu tượng ổ khóa cạnh URL -> Chọn *Cài đặt trang web (Site settings)* -> Mục *Âm thanh (Sound)* chọn **Cho phép (Allow)**.
 
-> **Đã xử lý L1:** ODS đã kiểm tra quyền, trình duyệt và thiết bị âm thanh. Trường hợp còn lỗi đã được chuyển kiểm tra file/storage.
+2. **Giải thích về quyền tải file bảo mật:**
+   - Nếu nhân viên chỉ nghe được mà không tải được: Giải thích đây là chính sách bảo mật chống rò rỉ dữ liệu của công ty họ, chỉ tài khoản cấp Quản lý (Admin/Manager) mới có nút Tải file về máy.
 
-## Nguyên nhân thường gặp và tra cứu
+3. **Xóa Cookie và Cache trang web:**
+   - Hướng dẫn người dùng xóa dữ liệu đệm của trang Portal để trình duyệt tải lại phiên bản trình phát âm thanh mới nhất.
 
-- Sai thiết bị âm thanh, tab bị mute, cache/session hoặc thiếu quyền.
-- Link hết hạn, file hỏng/0 byte hoặc storage/API phục vụ media lỗi.
+---
 
-- [Lịch sử cuộc gọi](/docs/ai-contact-center/portal/tong-dai/lich-su-cuoc-goi)
-- [Mất ghi âm](/internal/ai-contact-center/runbooks/recordings/missing-recordings)
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket lên L2 / Kỹ sư Hạ tầng Lưu trữ khi:
+
+- [ ] **Mã lỗi 403 / 404 diện rộng:** Hàng loạt file ghi âm không thể phát hoặc tải được do lỗi chứng thực với Cloud Storage.
+- [ ] **File tải về có dung lượng 0 byte hoặc bị hỏng định dạng:** Nghi vấn lỗi tiến trình nén file MP3 từ bản ghi WAV thô.
+- [ ] **Thanh âm thanh chạy bình thường nhưng hoàn toàn không có tiếng:** Cần kiểm tra xem luồng RTP của cuộc gọi có bị mất gói tin âm thanh ngay từ lúc đàm thoại hay không.
+- [ ] **Lỗi hết hạn chứng chỉ bảo mật Storage:** Tên miền lưu trữ media bị lỗi SSL hoặc cấu hình CORS chặn trình duyệt phát âm thanh.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Không nghe / tải được file ghi âm (Playback Failed)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Mã cuộc gọi mẫu (Call-ID): [CALL_ID]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[CHI TIẾT LỖI]:
+- Hiện tượng: [Nút Play quay liên tục / Báo lỗi 403 Forbidden / File tải về 0 byte]
+- Mã HTTP trả về trên Network tab: [HTTP 403 / HTTP 404 / CORS error]
+- Phạm vi: [Xảy ra trên nhiều cuộc gọi trong ngày]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Phân quyền tài khoản: [Tài khoản có đầy đủ quyền Play và Download]
+2. Trình duyệt & Thiết bị: [Đã thử trên Cửa sổ ẩn danh Chrome và Edge vẫn bị lỗi]
+3. Loa máy tính: [Phát âm thanh từ YouTube bình thường]
+
+[NỘI DUNG CẦN L2 / STORAGE TEAM HỖ TRỢ]:
+- Kiểm tra tính hợp lệ của Presigned URL và quyền đọc (Read Access) trên Bucket lưu trữ.
+- Kiểm tra tính toàn vẹn của file ghi âm cuộc gọi [CALL_ID].
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và xin thông tin
+> *"Dạ ODS đã tiếp nhận thông tin về việc chưa nghe/tải được file ghi âm của cuộc gọi [CALL_ID]. Để hỗ trợ kiểm tra nhanh nhất, anh/chị vui lòng chia sẻ giúp em câu thông báo lỗi cụ thể hiển thị trên màn hình khi bấm nút Nghe, và hiện tại mình đang dùng trình duyệt gì nhé ạ. Em cảm ơn anh/chị!"*
+
+### Mẫu 2: Hướng dẫn bật âm thanh trình duyệt
+> *"Dạ anh/chị kiểm tra giúp em trên tab trình duyệt xem biểu tượng chiếc loa có đang bị gạch chéo (tắt tiếng) không nhé ạ. Đồng thời anh/chị thử mở một Cửa sổ ẩn danh (Ctrl + Shift + N) rồi bấm nghe lại giúp em xem âm thanh đã phát được chưa nha."*
+
+### Mẫu 3: Thông báo chuyển cấp chuyên sâu
+> *"Dạ em đã kiểm tra file ghi âm của cuộc gọi [CALL_ID] trên hệ thống. Do đường dẫn phát âm thanh trực tuyến đang bị gián đoạn kết nối với máy chủ lưu trữ, em đã chuyển mã cuộc gọi tới đội ngũ Kỹ thuật phụ trách Dữ liệu để đồng bộ lại file nghe cho mình ngay ạ."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Phát thử nghiệm trên trình duyệt:** Bấm nút Play, xác nhận thanh tiến trình di chuyển mượt mà, âm thanh phát rõ ràng qua tai nghe/loa.
+2. **Tải thử file về máy:** Bấm nút Download, xác nhận file tải về đầy đủ dung lượng (dung lượng > 0 KB), mở file bằng trình phát nhạc chuẩn (Windows Media Player, VLC) nghe bình thường.
+3. **Xác nhận từ người dùng:** Nhận được phản hồi xác nhận nghe tốt từ phía khách hàng.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Bấm nghe ghi âm báo lỗi CORS policy | Cấu hình CORS trên cụm máy chủ Storage chưa cấp phép cho domain mới của khách | Kỹ thuật cập nhật thêm Allowed Origins trên Storage | Khách hàng nghe và tải ghi âm mượt mà | `#TK-EXAMPLE` |
+

@@ -1,75 +1,85 @@
 ---
 title: Xử lý sự cố
-description: Hướng dẫn khoanh vùng, chẩn đoán nguyên nhân gốc rễ và danh mục runbook theo triệu chứng sự cố dịch vụ Tổng đài ODS.
+description: Hướng dẫn quy trình tiếp nhận, kiểm tra an toàn, thu thập bằng chứng kỹ thuật và danh mục runbook theo triệu chứng sự cố dịch vụ Tổng đài ODS.
 ---
 
-Sổ tay xử lý sự cố (Runbooks) cung cấp hướng dẫn chẩn đoán và khắc phục nhanh cho kỹ sư Support khi tiếp nhận phản ánh gián đoạn hoặc lỗi vận hành từ khách hàng.
+## Phương pháp 4 bước khoanh vùng sự cố cho L1
 
-## Phương pháp 4 bước khoanh vùng sự cố
+Để tiếp nhận và xử lý nhanh chóng, an toàn, kỹ sư L1 thực hiện tuần tự 4 bước:
 
-Để chẩn đoán nhanh và chính xác, kỹ sư thực hiện khoanh vùng theo 4 bước:
+<TroubleshootingMethodDiagram />
 
-```text
-[1. Xác định phạm vi] ──> [2. Xác định tầng lỗi] ──> [3. Thu thập Call-ID & Log] ──> [4. Mở Runbook xử lý]
-```
-
-1. **Bước 1 — Xác định phạm vi ảnh hưởng**:
+1. **Bước 1 — Tiếp nhận & Xác định phạm vi ảnh hưởng**:
    - Sự cố xảy ra trên **1 máy nhánh / 1 thiết bị đơn lẻ**, **1 nhóm người dùng**, **1 đầu số cụ thể** hay **toàn bộ tổng đài khách hàng**?
-   - Phạm vi hẹp thường chỉ ra lỗi tại thiết bị đầu cuối, cấu hình IP/NAT hoặc quyền hạn; phạm vi rộng chỉ ra lỗi trunk nhà mạng, server PBX hoặc hạ tầng mạng diện rộng.
+   - Phạm vi hẹp (cục bộ) thường chỉ ra vấn đề tại thiết bị đầu cuối, quyền hạn hoặc mạng nội bộ khách hàng; phạm vi rộng (nhiều tenant/toàn bộ cuộc gọi) chỉ ra sự cố hạ tầng Core PBX, Trunk nhà mạng hoặc mạng diện rộng.
 
-2. **Bước 2 — Xác định tầng phát sinh lỗi**:
-   - **Tầng thiết bị / Client**: Máy nhánh IP Phone/Softphone không đăng ký, mất kết nối mạng nội bộ.
-   - **Tầng cuộc gọi & Media**: Không kết nối được cuộc gọi, rớt cuộc gọi, mất âm thanh / âm thanh một chiều (RTP).
-   - **Tầng kết nối nhà mạng (Carrier/Trunk)**: Số dư tài khoản nhà mạng cạn kiệt, SIP trunk nhà mạng offline, đầu số bị khóa chiều gọi.
-   - **Tầng ứng dụng / Tích hợp**: Lỗi API CRM, Webhook không gửi, chiến dịch Autocall không phân bổ cuộc gọi, mất ghi âm.
+2. **Bước 2 — Xác định tầng phát sinh lỗi sơ bộ**:
+   - **Tầng thiết bị / Client**: Máy nhánh IP Phone/Softphone không đăng ký, mất kết nối mạng, mic/tai nghe bị ngắt.
+   - **Tầng cuộc gọi & Media**: Không bấm gọi ra được, không nhận được cuộc gọi vào, rớt cuộc gọi giữa chừng, âm thanh một chiều (RTP).
+   - **Tầng kết nối nhà mạng (Carrier/Trunk)**: Số dư tài khoản nhà mạng cạn kiệt, SIP Trunk offline, đầu số bị chặn hoặc gắn cờ spam.
+   - **Tầng ứng dụng / Tích hợp**: Lỗi API CRM, Webhook không gửi, chiến dịch Autocall không phân bổ cuộc gọi, thiếu file ghi âm.
 
-3. **Bước 3 — Thu thập chứng cứ kỹ thuật**:
-   - Lấy chính xác: Số gọi đi (Caller ID), số gọi đến (Callee), mốc thời gian phát sinh lỗi, mã phản hồi SIP (4xx, 5xx, 6xx) và SIP Call-ID từ log hệ thống.
+3. **Bước 3 — Kiểm tra an toàn & Thu thập chứng cứ kỹ thuật**:
+   - Thực hiện các thao tác quan sát (Read-only) theo checklist từng bài.
+   - Thu thập thông tin bắt buộc: Số gọi đi (Caller ID), số gọi đến (Callee), mốc thời gian phát sinh lỗi (kèm giây), mã phản hồi SIP / HTTP và Call-ID từ log hệ thống (che toàn bộ mật khẩu, OTP và token nhạy cảm).
 
-4. **Bước 4 — Mở đúng runbook xử lý theo triệu chứng bên dưới**.
+4. **Bước 4 — Mở đúng runbook theo triệu chứng hoặc chuyển cấp**:
+   - Tra cứu và thực hiện theo runbook tương ứng bên dưới. Nếu chạm điểm dừng an toàn, sao chép mẫu ticket chuyển cấp cho L2/NOC.
 
 ---
 
 ## Danh mục Runbook theo nhóm triệu chứng
 
 ### 1. Máy nhánh & Thiết bị đầu cuối
-| Triệu chứng | Runbook xử lý |
+| Triệu chứng quan sát | Runbook xử lý |
 |---|---|
-| Máy nhánh không đăng ký được (SIP 401, 403, Timeout) | [Mở runbook](/internal/ai-contact-center/runbooks/extensions/registration-failed) |
-| Softphone / IP Phone lỗi kết nối âm thanh hoặc phím bấm | [Mở runbook](/internal/ai-contact-center/runbooks/extensions/softphone-issues) |
+| Máy nhánh không đăng ký được (`Unregistered`, `401`, `403`, sai thông số SIP) | [Mở runbook](/internal/ai-contact-center/runbooks/extensions/registration-failed) |
+| Điện thoại bàn IP Phone (Yealink, Grandstream, lỗi mạng LAN, DND, cắm dây handset) | [Mở runbook](/internal/ai-contact-center/runbooks/extensions/ip-phone) |
+| Softphone máy tính (PC/Mac, quyền mic Windows/macOS, chọn thiết bị âm thanh, VPN) | [Mở runbook](/internal/ai-contact-center/runbooks/extensions/softphone) |
+| Ứng dụng ODS Phone Mobile (iOS/Android, không push, không hiện popup, gỡ cài lại & quét QR) | [Mở runbook](/internal/ai-contact-center/runbooks/extensions/ods-phone-app) |
 
 ### 2. Cuộc gọi & Âm thanh
-| Triệu chứng | Runbook xử lý |
+| Triệu chứng quan sát | Runbook xử lý |
 |---|---|
-| Không thực hiện được cuộc gọi ra ngoài (Outbound Failed) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/outbound-failed) |
-| Khách hàng gọi vào không được / Báo máy bận / Ngắt ngay | [Mở runbook](/internal/ai-contact-center/runbooks/calls/inbound-failed) |
-| Cuộc gọi đang đàm thoại thì bị rớt giữa chừng | [Mở runbook](/internal/ai-contact-center/runbooks/calls/dropped-calls) |
-| Âm thanh một chiều, nghe nghẹt hoặc rè tiếng (Lỗi RTP/NAT) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/one-way-audio) |
+| Không gọi ra được (Gọi số di động trong nước, số cố định, nhóm quyền Class of Service) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/outbound-failed) |
+| Không gọi được hướng quốc tế (Mở chiều Telco chống Toll Fraud, chuẩn quay số `00`, hạn mức cước) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/international-calls) |
+| Chuyển tiếp cuộc gọi không thành công (Call Forwarding ra di động, Leg 1 / Leg 2, Caller ID) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/call-forwarding) |
+| Không nhận được cuộc gọi đến (Hotline không đổ chuông, số máy tạm thời không liên lạc được, Telco nợ cước) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/inbound-failed) |
+| Lệch kịch bản thời gian làm việc (Làm bù thứ 7, ngày lễ tết, rơi sai kịch bản Ngoài giờ, lệch múi giờ) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/time-conditions) |
+| Bấm phím IVR không nhận và lỗi lời chào (DTMF không nhận diện, nhánh Timeout/Invalid, chuẩn WAV 8000Hz) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/ivr-dtmf) |
+| Cuộc gọi bị rớt giữa chừng (Ngắt đúng 30 giây do SIP ALG làm mất SIP ACK, mốc 15m Session Timer) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/dropped-calls) |
+| Rớt cuộc gọi khi chuyển máy (Transfer giữa nhân viên, Blind `##` vs Attended `*2`, Transfer Failback) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/call-transfer) |
+| Âm thanh một chiều, mất tiếng (Lỗi luồng RTP UDP 10000-20000, NAT, Router SIP ALG làm sai SDP) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/one-way-audio) |
+| Tín hiệu chập chờn, giật tiếng, tiếng vọng (Remote UltraViewer đo Ping 8.8.8.8, Jitter PBX, roaming Wi-Fi) | [Mở runbook](/internal/ai-contact-center/runbooks/calls/audio-quality) |
 
-### 3. Đầu số & Kết nối nhà mạng
-| Triệu chứng | Runbook xử lý |
+### 3. Mạng & Tường lửa
+| Triệu chứng quan sát | Runbook xử lý |
 |---|---|
-| Trunk SIP nhà mạng mất kết nối / Báo offline | [Mở runbook](/internal/ai-contact-center/runbooks/carriers/trunk-down) |
-| Đầu số bị nhà mạng chặn, báo spam hoặc hạn chế cuộc gọi | [Mở runbook](/internal/ai-contact-center/runbooks/carriers/number-blocked) |
+| Dải IP WAN văn phòng bị chặn Firewall PBX (Cơ chế `Fail2ban` do nhập sai pass nhiều lần, tra cứu `ifconfig.me`, `tracert`) | [Mở runbook](/internal/ai-contact-center/runbooks/network/ip-blocked-fail2ban) |
 
-### 4. API / Webhook & Tích hợp WebRTC
-| Triệu chứng | Runbook xử lý |
+### 4. Đầu số & Kết nối nhà mạng
+| Triệu chứng quan sát | Runbook xử lý |
 |---|---|
-| Ứng dụng tích hợp gọi API báo lỗi 4xx/5xx | [Mở runbook](/internal/ai-contact-center/runbooks/integrations/api-errors) |
-| Webhook sự kiện cuộc gọi không bắn về CRM khách hàng | [Mở runbook](/internal/ai-contact-center/runbooks/integrations/webhook-not-received) |
+| Trunk SIP nhà mạng mất kết nối / Báo offline diện rộng | [Mở runbook](/internal/ai-contact-center/runbooks/carriers/trunk-down) |
+| Đầu số bị nhà mạng từ chối kết nối hoặc bị gắn nhãn cuộc gọi rác / Spam (Voice Brandname) | [Mở runbook](/internal/ai-contact-center/runbooks/carriers/number-blocked) |
 
-### 5. Gọi tự động (Autocall / Campaign)
-| Triệu chứng | Runbook xử lý |
+### 5. API / Webhook & Tích hợp CRM
+| Triệu chứng quan sát | Runbook xử lý |
 |---|---|
-| Chiến dịch Autocall đã tạo nhưng không phát cuộc gọi | [Mở runbook](/internal/ai-contact-center/runbooks/autocall/campaign-not-running) |
-| Tỉ lệ kết nối chiến dịch thấp bất thường | [Mở runbook](/internal/ai-contact-center/runbooks/autocall/low-connect-rate) |
+| CRM không tự bật Popup thông tin khách hàng khi có chuông reo (Trình duyệt chặn Pop-up blocked, Webhook latency) | [Mở runbook](/internal/ai-contact-center/runbooks/integrations/screen-pop) |
+| Máy chủ CRM khách hàng không nhận được Webhook sự kiện cuộc gọi | [Mở runbook](/internal/ai-contact-center/runbooks/integrations/webhook-not-received) |
+| Ứng dụng tích hợp gọi API ODS báo lỗi HTTP 4xx, 5xx hoặc Timeout | [Mở runbook](/internal/ai-contact-center/runbooks/integrations/api-errors) |
 
-### 6. Báo cáo, Giao diện Portal & Ghi âm
-| Triệu chứng | Runbook xử lý |
+### 6. Gọi tự động (Autocall / Campaign)
+| Triệu chứng quan sát | Runbook xử lý |
 |---|---|
-| Không tìm thấy file ghi âm cuộc gọi trên hệ thống | [Mở runbook](/internal/ai-contact-center/runbooks/recordings/missing-recordings) |
-| Lỗi không nghe hoặc không tải được file ghi âm | [Mở runbook](/internal/ai-contact-center/runbooks/recordings/playback-failed) |
-| Người dùng không đăng nhập được Portal khách hàng | [Mở runbook](/internal/ai-contact-center/runbooks/portal/login-failed) |
-| Báo cáo thống kê cuộc gọi sai lệch số liệu thực tế | [Mở runbook](/internal/ai-contact-center/runbooks/portal/report-mismatch) |
+| Chiến dịch Autocall đã đến lịch nhưng không chạy hoặc đứng yên | [Mở runbook](/internal/ai-contact-center/runbooks/autocall/campaign-not-running) |
+| Tỷ lệ bắt máy / kết nối của chiến dịch Auto Call thấp bất thường | [Mở runbook](/internal/ai-contact-center/runbooks/autocall/low-connect-rate) |
 
-
+### 7. Báo cáo, Giao diện Portal & Ghi âm
+| Triệu chứng quan sát | Runbook xử lý |
+|---|---|
+| Số liệu báo cáo thống kê trên Portal bị lệch hoặc chênh lệch file Excel (Phân biệt Call Session vs Call Legs) | [Mở runbook](/internal/ai-contact-center/runbooks/portal/report-mismatch) |
+| Không tìm thấy file ghi âm của cuộc gọi trên hệ thống | [Mở runbook](/internal/ai-contact-center/runbooks/recordings/missing-recordings) |
+| File ghi âm có hiển thị nhưng không nghe được hoặc tải về bị lỗi | [Mở runbook](/internal/ai-contact-center/runbooks/recordings/playback-failed) |
+| Người dùng không thể truy cập hoặc đăng nhập vào Portal ODS | [Mở runbook](/internal/ai-contact-center/runbooks/portal/login-failed) |

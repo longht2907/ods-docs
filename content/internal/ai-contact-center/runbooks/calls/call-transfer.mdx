@@ -1,0 +1,148 @@
+---
+title: Rớt cuộc gọi khi chuyển máy
+description: Runbook L1 tiếp nhận, phân biệt Blind Transfer (##) và Attended Transfer (*2), cấu hình kịch bản chuyển máy quay lại (Failback) và xử lý rớt cuộc gọi khi chuyển máy giữa các nhân viên.
+---
+
+## 1. Khi nào dùng bài này?
+
+Áp dụng khi điện thoại viên phản ánh **sự cố rớt cuộc gọi hoặc không thực hiện được khi chuyển máy (Transfer)** cho đồng nghiệp:
+- Nhân viên đang nghe máy khách hàng, bấm phím chuyển máy cho đồng nghiệp thì cuộc gọi của khách hàng **bị cúp máy (ngắt kết nối) ngay lập tức**.
+- Chuyển máy cho máy nhánh đồng nghiệp nhưng máy nhánh đó không reo chuông, hoặc chuông reo vài hồi rồi cuộc gọi tự động rớt thay vì quay lại cho nhân viên ban đầu.
+- Nhân viên bấm phím chuyển máy nhưng tổng đài không nhận lệnh, cuộc gọi vẫn giữ nguyên với khách hàng.
+
+### Phân biệt với các sự cố gần giống
+- **Chuyển tiếp cuộc gọi tự động (Call Forwarding) ra số di động cá nhân**: Xem [Sự cố Chuyển tiếp cuộc gọi](/internal/ai-contact-center/runbooks/calls/call-forwarding).
+- **Cuộc gọi đang đàm thoại bình thường tự ngắt ở giây 30**: Xem [Cuộc gọi bị rớt giữa chừng](/internal/ai-contact-center/runbooks/calls/dropped-calls).
+- **Máy nhánh đích bị mất kết nối (Offline)**: Xem [Máy nhánh không đăng ký được](/internal/ai-contact-center/runbooks/extensions/registration-failed).
+
+---
+
+## 2. Tiếp nhận và kiểm tra nhanh: Phân biệt 2 chế độ chuyển máy
+
+> [!IMPORTANT]
+> **Hiểu đúng bản chất 2 cơ chế chuyển máy trong viễn thông**:
+> - **Chuyển máy trực tiếp (Blind Transfer — phím `##[EXT]`):** Nhân viên bấm lệnh ngắt máy ngay lập tức và đẩy thẳng khách hàng sang máy nhánh đồng nghiệp. **Rủi ro rất cao**: Nếu đồng nghiệp đang bận cuộc gọi khác, đang bật DND hoặc vắng mặt không bắt máy, cuộc gọi của khách hàng sẽ bị ngắt luôn!
+> - **Chuyển máy có thông báo (Attended Transfer — phím `*2[EXT]`):** Nhân viên đưa khách hàng vào chế độ nghe nhạc chờ (Hold), gọi nói chuyện riêng với đồng nghiệp để hỏi ý kiến trước. Nếu đồng nghiệp sẵn sàng nhận máy ➔ Nhân viên mới gác máy để hoàn tất chuyển cuộc gọi.
+
+Khi tiếp nhận phản ánh rớt cuộc gọi khi chuyển máy, L1 phân loại theo bảng sau:
+
+| Hiện tượng quan sát | Nguyên nhân kỹ thuật cốt lõi | Hướng xử lý nhanh L1 |
+| :--- | :--- | :--- |
+| **Bấm chuyển máy là khách hàng bị cúp luôn** | Nhân viên dùng phím **Blind Transfer (`##`)** trong khi máy nhánh đích đang bận hoặc bật chế độ Không làm phiền (**DND**). | Hướng dẫn nhân viên chuyển sang dùng **Attended Transfer (`*2`)**. |
+| **Đồng nghiệp không bắt máy thì cuộc gọi bị ngắt** | Hệ thống chưa cấu hình tính năng **Transfer Failback** (Tự động quay lại nhân viên cũ khi chuyển máy thất bại). | Cấu hình thời gian Re-call quay lại máy cũ trên Portal ODS. |
+| **Bấm phím chuyển máy nhưng không có phản hồi** | Tính năng nhận diện phím chuyển máy trong cuộc gọi (In-call Feature Codes) bị tắt hoặc thiết bị đầu cuối chặn mã phím. | Bật lại mã phím tính năng trong cài đặt tổng đài hoặc dùng phím cứng Transfer trên IP Phone. |
+
+---
+
+## 3. Thông tin cần hỏi khách hàng
+
+Thu thập thông tin theo 2 nhóm:
+
+### Thông tin tối thiểu bắt buộc
+1. **Số máy nhánh chuyển máy (`[FROM_EXT]`):** Nhân viên nào thực hiện thao tác chuyển cuộc gọi?
+2. **Số máy nhánh nhận chuyển máy (`[TO_EXT]`):** Chuyển cuộc gọi tới máy nhánh của ai?
+3. **Thao tác chuyển máy nhân viên đã bấm:**
+   - Bấm nút Transfer cứng trên điện thoại bàn Yealink/Grandstream?
+   - Bấm nút Transfer trên phần mềm Zoiper/ODS Phone?
+   - Hay bấm mã phím số (ví dụ: `##` hay `*2`)?
+4. **Trạng thái máy nhánh đích lúc đó:** Đồng nghiệp có đang ngồi ở bàn làm việc không, máy nhánh đích có đổ chuông không?
+
+---
+
+## 4. Checklist kiểm tra an toàn cho L1
+
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
+
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra trạng thái máy nhánh đích** | L1 tra cứu | Xem máy nhánh `[TO_EXT]` trên Portal ODS | Máy nhánh báo `Online / Idle` (Sẵn sàng) | Báo `Offline`, `In-Call` (Bận) hoặc `DND`: Chuyển máy trực tiếp sẽ bị rớt. |
+| **2. Tra cứu CDR cuộc gọi chuyển máy** | L1 tra cứu | Xem chi tiết cuộc gọi bị rớt trên Portal | Ghi nhận sự kiện Transfer | Ghi nhận lý do ngắt là `NO_ANSWER` hoặc `BUSY` tại nhánh đích. |
+| **3. Kiểm tra mã phím tính năng (Feature Codes)** | L1 đối chiếu | Xem cài đặt mã phím tính năng trên Portal | `*2` (Attended Transfer) và `##` (Blind Transfer) đang bật | Mã phím bị tắt hoặc đổi thành ký tự khác: Khôi phục lại mã chuẩn. |
+| **4. Thử nghiệm cuộc gọi nội bộ đối chứng** | Khách hàng | Hai nhân viên gọi trực tiếp cho nhau xem có thông máy không | Đàm thoại 2 chiều bình thường | Không gọi được: Máy nhánh đích bị lỗi âm thanh hoặc mạng. |
+
+---
+
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
+
+<Steps>
+  <Step title="Chuẩn hóa quy trình Chuyển máy có thông báo (Attended Transfer)">
+    Hướng dẫn toàn bộ điện thoại viên thực hiện chuyển máy theo quy trình 4 bước chuẩn để không bao giờ làm rớt cuộc gọi của khách:
+    1. Khi đang đàm thoại với khách, thông báo lịch sự: *"Em xin phép chuyển máy cho bộ phận kỹ thuật, anh/chị giữ máy một chút giúp em nhé ạ"*.
+    2. Bấm phím **`*2`** (hoặc bấm nút **Transfer** trên phần mềm/máy bàn) -> Bấm số máy nhánh đồng nghiệp (ví dụ: `102`) -> Bấm phím **Send/#**.
+    3. Lúc này khách hàng sẽ được giữ máy và nghe nhạc chờ (Hold). Điện thoại viên nói chuyện trước với đồng nghiệp: *"Em chuyển khách hàng A qua nhé"*.
+    4. Khi đồng nghiệp đồng ý nhận ➔ Điện thoại viên mới bấm nút **Transfer** lần 2 (hoặc gác máy) để hoàn tất chuyển cuộc gọi.
+  </Step>
+
+  <Step title="Cách xử lý khi đồng nghiệp bận hoặc không nghe máy">
+    - Nếu sau 3-4 hồi chuông mà đồng nghiệp không bắt máy:
+      + Điện thoại viên bấm phím hủy Transfer (nút **Cancel** trên điện thoại bàn, hoặc bấm lại nút **Hold/Resume** trên Softphone).
+      + Cuộc gọi sẽ lập tức được nối lại với khách hàng: *"Dạ hiện tại máy nhánh kỹ thuật đang bận, em xin phép ghi nhận thông tin để kỹ thuật gọi lại cho anh/chị ngay nhé ạ"*.
+  </Step>
+
+  <Step title="Kiểm tra tắt chế độ DND trên máy nhánh đích">
+    - Nếu máy nhánh đích không reo chuông khi chuyển máy: Kiểm tra xem trên màn hình điện thoại bàn của đồng nghiệp có đang hiển thị chữ `DND` (Do Not Disturb) không. Nếu có, bấm phím mềm DND để tắt đi.
+  </Step>
+</Steps>
+
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket cho L2 khi:
+
+- [ ] **Lỗi giao thức SIP REFER:** Thiết bị đầu cuối gửi bản tin `REFER` để chuyển máy nhưng máy chủ PBX ODS từ chối hoặc trả về mã `500 Server Internal Error`.
+- [ ] **Lỗi giữ chỗ kênh âm thanh (Hold Media Loop):** Khách hàng sau khi được chuyển máy bị im lặng hoàn toàn, không nghe thấy tiếng đồng nghiệp dù cả 2 bên đều đã nhấc máy (lỗi luồng Re-INVITE RTP).
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Rớt cuộc gọi khi Chuyển máy nội bộ (Call Transfer Failed)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Số máy nhánh thực hiện chuyển: [FROM_EXT]
+- Số máy nhánh nhận chuyển: [TO_EXT]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[CHI TIẾT THAO TÁC]:
+- Phương thức chuyển: [Attended Transfer *2 / Phím cứng Transfer IP Phone]
+- Hiện tượng: [Vừa bấm chuyển là cuộc gọi khách bị ngắt ngay lập tức]
+- Trạng thái máy nhánh đích: [Đang Online và rỗi máy]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Thử gọi nội bộ giữa 2 máy: [Gọi nội bộ nói chuyện to rõ]
+2. Trạng thái DND máy đích: [Đã tắt DND]
+3. Lịch sử CDR: [Ghi nhận cuộc gọi bị terminate ngay tại mốc transfer]
+
+[NỘI DUNG CẦN L2 HỖ TRỢ]:
+- Kiểm tra SIP trace bản tin REFER và Re-INVITE giữa PBX và máy nhánh [FROM_EXT].
+- Kiểm tra luồng bridging âm thanh giữa khách hàng và máy nhánh [TO_EXT].
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu: Hướng dẫn nhân viên thao tác chuyển máy có thông báo an toàn
+> *"Dạ để đảm bảo không bị cúp máy nhầm của khách hàng khi chuyển máy, anh/chị thao tác theo quy trình chuyển máy có thông báo giúp em nhé ạ:
+> 1. Mình bấm phím `*2` kèm số máy nhánh của đồng nghiệp (ví dụ `*2102`).
+> 2. Lúc này khách hàng sẽ nghe nhạc chờ, mình nói chuyện trước với đồng nghiệp xem họ có tiện nghe máy không.
+> 3. Khi đồng nghiệp đồng ý thì mình mới gác máy để hoàn tất chuyển cuộc gọi.
+> Nếu đồng nghiệp bận hoặc không nghe, mình chỉ cần bấm phím hủy Transfer là sẽ nói chuyện lại với khách hàng được ngay, tránh việc khách bị cúp máy đột ngột ạ!"*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Thử nghiệm chuyển máy thành công:** Thực hiện 1 cuộc gọi thử nghiệm từ bên ngoài vào máy nhánh A ➔ Máy nhánh A bấm `*2` chuyển sang máy nhánh B ➔ Khách nghe nhạc chờ ➔ Máy nhánh B nhấc máy đàm thoại thông suốt với khách hàng.
+2. **Thử nghiệm hủy chuyển máy (Failback):** Máy nhánh A chuyển sang máy nhánh B nhưng B không nghe máy ➔ Máy nhánh A bấm hủy và quay lại nói chuyện với khách bình thường.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Lễ tân chuyển máy cho kỹ thuật thì khách bị rớt máy | Lễ tân dùng phím Blind Transfer (`##`) trong khi máy kỹ thuật đang bận | Hướng dẫn đổi sang dùng Attended Transfer (`*2`) | Khách hàng nghe nhạc chờ và chuyển máy thông suốt | `#TK-TRANSFER-01` |
+| *Template* | Bấm nút Transfer cứng trên điện thoại Yealink không ăn | Phím Transfer trên điện thoại đang đặt chế độ New Call thay vì Blind/Attended | Cấu hình lại phím Transfer trong Web GUI điện thoại | Bấm phím chuyển máy mượt mà | `#TK-YEALINK-02` |
+

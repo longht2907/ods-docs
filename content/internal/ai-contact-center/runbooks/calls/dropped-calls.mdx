@@ -1,115 +1,132 @@
 ---
-title: Cuộc gọi bị rớt
-description: Dàn ý chẩn đoán và xử lý case cuộc gọi bị ngắt ngoài dự kiến.
+title: Cuộc gọi bị rớt giữa chừng
+description: Runbook L1 tiếp nhận, phân loại mốc thời gian ngắt (30s SIP ACK do SIP ALG, 15m Session Timer) và xử lý sự cố cuộc gọi đang đàm thoại bị ngắt đột ngột.
 ---
 
-<Callout title="Dàn ý — chờ bổ sung" type="warn">
-  Mục ghi *(đề xuất)* là gợi ý cần xác nhận. Mục **Cần bổ sung** là thông tin riêng của ODS. Câu hỏi xem tại file câu hỏi TASK-018.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Triệu chứng
+Áp dụng khi điện thoại viên hoặc khách hàng phản ánh cuộc gọi **đã kết nối thành công, đang đàm thoại nhưng bị ngắt đột ngột**:
+- **Ngắt đúng ở 30 - 32 giây (30-second Drop):** Mọi cuộc gọi cứ bấm nghe nói chuyện đúng 30 giây là tự động tút tút ngắt máy.
+- **Ngắt đúng ở mốc 15 phút hoặc 30 phút:** Cuộc gọi dài tự động kết thúc đúng ở một mốc thời gian cố định lặp lại.
+- **Ngắt ngẫu nhiên khi dùng App di động:** Cuộc gọi ngắt bất chợt sau vài giây đến vài phút do ứng dụng ODS Phone bị hệ điều hành tắt ngầm khi máy khóa màn hình.
 
-- Cuộc gọi thiết lập thành công nhưng tự ngắt sau một khoảng thời gian hoặc tại mốc thời gian lặp lại. *(đề xuất)*
-- Lỗi có thể chỉ xảy ra ở một chiều gọi, một thiết bị, một mạng truy cập, một trunk hoặc một nhà mạng. *(đề xuất)*
-- Người dùng có thể thấy thông báo mất kết nối hoặc chỉ nghe im lặng trước khi cuộc gọi kết thúc. *(đề xuất)*
+### Phân biệt với các sự cố gần giống
+- **Rớt cuộc gọi khi bấm chuyển máy cho đồng nghiệp**: Xem [Sự cố Chuyển máy nội bộ](/internal/ai-contact-center/runbooks/calls/call-transfer).
+- **Bấm gọi ngắt ngay lập tức, không đổ chuông**: Xem [Không gọi ra được](/internal/ai-contact-center/runbooks/calls/outbound-failed).
+- **Cuộc gọi kết nối nhưng không nghe thấy tiếng**: Xem [Âm thanh một chiều / Mất tiếng](/internal/ai-contact-center/runbooks/calls/one-way-audio).
+- **Âm thanh giật tiếng, trễ tiếng do suy hao mạng**: Xem [Tín hiệu thoại chập chờn / Mất gói](/internal/ai-contact-center/runbooks/calls/audio-quality).
 
-**Cần bổ sung:** Ngưỡng và dấu hiệu ODS dùng để phân biệt rớt cuộc gọi với người dùng chủ động kết thúc.
+---
 
-<ReviewQuestion id="Q-dropped-calls-1">
-  ODS xác nhận một cuộc gọi “bị rớt” dựa trên CDR, SIP cause hay dấu hiệu nào khác?
-</ReviewQuestion>
+## 2. Bản chất kỹ thuật: Cơ chế rớt ở giây thứ 30 (SIP ACK Timeout)
 
-## Cần hỏi KH
+> [!IMPORTANT]
+> **Nguyên lý viễn thông**: Trong giao thức khởi tạo phiên SIP:
+> 1. Khi người nghe bấm nhấc máy, tổng đài PBX gửi bản tin `SIP 200 OK`.
+> 2. Thiết bị đầu cuối của người nghe **bắt buộc phải phản hồi lại bản tin xác nhận `SIP ACK`**.
+> 3. Nếu Modem/Router tại văn phòng khách hàng đang bật tính năng **`SIP ALG` (Application Layer Gateway)**, tính năng này thường can thiệp và sửa đổi sai địa chỉ IP trong gói tin, khiến bản tin `ACK` bị thất lạc không tìm được đường về máy chủ PBX ODS.
+> 4. **Sau 30 giây không nhận được xác nhận ACK**, PBX coi như kết nối đã bị đứt và chủ động gửi lệnh `BYE` để giải phóng kênh cuộc gọi!
 
-- Số gọi, số bị gọi, thời điểm kèm múi giờ và thời lượng trước khi bị ngắt. *(đề xuất)*
-- Chiều gọi, máy nhánh, thiết bị/softphone, loại mạng và vị trí kết nối. *(đề xuất)*
-- Lỗi có lặp lại ở cùng một mốc thời gian, cùng số đích hoặc khi đổi thiết bị/mạng không. *(đề xuất)*
-- Trước sự cố có thay đổi firewall, router, ISP, thiết bị hoặc cấu hình Tổng đài không. *(đề xuất)*
+| Mốc thời gian cuộc gọi bị ngắt | Nguyên nhân kỹ thuật cốt lõi | Hướng xử lý nhanh L1 |
+| :--- | :--- | :--- |
+| **Ngắt đúng ở giây 30 - 32** | **Lỗi SIP ACK Timeout**: Router văn phòng bật `SIP ALG` làm thất lạc gói tin `ACK`. | Hướng dẫn IT văn phòng tắt tính năng `SIP ALG` trên Router hoặc chuyển kết nối sang TLS/4G. |
+| **Ngắt đúng ở 15 phút hoặc 30 phút** | **Lỗi Session Timer**: Quá trình gia hạn phiên (Re-INVITE / Session Refresh) giữa PBX và nhà mạng viễn thông bị lỗi timeout. | Ghi nhận mã cuộc gọi Call-ID và chuyển cấp L2 kiểm tra thông số Session Timer. |
+| **Ngắt khi khóa màn hình điện thoại** | Hệ điều hành (Android/iOS) tự động tắt ngầm ứng dụng ODS Phone để tiết kiệm pin. | Cài đặt Pin sang chế độ `Không hạn chế (Unrestricted)` và bật Tự khởi chạy. |
 
-**Cần bổ sung:** Trường ticket và bài test đối chứng ODS yêu cầu khách hàng thực hiện.
+---
 
-<ReviewQuestion id="Q-dropped-calls-2">
-  Khách hàng cần thực hiện những cuộc gọi thử nào để khoanh vùng case rớt cuộc gọi?
-</ReviewQuestion>
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra
+Thu thập thông tin theo 2 nhóm:
 
-1. Kiểm tra mạng và thiết bị ở hai đầu; so sánh với một thiết bị hoặc kết nối khác nếu có thể. *(đề xuất)*
-2. Xác nhận máy nhánh đăng ký ổn định và không bị thay đổi contact bất thường trong thời gian gọi. *(đề xuất)*
-3. Đối chiếu CDR, Call-ID và SIP BYE/CANCEL để xác định phía nào kết thúc cuộc gọi và mã nguyên nhân. *(đề xuất)*
-4. Kiểm tra session timer, NAT/firewall timeout, trunk và dấu hiệu mất gói hoặc mất luồng RTP. *(đề xuất)*
-5. Có thể tham khảo `pjsip show endpoints`, `pjsip show contacts`, CDR, log, `sngrep` hoặc RTP debug. *(đề xuất — cần xác nhận công cụ thực tế ODS)*
+### Thông tin tối thiểu bắt buộc
+1. **Thời lượng đàm thoại chính xác trước khi ngắt:** Cuộc gọi kéo dài đúng 30-32 giây, 15 phút hay ngẫu nhiên?
+2. **Số máy nhánh (`[EXT]`) & Số điện thoại đối phương:** Cuộc gọi bị rớt diễn ra giữa hai số nào?
+3. **Mốc thời gian xảy ra:** Thời điểm chính xác của cuộc gọi bị rớt gần nhất?
+4. **Tần suất xảy ra:** Cuộc gọi nào cũng bị ngắt ở mốc 30s hay chỉ thỉnh thoảng?
+5. **Môi trường thiết bị:** Cắm dây mạng LAN hay Wi-Fi? App ODS Phone Mobile dùng Wi-Fi hay 4G?
 
-**Cần bổ sung:** Công cụ ODS dùng để xem SIP ladder, RTP quality và giới hạn quyền capture theo vai trò.
+---
 
-<ReviewQuestion id="Q-dropped-calls-3">
-  ODS có số liệu hoặc log nào để xác định bên gửi BYE và chất lượng RTP trước lúc cuộc gọi rớt?
-</ReviewQuestion>
+## 4. Checklist kiểm tra an toàn cho L1
 
-## Xử lý
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-- Nếu lỗi chỉ ở một mạng/thiết bị: xử lý kết nối, NAT hoặc firmware theo hướng dẫn đã duyệt và gọi thử lại. *(đề xuất)*
-- Nếu session timer hoặc timeout không tương thích: chuyển nhóm có quyền để đối chiếu và thay đổi có kiểm soát. *(đề xuất)*
-- Nếu trunk/nhà mạng gửi tín hiệu kết thúc: lưu Call-ID, mã nguyên nhân và chuyển bằng chứng cho nhóm phụ trách. *(đề xuất)*
-- Nếu có mất gói/jitter cao: khoanh vùng đường truyền và phối hợp bên quản lý mạng thay vì thay đổi dialplan. *(đề xuất)*
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Tra cứu thời lượng CDR trên Portal** | L1 tra cứu | Xem lịch sử cuộc gọi `[EXT]` tại thời điểm phát sinh lỗi | Thời lượng đàm thoại (`Duration` / `Billsec`) tự nhiên | **Thời lượng đúng 30-32s**: Xác định ngay nghi vấn lỗi SIP ACK Timeout. |
+| **2. Phân tích nguyên nhân ngắt trên CDR** | L1 tra cứu | Xem trường lý do ngắt (`Hangup Cause`) | Người dùng chủ động gác máy (`NORMAL_CLEARING`) | Hệ thống tự ngắt (`CRASH`, `TIMEOUT`, `MEDIA_TIMEOUT`). |
+| **3. Thử nghiệm trên mạng 4G/5G** | Khách hàng | Đăng nhập trên ODS Phone Mobile dùng 4G gọi thử cuộc gọi trên 1 phút | Cuộc gọi duy trì liên tục, không bị ngắt ở 30s | **4G ổn định nhưng mạng văn phòng rớt 30s**: Xác nhận lỗi do Router văn phòng khách hàng bật SIP ALG. |
+| **4. Kiểm tra quyền chạy ngầm (Mobile)** | Khách hàng | Cài đặt pin của ODS Phone trên điện thoại | Đặt ở chế độ `Không hạn chế (Unrestricted)` | Đang ở chế độ *Tiết kiệm pin*: Ứng dụng bị hệ điều hành tắt ngầm khi máy ngủ. |
 
-**Cần bổ sung:** Ngưỡng chất lượng mạng, thao tác L1 được phép và quy trình rollback của ODS.
+---
 
-<ReviewQuestion id="Q-dropped-calls-4">
-  Ngưỡng packet loss, jitter hoặc latency nào được ODS dùng để kết luận cần chuyển đội mạng?
-</ReviewQuestion>
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-## Chuyển cấp
+<Steps>
+  <Step title="Hướng dẫn IT khách hàng tắt SIP ALG trên Router văn phòng">
+    - Giải thích rõ cho IT khách hàng: Modem/Router của các nhà mạng (Viettel, VNPT, FPT, DrayTek, MikroTik) thường bật mặc định tính năng `SIP ALG`. Tính năng này can thiệp vào gói tin SIP và làm mất gói tin `ACK`, dẫn đến tổng đài tự ngắt sau 30 giây.
+    - Hướng dẫn IT đăng nhập vào trang quản trị Router văn phòng -> Tìm mục `NAT / Application Layer Gateway (ALG)` -> Gạt tắt tính năng **SIP ALG** -> Khởi động lại Router.
+  </Step>
 
-- Chuyển cấp khi nhiều tenant/nhà mạng cùng bị ảnh hưởng, cuộc gọi rớt theo mẫu thời gian lặp lại, hoặc cần SIP/RTP capture ngoài quyền L1. *(đề xuất)*
-- Đính kèm thời điểm/múi giờ, số gọi/bị gọi đã xử lý an toàn, Call-ID, thời lượng, thiết bị/mạng, SIP cause và các bước đã thử. *(đề xuất)*
-- Chỉ gửi log/pcap qua kênh được duyệt và loại bỏ credential hoặc dữ liệu không liên quan. *(đề xuất)*
+  <Step title="Cấu hình quyền chạy ngầm trên ứng dụng di động ODS Phone">
+    - **Trên Android:** Vào *Cài đặt* -> *Ứng dụng* -> *ODS Phone* -> *Pin* -> Chọn **Không giới hạn (Unrestricted)** và bật quyền **Tự khởi chạy**.
+    - **Trên iOS:** Vào *Cài đặt* -> *ODS Phone* -> Bật mục **Làm mới ứng dụng trong nền**.
+  </Step>
+</Steps>
 
-**Cần bổ sung:** Nhóm nhận chuyển cấp, kênh chung, SLA và chính sách lưu/chia sẻ pcap.
+---
 
-<ReviewQuestion id="Q-dropped-calls-5">
-  Case rớt cuộc gọi được chuyển cho L2, NOC, ISP hay nhà mạng theo ma trận nào?
-</ReviewQuestion>
+## 6. Khi nào dừng và chuyển cấp?
 
-## Trả lời mẫu
+Dừng xử lý và chuyển ticket lên L2/Core PBX khi:
 
-> **Tiếp nhận:** ODS đã ghi nhận cuộc gọi bị ngắt ngoài dự kiến. Anh/chị vui lòng cung cấp hai số, thời điểm, thời lượng và thiết bị/mạng đang dùng để đội ngũ khoanh vùng. *(đề xuất)*
+- [ ] **Rớt cuộc gọi ở mốc cố định 15 hoặc 30 phút:** Lỗi Session Timer cần phân tích SIP trace giữa ODS và nhà mạng.
+- [ ] **Lỗi diện rộng:** Nhiều máy nhánh thuộc nhiều tenant cùng bị rớt cuộc gọi đồng loạt vào cùng một thời điểm.
+- [ ] **Đã tắt SIP ALG nhưng vẫn bị ngắt 30s:** Cần kỹ thuật L2 trích xuất gói tin mạng (Wireshark/sngrep) để kiểm tra đường đi của bản tin ACK.
 
-> **Đã xử lý:** ODS đã hoàn tất bước xử lý và kiểm tra tín hiệu cuộc gọi. Anh/chị vui lòng thực hiện một cuộc gọi thử đủ thời lượng thường phát sinh lỗi và phản hồi kết quả. *(đề xuất)*
+---
 
-**Cần bổ sung:** Mẫu phản hồi và tiêu chí xác nhận ổn định của ODS.
+## 7. Mẫu ticket chuyển cấp
 
-<ReviewQuestion id="Q-dropped-calls-6">
-  Sau xử lý, ODS yêu cầu test trong bao lâu hoặc bao nhiêu cuộc gọi trước khi xác nhận ổn định?
-</ReviewQuestion>
+```markdown
+[TÓM TẮT SỰ CỐ]: Cuộc gọi bị ngắt đúng mốc thời gian (SIP ACK / Session Timer)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Số máy nhánh: [EXT]
+- Số đối phương: [CALLEE / CALLER]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+- Mốc thời gian ngắt: [Đúng 32 giây / Đúng 15 phút]
 
-## Nguyên nhân đã gặp
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Tra cứu CDR: [Duration đúng 32s / Hangup Cause: SYSTEM_TIMEOUT]
+2. Thử nghiệm trên 4G: [4G gọi bình thường trên 1 phút / 4G cũng bị rớt 30s]
+3. Trạng thái SIP ALG: [Đã báo IT kiểm tra router]
+4. Quyền Pin ứng dụng mobile: [Đã chọn Không hạn chế]
 
-| Ngày | Nguyên nhân | Cách xử lý | Ticket |
-|---|---|---|---|
-| | | | |
+[NỘI DUNG CẦN L2 HỖ TRỢ]:
+- Kiểm tra SIP trace xem PBX có nhận được bản tin ACK từ máy nhánh [EXT] hay không.
+- Phân tích bản tin BYE xem do phía nào khởi tạo (Client, PBX hay Carrier).
+```
 
-**Cần bổ sung:** Chỉ Human điền case thật đã được phép lưu và loại bỏ dữ liệu nhận diện khách hàng.
+---
 
-<ReviewQuestion id="Q-dropped-calls-7">
-  Có ticket đã đóng nào phù hợp để tổng hợp nguyên nhân rớt cuộc gọi mà không chứa dữ liệu bị cấm?
-</ReviewQuestion>
+## 8. Mẫu phản hồi khách hàng
 
-## Tra cứu liên quan
+### Mẫu: Hướng dẫn xử lý lỗi ngắt đúng 30 giây
+> *"Dạ ODS đã tiếp nhận thông tin cuộc gọi bị ngắt đúng mốc 30 giây. Hiện tượng này xảy ra khi thiết bị Modem/Router của văn phòng đang bật tính năng can thiệp gói tin gọi (SIP ALG) làm thất lạc bản tin xác nhận kết nối giữa máy nhánh và máy chủ tổng đài. Anh/chị nhờ bạn IT nội bộ vào trang quản trị modem tắt tính năng 'SIP ALG' đi là cuộc gọi sẽ kéo dài bình thường nhé ạ."*
 
-- [Rule gọi ra (Outbound Rules)](/internal/ai-contact-center/knowledge-base/outbound-rules)
-- [Bảng IP hạ tầng core](/internal/ai-contact-center/knowledge-base/core-infrastructure)
+---
 
-**Cần bổ sung:** Xác nhận có cần thêm trang tra cứu chất lượng mạng/RTP.
+## 9. Xác nhận khôi phục
 
-<ReviewQuestion id="Q-dropped-calls-8">
-  Runbook rớt cuộc gọi cần liên kết thêm tài liệu mạng hoặc RTP nào?
-</ReviewQuestion>
+1. **Cuộc gọi thử nghiệm vượt mốc thời gian lỗi:** Thực hiện cuộc gọi thử kéo dài ít nhất 2 - 3 phút để xác nhận không còn bị ngắt ở giây 30.
+2. **Đối chiếu CDR:** Xác nhận cuộc gọi kết thúc bằng trạng thái `NORMAL_CLEARING` khi người dùng chủ động gác máy.
 
-## Cập nhật lần cuối
+---
 
-**Cần bổ sung:** Ngày duyệt gần nhất và vai trò chịu trách nhiệm cập nhật runbook.
+## 10. Case thực tế và cập nhật
 
-<ReviewQuestion id="Q-common-10">
-  Vai trò nào phê duyệt và duy trì nội dung Support Wiki?
-</ReviewQuestion>
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Mọi cuộc gọi ra ngoài đều ngắt đúng ở giây thứ 32 | Modem DrayTek văn phòng khách hàng bật SIP ALG | Tắt SIP ALG trong mục NAT của Modem | Cuộc gọi kéo dài trên 10 phút ổn định | `#TK-EXAMPLE` |
+| *Template* | Cuộc gọi dài đúng 15 phút 00 giây là tự ngắt | Lệch thông số Session Timer giữa ODS và Carrier Viettel | Điều chỉnh session-expires lên 1800s trên PBX | Cuộc gọi duy trì không giới hạn | `#TK-TIMER-01` |

@@ -1,10 +1,15 @@
 {
-  "title": "Cuộc gọi",
+  "title": "Cuộc gọi & Âm thanh",
   "pages": [
     "outbound-failed",
+    "international-calls",
+    "call-forwarding",
     "inbound-failed",
+    "time-conditions",
+    "ivr-dtmf",
     "dropped-calls",
-    "one-way-audio"
+    "call-transfer",
+    "one-way-audio",
+    "audio-quality"
   ]
 }
-

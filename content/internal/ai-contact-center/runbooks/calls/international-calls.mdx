@@ -1,0 +1,155 @@
+---
+title: Không gọi được hướng quốc tế
+description: Runbook L1 tiếp nhận, kiểm tra hồ sơ mở chiều viễn thông chống Toll Fraud, chuẩn quay số tiền tố 00 và xử lý sự cố máy nhánh không gọi được số quốc tế.
+---
+
+## 1. Khi nào dùng bài này?
+
+Áp dụng khi điện thoại viên hoặc doanh nghiệp phản ánh **không thể thực hiện cuộc gọi ra các số điện thoại ở nước ngoài**:
+- Bấm gọi số quốc tế (Mỹ, Úc, Nhật, Hàn, Singapore...) nhưng cuộc gọi ngắt ngay sau 1 tiếng tút ngắn.
+- Trên màn hình thiết bị hiển thị lỗi: `Call Rejected`, `403 Forbidden`, `Destination Not Allowed`, hoặc `Call Failed`.
+- Nghe câu thông báo thoại từ hệ thống hoặc nhà mạng: *"Cuộc gọi không thể thực hiện được do thuê bao chưa đăng ký dịch vụ gọi quốc tế"*.
+
+### Phân biệt với các sự cố gần giống
+- **Không gọi được số di động / cố định trong nước**: Xem [Không gọi ra được](/internal/ai-contact-center/runbooks/calls/outbound-failed).
+- **Chuyển tiếp cuộc gọi ra số di động cá nhân thất bại**: Xem [Sự cố Chuyển tiếp cuộc gọi](/internal/ai-contact-center/runbooks/calls/call-forwarding).
+- **Máy nhánh chưa kết nối vào tổng đài (Offline)**: Xem [Máy nhánh không đăng ký được](/internal/ai-contact-center/runbooks/extensions/registration-failed).
+
+---
+
+## 2. Tiếp nhận và kiểm tra nhanh
+
+Khi tiếp nhận sự cố gọi quốc tế, L1 phân loại nhanh theo 4 nguyên nhân kỹ thuật cốt lõi:
+
+| Hiện tượng quan sát | Nguyên nhân kỹ thuật cốt lõi | Hướng xử lý nhanh L1 |
+| :--- | :--- | :--- |
+| **Bấm số có dấu `+` (VD: `+1415...`) bị ngắt ngay** | Tổng đài hoặc SIP Trunk nhà mạng chỉ hỗ trợ chuẩn quay số tiền tố `00` thay vì ký tự `+`. | Hướng dẫn khách hàng đổi dấu `+` thành `00` (VD: `001415...`). |
+| **Bấm đúng chuẩn nhưng nhận mã `403 Forbidden`** | Máy nhánh chưa được gán quyền gọi quốc tế (**Class of Service / Outbound Rule**) trên Portal ODS. | Kiểm tra và gán quyền Outbound Route quốc tế cho máy nhánh. |
+| **Tổng đài báo gọi ra nhưng nhà mạng từ chối (Decline)** | Đầu số SIP Trunk **chưa mở chiều quốc tế** từ phía nhà mạng viễn thông (để chống gian lận cước *Toll Fraud*). | Báo quản trị viên kiểm tra hợp đồng với Telco để làm thủ tục mở chiều quốc tế. |
+| **Nghe thông báo hết số dư / cạn tài khoản** | Tài khoản cước quốc tế trả trước của khách hàng với ODS/Telco đã hết hạn mức. | Hướng dẫn khách hàng kiểm tra số dư và nạp thêm tiền cước quốc tế. |
+
+---
+
+## 3. Thông tin cần hỏi khách hàng
+
+Thu thập thông tin theo 2 nhóm:
+
+### Thông tin tối thiểu bắt buộc
+1. **Số máy nhánh gọi đi (`[EXT]`):** Máy nhánh nào đang thực hiện cuộc gọi quốc tế?
+2. **Số điện thoại nước ngoài bị gọi (`[INTL_NUMBER]`):** Số điện thoại đầy đủ khách hàng vừa bấm (ghi rõ mã quốc gia, ví dụ: `001 415 555 2671`)?
+3. **Quốc gia đích:** Cuộc gọi hướng tới quốc gia nào (Mỹ, Châu Âu, Nhật Bản, Đông Nam Á...)?
+4. **Mốc thời gian gọi thử:** Thời điểm chính xác của cuộc gọi bị lỗi gần nhất?
+5. **Tín hiệu nghe thấy:** Nghe tút bận, ngắt ngay, hay nghe câu thông báo thoại (nêu rõ câu thông báo)?
+
+### Thông tin bổ sung (Hỏi khi cần)
+- Doanh nghiệp trước đây đã từng gọi thành công tới quốc gia đó từ tổng đài này chưa?
+- Các máy nhánh khác trong công ty có gọi quốc tế được không?
+
+---
+
+## 4. Checklist kiểm tra an toàn cho L1
+
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
+
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra cú pháp quay số** | L1 đối chiếu | So khớp chuỗi số khách bấm trên CDR hoặc Softphone | Bắt đầu bằng `00` + Mã nước + Mã vùng + Số thuê bao | Bấm dấu `+`, bấm thừa số `0` ở đầu số nội địa nước ngoài: Hướng dẫn bấm đúng chuẩn. |
+| **2. Kiểm tra quyền máy nhánh trên Portal** | L1 tra cứu | Vào *Quản lý máy nhánh* -> Xem mục *Quyền gọi ra (Outbound Rule)* | Có tích chọn quyền `Quốc tế (International)` | Máy nhánh chỉ được gán quyền `Nội hạt` hoặc `Di động`: Báo quản trị viên cấp quyền. |
+| **3. Kiểm tra số dư cước quốc tế** | L1 tra cứu | Xem số dư tài khoản cước của tenant trên Portal ODS | Tài khoản cước viễn thông còn số dư khả dụng | Số dư = 0đ hoặc chạm hạn mức nợ cước: Hướng dẫn khách hàng nạp cước. |
+| **4. Tra cứu mã phản hồi SIP trên CDR** | L1 tra cứu | Tìm cuộc gọi theo `[EXT]` trong mục Lịch sử cuộc gọi | Nhận mã `200 OK` khi thông cuộc gọi | Nhận mã `403 Forbidden` hoặc `404 Not Found`: Kiểm tra quyền route hoặc thông tin mở chiều từ Telco. |
+| **5. Đối chiếu hồ sơ đầu số với Telco** | L1 tra cứu | Xem thông tin đầu số SIP Trunk kết nối với nhà mạng | Đầu số đã được Telco kích hoạt chiều quốc tế | **Chưa mở chiều quốc tế**: Nhà mạng mặc định chặn chiều quốc tế để chống gian lận cước (Toll Fraud). |
+
+---
+
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
+
+<Steps>
+  <Step title="Chuẩn hóa cú pháp quay số quốc tế viễn thông">
+    Hướng dẫn nhân viên thay đổi cú pháp bấm số:
+    - **Quy tắc vàng:** Thay toàn bộ dấu `+` bằng tiền tố `00`.
+    - **Loại bỏ số 0 đầu của mạng nội địa nước ngoài:** Ví dụ số tại Úc là `+61 04 1234 5678` ➔ Bấm chính xác là `0061412345678` (bỏ số `0` trước số `4`).
+    - Bảng tiền tố một số quốc gia phổ biến:
+      + **Mỹ / Canada:** `001` + [Số điện thoại 10 chữ số].
+      + **Úc (Australia):** `0061` + [Số điện thoại].
+      + **Nhật Bản:** `0081` + [Số điện thoại].
+      + **Singapore:** `0065` + [Số điện thoại].
+  </Step>
+
+  <Step title="Kiểm tra và kích hoạt quyền Outbound Rule trên Portal">
+    Nếu quản trị viên tenant đồng ý cấp quyền gọi quốc tế cho máy nhánh:
+    1. Đăng nhập Portal ODS với tài khoản quản trị tenant.
+    2. Vào mục **Cấu hình máy nhánh (Extensions)** -> Chọn máy nhánh `[EXT]`.
+    3. Tại mục **Nhóm quyền gọi ra (Class of Service / Outbound Route)** -> Tích chọn quyền `Quốc tế (International)`.
+    4. Bấm **Lưu cấu hình** và nhắc nhân viên thử gọi lại sau 30 giây.
+  </Step>
+
+  <Step title="Hướng dẫn thủ tục mở chiều quốc tế với nhà mạng (Telco)">
+    - Giải thích rõ cho khách hàng: Để phòng ngừa rủi ro bị tấn công chiếm đoạt tài khoản tổng đài và phát sinh cước quốc tế hàng trăm triệu đồng (*Toll Fraud*), các nhà mạng viễn thông (Viettel, VNPT, FPT, CMC) **mặc định luôn khóa chiều gọi đi quốc tế** trên mọi đầu số SIP Trunk.
+    - Hướng dẫn doanh nghiệp liên hệ đầu mối kinh doanh của nhà mạng cung cấp đầu số để ký phụ lục hợp đồng mở chiều gọi quốc tế và thiết lập hạn mức trần cước (Credit Limit) an toàn theo tháng.
+  </Step>
+</Steps>
+
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket cho L2 / Bộ phận Carrier ODS khi:
+
+- [ ] **Đã mở quyền và quay số đúng nhưng nhà mạng từ chối:** SIP trace trả về bản tin `SIP 403 Forbidden` hoặc `SIP 503 Service Unavailable` từ địa chỉ IP của SIP Trunk nhà mạng.
+- [ ] **Yêu cầu cấu hình tiền tố tự động (Dialplan Translation):** Khách hàng yêu cầu hệ thống tự động đổi dấu `+` thành `00` để nhân viên bấm số từ CRM không cần sửa thủ công.
+- [ ] **Nghi vấn bị hack cước quốc tế (Toll Fraud Alert):** Phát hiện lưu lượng cuộc gọi quốc tế tăng đột biến ngoài giờ làm việc (gọi đi các quốc gia lạ châu Phi, Đông Âu) ➔ **Khóa ngay lập tức quyền gọi ra** và báo động khẩn cấp cho L2/NOC.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Máy nhánh không gọi được hướng quốc tế (International Call Failed)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Số máy nhánh: [EXT]
+- Đầu số gọi ra (Caller ID): [HOTLINE_TRUNK]
+- Nhà mạng cung cấp đầu số: [Viettel / VNPT / FPT / CMC]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[CHI TIẾT CUỘC GỌI QUỐC TẾ]:
+- Quốc gia đích: [Mỹ / Úc / Nhật Bản / Singapore]
+- Số điện thoại bị gọi: [001XXXXXXXXXX] (Đã chuẩn hóa tiền tố 00)
+- Tín hiệu nhận được: [Mã lỗi 403 Forbidden / Tút bận ngay / Câu thông báo Telco]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Quyền máy nhánh trên Portal: [Đã gán quyền Outbound Quốc tế]
+2. Cú pháp quay số: [Đã hướng dẫn bấm 00 thay cho dấu +]
+3. Số dư tài khoản cước: [Còn đủ số dư khả dụng]
+4. Tra cứu CDR: [Ghi nhận mã SIP XXX từ Carrier]
+
+[NỘI DUNG CẦN L2 / CARRIER HỖ TRỢ]:
+- Kiểm tra SIP trace bản tin INVITE gửi tới SIP Trunk nhà mạng.
+- Xác nhận đầu số [HOTLINE_TRUNK] đã được Telco kích hoạt chiều quốc tế chưa.
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Hướng dẫn quay số tiền tố 00
+> *"Dạ đối với cuộc gọi quốc tế qua tổng đài, anh/chị bấm số theo cú pháp chuẩn viễn thông giúp em: Bấm `00` + Mã quốc gia + Số điện thoại (bỏ số 0 đầu của số điện thoại nếu có). Ví dụ gọi sang Mỹ số `+1 415 555 2671` thì mình bấm chính xác là `0014155552671` nhé ạ. Anh/chị thử gọi lại giúp em xem chuông đã reo chưa nha."*
+
+### Mẫu 2: Giải thích về thủ tục mở chiều Telco chống gian lận cước
+> *"Dạ em đã kiểm tra trên hệ thống tổng đài ODS thì máy nhánh của mình đã được phân quyền gọi quốc tế đầy đủ. Tuy nhiên, chiều gọi ra quốc tế đang bị chặn từ phía nhà mạng viễn thông cung cấp đầu số (Viettel/VNPT/FPT). Do quy định bảo mật viễn thông để chống gian lận cước (Toll Fraud), các nhà mạng mặc định khóa chiều gọi quốc tế cho đến khi doanh nghiệp có văn bản yêu cầu mở riêng. Anh/chị liên hệ bạn phụ trách hợp đồng đầu số với nhà mạng để hoàn tất thủ tục mở chiều giúp em nhé ạ."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Cuộc gọi quốc tế kết nối thành công:** Thực hiện cuộc gọi thử nghiệm tới số nước ngoài, chuông reo và đàm thoại 2 chiều rõ ràng trong ít nhất 15-30 giây.
+2. **Kiểm tra nhật ký CDR:** Trên Portal xuất hiện bản ghi cuộc gọi quốc tế với trạng thái `ANSWERED`, ghi nhận đúng thời lượng và đơn giá cước quốc tế.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Gọi số đối tác tại Mỹ (+1...) bị ngắt ngay lập tức | Khách bấm dấu `+` và máy nhánh chưa mở quyền quốc tế trên Portal | Bật quyền gọi quốc tế trên Portal và đổi sang tiền tố `001...` | Đổ chuông và đàm thoại rõ ràng | `#TK-INTL-01` |
+| *Template* | Bấm đúng cú pháp 0061 sang Úc nhưng bị Telco từ chối | Đầu số SIP Trunk mới đấu nối chưa đăng ký mở chiều quốc tế với Viettel | Khách hàng bổ sung phụ lục mở chiều quốc tế với nhà mạng | Nhà mạng mở luồng, gọi quốc tế thành công | `#TK-INTL-02` |
+

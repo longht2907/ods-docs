@@ -4,6 +4,7 @@
     "index",
     "calls",
     "extensions",
+    "network",
     "recordings",
     "autocall",
     "carriers",
@@ -11,4 +12,3 @@
     "integrations"
   ]
 }
-

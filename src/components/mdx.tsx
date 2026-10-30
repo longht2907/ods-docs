@@ -46,6 +46,18 @@ import { StartCampaignFlow } from '@/components/docs/start-campaign-flow';
 import { CustomerFlowDiagram } from '@/components/docs/customer-flow-diagram';
 import { DocsProductDirectory } from '@/components/docs/docs-product-directory';
 import { ProcessFlowchart } from '@/components/flowchart';
+import {
+  WebrtcArchitectureDiagram,
+  WebrtcConnectionFlowDiagram,
+} from '@/components/docs/webrtc-architecture-diagram';
+import { OdsphoneWidgetFlow } from '@/components/docs/odsphone-widget-flow';
+import {
+  WebhookArchitectureDiagram,
+  WebhookMultiBranchDiagram,
+  WebhookLifecycleDiagram,
+} from '@/components/docs/webhook-flow-diagram';
+import { NetworkTopologyDiagram } from '@/components/docs/network-topology-diagram';
+import { TroubleshootingMethodDiagram } from '@/components/docs/troubleshooting-method-diagram';
 
 const {
   img: defaultImageComponent,
@@ -140,6 +152,14 @@ export function getMDXComponents(components?: MDXComponents) {
     ApiArchitectureOverview,
     StartCampaignFlow,
     ProcessFlowchart,
+    WebrtcArchitectureDiagram,
+    WebrtcConnectionFlowDiagram,
+    OdsphoneWidgetFlow,
+    WebhookArchitectureDiagram,
+    WebhookMultiBranchDiagram,
+    WebhookLifecycleDiagram,
+    NetworkTopologyDiagram,
+    TroubleshootingMethodDiagram,
     ...components,
   } satisfies MDXComponents;
 }

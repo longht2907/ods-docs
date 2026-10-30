@@ -1,115 +1,141 @@
 ---
-title: Âm thanh một chiều / rè
-description: Dàn ý chẩn đoán và xử lý case âm thanh một chiều, chập chờn hoặc bị rè.
+title: Âm thanh một chiều, mất tiếng
+description: Runbook L1 tiếp nhận, phân loại luồng media RTP, kiểm tra cấu hình NAT, SIP ALG và xử lý sự cố cuộc gọi mất tiếng một chiều hoặc hoàn toàn im lặng.
 ---
 
-<Callout title="Dàn ý — chờ bổ sung" type="warn">
-  Mục ghi *(đề xuất)* là gợi ý cần xác nhận. Mục **Cần bổ sung** là thông tin riêng của ODS. Câu hỏi xem tại file câu hỏi TASK-018.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Triệu chứng
+Áp dụng khi điện thoại viên hoặc khách hàng phản ánh cuộc gọi **đã kết nối (bắt máy) nhưng gặp sự cố mất tiếng hoàn toàn hoặc một chiều**:
+- **Âm thanh một chiều (One-way Audio):** Nhân viên nghe khách hàng nói nhưng khách hàng không nghe thấy nhân viên nói (hoặc ngược lại).
+- **Mất tiếng hoàn toàn (Dead Air / No Audio):** Cuộc gọi hiển thị đếm giây đàm thoại nhưng cả hai bên đều hoàn toàn im lặng, không nghe thấy bất kỳ âm thanh nào.
+- **Hiện tượng đặc trưng:** Gọi nội bộ giữa 2 máy nhánh trong văn phòng nghe to rõ, nhưng cứ gọi ra ngoài số di động thì bị mất tiếng 1 chiều.
 
-- Một bên nghe được nhưng bên còn lại không nghe, hoặc mất tiếng sau khi cuộc gọi đã kết nối. *(đề xuất)*
-- Âm thanh bị rè, ngắt quãng, trễ hoặc méo trên một hay cả hai chiều. *(đề xuất)*
-- Lỗi có thể giới hạn ở một thiết bị, một mạng, một chiều gọi, một trunk/nhà mạng hoặc nhiều tenant. *(đề xuất)*
+### Phân biệt với các sự cố gần giống
+- **Tín hiệu chập chờn, giật tiếng robot, trễ tiếng, tiếng vọng (Echo)**: Xem [Tín hiệu thoại chập chờn / Mất gói](/internal/ai-contact-center/runbooks/calls/audio-quality).
+- **Chưa cấp quyền Microphone trên hệ điều hành**: Xem [Sự cố Softphone PC](/internal/ai-contact-center/runbooks/extensions/softphone) hoặc [Sự cố ODS Phone Mobile](/internal/ai-contact-center/runbooks/extensions/ods-phone-app).
+- **Cuộc gọi đang đàm thoại bị ngắt đúng 30 giây**: Xem [Cuộc gọi bị rớt giữa chừng](/internal/ai-contact-center/runbooks/calls/dropped-calls).
 
-**Cần bổ sung:** Cách ODS phân loại one-way audio, no-audio và degraded audio cùng mức độ tương ứng.
+---
 
-<ReviewQuestion id="Q-one-way-audio-1">
-  ODS dùng tiêu chí nào để tách âm thanh một chiều, mất tiếng hoàn toàn và chất lượng thoại kém?
-</ReviewQuestion>
+## 2. Bản chất kỹ thuật: Báo hiệu SIP vs Luồng âm thanh RTP
 
-## Cần hỏi KH
+> [!IMPORTANT]
+> **Hiểu đúng kiến trúc viễn thông VoIP**: Một cuộc gọi được chia thành 2 luồng độc lập:
+> 1. **Luồng Báo hiệu (Signaling - SIP cổng 5060/4433):** Dùng để thiết lập cuộc gọi và đổ chuông.
+> 2. **Luồng Âm thanh (Media - RTP dải cổng UDP 10000 - 20000):** Dùng để truyền giọng nói thực tế.
+> 
+> Khi cuộc gọi đổ chuông và bắt máy được (báo hiệu thành công) nhưng **mất tiếng 1 chiều**, nguyên nhân cốt lõi là do luồng UDP RTP bị chặn bởi Firewall văn phòng hoặc Router bật **`SIP ALG`** tự ý sửa sai địa chỉ IP trong bản tin SDP, khiến máy chủ tổng đài không biết gửi gói tin âm thanh về đâu.
 
-- Số gọi, số bị gọi, thời điểm kèm múi giờ và chiều nào không nghe được. *(đề xuất)*
-- Máy nhánh, thiết bị/softphone, headset, loại mạng và vị trí của hai đầu. *(đề xuất)*
-- Lỗi xảy ra với mọi cuộc gọi hay chỉ một số đích, nhà mạng hoặc chiều gọi. *(đề xuất)*
-- Có tái hiện khi đổi thiết bị, headset hoặc mạng; gần đây có thay đổi firewall/NAT không. *(đề xuất)*
+| Chiều mất tiếng quan sát | Nguyên nhân kỹ thuật cốt lõi | Hướng xử lý nhanh L1 |
+| :--- | :--- | :--- |
+| **Nhân viên nghe khách nói, khách không nghe nhân viên** | Gói tin RTP từ máy nhánh nhân viên gửi lên PBX bị chặn bởi Firewall/Router văn phòng (hoặc mic bị tắt). | Kiểm tra nút Mute; kiểm tra dải cổng UDP 10000-20000 trên Firewall văn phòng. |
+| **Khách nghe nhân viên nói, nhân viên không nghe khách** | Gói tin RTP từ PBX gửi về máy nhánh bị Router NAT chặn không cho vào mạng nội bộ. | Tắt tính năng `SIP ALG` trên Router văn phòng hoặc đổi sang kết nối TLS/4G. |
+| **Đổi sang 4G thì nghe gọi 2 chiều to rõ bình thường** | Xác nhận 100% lỗi do Router/Firewall của mạng văn phòng khách hàng chặn luồng RTP. | Hướng dẫn IT văn phòng kiểm tra Router hoặc mở dải cổng UDP. |
 
-**Cần bổ sung:** Bài test âm thanh chuẩn và trường ticket ODS yêu cầu.
+---
 
-<ReviewQuestion id="Q-one-way-audio-2">
-  ODS yêu cầu khách hàng thực hiện những bài test nào để xác định chiều và phạm vi lỗi âm thanh?
-</ReviewQuestion>
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra
+Thu thập thông tin theo 2 nhóm:
 
-1. Loại trừ microphone, loa, headset, quyền ứng dụng và chất lượng mạng trên thiết bị khách hàng. *(đề xuất)*
-2. Xác nhận máy nhánh đăng ký đúng contact và không có dấu hiệu NAT/contact bất thường. *(đề xuất)*
-3. Đối chiếu SIP/SDP để kiểm tra địa chỉ media, port và codec hai bên đã thương lượng. *(đề xuất)*
-4. Kiểm tra có luồng RTP theo cả hai chiều, packet loss/jitter và thay đổi đường đi qua trunk/nhà mạng. *(đề xuất)*
-5. Có thể tham khảo `pjsip show endpoints`, `pjsip show contacts`, CDR, log, `sngrep` hoặc RTP debug. *(đề xuất — cần xác nhận công cụ thực tế ODS)*
+### Thông tin tối thiểu bắt buộc
+1. **Chiều nào không nghe được:**
+   - Nhân viên không nghe khách hàng nói?
+   - Khách hàng không nghe nhân viên nói?
+   - Hay cả hai bên đều không nghe thấy gì (im lặng hoàn toàn)?
+2. **Số máy nhánh (`[EXT]`) & Số điện thoại đối phương:** Cuộc gọi xảy ra giữa hai số nào?
+3. **Mốc thời gian chính xác:** Thời điểm diễn ra cuộc gọi bị lỗi (kèm phút/giây)?
+4. **Môi trường kết nối mạng:** Cắm dây mạng LAN hay Wi-Fi? Có thử trên 4G chưa?
 
-**Cần bổ sung:** Công cụ xem RTP, quyền capture, codec được hỗ trợ và ngưỡng chất lượng mạng của ODS.
+---
 
-<ReviewQuestion id="Q-one-way-audio-3">
-  ODS kiểm tra SIP/SDP và RTP hai chiều bằng công cụ nào, với ngưỡng packet loss/jitter nào?
-</ReviewQuestion>
+## 4. Checklist kiểm tra an toàn cho L1
 
-## Xử lý
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-- Nếu lỗi do thiết bị/headset/quyền ứng dụng: sửa cấu hình đầu cuối và xác nhận bằng cuộc gọi thử. *(đề xuất)*
-- Nếu contact hoặc NAT sai: chuyển nhóm có quyền để điều chỉnh cấu hình theo chuẩn và kiểm tra lại media hai chiều. *(đề xuất)*
-- Nếu codec không tương thích: dùng codec được hai đầu và chính sách ODS hỗ trợ sau khi được phê duyệt. *(đề xuất)*
-- Nếu RTP mất trên trunk/nhà mạng: giữ capture tối thiểu, xác định chiều mất và chuyển bằng chứng cho nhóm phụ trách. *(đề xuất)*
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra nút Mute phần cứng** | Khách hàng | Nhìn đèn trên tai nghe USB hoặc phím Mute trên IP Phone/Softphone | Đèn Mute tắt, mic hoạt động | Đèn đỏ / gạt nhầm nút Mute: Hướng dẫn mở mic lại. |
+| **2. Phân lập bằng cuộc gọi nội bộ** | Khách hàng | Hai máy nhánh trong cùng văn phòng bấm gọi trực tiếp cho nhau | Âm thanh 2 chiều thông suốt | **Nội bộ tốt nhưng gọi ra ngoài mất tiếng**: Vấn đề nằm ở NAT/SIP ALG bên ngoài. |
+| **3. Phân lập bằng mạng 4G/5G** | Khách hàng | Đăng nhập trên ODS Phone Mobile và dùng 4G gọi thử | Nghe gọi 2 chiều to rõ | **4G gọi tốt nhưng mạng văn phòng mất tiếng**: Router văn phòng chặn dải port RTP (10000-20000 UDP) hoặc do `SIP ALG`. |
+| **4. Tra cứu thông số SDP trên CDR** | L1 tra cứu | Xem thông tin kỹ thuật cuộc gọi trên Portal ODS | Audio Codec thống nhất (`G711u` / `G711a`) | Không thấy gói tin RTP gửi từ Client: Gói tin bị chặn tại Firewall văn phòng. |
 
-**Cần bổ sung:** Danh sách codec, quy tắc NAT/media và thao tác L1 được phép thực hiện.
+---
 
-<ReviewQuestion id="Q-one-way-audio-4">
-  Codec và mô hình xử lý media nào đang được ODS hỗ trợ cho từng loại endpoint/trunk?
-</ReviewQuestion>
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-## Chuyển cấp
+<Steps>
+  <Step title="Tắt tính năng SIP ALG trên Router văn phòng">
+    - Giải thích cho IT khách hàng: `SIP ALG` thường tự ý can thiệp vào bản tin SDP và thay thế địa chỉ IP nội bộ (`192.168.x.x`) bằng IP WAN không chính xác, khiến tổng đài không thể định tuyến luồng âm thanh RTP 2 chiều.
+    - Hướng dẫn IT đăng nhập vào Router mạng văn phòng -> Tìm mục `NAT / ALG` -> Tắt hoàn toàn **SIP ALG**.
+  </Step>
 
-- Chuyển cấp khi lỗi ảnh hưởng nhiều tenant, không có RTP ở một chiều sau khi đã loại trừ thiết bị/mạng, hoặc cần thay đổi NAT, codec, firewall hay trunk. *(đề xuất)*
-- Đính kèm thời điểm/múi giờ, số gọi/bị gọi đã xử lý an toàn, Call-ID, chiều mất tiếng, thiết bị/mạng, codec và kết quả kiểm tra. *(đề xuất)*
-- Chỉ gửi log/pcap qua kênh được duyệt và loại bỏ credential hoặc dữ liệu không liên quan. *(đề xuất)*
+  <Step title="Kiểm tra dải cổng âm thanh RTP trên Firewall văn phòng">
+    - Nếu công ty khách hàng sử dụng tường lửa chuyên dụng (Fortinet, Sophos, pfSense, Cisco):
+      + Hướng dẫn IT mở (Allow Outbound) dải cổng **UDP từ 10000 đến 20000** hướng tới dải địa chỉ IP máy chủ của ODS.
+  </Step>
 
-**Cần bổ sung:** Nhóm nhận chuyển cấp, kênh chung, SLA và chính sách thu thập/chia sẻ RTP capture.
+  <Step title="Chuyển sang giao thức SIP bảo mật (TLS / WSS)">
+    - Nếu Router văn phòng không thể tắt được SIP ALG (do modem bị nhà mạng khóa quyền quản trị):
+      + Hướng dẫn nhân viên chuyển sang sử dụng ứng dụng WebRTC hoặc Softphone cấu hình giao thức truyền tải là **TLS** hoặc **WSS (cổng 4433)**. Do gói tin TLS/WSS được mã hóa toàn bộ nên Router không thể can thiệp làm sai luồng âm thanh.
+  </Step>
+</Steps>
 
-<ReviewQuestion id="Q-one-way-audio-5">
-  Case âm thanh được chuyển cho L2, NOC, ISP hay nhà mạng theo điều kiện nào?
-</ReviewQuestion>
+---
 
-## Trả lời mẫu
+## 6. Khi nào dừng và chuyển cấp?
 
-> **Tiếp nhận:** ODS đã ghi nhận tình trạng âm thanh bất thường. Anh/chị vui lòng cung cấp hai số, thời điểm, chiều không nghe được và thiết bị/mạng đang sử dụng để đội ngũ kiểm tra. *(đề xuất)*
+Dừng xử lý và chuyển ticket lên L2/NOC khi:
 
-> **Đã xử lý:** ODS đã hoàn tất bước xử lý luồng âm thanh. Anh/chị vui lòng gọi thử hai chiều và xác nhận chất lượng thoại trên ticket. *(đề xuất)*
+- [ ] **Lỗi diện rộng:** Toàn bộ cuộc gọi ra ngoài qua một đầu số hoặc một tenant đều bị mất tiếng 1 chiều hoặc 2 chiều.
+- [ ] **Đã loại trừ toàn bộ thiết bị và mạng:** Gọi qua 4G vẫn bị mất tiếng 1 chiều (lỗi luồng Media Gateway giữa ODS và nhà mạng viễn thông).
+- [ ] **Lỗi Codec không tương thích:** Bản tin SDP ghi nhận lỗi không đàm phán được codec âm thanh giữa thiết bị và PBX.
 
-**Cần bổ sung:** Mẫu phản hồi và tiêu chí chất lượng thoại được ODS chấp nhận.
+---
 
-<ReviewQuestion id="Q-one-way-audio-6">
-  Sau xử lý, ODS dùng bài test hoặc tiêu chí nào để xác nhận âm thanh đã ổn định?
-</ReviewQuestion>
+## 7. Mẫu ticket chuyển cấp
 
-## Nguyên nhân đã gặp
+```markdown
+[TÓM TẮT SỰ CỐ]: Cuộc gọi bị mất tiếng một chiều / Không có âm thanh (RTP Issue)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+- Chiều mất tiếng: [Nhân viên không nghe khách nói / Khách không nghe nhân viên nói / Cả 2 bên không nghe]
 
-| Ngày | Nguyên nhân | Cách xử lý | Ticket |
-|---|---|---|---|
-| | | | |
+[CHI TIẾT CUỘC GỌI]:
+- Số máy nhánh: [EXT]
+- Số đối phương: [CALLEE / CALLER]
+- Thiết bị & Mạng: [Tai nghe Jabra USB + Zoiper PC / IP Phone Yealink] - Mạng: [LAN văn phòng]
 
-**Cần bổ sung:** Chỉ Human điền case thật đã được phép lưu và loại bỏ dữ liệu nhận diện khách hàng.
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Phần cứng & Nút Mute: [Đã kiểm tra, không bị Mute]
+2. Gọi nội bộ: [Nội bộ 2 máy nhánh nghe rõ 100%]
+3. Thử nghiệm trên 4G: [Đổi sang 4G nghe gọi 2 chiều bình thường]
+4. Trạng thái SIP ALG: [Nghi vấn Modem văn phòng bật SIP ALG]
 
-<ReviewQuestion id="Q-one-way-audio-7">
-  Có ticket đã đóng nào phù hợp để tổng hợp nguyên nhân âm thanh mà không chứa dữ liệu bị cấm?
-</ReviewQuestion>
+[NỘI DUNG CẦN L2 HỖ TRỢ]:
+- Kiểm tra RTP stream và bản tin SDP trong SIP trace cho cuộc gọi giữa [EXT] và [CALLEE].
+- Kiểm tra xem PBX có nhận được luồng RTP từ phía máy nhánh và từ phía nhà mạng không.
+```
 
-## Tra cứu liên quan
+---
 
-- [Rule gọi ra (Outbound Rules)](/internal/ai-contact-center/knowledge-base/outbound-rules)
-- [Bảng IP hạ tầng core](/internal/ai-contact-center/knowledge-base/core-infrastructure)
+## 8. Mẫu phản hồi khách hàng
 
-**Cần bổ sung:** Xác nhận có cần thêm trang tra cứu codec, NAT hoặc RTP.
+### Mẫu: Giải thích lỗi âm thanh một chiều do Router văn phòng
+> *"Dạ em đã kiểm tra trạng thái cuộc gọi giữa máy nhánh [EXT] và khách hàng: Cuộc gọi kết nối bình thường và khi mình thử gọi nội bộ thì âm thanh nghe rất rõ. Hiện tượng gọi ra ngoài bị mất tiếng 1 chiều thường xảy ra do Router mạng văn phòng đang bật tính năng can thiệp luồng âm thanh (SIP ALG) hoặc tường lửa chặn dải cổng truyền tiếng (RTP). Anh/chị nhờ bạn IT nội bộ vào trang quản trị modem tắt tính năng 'SIP ALG' đi là âm thanh 2 chiều sẽ thông suốt ngay nhé ạ!"*
 
-<ReviewQuestion id="Q-one-way-audio-8">
-  Runbook âm thanh cần liên kết thêm tài liệu codec, NAT hoặc RTP nào?
-</ReviewQuestion>
+---
 
-## Cập nhật lần cuối
+## 9. Xác nhận khôi phục
 
-**Cần bổ sung:** Ngày duyệt gần nhất và vai trò chịu trách nhiệm cập nhật runbook.
+1. **Thực hiện cuộc gọi thử nghiệm 2 chiều:** Bấm gọi ra số di động và đàm thoại trong ít nhất 30 giây, xác nhận cả chiều nói và chiều nghe đều to rõ, không mất tiếng.
+2. **Kiểm tra nhật ký CDR:** Trên Portal xuất hiện bản ghi cuộc gọi với thời lượng đàm thoại (`Duration > 0`).
 
-<ReviewQuestion id="Q-common-10">
-  Vai trò nào phê duyệt và duy trì nội dung Support Wiki?
-</ReviewQuestion>
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Nhân viên nói khách không nghe nhưng khách nói nhân viên nghe | Modem DrayTek văn phòng bật SIP ALG làm sai IP trong bản tin SDP | Tắt SIP ALG trong mục NAT của Modem | Âm thanh 2 chiều to rõ | `#TK-AUDIO-01` |
+| *Template* | Mất tiếng 2 chiều khi dùng mạng Wi-Fi công ty | Tường lửa văn phòng chặn toàn bộ dải cổng UDP ra ngoài | IT văn phòng mở dải cổng UDP 10000 - 20000 | Đàm thoại thông suốt | `#TK-RTP-02` |

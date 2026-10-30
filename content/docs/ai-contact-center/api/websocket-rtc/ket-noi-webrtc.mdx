@@ -51,11 +51,7 @@ Hệ thống hoạt động dựa trên 2 kênh độc lập: **Kênh báo hiệ
 
 ### Các mốc trạng thái kết nối
 
-```
-[1. WSS Handshake]          [2. SIP REGISTER]           [3. INVITE & Ringing]         [4. Đàm thoại Audio]
- Trình duyệt mở kết nối  ──►  Đăng ký tài khoản SIP   ──►  Quay số & Đổ chuông    ──►  Truyền âm thanh 2 chiều
- tới rtc.cloudfone.vn:4433    Xác thực máy lẻ + Pass       Thỏa thuận SDP (Codec)       (SRTP qua UDP / WebRTC)
-```
+<WebrtcConnectionFlowDiagram />
 
 1. **WSS connected**: Mở thành công kênh WebSocket tới máy chủ ODS (chứng minh mạng thông suốt tới cổng `4433`).
 2. **SIP registered**: Tổng đài xác thực thành công máy nhánh (`200 OK`). Máy lẻ chính thức trực tuyến.

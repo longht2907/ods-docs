@@ -11,9 +11,7 @@ Webhook là cơ chế thông báo chủ động theo thời gian thực (Event-d
 
 Để tích hợp đúng phạm vi dịch vụ ODS, cần phân biệt Webhook với các thành phần công nghệ khác trong hệ sinh thái tổng đài:
 
-```
-[Tổng đài ODS] ───────── HTTP POST (JSON Event) ─────────► [Endpoint khách hàng cung cấp]
-```
+<WebhookArchitectureDiagram />
 
 - **Khác biệt với REST API**:
   - REST API hoạt động theo cơ chế kéo (Pull/Command): Máy chủ CRM chủ động gửi yêu cầu lên ODS khi cần lấy dữ liệu hoặc thực thi hành động (như tạo máy nhánh, kích hoạt cuộc gọi).
@@ -68,13 +66,7 @@ Tổng đài ODS phân loại tiến trình cuộc gọi thành 5 sự kiện ch
 
 Trong môi trường tổng đài doanh nghiệp, một cuộc gọi có thể đổ chuông nhiều máy nhánh hoặc chuyển tiếp qua nhiều bộ phận. Hệ thống phân định bằng 3 tham số cốt lõi:
 
-```
-[Cuộc gọi tổng thể: LID = 1792051050.26559]
-  ├── Nhánh 1: Ext = 7875, Uid = 1792051059.26568 (Đổ chuông ➔ Dừng chuông)
-  ├── Nhánh 2: Ext = 7877, Uid = 1792051059.26564 (Đổ chuông ➔ Nhấc máy ➔ Gác máy)
-  ├── Nhánh 3: Ext = 7874, Uid = 1792051059.26562 (Đổ chuông ➔ Dừng chuông)
-  └── Nhánh 4: Ext = 7873, Uid = 1792051059.26566 (Đổ chuông ➔ Dừng chuông)
-```
+<WebhookMultiBranchDiagram />
 
 - **`LID` (Linked ID)**:
   - Mã định danh cấp cao nhất của toàn bộ phiên cuộc gọi (Session ID).
@@ -100,11 +92,7 @@ Dựa trên dữ liệu log thực tế từ hệ thống ODS, dưới đây là
 
 Khi nhân viên gọi ra cho khách hàng và khách hàng nhấc máy:
 
-```
-[register] ──────────► [show] ──────────► [answer] ──────────► [finish]
-Khởi tạo gọi ra        Khách đổ chuông    Khách nhấc máy       Gác máy & có file ghi âm
-(Chưa có TimeAnswer)   (TimeDial)         (TimeAnswer)         (TimeEnd, recordingfileURL)
-```
+<WebhookLifecycleDiagram scenario="outbound" />
 
 1. **`register`**: Ghi nhận máy nhánh bắt đầu khởi tạo kết nối gọi ra. `LID` và `Uid` được tạo.
 2. **`show`**: Bắt đầu quay số đến khách hàng (`TimeDial`).
@@ -116,22 +104,7 @@ Khởi tạo gọi ra        Khách đổ chuông    Khách nhấc máy       G�
 
 Khi khách hàng gọi vào Hotline, nghe lời chào IVR và cuộc gọi được phân phối đổ chuông đồng thời đến 4 máy nhánh (Ring Group / Queue):
 
-```
-[register] ──► Tổng đài tiếp nhận cuộc gọi vào Hotline
-    │
-    ├──► [show] (Ext 7875, Uid .26568) ── đổ chuông
-    ├──► [show] (Ext 7877, Uid .26564) ── đổ chuông
-    ├──► [show] (Ext 7874, Uid .26562) ── đổ chuông
-    └──► [show] (Ext 7873, Uid .26566) ── đổ chuông
-             │
-             ├──► [answer] (Ext 7877 nhấc máy nghe)
-             │
-             ├──► [hide] (Ext 7875 dừng chuông - ANSWERED_ELSEWHERE)
-             ├──► [hide] (Ext 7874 dừng chuông - ANSWERED_ELSEWHERE)
-             └──► [hide] (Ext 7873 dừng chuông - ANSWERED_ELSEWHERE)
-             │
-             └──► [finish] (Ext 7877 và khách gác máy - Kết thúc toàn bộ cuộc gọi)
-```
+<WebhookLifecycleDiagram scenario="inbound" />
 
 1. **`register`**: Khách hàng kết nối vào tổng đài. Sự kiện lúc này chưa có thông tin `Ext` hay `Uid` vì cuộc gọi đang nằm ở tầng Trunk/IVR.
 2. **Nhiều sự kiện `show`**: Tổng đài phát nhiều webhook `show` tương ứng với từng máy lẻ đang đổ chuông (`Ext: 7875`, `7877`, `7874`, `7873`).

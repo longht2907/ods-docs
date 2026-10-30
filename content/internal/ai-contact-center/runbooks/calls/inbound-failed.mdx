@@ -1,115 +1,138 @@
 ---
 title: Không nhận được cuộc gọi đến
-description: Dàn ý chẩn đoán và xử lý case khách hàng không nhận được cuộc gọi đến.
+description: Runbook L1 tiếp nhận, phân loại luồng định tuyến, kiểm tra kết nối Trunk nhà mạng viễn thông và xử lý sự cố khách hàng không gọi được vào Hotline tổng đài.
 ---
 
-<Callout title="Dàn ý — chờ bổ sung" type="warn">
-  Mục ghi *(đề xuất)* là gợi ý cần xác nhận. Mục **Cần bổ sung** là thông tin riêng của ODS. Câu hỏi xem tại file câu hỏi TASK-018.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Triệu chứng
+Áp dụng khi khách hàng phản ánh **đầu số hotline của công ty không nhận được bất kỳ cuộc gọi nào từ bên ngoài gọi vào**:
+- Người gọi từ bên ngoài bấm số hotline nghe thông báo từ nhà mạng viễn thông: *"Số máy quý khách vừa gọi không đúng / tạm thời không liên lạc được"*, máy bận tút nhanh hoặc cuộc gọi ngắt ngay.
+- Hotline đổ chuông hoặc nghe nhạc chờ nhưng không có bất kỳ máy nhánh nhân viên nào reo chuông.
+- Toàn bộ điện thoại viên đang trực nhưng không có cuộc gọi nào đổ vào hàng đợi (Queue).
 
-- Người gọi không kết nối được vào đầu số, nghe báo lỗi hoặc cuộc gọi kết thúc trước khi tới đích. *(đề xuất)*
-- Cuộc gọi vào hệ thống nhưng không đổ tới máy nhánh, queue, ring group hoặc IVR mong đợi. *(đề xuất)*
-- Phạm vi có thể là một người gọi, một đầu số, một nhánh định tuyến, một tenant hoặc toàn hệ thống. *(đề xuất)*
+### Phân biệt với các sự cố gần giống
+- **Đang giờ làm việc nhưng bị rơi vào nhánh Ngoài giờ**: Xem [Sự cố Thời gian làm việc](/internal/ai-contact-center/runbooks/calls/time-conditions).
+- **Khách gọi vào nghe lời chào nhưng bấm phím 1, 2 không ăn**: Xem [Sự cố Bấm phím IVR](/internal/ai-contact-center/runbooks/calls/ivr-dtmf).
+- **Máy nhánh không nhận cuộc gọi do đang Offline**: Xem [Máy nhánh không đăng ký được](/internal/ai-contact-center/runbooks/extensions/registration-failed).
+- **Cuộc gọi vào bắt máy nhưng không nghe tiếng**: Xem [Âm thanh một chiều / Mất tiếng](/internal/ai-contact-center/runbooks/calls/one-way-audio).
 
-**Cần bổ sung:** Dấu hiệu, mã lỗi và quy tắc phân mức độ ODS dùng cho sự cố gọi vào.
+---
 
-<ReviewQuestion id="Q-inbound-failed-1">
-  ODS phân biệt “nhà mạng chưa đưa cuộc gọi vào” với “hệ thống đã nhận nhưng không chuyển tới đích” bằng dấu hiệu nào?
-</ReviewQuestion>
+## 2. Tiếp nhận và kiểm tra nhanh
 
-## Cần hỏi KH
+Khi tiếp nhận phản ánh, L1 cần phân loại theo 4 nhóm tình huống điển hình:
 
-- Số gọi, đầu số được gọi, thời điểm kèm múi giờ và kết quả người gọi nghe thấy. *(đề xuất)*
-- Lỗi xảy ra với mọi số gọi hay chỉ một nhà mạng hoặc một vùng số. *(đề xuất)*
-- Đích mong đợi là máy nhánh, queue, ring group hay IVR; các đích khác có nhận được không. *(đề xuất)*
-- Có tái hiện được không và gần đây có thay đổi lịch làm việc, IVR hoặc inbound route không. *(đề xuất)*
+| Tình huống quan sát | Nguyên nhân kỹ thuật cốt lõi | Hướng xử lý nhanh L1 |
+| :--- | :--- | :--- |
+| **Gọi vào nghe "Số máy tạm thời không liên lạc được"** | Đầu số SIP Trunk bị nhà mạng viễn thông tạm khóa do **nợ cước định kỳ**, hoặc bị khóa chuẩn hóa thông tin thuê bao doanh nghiệp (Nghị định 49). | Kiểm tra trạng thái Trunk trên Portal ODS; nhắc khách hàng kiểm tra tình trạng thanh toán với Telco. |
+| **Gọi vào có chuông reo nhưng không máy nào nhận** | Toàn bộ máy nhánh trong hàng đợi (Queue/Ring Group) đang **Offline**, đang bận cuộc gọi khác hoặc đang bật chế độ **DND**. | Nhắc nhân viên đăng nhập máy nhánh, kiểm tra và tắt DND. |
+| **Chỉ 1 nhà mạng di động gọi vào bị lỗi (VD Viettel)** | Sự cố định tuyến liên mạng (Interconnection Routing) giữa mạng Viettel và nhà mạng cung cấp đầu số của khách hàng. | Thu thập mẫu số gọi bị lỗi và chuyển cấp L2 làm việc với Carrier. |
+| **Trên Portal hoàn toàn không có bất kỳ bản ghi CDR nào** | Cuộc gọi chưa bao giờ rời khỏi hạ tầng của nhà mạng viễn thông để tới cụm máy chủ ODS PBX. | Kiểm tra trạng thái Trunk kết nối; chuyển cấp đối soát với Telco. |
 
-**Cần bổ sung:** Trường ticket bắt buộc và cách ghi đầu số/số gọi phù hợp chính sách dữ liệu của ODS.
+---
 
-<ReviewQuestion id="Q-inbound-failed-2">
-  Case gọi vào cần khách hàng cung cấp thêm thông tin nào ngoài hai số, thời điểm và đích mong đợi?
-</ReviewQuestion>
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra
+Thu thập thông tin theo 2 nhóm:
 
-1. Kiểm tra thiết bị hoặc máy nhánh đích có mạng và đang đăng ký nếu phạm vi chỉ ở một đích. *(đề xuất)*
-2. Tìm CDR và SIP trace để xác định INVITE có tới hệ thống, vào tenant và khớp đầu số hay không. *(đề xuất)*
-3. Đối chiếu inbound route, lịch làm việc, IVR, queue hoặc đích chuyển tiếp theo cấu hình đã duyệt. *(đề xuất)*
-4. Kiểm tra trạng thái trunk và phản hồi SIP; phối hợp nhà mạng nếu không thấy cuộc gọi tới hệ thống. *(đề xuất)*
-5. Có thể tham khảo `pjsip show endpoints`, `pjsip show contacts`, CDR, log, `sngrep` hoặc RTP debug. *(đề xuất — cần xác nhận công cụ thực tế ODS)*
+### Thông tin tối thiểu bắt buộc
+1. **Đầu số hotline bị gọi (`[HOTLINE]`):** Đầu số nào của công ty đang không nhận được cuộc gọi?
+2. **Số điện thoại người gọi đến dùng để test (`[CALLER]`):** Số di động/cố định thực tế đã gọi thử vào bị lỗi (kèm nhà mạng)?
+3. **Mốc thời gian gọi thử:** Thời điểm chính xác vừa gọi thử nghiệm?
+4. **Tín hiệu người gọi nghe thấy:**
+   - Nghe tiếng tút bận, ngắt ngay lập tức?
+   - Hay nghe câu thông báo của nhà mạng viễn thông?
+   - Hay nghe chuông reo nhưng không ai bắt máy?
 
-**Cần bổ sung:** Công cụ tra inbound route, CDR, SIP trace và quyền truy cập theo vai trò.
+---
 
-<ReviewQuestion id="Q-inbound-failed-3">
-  ODS tra cứu đầu số, inbound route và log cuộc gọi đến trên những hệ thống nào?
-</ReviewQuestion>
+## 4. Checklist kiểm tra an toàn cho L1
 
-## Xử lý
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-- Nếu đích không đăng ký: xử lý kết nối hoặc cấu hình thiết bị, sau đó gọi thử từ số ngoài. *(đề xuất)*
-- Nếu route hoặc lịch làm việc sai: điều chỉnh theo cấu hình đã được khách hàng/phụ trách xác nhận và lưu dấu thay đổi. *(đề xuất)*
-- Nếu IVR/queue không có đích khả dụng: khôi phục đích hợp lệ hoặc chuyển tạm theo phương án đã được phê duyệt. *(đề xuất)*
-- Nếu cuộc gọi không tới hệ thống: cung cấp bằng chứng kỹ thuật tối thiểu cho nhóm trunk/nhà mạng. *(đề xuất)*
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Tự gọi thử nghiệm vào Hotline** | L1 thực hiện | Dùng số di động cá nhân gọi trực tiếp vào đầu số `[HOTLINE]` | Cuộc gọi kết nối, nghe chuông reo | Báo bận/ngắt ngay/nghe thông báo Telco: Chuyển sang Bước 2. |
+| **2. Tra cứu CDR trên Portal** | L1 tra cứu | Tìm theo `[HOTLINE]` và `[CALLER]` tại thời điểm gọi | Có bản ghi cuộc gọi ghi nhận vào hệ thống | **Không có bản ghi CDR**: Cuộc gọi chưa tới ODS (lỗi phía nhà mạng đầu số hoặc Trunk nợ cước). |
+| **3. Kiểm tra trạng thái SIP Trunk trên Portal** | L1 tra cứu | Xem trạng thái kết nối SIP Trunk của đầu số | Trunk hiển thị `Online / OK` | Trunk hiển thị `Offline` / `Unregistered`: Mất kết nối luồng nhà mạng ➔ Chuyển cấp. |
+| **4. Kiểm tra trạng thái máy nhánh đích / Queue** | L1 tra cứu | Kiểm tra trạng thái các máy nhánh phụ trách nghe máy | Có ít nhất 1 máy nhánh `Online` | Tất cả máy nhánh đều `Offline` hoặc bật DND: Nhắc nhân viên đăng nhập máy nhánh. |
+| **5. Đối chiếu số dư đầu số (Hotline 1800)** | L1 tra cứu | Nếu là đầu số 1800 (doanh nghiệp trả cước), kiểm tra số dư | Tài khoản cước viễn thông còn số dư | Đầu số bị khóa do hết cước trả trước: Báo quản trị viên nạp cước duy trì. |
 
-**Cần bổ sung:** Quyền thay đổi inbound route, IVR, queue và phương án rollback chuẩn của ODS.
+---
 
-<ReviewQuestion id="Q-inbound-failed-4">
-  L1 được phép xử lý trực tiếp những lỗi gọi vào nào và thao tác nào bắt buộc chuyển L2?
-</ReviewQuestion>
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-## Chuyển cấp
+<Steps>
+  <Step title="Kiểm tra tình trạng thanh toán cước thuê bao đầu số với Telco">
+    - Nếu gọi vào nghe thông báo *"Số máy quý khách vừa gọi tạm thời không liên lạc được..."* và trên CDR không có log:
+      1. Báo ngay quản trị viên khách hàng liên hệ đầu mối kinh doanh của nhà mạng viễn thông cung cấp đầu số (Viettel/VNPT/FPT).
+      2. Kiểm tra xem doanh nghiệp có bị trễ hạn thanh toán hóa đơn cước thuê bao tháng vừa qua hay không.
+      3. Sau khi khách hàng hoàn tất thanh toán, nhà mạng sẽ tự động mở lại chiều gọi vào trong vòng 15-30 phút.
+  </Step>
 
-- Chuyển cấp khi nhiều đầu số hoặc tenant cùng lỗi, không thấy lưu lượng từ trunk, route đúng nhưng hệ thống không chuyển cuộc gọi, hoặc cần thay đổi ngoài quyền L1. *(đề xuất)*
-- Đính kèm ticket, thời điểm/múi giờ, số gọi và đầu số đích đã xử lý an toàn, Call-ID, mã SIP, CDR và kết quả từng bước kiểm tra. *(đề xuất)*
-- Chỉ đính kèm log/pcap đã loại bỏ credential và dữ liệu không liên quan. *(đề xuất)*
+  <Step title="Khắc phục khi toàn bộ máy nhánh nhân viên Offline">
+    - Nếu cuộc gọi vào có phát sinh CDR nhưng bị ngắt với lý do `NO_ANSWER`:
+      + Kiểm tra danh sách nhân viên trong nhóm trực: Nếu tất cả đều đang chấm xám (`Offline`), nhắc nhở nhân viên mở ứng dụng Softphone/ODS Phone và đăng nhập lại.
+      + Nếu nhân viên đang `Online` nhưng không nghe chuông: Kiểm tra xem nhân viên có đang bật chế độ **DND (Do Not Disturb)** hoặc đang cắm tai nghe bị lỏng không.
+  </Step>
+</Steps>
 
-**Cần bổ sung:** Nhóm nhận theo lớp lỗi, kênh chung, SLA và quy định gửi dữ liệu cho nhà mạng.
+---
 
-<ReviewQuestion id="Q-inbound-failed-5">
-  Điều kiện nào chuyển case gọi vào cho L2, NOC hoặc nhà mạng?
-</ReviewQuestion>
+## 6. Khi nào dừng và chuyển cấp?
 
-## Trả lời mẫu
+Dừng xử lý và chuyển ticket lên L2/NOC khi:
 
-> **Tiếp nhận:** ODS đã ghi nhận tình trạng không nhận được cuộc gọi đến. Anh/chị vui lòng cung cấp số gọi, đầu số được gọi, thời điểm và thông báo người gọi nghe thấy để đội ngũ kiểm tra. *(đề xuất)*
+- [ ] **Không có CDR trên ODS:** Cuộc gọi từ ngoài gọi vào bị ngắt nhưng trên hệ thống tổng đài hoàn toàn không nhận được bản tin SIP INVITE từ nhà mạng.
+- [ ] **Trunk nhà mạng offline:** Trạng thái SIP Trunk kết nối đầu số hiển thị mất kết nối hoặc trả về lỗi `503 Service Unavailable`.
+- [ ] **Đầu số bị nhà mạng khóa chiều:** Nghi vấn đầu số bị chặn chiều gọi đến từ phía nhà mạng viễn thông (liên quan đến hồ sơ pháp lý định danh thuê bao).
 
-> **Đã xử lý:** ODS đã hoàn tất bước xử lý luồng gọi đến. Anh/chị vui lòng gọi thử vào đầu số và xác nhận cuộc gọi đã tới đúng đích. *(đề xuất)*
+---
 
-**Cần bổ sung:** Mẫu phản hồi và trạng thái ticket chuẩn của ODS.
+## 7. Mẫu ticket chuyển cấp
 
-<ReviewQuestion id="Q-inbound-failed-6">
-  ODS có mẫu tiếp nhận và mẫu xác nhận xử lý chuẩn nào cho sự cố gọi vào?
-</ReviewQuestion>
+```markdown
+[TÓM TẮT SỰ CỐ]: Đầu số không nhận được cuộc gọi đến (Inbound Call Failed)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Đầu số bị ảnh hưởng: [HOTLINE]
+- Nhà mạng cung cấp đầu số: [VNPT / Viettel / FPT / CMC / Mobifone]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
 
-## Nguyên nhân đã gặp
+[TRIỆU CHỨNG CỤ THỂ]:
+- [ ] Gọi vào nghe câu thông báo viễn thông của nhà mạng
+- [ ] Gọi vào đổ chuông nhưng không máy nhánh nào nhận được
+- [ ] Hoàn toàn không ghi nhận CDR trên tổng đài
 
-| Ngày | Nguyên nhân | Cách xử lý | Ticket |
-|---|---|---|---|
-| | | | |
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Thử gọi từ số cá nhân: [Nghe câu thông báo viễn thông / Ngắt ngay]
+2. Tra cứu CDR: [Hoàn toàn không có bản ghi]
+3. Trạng thái Trunk trên Portal: [Trunk Online / Trunk Báo Offline]
+4. Trạng thái máy nhánh: [Có máy nhánh Online bình thường]
 
-**Cần bổ sung:** Chỉ Human điền case thật đã được phép lưu và loại bỏ dữ liệu nhận diện khách hàng.
+[NỘI DUNG CẦN L2 / TELCO HỖ TRỢ]:
+- Kiểm tra SIP trace bản tin INVITE từ Carrier tới PBX ODS xem có nhận được cuộc gọi không.
+- Phối hợp với Telco [TÊN_NHÀ_MẠNG] kiểm tra luồng định tuyến đầu số [HOTLINE].
+```
 
-<ReviewQuestion id="Q-inbound-failed-7">
-  Có những ticket đã đóng nào có thể dùng để tổng hợp nguyên nhân gọi vào thất bại mà không chứa dữ liệu bị cấm?
-</ReviewQuestion>
+---
 
-## Tra cứu liên quan
+## 8. Mẫu phản hồi khách hàng
 
-- [Rule gọi ra (Outbound Rules)](/internal/ai-contact-center/knowledge-base/outbound-rules)
-- [Bảng IP hạ tầng core](/internal/ai-contact-center/knowledge-base/core-infrastructure)
+### Mẫu: Giải thích khi gọi vào nghe thông báo viễn thông
+> *"Dạ ODS đã tiếp nhận thông tin về việc đầu số hotline [HOTLINE] không nhận được cuộc gọi. Em đã kiểm tra trên hệ thống tổng đài hiện hoàn toàn chưa nhận được tín hiệu cuộc gọi từ nhà mạng viễn thông chuyển sang. Anh/chị kiểm tra giúp em tình trạng thanh toán cước thuê bao của đầu số với nhà mạng (Viettel/VNPT/FPT) xem có bị tạm ngưng dịch vụ do trễ hạn cước không, đồng thời kỹ thuật ODS cũng đang phối hợp rà soát đường truyền kết nối nhé ạ."*
 
-**Cần bổ sung:** Xác nhận link về outbound rules có cần giữ cho case gọi vào hay thay bằng trang inbound routing trong tương lai.
+---
 
-<ReviewQuestion id="Q-inbound-failed-8">
-  Runbook gọi vào cần giữ hoặc bổ sung những trang tra cứu nào?
-</ReviewQuestion>
+## 9. Xác nhận khôi phục
 
-## Cập nhật lần cuối
+1. **Gọi thử nghiệm từ mạng ngoài:** Dùng số di động cá nhân gọi vào hotline, xác nhận chuông reo to rõ và cuộc gọi đổ về đúng máy nhánh/hàng đợi trực.
+2. **Đối chiếu CDR:** Xác nhận trên Portal xuất hiện bản ghi cuộc gọi mới với trạng thái `ANSWERED`.
 
-**Cần bổ sung:** Ngày duyệt gần nhất và vai trò chịu trách nhiệm cập nhật runbook.
+---
 
-<ReviewQuestion id="Q-common-10">
-  Vai trò nào phê duyệt và duy trì nội dung Support Wiki?
-</ReviewQuestion>
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Gọi vào hotline nghe "Số máy tạm thời không liên lạc được" | Đầu số bị nhà mạng khóa do nợ cước viễn thông định kỳ | Khách hàng hoàn tất thanh toán cước với Telco | Đầu số tự động mở lại sau 15 phút | `#TK-TELCO-01` |
+| *Template* | Hotline đổ chuông nhưng không ai nghe máy | 3 nhân viên trong nhóm trực đều quên đăng nhập Zoiper buổi sáng | Nhắc nhân viên đăng nhập máy nhánh | Cuộc gọi đổ chuông và tiếp nhận bình thường | `#TK-INBOUND-02` |

@@ -1,80 +1,145 @@
 ---
-title: Trunk SIP lỗi
-description: Runbook L1 khoanh vùng sự cố Trunk SIP hoặc đầu số không gọi vào, gọi ra hay cả hai chiều.
+title: Trunk SIP nhà mạng mất kết nối
+description: Runbook L1 tiếp nhận, phân loại diện rộng, kiểm tra an toàn và thu thập dữ liệu chuyển cấp sự cố Trunk SIP kết nối nhà mạng bị gián đoạn.
 ---
 
-<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
-  L1 chỉ thu thập bằng chứng và đối chiếu phạm vi. Không reload Trunk, đổi route, IP hoặc credential khi chưa có quyền và phương án rollback.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Phạm vi L1
+Áp dụng khi điện thoại viên hoặc khách hàng phản ánh sự cố **liên quan đồng loạt đến một đầu số hoặc một nhà mạng viễn thông cụ thể**:
+- Tất cả các máy nhánh khi gọi ra qua một đầu số đều báo lỗi kết nối hoặc nghe tiếng tút bận nhanh.
+- Khách hàng bên ngoài gọi vào đầu số nghe thông báo từ nhà mạng hoặc cuộc gọi ngắt ngay, trên Portal ODS hoàn toàn không có CDR.
+- Trên trang giám sát trạng thái hệ thống, kênh SIP Trunk kết nối tới nhà mạng (Viettel, VNPT, FPT, CMC, Mobifone) chuyển sang màu đỏ hoặc báo `UNREACHABLE` / `Timeout`.
 
-Áp dụng khi một đầu số/Trunk không nhận cuộc gọi, không gọi ra hoặc lỗi đồng thời nhiều máy nhánh. Mục tiêu là phân biệt lỗi endpoint, PBX, định tuyến hay nhà mạng.
+### Phân biệt với các sự cố gần giống
+- **Chỉ 1 máy nhánh đơn lẻ không gọi ra được**: Xem [Không gọi ra được](/internal/ai-contact-center/runbooks/calls/outbound-failed).
+- **Máy nhánh không nhận cuộc gọi do offline**: Xem [Máy nhánh không đăng ký được](/internal/ai-contact-center/runbooks/extensions/registration-failed).
+- **Cuộc gọi kết nối được nhưng bị người nhận báo spam**: Xem [Đầu số bị chặn / báo spam](/internal/ai-contact-center/runbooks/carriers/number-blocked).
 
-## Triệu chứng
+---
 
-- Tất cả máy nhánh không gọi ra qua cùng đầu số/route.
-- Cuộc gọi vào không tới PBX, IVR hoặc đích mong đợi.
-- CDR có mã SIP lỗi, cuộc gọi kết thúc ngay hoặc không có bản ghi.
+## 2. Tiếp nhận và kiểm tra nhanh
 
-### Phân nhánh nhanh
+L1 cần nhanh chóng xác định phạm vi ảnh hưởng của Trunk:
 
-| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
-| --- | --- | --- |
-| Gọi nội bộ bình thường, mọi cuộc gọi ra cùng đầu số đều lỗi | Nghi Trunk, route hoặc nhà mạng | Lấy mẫu CDR/SIP code và chuyển Carrier/L2 |
-| Cuộc gọi vào không có CDR | Có thể chưa tới PBX | Thu thập mẫu từ thuê bao gọi, thời điểm và chuyển Carrier/L2 |
-| Có CDR nhưng không tới đúng IVR/máy nhánh | Có thể liên quan route hoặc call flow | Đối chiếu lịch, IVR và đích đã duyệt |
-| Chỉ một máy nhánh lỗi | Không đủ bằng chứng kết luận Trunk | Chuyển sang runbook endpoint hoặc hướng gọi tương ứng |
-| Chỉ lỗi tới một nhà mạng/nhóm số | Có thể là định tuyến hoặc carrier rejection | Lấy tối thiểu hai mẫu cùng nhóm và một mẫu đối chứng |
+| Tiêu chí phân loại | Nhận định ban đầu | Hướng xử lý L1 |
+| :--- | :--- | :--- |
+| **Gọi nội bộ vẫn tốt, nhưng gọi ra ngoài qua đầu số đó đều lỗi** | Khả năng cao Trunk SIP của đầu số đó đang gặp sự cố. | Kiểm tra trạng thái Trunk trên Portal và thu thập mẫu cuộc gọi lỗi. |
+| **Chỉ lỗi khi gọi tới 1 nhà mạng đối phương (VD: chỉ gọi mạng Viettel lỗi)** | Trunk kết nối giữa nhà mạng cung cấp đầu số và mạng đối phương bị nghẽn định tuyến. | Thu thập 2-3 số mẫu và chuyển nhóm Carrier làm việc với nhà mạng. |
+| **Nhiều khách hàng/tenant dùng chung nhà mạng cùng báo lỗi** | **Sự cố Trunk diện rộng cấp hạ tầng (P1/P0)**. | **Dừng thao tác lẻ và chuyển cấp khẩn cấp ngay lập tức.** |
+| **Chỉ một máy nhánh bị lỗi, các máy nhánh khác gọi qua đầu số đó bình thường** | Lỗi cục bộ máy nhánh, không phải do Trunk SIP. | Chuyển sang runbook [Không gọi ra được](/internal/ai-contact-center/runbooks/calls/outbound-failed). |
 
-## Cần hỏi khách hàng
+> [!IMPORTANT]
+> **Dấu hiệu chuyển cấp khẩn cấp**: Khi nhận thấy toàn bộ cuộc gọi qua một nhà mạng (ví dụ toàn bộ đầu số FPT hoặc VNPT) đồng loạt không thể gọi vào hoặc gọi ra, L1 lập tức kích hoạt quy trình báo động sự cố diện rộng cho L2/NOC/Carrier Lead.
 
-- Mã dịch vụ, đầu số, hướng gọi lỗi và phạm vi máy nhánh.
-- Số gọi, số được gọi, thời điểm/múi giờ và thông báo nghe thấy.
-- Lỗi với mọi nhà mạng/đích gọi hay chỉ một nhóm số.
-- Thay đổi gần nhất ở route, lịch làm việc, IVR, Firewall hoặc Internet.
+---
 
-## Kiểm tra L1
+## 3. Thông tin cần hỏi khách hàng
 
-1. Kiểm tra nhiều máy nhánh và một cuộc gọi nội bộ để loại trừ endpoint.
-2. Tra CDR bằng số mẫu/thời gian; ghi nhận có hay không có bản ghi.
-3. Đối chiếu đầu số, route và lịch hoạt động theo cấu hình đã duyệt, không tự chỉnh.
-4. Khoanh vùng một đầu số, một nhà mạng, một tenant hay nhiều khách hàng.
-5. Ghi nhận mã SIP/Call-ID nếu công cụ L1 cho phép; không thu thập credential Trunk.
+Thu thập thông tin theo 2 nhóm:
 
-## Xử lý trong phạm vi L1
+### Thông tin tối thiểu bắt buộc
+1. **Đầu số bị ảnh hưởng (`[HOTLINE]`):** Đầu số cụ thể nào của công ty đang bị gián đoạn?
+2. **Nhà mạng cung cấp đầu số:** Nhà mạng nào (FPT, VNPT, Viettel, CMC, MobiFone)?
+3. **Mốc thời gian bắt đầu phát sinh:** Bắt đầu không gọi được từ lúc mấy giờ?
+4. **Chiều bị ảnh hưởng:** Chiều gọi vào, chiều gọi ra hay cả 2 chiều?
+5. **Mẫu cuộc gọi lỗi:** Ít nhất 2 số điện thoại đối phương gọi thử bị lỗi (kèm phút/giây).
 
-- Thử bằng máy nhánh đã biết hoạt động và một số đích khác.
-- Sửa lỗi nhập số/quy tắc quay số phía người dùng khi có tài liệu đối chiếu.
-- Nếu chỉ một máy nhánh lỗi, chuyển về runbook endpoint.
-- Nếu route/lịch sai, chuyển người có quyền và ghi rõ cấu hình hiện tại/mong đợi.
+### Thông tin bổ sung (Hỏi khi cần)
+- Doanh nghiệp có nhiều đầu số khác nhau không? Các đầu số khác có gọi bình thường không?
+- Khách hàng có nhận được thông báo bảo trì định kỳ nào từ phía nhà mạng viễn thông trước đó không?
 
-## Điểm dừng và chuyển cấp
+---
 
-- Không thấy cuộc gọi vào hoặc mọi cuộc gọi ra cùng Trunk đều lỗi.
-- Nhiều đầu số/khách hàng cùng lỗi hoặc mã SIP 5xx/timeout lặp lại.
-- Cần SIP trace, trạng thái peering, thay route, reload Trunk hay làm việc nhà mạng.
-- Nghi ngờ nghẽn kênh, hết hạn dịch vụ hoặc thay đổi whitelist IP.
+## 4. Checklist kiểm tra an toàn cho L1
 
-## Dữ liệu chuyển cấp
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-- Mã dịch vụ, đầu số, hướng gọi, phạm vi và thời điểm/múi giờ.
-- Hai đến ba mẫu cuộc gọi đã che dữ liệu, Call-ID/mã SIP và trạng thái CDR.
-- Kết quả gọi nội bộ, gọi qua số/nhà mạng khác và thay đổi gần nhất.
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra trạng thái Trunk trên Portal ODS** | L1 tra cứu | Vào mục Quản lý Trunk/Carrier xem trạng thái kết nối | Trạng thái hiển thị `ONLINE` / `OK` | Trạng thái hiển thị `OFFLINE`, `UNREACHABLE` hoặc `LAGGED`: Trunk mất kết nối vật lý/SIP với nhà mạng. |
+| **2. Tra cứu CDR (Mã lỗi phản hồi)** | L1 tra cứu | Xem lịch sử cuộc gọi gần nhất của đầu số trên Portal | Mã kết thúc bình thường (`ANSWERED`, `BUSY`) | Xuất hiện liên tục các mã lỗi `503 Service Unavailable`, `500 Server Internal Error`, `408 Request Timeout`. |
+| **3. Gọi nội bộ đối chứng** | Khách hàng | Hai máy nhánh bấm gọi nội bộ cho nhau | Đổ chuông, đàm thoại 2 chiều bình thường | Cuộc gọi nội bộ cũng lỗi: Lỗi hệ thống Core PBX chứ không riêng gì Trunk. |
+| **4. Kiểm tra tài khoản cước viễn thông** | L1 / Khách hàng | Với đầu số trả trước hoặc có cước thuê bao tháng: Kiểm tra số dư | Tài khoản còn tiền duy trì dịch vụ | Hết hạn cước/nợ cước: Nhà mạng tự động khóa chiều gọi của đầu số. |
+| **5. Đối chiếu thông báo sự cố diện rộng** | L1 tra cứu | Xem kênh thông báo nội bộ (NOC / Carrier Channel) | Không có cảnh báo sự cố nhà mạng | Có thông báo nhà mạng viễn thông đang đứt cáp hoặc nâng cấp hạ tầng. |
 
-## Trả lời mẫu
+---
 
-> **Tiếp nhận:** ODS đã ghi nhận đầu số/luồng Trunk có dấu hiệu bất thường. Anh/chị vui lòng cung cấp số gọi, số được gọi, thời điểm và hướng gọi lỗi để đối chiếu nhật ký.
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-> **Chuyển cấp:** Lỗi không giới hạn ở một máy nhánh. ODS đã chuyển đội chuyên trách kiểm tra Trunk/định tuyến với các mẫu cuộc gọi đã thu thập.
+1. **Xác nhận số dư cước viễn thông:**
+   - Nếu phát hiện đầu số trả trước của khách hàng bị hết tiền hoặc nợ cước kỳ trước: Hướng dẫn quản trị viên khách hàng nạp tiền cước hoặc liên hệ phòng kinh doanh nhà mạng để mở lại chiều.
 
-## Nguyên nhân thường gặp và tra cứu
+2. **Tạm thời chuyển tiếp cuộc gọi (Nếu khách hàng có yêu cầu khẩn cấp):**
+   - Nếu doanh nghiệp có nhiều đầu số hotline dự phòng (Secondary Hotline), hướng dẫn khách hàng tạm thời cấu hình định tuyến gọi ra qua đầu số dự phòng trong khi chờ nhà mạng xử lý đầu số chính.
 
-- Sai quy tắc quay số, route/lịch không khớp hoặc endpoint bị hiểu nhầm là lỗi Trunk.
-- Mất peering, nhà mạng từ chối, nghẽn kênh hoặc whitelist IP thay đổi.
+3. **Thu thập đầy đủ mẫu cuộc gọi đối chứng:**
+   - Thu thập ít nhất 3 cuộc gọi mẫu (gồm: Số gọi, Số nhận, Thời điểm chính xác, Mã lỗi ghi nhận) để làm bằng chứng gửi sang nhà mạng viễn thông.
 
-- [Không gọi ra được](/internal/ai-contact-center/runbooks/calls/outbound-failed)
-- [Không nhận cuộc gọi đến](/internal/ai-contact-center/runbooks/calls/inbound-failed)
-- [Rule gọi ra](/internal/ai-contact-center/knowledge-base/outbound-rules)
-- [Giới hạn nhà mạng](/internal/ai-contact-center/knowledge-base/carrier-limitations)
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket lên L2 / Bộ phận Quản lý Nhà mạng (Carrier Operations) khi:
+
+- [ ] **Trunk SIP hiển thị Offline:** Trạng thái kết nối giữa tổng đài ODS và IP SBC của nhà mạng viễn thông bị ngắt quãng.
+- [ ] **Mã lỗi 503 từ Carrier:** Tổng đài gửi lệnh gọi sang nhưng nhà mạng từ chối với lý do nghẽn mạch hoặc lỗi định tuyến phía nhà mạng.
+- [ ] **Sự cố diện rộng:** Toàn bộ đầu số thuộc cùng một dải của nhà mạng đều không thể liên lạc được.
+- [ ] **Cần can thiệp hạ tầng:** Cần restart kênh Trunk, đổi IP Peering, kiểm tra luồng kết nối VPN/Direct Connect giữa ODS và nhà mạng.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Trunk SIP nhà mạng mất kết nối (SIP Trunk Down)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Đầu số bị ảnh hưởng: [HOTLINE]
+- Nhà mạng cung cấp: [Viettel / VNPT / FPT / CMC / Mobifone]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+- Chiều bị lỗi: [Không gọi ra được / Không nhận được gọi vào / Cả 2 chiều]
+
+[TRẠNG THÁI QUAN SÁT TRÊN HỆ THỐNG]:
+- Trạng thái Trunk trên Portal: [OFFLINE / UNREACHABLE / TIMEOUT]
+- Mã SIP phản hồi trên CDR: [SIP 503 Service Unavailable / 408 Request Timeout]
+- Thử nghiệm gọi nội bộ: [Nội bộ vẫn hoạt động bình thường]
+
+[DANH SÁCH MẪU CUỘC GỌI LỖI]:
+1. [CALLER_1] -> [CALLEE_1] lúc [HH:MM:SS] - Kết quả: [503]
+2. [CALLER_2] -> [CALLEE_2] lúc [HH:MM:SS] - Kết quả: [503]
+
+[NỘI DUNG CẦN L2 / CARRIER TEAM HỖ TRỢ]:
+- Kiểm tra kết nối mạng/IP Peering tới SBC của nhà mạng [NHÀ_MẠNG].
+- Mở ticket phối hợp với NOC nhà mạng để xử lý khôi phục kênh Trunk.
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và xin thông tin
+> *"Dạ ODS đã tiếp nhận thông tin về việc gián đoạn kết nối trên đầu số [HOTLINE]. Để phối hợp kiểm tra kỹ thuật nhanh nhất, anh/chị vui lòng cung cấp giúp em vài số điện thoại vừa gọi thử bị lỗi và mốc thời gian cụ thể ạ. Em cảm ơn anh/chị!"*
+
+### Mẫu 2: Thông báo chuyển cấp nhà mạng
+> *"Dạ qua kiểm tra trên hệ thống giám sát, kênh kết nối viễn thông (Trunk SIP) từ nhà mạng [NHÀ_MẠNG] tới tổng đài đang ghi nhận trạng thái gián đoạn. Đội ngũ Kỹ thuật chuyên trách ODS đã mở kênh hỗ trợ khẩn cấp với nhà mạng để xử lý luồng đường truyền này ngay lập tức. Em sẽ theo dõi sát và cập nhật tiến độ liên tục tới anh/chị ạ."*
+
+### Mẫu 3: Thông báo hoàn tất và đề nghị kiểm tra
+> *"Dạ em xin thông báo kênh kết nối Trunk của đầu số [HOTLINE] đã được nhà mạng và ODS xử lý khôi phục hoạt động bình thường. Anh/chị vui lòng thực hiện cuộc gọi thử nghiệm cả chiều gọi vào và gọi ra để kiểm tra lại giúp em nhé ạ!"*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Quan sát trạng thái Trunk:** Trên trang quản trị, biểu tượng Trunk chuyển sang màu xanh lá (`ONLINE` / `OK`).
+2. **Thực hiện cuộc gọi thử nghiệm 2 chiều:**
+   - Bấm gọi ra từ máy nhánh qua đầu số hotline tới 1 số di động ngoài: Kết nối thành công, âm thanh 2 chiều rõ ràng.
+   - Dùng số di động ngoài gọi vào đầu số hotline: Đổ chuông, phát lời chào và phân phối đúng máy nhánh.
+3. **Đối chiếu CDR:** Các cuộc gọi thử nghiệm đều có bản ghi CDR với trạng thái `ANSWERED`.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Đầu số 028xxxx báo 503 khi gọi ra | Nhà mạng nâng cấp cụm SBC định tuyến nhưng chưa cập nhật IP mới | L2 phối hợp NOC nhà mạng cập nhật đúng IP Peering | Kênh Trunk Online, cuộc gọi ra bình thường | `#TK-EXAMPLE` |
 

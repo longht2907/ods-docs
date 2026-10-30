@@ -27,32 +27,7 @@ Trong ngữ cảnh thoại doanh nghiệp:
 
 Một cuộc gọi thoại qua trình duyệt web không hoạt động đơn lẻ mà là sự phối hợp chặt chẽ giữa 5 thành phần kiến trúc:
 
-```
-+-----------------------------------------------------------------------------------+
-| TRÌNH DUYỆT CỦA NHÂN VIÊN (CRM / ERP Frontend)                                    |
-|                                                                                   |
-|  +--------------------+    (1) Báo hiệu SIP qua WSS       +--------------------+  |
-|  | SIP Client (Web)   | ================================> | SIP Proxy / SBC    |  |
-|  | (JsSIP / Widget)   | <================================ | (Cổng WSS: 4433)   |  |
-|  +--------------------+                                   +--------------------+  |
-|            ||                                                       ||            |
-|            || (2) Luồng thoại âm thanh hai chiều (RTP Media)        ||            |
-|            =========================================================++            |
-|                                                                     ||            |
-+---------------------------------------------------------------------||------------+
-                                                                      ||
-                                                    +----------------------------------+
-                                                    | HẠ TẦNG TỔNG ĐÀI PBX ODS         |
-                                                    | - Định tuyến cuộc gọi & ghi âm   |
-                                                    | - Kết nối mạng viễn thông (PSTN) |
-                                                    +----------------------------------+
-                                                                      ||
-                                                    +----------------------------------+
-                                                    | ĐẦU CUỐI CUỘC GỌI                |
-                                                    | - Khách hàng (Di động / Cố định) |
-                                                    | - Máy nhánh nội bộ khác          |
-                                                    +----------------------------------+
-```
+<WebrtcArchitectureDiagram />
 
 ### Vai trò của từng thành phần:
 

@@ -1,77 +1,138 @@
 ---
-title: Mất ghi âm
-description: Runbook L1 phân biệt cuộc gọi không có CDR, không được ghi âm hoặc file ghi âm chưa xuất hiện trên Portal.
+title: Thiếu file ghi âm cuộc gọi
+description: Runbook L1 tiếp nhận, phân loại chính sách ghi âm, đối soát trạng thái CDR và kiểm tra sự cố không tìm thấy file ghi âm trên Portal ODS.
 ---
 
-<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
-  Không cam kết khôi phục file trước khi xác định file có từng được tạo hay không. Không tải/chia sẻ ghi âm ra kênh ngoài ticket đã được phép.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Phạm vi L1
+Áp dụng khi người dùng hoặc giám sát viên phản ánh **không tìm thấy file ghi âm của cuộc gọi trên Portal**:
+- Cuộc gọi có phát sinh và hiển thị trong lịch sử CDR nhưng cột Ghi âm không có biểu tượng nút Nghe/Tải.
+- Một số cuộc gọi có file ghi âm đầy đủ, nhưng một số cuộc gọi khác lại hoàn toàn không có ghi âm.
+- Cuộc gọi vừa kết thúc nhưng tìm kiếm không thấy file ghi âm xuất hiện ngay lập tức.
 
-Áp dụng khi khách hàng tìm thấy hoặc không tìm thấy cuộc gọi nhưng không thấy nút/file ghi âm tương ứng.
+### Phân biệt với các sự cố gần giống
+- **File ghi âm có hiển thị nút Play nhưng bấm vào báo lỗi hoặc quay tròn**: Xem [Không nghe / tải được ghi âm](/internal/ai-contact-center/runbooks/recordings/playback-failed).
+- **Cuộc gọi hoàn toàn không có bản ghi trong lịch sử**: Xem [Lệch số liệu báo cáo](/internal/ai-contact-center/runbooks/portal/report-mismatch).
 
-## Triệu chứng
+---
 
-- Có CDR nhưng không có biểu tượng hoặc đường dẫn ghi âm.
-- Một số cuộc gọi có ghi âm, một số cuộc gọi không có.
-- Ghi âm xuất hiện chậm hoặc mất theo một khoảng thời gian/nhóm máy nhánh.
+## 2. Tiếp nhận và kiểm tra nhanh
 
-### Phân nhánh nhanh
+L1 cần nhanh chóng xác định điều kiện phát sinh cuộc gọi và chính sách ghi âm (Recording Policy):
 
-| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
-| --- | --- | --- |
-| Không có CDR | Chưa thể kết luận lỗi recording | Chuyển sang kiểm tra luồng gọi hoặc dữ liệu CDR |
-| Có CDR nhưng cuộc gọi không được trả lời | Có thể không thuộc điều kiện tạo recording | Đối chiếu recording policy đã được xác nhận |
-| Có CDR, có thời lượng thoại, chỉ một route không có file | Có thể policy/MixMonitor không áp dụng đúng route | Lấy mẫu đối chứng cùng extension và chuyển L2 |
-| File xuất hiện sau một khoảng trễ | Có thể là processing/upload hậu kỳ | Ghi nhận thời gian trễ và so với SLA đã duyệt |
-| Nhiều tenant cùng mất recording | Có thể là storage hoặc processing diện rộng | Dừng thay đổi quyền/filter và chuyển cấp ngay |
+| Dấu hiệu quan sát | Nguyên nhân cốt lõi | Hướng xử lý L1 |
+| :--- | :--- | :--- |
+| **Cuộc gọi không có người bắt máy (`NO ANSWER`, `BUSY`, `FAILED`)** | Theo mặc định, tổng đài chỉ ghi âm các cuộc gọi kết nối đàm thoại thành công (`ANSWERED`). Cuộc gọi nhỡ hoặc bận không tạo file ghi âm. | Giải thích chính sách ghi âm cho khách hàng. |
+| **Cuộc gọi nội bộ giữa 2 máy nhánh** | Cấu hình tenant có thể chỉ bật ghi âm cho cuộc gọi ra/vào từ bên ngoài, không bật ghi âm cuộc gọi nội bộ (Internal Call). | Kiểm tra chính sách ghi âm của tenant trên Portal. |
+| **Cuộc gọi vừa mới kết thúc cách đây 1 - 2 phút** | File âm thanh đang trong tiến trình ghép luồng (MixMonitor), nén file (MP3/WAV) và tải lên cụm lưu trữ (Cloud Storage / S3). | Hướng dẫn khách hàng đợi vài phút rồi tải lại trang. |
+| **Cuộc gọi đàm thoại trên 1 phút nhưng mất ghi âm hàng loạt** | Sự cố dịch vụ xử lý ghi âm (Recording Service) hoặc cụm lưu trữ bị đầy dung lượng. | **Chuyển cấp khẩn cấp L2 / Hạ tầng Core.** |
 
-## Cần hỏi khách hàng
+---
 
-- Tenant, Call-ID hoặc số gọi/số nhận đã che dữ liệu, thời điểm/múi giờ.
-- Hướng gọi, máy nhánh/queue và cuộc gọi có kết nối đàm thoại không.
-- Một hay nhiều cuộc gọi bị ảnh hưởng; khoảng thời gian bắt đầu/kết thúc.
-- Người dùng có quyền xem ghi âm và trước đây có xem được không.
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra L1
+Thu thập thông tin theo 2 nhóm:
 
-1. Tìm CDR bằng Call-ID/thời điểm; nếu không có CDR, xử lý như lỗi luồng gọi/dữ liệu.
-2. Xác nhận cuộc gọi đã trả lời và có thời lượng thoại; cuộc gọi không kết nối có thể không tạo ghi âm.
-3. Kiểm tra bộ lọc, tenant, quyền người dùng và trạng thái hiển thị ghi âm.
-4. So sánh một cuộc gọi có ghi âm và một cuộc gọi lỗi cùng máy nhánh/queue.
-5. Ghi nhận độ trễ từ khi cuộc gọi kết thúc tới lúc file xuất hiện; không tự đặt SLA.
+### Thông tin tối thiểu bắt buộc
+1. **Mã cuộc gọi mẫu (`[CALL_ID]`):** Mã cuộc gọi cụ thể bị thiếu file ghi âm?
+2. **Số máy nhánh & Số đối phương:** Cuộc gọi diễn ra giữa hai số nào?
+3. **Mốc thời gian & Thời lượng đàm thoại:** Cuộc gọi phát sinh lúc mấy giờ và đàm thoại trong bao lâu (ví dụ: đàm thoại 2 phút 15 giây)?
+4. **Phạm vi thiếu:** Thiếu trên 1 máy nhánh cụ thể hay tất cả các máy nhánh đều bị thiếu?
 
-## Xử lý trong phạm vi L1
+### Thông tin bổ sung (Hỏi khi cần)
+- Tài khoản người dùng đang đăng nhập có được phân quyền "Nghe/Tải ghi âm" không?
+- Dung lượng gói lưu trữ ghi âm của doanh nghiệp đã sử dụng bao nhiêu phần trăm?
 
-- Sửa bộ lọc/quyền hiển thị nếu có căn cứ và người thực hiện có thẩm quyền.
-- Chờ xử lý hậu kỳ trong khoảng thời gian do quy trình ODS xác nhận; không hứa thời gian khi chưa có SLA.
-- Nếu chỉ một kịch bản không ghi âm, ghi rõ route/queue/extension để L2 kiểm tra policy.
-- Không tạo file thay thế hoặc lấy ghi âm của cuộc gọi khác.
+---
 
-## Điểm dừng và chuyển cấp
+## 4. Checklist kiểm tra an toàn cho L1
 
-- Cuộc gọi đã trả lời, có CDR nhưng file không được tạo sau thời gian xử lý đã duyệt.
-- Nhiều cuộc gọi/tenant cùng mất ghi âm hoặc dung lượng lưu trữ có cảnh báo.
-- Cần kiểm tra recording policy, MixMonitor, storage, upload job hoặc database mapping.
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-## Dữ liệu chuyển cấp
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Tra cứu trạng thái cuộc gọi trên CDR** | L1 tra cứu | Tìm theo mã `[CALL_ID]` trên Portal | Trạng thái là `ANSWERED`, thời lượng > 0 | Trạng thái `NO ANSWER` / `BUSY`: Không tạo file ghi âm theo thiết kế. |
+| **2. Kiểm tra phân quyền tài khoản (Permission)** | L1 tra cứu | Xem quyền hạn của tài khoản khách hàng trên Portal | Tài khoản có quyền `View/Play Recording` | Bị tắt quyền xem ghi âm: Liên hệ quản trị viên tenant để cấp quyền. |
+| **3. Đối chiếu cấu hình ghi âm của máy nhánh** | L1 đối chiếu | Vào mục Cài đặt máy nhánh xem tùy chọn *Record Inbound / Record Outbound* | Đang bật trạng thái `Always` / `Yes` | Tùy chọn ghi âm bị tắt (`No`): Bật lại theo yêu cầu của quản trị viên. |
+| **4. Kiểm tra độ trễ xử lý file (Processing Delay)** | L1 theo dõi | Kiểm tra thời gian từ lúc gác máy đến thời điểm hiện tại | Đã qua hơn 5 - 10 phút | Vừa gác máy dưới 2 phút: Nhắc khách hàng đợi tiến trình hậu kỳ hoàn tất. |
+| **5. Kiểm tra dung lượng lưu trữ gói dịch vụ** | L1 tra cứu | Xem mục Thông tin thuê bao / Dung lượng lưu trữ | Dung lượng sử dụng chưa vượt định mức gói | **Dung lượng đã đầy 100%**: Tổng đài tự động ngừng ghi âm để bảo vệ hệ thống. |
 
-- Tenant, Call-ID, hướng gọi, máy nhánh/queue và thời điểm/múi giờ.
-- Kết quả CDR, thời lượng, quyền người dùng và một mẫu đối chứng hoạt động.
-- Phạm vi/thời gian ảnh hưởng; không đính kèm audio thật nếu chưa được phép.
+---
 
-## Trả lời mẫu
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-> **Tiếp nhận:** ODS đã ghi nhận chưa thấy ghi âm của cuộc gọi. Anh/chị vui lòng cung cấp Call-ID hoặc thời điểm, hướng gọi và máy nhánh; không gửi nội dung ghi âm qua kênh không được phép.
+1. **Khắc phục khi dung lượng lưu trữ bị đầy:**
+   - Nếu phát hiện gói cước lưu trữ của doanh nghiệp đã dùng hết 100%: Thông báo cho quản trị viên khách hàng nâng cấp dung lượng lưu trữ hoặc cấu hình tự động sao lưu đẩy về Cloud riêng (Google Drive / S3 / FTP cá nhân).
 
-> **Chuyển cấp:** Cuộc gọi có CDR nhưng file ghi âm chưa xuất hiện. ODS đã chuyển đội chuyên trách kiểm tra luồng tạo và lưu trữ file.
+2. **Kích hoạt lại tính năng ghi âm cho máy nhánh:**
+   - Nếu máy nhánh vô tình bị tắt tính năng ghi âm trong mục cấu hình: Hướng dẫn quản trị viên khách hàng tự vào mục Quản lý máy nhánh, chuyển cài đặt *Ghi âm cuộc gọi* sang chế độ **Luôn luôn (Always)** và lưu lại.
 
-## Nguyên nhân thường gặp và tra cứu
+3. **Hướng dẫn tra cứu đúng bộ lọc:**
+   - Nhiều trường hợp khách hàng lọc nhầm khoảng thời gian hoặc lọc máy nhánh khác nên không thấy file: Hướng dẫn nhập trực tiếp số điện thoại đối phương vào ô tìm kiếm nhanh.
 
-- Cuộc gọi không được trả lời, sai bộ lọc/quyền hoặc file đang xử lý hậu kỳ.
-- Policy ghi âm không áp dụng cho route; lỗi storage/upload/mapping cần L2.
+---
 
-- [Lịch sử cuộc gọi](/docs/ai-contact-center/portal/tong-dai/lich-su-cuoc-goi)
-- [Không nghe / tải được ghi âm](/internal/ai-contact-center/runbooks/recordings/playback-failed)
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket lên L2 / Kỹ sư Hạ tầng Lưu trữ (Storage Team) khi:
+
+- [ ] **Cuộc gọi có đàm thoại, đã qua hơn 30 phút nhưng không có file ghi âm:** Cần kiểm tra tiến trình `MixMonitor` và script upload file từ PBX lên máy chủ lưu trữ.
+- [ ] **Thiếu ghi âm diện rộng:** Toàn bộ cuộc gọi của tất cả máy nhánh trong một khoảng thời gian nhất định đều không có ghi âm.
+- [ ] **Lỗi phân quyền hệ thống:** Quản trị viên cấp cao nhất của tenant cũng không thấy biểu tượng ghi âm trên các cuộc gọi đàm thoại thành công.
+- [ ] **Cần khôi phục file từ thư mục tạm của PBX:** Cần truy vết file âm thanh thô (`.wav`) còn lưu trên bộ nhớ đệm máy chủ tổng đài.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Thiếu file ghi âm cuộc gọi (Missing Call Recording)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+- Phạm vi: [1 máy nhánh cụ thể / Toàn bộ cuộc gọi của tenant]
+
+[CHI TIẾT CUỘC GỌI MẪU]:
+- Mã cuộc gọi (Call-ID): [CALL_ID]
+- Máy nhánh: [EXT] - Số đối phương: [PHONE_NUMBER]
+- Trạng thái trên CDR: [ANSWERED] - Thời lượng đàm thoại: [02:30]
+- Thời điểm cuộc gọi kết thúc: [HH:MM:SS] (Đã qua hơn 30 phút)
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Cấu hình máy nhánh: [Đã bật Always Record]
+2. Phân quyền tài khoản: [Có quyền nghe/tải ghi âm]
+3. Dung lượng lưu trữ: [Mới sử dụng 45%, còn trống nhiều]
+
+[NỘI DUNG CẦN L2 / STORAGE TEAM HỖ TRỢ]:
+- Kiểm tra log tiến trình MixMonitor của cuộc gọi [CALL_ID].
+- Kiểm tra file âm thanh tạm trên PBX Core có được đồng bộ lên Cloud Storage không.
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và xin thông tin
+> *"Dạ ODS đã tiếp nhận thông tin về việc chưa tìm thấy file ghi âm của cuộc gọi. Để hỗ trợ tra soát trên hệ thống lưu trữ, anh/chị vui lòng cung cấp giúp em mã cuộc gọi (hoặc số máy nhánh, số điện thoại và mốc thời gian cuộc gọi kết thúc) để em kiểm tra chi tiết nhé ạ. Em cảm ơn anh/chị!"*
+
+### Mẫu 2: Giải thích về cuộc gọi không đàm thoại / độ trễ xử lý
+> *"Dạ qua kiểm tra cuộc gọi [CALL_ID], cuộc gọi này có trạng thái là Người nhận không bắt máy (No Answer) / hoặc vừa mới kết thúc cách đây 1 phút. Theo quy chuẩn hệ thống, các cuộc gọi không phát sinh đàm thoại sẽ không tạo file ghi âm; đối với cuộc gọi vừa kết thúc, anh/chị vui lòng đợi khoảng 3 - 5 phút để hệ thống hoàn tất tiến trình mã hóa và tải file lên giao diện nhé ạ."*
+
+### Mẫu 3: Thông báo chuyển cấp chuyên sâu
+> *"Dạ em đã kiểm tra cuộc gọi [CALL_ID] có thời lượng đàm thoại đầy đủ và cấu hình ghi âm của máy nhánh đang hoạt động bình thường. Do file âm thanh đang bị chậm đồng bộ từ máy chủ tổng đài lên cổng lưu trữ, em đã chuyển thông tin tới đội ngũ Kỹ sư Hạ tầng để truy xuất và cập nhật lại file ngay cho mình ạ."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Kiểm tra sự xuất hiện của file:** Tải lại trang Lịch sử cuộc gọi, xác nhận biểu tượng nút Play hoặc Download đã hiển thị tại dòng cuộc gọi mẫu.
+2. **Nghe thử kiểm chứng:** Bấm phát đoạn ghi âm, xác nhận âm thanh rõ ràng, nghe được tiếng đàm thoại của cả 2 bên.
+3. **Kiểm tra các cuộc gọi tiếp theo:** Thực hiện một cuộc gọi mới và xác nhận sau khi kết thúc 3-5 phút, file ghi âm xuất hiện tự động bình thường.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Máy nhánh 108 gọi ra không thấy file ghi âm | Máy nhánh bị cấu hình nhầm Record Outbound = No | Chuyển cài đặt Record Outbound sang Yes | Các cuộc gọi sau có file ghi âm đầy đủ | `#TK-EXAMPLE` |
 

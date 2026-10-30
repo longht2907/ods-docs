@@ -171,20 +171,7 @@ window.addEventListener('odsphone:ready', async (event) => {
 
 ### Luồng khởi tạo và đăng nhập có điều kiện:
 
-```
-[1. Khai báo ODS_CONFIG] ──► [2. Nạp odsphone.js] ──► [3. Sự kiện odsphone:ready]
-                                                                  │
-                                       ┌──────────────────────────┴──────────────────────────┐
-                                       ▼                                                     ▼
-                           [Phương án A: Nhập tay]                                [Phương án B: Auto-Login]
-                            Nhân viên gõ Ext/Pass                                  Kiểm tra quyền programmaticLogin
-                            trực tiếp trong iframe                                 Gọi phone.login({ ext, pass, serverName })
-                                       │                                                     │
-                                       └──────────────────────────┬──────────────────────────┘
-                                                                  ▼
-                                                      [SIP Registered thành công]
-                                                      Bàn phím chuyển trạng thái Trực tuyến
-```
+<OdsphoneWidgetFlow />
 
 ### Ranh giới an toàn thông tin
 - **Đối với Phương án A**: Nhân viên nhập mật khẩu trực tiếp vào khung iframe được phục vụ từ `https://webphone.ods.vn` (khác origin với CRM). Mã JavaScript trên CRM không thể tiếp cận hay đọc được mật khẩu này.

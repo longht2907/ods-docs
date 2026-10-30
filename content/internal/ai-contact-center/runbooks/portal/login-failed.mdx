@@ -1,76 +1,139 @@
 ---
-title: Không đăng nhập được
-description: Runbook L1 xử lý người dùng không đăng nhập được Portal ODS mà không thu thập mật khẩu.
+title: Không đăng nhập được Portal
+description: Runbook L1 tiếp nhận, phân loại lỗi xác thực, xử lý an toàn và chuyển cấp sự cố người dùng không đăng nhập được Portal ODS.
 ---
 
-<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
-  Tuyệt đối không yêu cầu khách hàng gửi password, OTP hoặc token. Chỉ mở khóa/reset theo quy trình xác thực người yêu cầu và quyền thao tác được Human duyệt.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Phạm vi L1
+Áp dụng khi người dùng hoặc quản trị viên phản ánh **không thể truy cập hoặc đăng nhập vào Portal quản trị ODS**:
+- Truy cập đường link Portal báo lỗi màn hình trắng, trang tải vô tận (loading loop) hoặc lỗi trình duyệt (`ERR_CONNECTION_REFUSED`, `502 Bad Gateway`).
+- Nhập thông tin đăng nhập nhưng hệ thống báo lỗi: *"Tài khoản hoặc mật khẩu không chính xác"*, *"Tài khoản đã bị tạm khóa do nhập sai nhiều lần"*, hoặc *"Tài khoản không tồn tại"*.
+- Đăng nhập thành công nhưng giao diện hiển thị sai doanh nghiệp (sai tenant) hoặc thiếu toàn bộ các menu chức năng được giao.
 
-Áp dụng khi Portal không mở, đăng nhập bị từ chối, tài khoản bị khóa hoặc người dùng vào được nhưng không thấy đúng doanh nghiệp/chức năng.
+### Phân biệt với các sự cố gần giống
+- **Máy nhánh softphone không kết nối được vào tổng đài**: Xem [Máy nhánh không đăng ký được](/internal/ai-contact-center/runbooks/extensions/registration-failed).
+- **Đăng nhập được Portal nhưng số liệu báo cáo hiển thị sai**: Xem [Lệch dữ liệu báo cáo](/internal/ai-contact-center/runbooks/portal/report-mismatch).
 
-## Triệu chứng
+---
 
-- Trang không tải, redirect lặp, màn hình trắng hoặc lỗi trình duyệt.
-- Portal báo sai thông tin đăng nhập, tài khoản không tồn tại/bị khóa.
-- Đăng nhập thành công nhưng sai tenant hoặc thiếu menu/quyền.
+## 2. Tiếp nhận và kiểm tra nhanh
 
-### Phân nhánh nhanh
+L1 cần phân biệt nhanh giữa lỗi tài khoản cục bộ và lỗi máy chủ Portal:
 
-| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
-| --- | --- | --- |
-| Portal không mở trên nhiều tài khoản/mạng | Có thể là lỗi DNS, TLS hoặc dịch vụ | Ghi nhận URL, thời điểm, mã lỗi và chuyển đội ứng dụng |
-| Chỉ một tài khoản bị từ chối | Account, trạng thái khóa hoặc thông tin đăng nhập | Xác minh username và dùng luồng reset chính thức nếu đủ điều kiện |
-| Cửa sổ riêng tư đăng nhập được | Cache, cookie hoặc extension trình duyệt | Xóa riêng site data của Portal và thử lại |
-| Đăng nhập được nhưng thiếu menu | Vấn đề role/permission, không phải authentication | Chuyển quản trị tenant hoặc đội có quyền phân quyền |
-| Đăng nhập vào sai doanh nghiệp | Sai tenant hoặc mapping tài khoản | Không chỉnh thủ công; ghi tenant hiện tại/mong đợi và chuyển cấp |
+| Tình huống phân loại | Nhận định ban đầu | Hướng xử lý L1 |
+| :--- | :--- | :--- |
+| **Trang Portal không mở được trên mọi máy tính/mạng** | Sự cố dịch vụ Web Portal, DNS hoặc chứng chỉ SSL bị lỗi. | Kiểm tra trạng thái máy chủ Web và chuyển cấp khẩn cấp. |
+| **Chỉ 1 tài khoản báo sai mật khẩu** | Người dùng gõ nhầm mật khẩu, bật Caps Lock, hoặc quên mật khẩu. | Hướng dẫn tính năng "Quên mật khẩu" hoặc liên hệ Admin nội bộ. |
+| **Mở tab ẩn danh (Incognito) thì đăng nhập được** | Trình duyệt bị kẹt Cookie, Cache cũ hoặc xung đột Extension. | Hướng dẫn xóa Cookie/Cache riêng của trang Portal. |
+| **Đăng nhập vào được nhưng không có menu** | Tài khoản chưa được gán quyền (Role/Permission) phù hợp. | Quản trị viên tenant tự phân quyền lại trên Portal. |
 
-## Cần hỏi khách hàng
+---
 
-- URL đang truy cập, email/username (không gửi password), thời điểm và ảnh lỗi.
-- Trình duyệt/thiết bị; một hay nhiều tài khoản bị ảnh hưởng.
-- Có đổi mật khẩu, nhân sự, quyền hoặc tenant gần đây không.
-- Lỗi trên mọi mạng/trình duyệt hay chỉ một môi trường.
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra L1
+Thu thập thông tin theo 2 nhóm:
 
-1. Xác nhận đúng URL Portal và tình trạng truy cập Internet/DNS.
-2. Kiểm tra lỗi trên cửa sổ riêng tư hoặc trình duyệt được hỗ trợ để loại trừ cache/extension.
-3. Xác nhận Caps Lock, layout bàn phím và thời gian thiết bị; không quan sát password.
-4. Kiểm tra trạng thái tài khoản/tenant/quyền bằng công cụ L1 được cấp phép.
-5. Khoanh vùng một tài khoản, một tenant hay nhiều khách hàng.
+### Thông tin tối thiểu bắt buộc
+1. **Tên đăng nhập / Email (`[USERNAME]`):** Tài khoản cụ thể nào đang không đăng nhập được (không xin mật khẩu)?
+2. **Đường dẫn URL Portal:** Đường dẫn website đang truy cập (ví dụ: `https://portal.cloudfone.vn`)?
+3. **Thông báo lỗi chính xác:** Màn hình hiển thị câu chữ gì hoặc ảnh chụp màn hình thông báo lỗi?
+4. **Phạm vi:** Chỉ 1 nhân viên bị hay tất cả mọi người trong công ty đều bị?
 
-## Xử lý trong phạm vi L1
+### Thông tin bổ sung (Hỏi khi cần)
+- Người dùng đang dùng trình duyệt gì (Google Chrome, Microsoft Edge, Safari, Cốc Cốc)?
+- Khách hàng có vừa đổi mật khẩu gần đây không?
 
-- Xóa dữ liệu site riêng của Portal hoặc thử cửa sổ riêng tư; không xóa toàn bộ dữ liệu trình duyệt nếu chưa cần.
-- Hướng dẫn dùng luồng quên mật khẩu chính thức nếu Portal có hỗ trợ và người dùng đã được xác thực.
-- Chuyển người quản trị tenant khi vấn đề là quyền/menu, không tự cấp quyền.
-- Không mở khóa/reset thủ công ngoài quy trình đã duyệt.
+---
 
-## Điểm dừng và chuyển cấp
+## 4. Checklist kiểm tra an toàn cho L1
 
-- Nhiều tài khoản/tenant không truy cập được hoặc Portal trả 5xx/redirect loop.
-- Tài khoản đúng nhưng trạng thái/quyền không đồng bộ.
-- Cần mở khóa, thay email, đổi tenant hoặc truy vết authentication log.
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-## Dữ liệu chuyển cấp
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra trạng thái máy chủ Portal** | L1 thực hiện | Mở đường link Portal bằng trình duyệt nội bộ | Trang đăng nhập hiển thị mượt mà, SSL hợp lệ | Trang báo lỗi 502/504 hoặc không tải được: Sự cố hạ tầng Web Portal diện rộng. |
+| **2. Thử nghiệm trên Cửa sổ ẩn danh** | Khách hàng | Mở cửa sổ ẩn danh (Ctrl + Shift + N trên Chrome) và đăng nhập lại | Đăng nhập thành công | **Do Cache/Cookie trình duyệt**: Hướng dẫn xóa lịch sử duyệt web của riêng trang Portal. |
+| **3. Kiểm tra bàn phím & Caps Lock** | Khách hàng | Gõ mật khẩu ra file Notepad kiểm tra xem có dính phím hoa/bộ gõ tiếng Việt Telex không | Mật khẩu chuẩn, không nhảy ký tự lạ | Bộ gõ tiếng Việt làm biến dạng ký tự mật khẩu: Tắt gõ tiếng Việt khi nhập pass. |
+| **4. Kiểm tra trạng thái tài khoản trên hệ thống** | L1 tra cứu | Tìm theo username trên công cụ quản trị ODS | Tài khoản `Active`, đúng Tenant ID | Tài khoản bị `Locked` (khóa do nhập sai) hoặc `Disabled`: Mở khóa theo quy trình nếu có yêu cầu hợp lệ. |
+| **5. Đối chiếu phân quyền (Role & Permission)** | L1 tra cứu | Xem nhóm quyền của tài khoản trên hệ thống | Đã được gán Role (VD: Agent, Supervisor, Admin) | Tài khoản chưa gán bất kỳ Role nào: Báo Quản trị viên tenant gán quyền. |
 
-- URL, email/username, tenant, thời điểm/múi giờ và mã lỗi/Request ID.
-- Trình duyệt/OS, kết quả cửa sổ riêng tư/mạng khác và phạm vi ảnh hưởng.
-- Screenshot phải che token, cookie và dữ liệu khách hàng khác.
+---
 
-## Trả lời mẫu
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-> **Tiếp nhận:** ODS đã ghi nhận anh/chị chưa đăng nhập được Portal. Vui lòng gửi URL, email đăng nhập, thời điểm và ảnh lỗi; không gửi password hoặc OTP.
+1. **Hướng dẫn xóa Cache & Cookie riêng của Portal:**
+   - Trên Chrome/Edge: Bấm vào biểu tượng ổ khóa bên trái URL -> Chọn *Dữ liệu trang web (Cookies and site data)* -> Bấm *Xóa dữ liệu (Clear)* -> Tải lại trang (F5).
+   - Tránh việc khách hàng xóa toàn bộ lịch sử duyệt web làm mất mật khẩu các trang web khác.
 
-> **Chuyển cấp:** Kiểm tra trình duyệt và tài khoản cơ bản đã hoàn tất. ODS đã chuyển đội chuyên trách kiểm tra trạng thái xác thực/quyền của tài khoản.
+2. **Sử dụng chức năng "Quên mật khẩu":**
+   - Hướng dẫn người dùng bấm vào dòng chữ *"Quên mật khẩu?"* tại màn hình đăng nhập, nhập email đã đăng ký để hệ thống tự động gửi link đặt lại mật khẩu an toàn.
 
-## Nguyên nhân thường gặp và tra cứu
+3. **Mở khóa tài khoản bị khóa tạm thời (Nếu L1 có quyền):**
+   - Nếu tài khoản bị khóa do nhập sai quá 5 lần: Sau khi xác minh đúng nhân sự của khách hàng, L1 hỗ trợ bấm nút Mở khóa (Unlock) trên hệ thống quản trị để người dùng thử lại.
 
-- Sai URL/thông tin đăng nhập, cache/extension, tài khoản khóa hoặc quyền tenant thay đổi.
-- Sự cố Portal/authentication diện rộng cần đội ứng dụng xử lý.
+---
 
-- [Truy cập Portal ODS](/docs/ai-contact-center/portal)
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket lên L2 / Đội phát triển Web Portal khi:
+
+- [ ] **Màn hình Portal bị lỗi 500 / 502 diện rộng:** Toàn bộ khách hàng không thể mở được trang đăng nhập.
+- [ ] **Vòng lặp chuyển hướng (Redirect Loop):** Đăng nhập thành công nhưng trình duyệt bị chuyển hướng liên tục giữa trang Login và Dashboard không dừng.
+- [ ] **Tài khoản bị sai Tenant:** Đăng nhập vào nhưng thông tin hiển thị là của một công ty hoàn toàn khác (sự cố bảo mật phân vùng dữ liệu nghiêm trọng).
+- [ ] **Lỗi dịch vụ gửi mail OTP / Đặt lại mật khẩu:** Hệ thống không gửi được email đặt lại mật khẩu về hòm thư người dùng.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Không đăng nhập được Portal ODS (Portal Login Failed)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- URL Portal: [https://portal.cloudfone.vn]
+- Tài khoản bị ảnh hưởng: [email@example.com]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[CHI TIẾT LỖI]:
+- Thông báo hiển thị: [Tài khoản không tồn tại / 502 Bad Gateway / Redirect loop]
+- Trình duyệt & Thiết bị: [Chrome v120 trên Windows 11]
+- Đã thử trên Cửa sổ ẩn danh: [Vẫn bị lỗi tương tự]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Trạng thái tài khoản trên hệ thống: [Đang Active / Đang bị Locked]
+2. Phân quyền Role: [Đã gán quyền Supervisor]
+3. Thử nghiệm từ mạng khác: [Dùng 4G vẫn gặp lỗi tương tự]
+
+[NỘI DUNG CẦN L2 / WEB TEAM HỖ TRỢ]:
+- Kiểm tra log xác thực authentication của tài khoản [email@example.com].
+- Kiểm tra trạng thái cụm máy chủ Web Portal tại thời điểm [HH:MM].
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và xin thông tin
+> *"Dạ ODS đã tiếp nhận thông tin về việc chưa đăng nhập được vào Portal quản trị. Để hỗ trợ kiểm tra tài khoản nhanh nhất, anh/chị vui lòng chia sẻ giúp em: Tên đăng nhập (hoặc email) của mình và ảnh chụp màn hình câu thông báo lỗi hiển thị trên trang nhé ạ. Lưu ý mình không gửi mật khẩu qua đây giúp em nha. Em cảm ơn anh/chị!"*
+
+### Mẫu 2: Hướng dẫn mở tab ẩn danh / quên mật khẩu
+> *"Dạ anh/chị thử mở một Cửa sổ ẩn danh mới (bằng cách nhấn tổ hợp phím Ctrl + Shift + N trên trình duyệt Chrome) rồi truy cập lại Portal đăng nhập thử giúp em nhé ạ. Nếu mình quên mật khẩu, anh/chị có thể bấm trực tiếp vào nút 'Quên mật khẩu' ngay dưới khung đăng nhập để hệ thống gửi link tạo lại mật khẩu về email của mình nha."*
+
+### Mẫu 3: Thông báo chuyển cấp chuyên sâu
+> *"Dạ em đã kiểm tra trạng thái tài khoản của mình trên hệ thống quản trị. Do lỗi phát sinh từ tiến trình xác thực bảo mật của trang web, em đã chuyển thông tin tới đội ngũ Kỹ sư Phần mềm Portal để xử lý luồng đăng nhập ngay cho mình ạ."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Đăng nhập thử nghiệm thành công:** Người dùng nhập thông tin và truy cập vào trang Dashboard bình thường.
+2. **Kiểm tra đầy đủ menu chức năng:** Xác nhận các thanh điều hướng, lịch sử cuộc gọi và máy nhánh hiển thị đúng theo quyền hạn.
+3. **Kiểm tra tính năng đăng xuất / đăng nhập lại:** Đảm bảo phiên đăng nhập duy trì ổn định, không bị văng ra ngoài bất ngờ.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Đăng nhập báo sai mật khẩu liên tục | Khách hàng bật bộ gõ Telex làm ký tự mật khẩu có dấu (VD: aa thành â) | Hướng dẫn tắt bộ gõ tiếng Việt khi nhập mật khẩu | Đăng nhập thành công ngay lập tức | `#TK-EXAMPLE` |
 

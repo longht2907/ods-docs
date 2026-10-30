@@ -1,0 +1,139 @@
+---
+title: CRM không hiện popup cuộc gọi
+description: Runbook L1 tiếp nhận, kiểm tra cài đặt chặn Pop-up trên trình duyệt Chrome/Edge, độ trễ Webhook/CTI và xử lý sự cố màn hình CRM không tự bật thông tin khách hàng.
+---
+
+## 1. Khi nào dùng bài này?
+
+Áp dụng khi điện thoại viên hoặc doanh nghiệp tích hợp hệ thống CRM (HubSpot, Salesforce, Zoho, CRM tự phát triển) phản ánh **không tự động mở cửa sổ thông tin khách hàng khi có cuộc gọi đến (Screen Pop / Inbound Popup)**:
+- Điện thoại bàn hoặc softphone đổ chuông, điện thoại viên bấm nghe máy nhưng trên màn hình máy tính **không xuất hiện bất kỳ cửa sổ pop-up nào**.
+- Nhân viên phải tự gõ số điện thoại của khách hàng vào ô tìm kiếm của CRM thủ công làm mất thời gian tra cứu.
+- Hiện tượng chỉ xảy ra trên một số máy tính của nhân viên nhất định, trong khi nhân viên khác ngồi cạnh vẫn bật pop-up bình thường.
+
+### Phân biệt với các sự cố gần giống
+- **Máy chủ CRM hoàn toàn không nhận được gói tin Webhook cuộc gọi**: Xem [Không nhận được Webhook sự kiện](/internal/ai-contact-center/runbooks/integrations/webhook-not-received).
+- **Lỗi gọi các API tương tác ODS**: Xem [Lỗi tích hợp API](/internal/ai-contact-center/runbooks/integrations/api-errors).
+- **Điện thoại không đổ chuông cuộc gọi đến**: Xem [Không nhận được cuộc gọi đến](/internal/ai-contact-center/runbooks/calls/inbound-failed).
+
+---
+
+## 2. Tiếp nhận và kiểm tra nhanh
+
+Khi tiếp nhận phản ánh, L1 phân loại nhanh theo 3 nguyên nhân kỹ thuật phổ biến:
+
+| Hiện tượng quan sát | Nguyên nhân kỹ thuật cốt lõi | Hướng xử lý nhanh L1 |
+| :--- | :--- | :--- |
+| **Góc phải thanh địa chỉ trình duyệt có icon dấu X đỏ** | Trình duyệt Chrome/Edge/Cốc Cốc đang bật tính năng **Chặn cửa sổ bật lên (Pop-up blocked)**. | Bấm vào icon và chọn *"Luôn cho phép cửa sổ bật lên từ trang web này"*. |
+| **Pop-up bật lên sau khi đã cúp máy (Trễ 5 - 10 giây)** | Máy chủ CRM của khách hàng xử lý Webhook quá chậm hoặc hạ tầng mạng văn phòng bị trễ (Webhook Latency cao). | Hướng dẫn IT đối tác tối ưu hóa kiến trúc nhận Webhook bất đồng bộ. |
+| **Không bật pop-up và tab CRM báo lỗi đăng nhập** | Phiên làm việc (Session Token / JWT) của nhân viên trên trang CRM đã bị hết hạn. | Đăng xuất và đăng nhập lại vào phần mềm CRM. |
+
+---
+
+## 3. Thông tin cần hỏi khách hàng
+
+Thu thập thông tin theo 2 nhóm:
+
+### Thông tin tối thiểu bắt buộc
+1. **Số máy nhánh bị lỗi (`[EXT]`):** Máy nhánh nào không bật được pop-up trên màn hình?
+2. **Trình duyệt đang sử dụng:** Google Chrome, Microsoft Edge, Cốc Cốc hay Safari (kèm phiên bản)?
+3. **Mã cuộc gọi mẫu (`[CALL_ID]`):** Cuộc gọi gần nhất vừa thử nghiệm mà không hiện pop-up?
+4. **Góc trên bên phải thanh địa chỉ (URL) trình duyệt:** Có xuất hiện biểu tượng chiếc cửa sổ nhỏ kèm dấu X đỏ hoặc thông báo *"Đã chặn cửa sổ bật lên"* không?
+
+---
+
+## 4. Checklist kiểm tra an toàn cho L1
+
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
+
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra quyền Pop-up trình duyệt** | Khách hàng | Nhìn vào góc phải thanh URL hoặc vào `chrome://settings/content/popups` | Cho phép trang web mở Pop-up (`Allowed`) | **Bị chặn (Blocked)**: Trình duyệt chủ động ngăn chặn mở cửa sổ mới ➔ Mở quyền Allow. |
+| **2. Tra cứu Webhook Delivery Log** | L1 tra cứu | Xem lịch sử gửi Webhook của tenant trên Portal ODS | Có bản ghi gửi sự kiện `RINGING`, HTTP `200 OK` | Gửi thất bại hoặc nhận mã `500`: Lỗi từ máy chủ backend của khách hàng. |
+| **3. Kiểm tra độ trễ phản hồi Webhook** | L1 đọc log | Xem thời gian phản hồi (Response Time) của máy chủ CRM | Phản hồi dưới 500ms | Phản hồi trên 3 - 5 giây: Lệnh mở pop-up bị trễ hoặc bị trình duyệt hủy. |
+| **4. Kiểm tra tiện ích mở rộng (Extension AdBlock)** | Khách hàng | Xem trình duyệt có cài phần mềm chặn quảng cáo (AdBlock, uBlock) không | Không bật trên trang CRM | Tiện ích chặn quảng cáo nhận nhầm pop-up là quảng cáo ➔ Tắt tiện ích trên trang CRM. |
+
+---
+
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
+
+<Steps>
+  <Step title="Mở khóa tính năng Chặn cửa sổ bật lên (Pop-up Blocked) trên trình duyệt">
+    Đây là nguyên nhân chiếm hơn **80% các trường hợp** nhân viên không thấy pop-up:
+    1. Khi đang ở trên tab trang web CRM, hướng dẫn nhân viên nhìn lên góc ngoài cùng bên phải của thanh địa chỉ (nơi gõ đường link trang web).
+    2. Quan sát thấy một biểu tượng chiếc cửa sổ nhỏ có dấu **X màu đỏ** (kèm dòng chữ *"Đã chặn cửa sổ bật lên"*).
+    3. Nhấp chuột vào biểu tượng đó ➔ Chọn tùy chọn: **"Luôn cho phép cửa sổ bật lên và liên kết chuyển hướng từ [ĐỊA_CHỈ_CRM]" (Always allow pop-ups)**.
+    4. Bấm nút **Xong (Done)**.
+    5. Nhấn phím **F5** để tải lại trang CRM và thực hiện cuộc gọi thử nghiệm.
+  </Step>
+
+  <Step title="Tắt tiện ích chặn quảng cáo (AdBlock) trên trang CRM">
+    - Nếu công ty cài đặt các extension chặn quảng cáo như AdBlock Plus, uBlock Origin:
+      + Bấm vào biểu tượng tiện ích trên thanh công cụ trình duyệt.
+      + Chọn tính năng **Tạm dừng / Tắt trên trang web này (Pause on this site)**.
+  </Step>
+
+  <Step title="Đăng nhập lại phiên làm việc CRM">
+    - Nếu nhân viên mở tab CRM qua đêm hoặc sau nhiều giờ không thao tác, token xác thực phiên làm việc có thể đã hết hạn.
+    - Hướng dẫn nhân viên đăng xuất hoàn toàn tài khoản CRM và đăng nhập lại để làm mới token phiên kết nối CTI/WebSocket.
+  </Step>
+</Steps>
+
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket cho L2 / Đội Tích hợp khi:
+
+- [ ] **Lỗi phía WebSocket CTI của ODS:** Nhân viên sử dụng widget nhúng ODSPhone nhưng tiến trình WebSocket báo lỗi mất kết nối `WebSocket connection to 'wss://...' failed`.
+- [ ] **Toàn bộ nhân viên của doanh nghiệp cùng bị mất Pop-up:** Phía ODS hoàn toàn không kích hoạt gửi sự kiện mở popup (sự cố dịch vụ Event Producer).
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Màn hình CRM không hiện Pop-up cuộc gọi đến (Screen Pop Issue)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Số máy nhánh: [EXT]
+- Phần mềm CRM sử dụng: [HubSpot / Salesforce / Zoho / CRM nội bộ]
+- Trình duyệt & Phiên bản: [Google Chrome v12X / Windows 11]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Quyền Pop-up trên trình duyệt: [Đã bật Always Allow]
+2. Tiện ích AdBlock: [Đã tắt trên trang CRM]
+3. Tra cứu Webhook Log ODS: [Có gửi sự kiện RINGING, mã HTTP 200 OK]
+4. Thử nghiệm trên máy khác: [Máy tính khác vẫn bị hiện tượng tương tự]
+
+[NỘI DUNG CẦN L2 / TÍCH HỢP HỖ TRỢ]:
+- Kiểm tra luồng CTI / WebSocket gửi lệnh Screen Pop tới Client máy nhánh [EXT].
+- Hỗ trợ đối soát log kết nối với đội ngũ lập trình viên CRM của khách hàng.
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu: Hướng dẫn mở quyền Pop-up trên trình duyệt
+> *"Dạ để màn hình CRM tự động bật thông tin khách hàng khi có cuộc gọi đến, anh/chị thao tác mở quyền trên trình duyệt giúp em nhé ạ:
+> 1. Mình nhìn lên thanh địa chỉ của trang web (góc trên bên phải).
+> 2. Nếu thấy biểu tượng chiếc cửa sổ có dấu X đỏ thông báo 'Đã chặn cửa sổ bật lên', mình nhấp chuột vào đó.
+> 3. Chọn dòng 'Luôn cho phép cửa sổ bật lên từ trang web này' rồi bấm Xong.
+> 4. Mình bấm phím F5 để tải lại trang CRM rồi em dùng số khác gọi thử vào máy nhánh để mình kiểm tra xem màn hình đã tự động bật thông tin khách hàng chưa nha!"*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Pop-up bật tức thì:** Dùng số điện thoại khác gọi vào máy nhánh ➔ Ngay khi điện thoại đổ chuông hồi đầu tiên, trên màn hình máy tính tự động bật cửa sổ thông tin khách hàng mà không cần bấm phím.
+2. **Hiển thị đúng dữ liệu:** Cửa sổ pop-up hiển thị chính xác số điện thoại và lịch sử giao dịch của người gọi đến.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Nhân viên mới vào không tự động bật cửa sổ khách hàng | Trình duyệt Chrome mới cài đặt mặc định chặn Pop-up | Bật Always allow pop-up trên Chrome | Pop-up bật tức thì khi có chuông reo | `#TK-POPUP-01` |
+| *Template* | Pop-up bị bật trễ sau khi đã kết thúc cuộc gọi | Endpoint webhook CRM xử lý đồng bộ quá nặng khiến latency > 6s | Khách chuyển sang nhận webhook bất đồng bộ đẩy vào queue | Pop-up hiển thị ngay trong giây đầu tiên | `#TK-LATENCY-02` |
+

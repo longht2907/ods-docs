@@ -1,0 +1,148 @@
+---
+title: Lệch kịch bản thời gian làm việc
+description: Runbook L1 tiếp nhận, kiểm tra khung giờ làm việc, ngày làm bù thứ 7, ngày lễ tết, lệch múi giờ UTC/GMT+7 và xử lý cuộc gọi rơi sai kịch bản Ngoài giờ.
+---
+
+## 1. Khi nào dùng bài này?
+
+Áp dụng khi khách hàng hoặc quản trị viên phản ánh **cuộc gọi đến hotline bị rơi sai kịch bản theo thời gian**:
+- Đang trong giờ làm việc (hoặc ngày công ty làm việc bù thứ Bảy) nhưng khách gọi vào hotline lại nghe thông báo: *"Hiện đã hết giờ làm việc, xin quý khách vui lòng gọi lại sau"* rồi tự động ngắt máy.
+- Đã hết giờ làm việc buổi tối hoặc ngày Chủ Nhật/Lễ Tết nhưng điện thoại bàn trong văn phòng vẫn đổ chuông ầm ĩ thay vì chuyển sang hộp thư thoại hoặc thông báo nghỉ.
+- Cuộc gọi bị lệch đúng 7 tiếng (ví dụ: 15h chiều thì tổng đài mới bắt đầu tính là giờ làm việc buổi sáng).
+
+### Phân biệt với các sự cố gần giống
+- **Đầu số bị báo số máy không liên lạc được do nợ cước**: Xem [Không nhận được cuộc gọi đến](/internal/ai-contact-center/runbooks/calls/inbound-failed).
+- **Đổ chuông đúng kịch bản nhưng nhân viên không nghe máy**: Xem [Sự cố máy nhánh](/internal/ai-contact-center/runbooks/extensions/registration-failed).
+- **Khách gọi vào bấm phím 1, 2 không nhận**: Xem [Sự cố Bấm phím IVR](/internal/ai-contact-center/runbooks/calls/ivr-dtmf).
+
+---
+
+## 2. Tiếp nhận và kiểm tra nhanh
+
+Khi tiếp nhận phản ánh, L1 phân loại nhanh theo 3 nguyên nhân cốt lõi:
+
+| Hiện tượng quan sát | Nguyên nhân kỹ thuật cốt lõi | Hướng xử lý nhanh L1 |
+| :--- | :--- | :--- |
+| **Công ty làm việc bù nhưng hệ thống báo Ngoài giờ** | Kịch bản **Time Condition** chỉ cài đặt lịch từ Thứ Hai đến Thứ Sáu, chưa cấu hình ngoại lệ cho ngày làm bù. | Thêm ngày làm việc bù vào mục *Ngày đặc biệt (Special Day / Holiday)* trên Portal. |
+| **Cuộc gọi bị lệch giờ cố định đúng 7 tiếng** | Múi giờ của máy chủ hoặc tenant bị đặt nhầm thành **UTC (+0)** thay vì **GMT+7 (Asia/Ho_Chi_Minh)**. | Chỉnh lại múi giờ hệ thống của tenant sang GMT+7. |
+| **Hết giờ làm việc nhưng vẫn đổ chuông máy bàn** | Kịch bản nhánh Ngoài giờ (Out-of-Work) chưa được gán đích đến, hệ thống tự động rơi về nhánh mặc định. | Cấu hình đích đến cho nhánh Ngoài giờ (phát file thông báo hoặc hộp thư thoại). |
+
+---
+
+## 3. Thông tin cần hỏi khách hàng
+
+Thu thập thông tin theo 2 nhóm:
+
+### Thông tin tối thiểu bắt buộc
+1. **Đầu số hotline bị ảnh hưởng (`[HOTLINE]`):** Hotline nào đang bị chạy sai kịch bản giờ làm việc?
+2. **Khung giờ làm việc thực tế của công ty:**
+   - Buổi sáng: Từ mấy giờ đến mấy giờ?
+   - Giờ nghỉ trưa: Có tắt chuông nghỉ trưa không?
+   - Buổi chiều: Kết thúc lúc mấy giờ?
+   - Các ngày làm việc trong tuần (Thứ Hai đến Thứ Sáu, hay có làm sáng Thứ Bảy)?
+3. **Mốc thời gian khách gọi vào bị lỗi:** Thời điểm chính xác vừa xảy ra cuộc gọi sai kịch bản?
+4. **Câu thông báo khách nghe thấy:** Khách nghe thấy câu gì trước khi ngắt máy?
+
+---
+
+## 4. Checklist kiểm tra an toàn cho L1
+
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
+
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra Múi giờ hệ thống (Timezone)** | L1 tra cứu | Vào Cài đặt hệ thống tenant trên Portal ODS | Múi giờ hiển thị là `GMT+7 (Asia/Ho_Chi_Minh)` | Đang hiển thị `UTC (+0)` hoặc múi giờ khác: Bị lệch giờ ➔ Đổi lại về GMT+7. |
+| **2. Đối chiếu quy tắc Time Condition** | L1 đối chiếu | Xem chi tiết quy tắc thời gian đang gán cho Hotline | Khung giờ cấu hình khớp chính xác với giờ làm việc thực tế | Thiếu ngày thứ Bảy hoặc cấu hình sai giờ bắt đầu/kết thúc: Cập nhật lại khung giờ. |
+| **3. Kiểm tra danh mục Ngày nghỉ lễ (Holiday)** | L1 tra cứu | Xem danh sách ngày nghỉ đặc biệt đã cài đặt | Chỉ chứa các ngày nghỉ lễ thực tế | Ngày làm bù đang bị nằm trong danh sách Ngày nghỉ lễ: Xóa khỏi danh sách nghỉ. |
+| **4. Kiểm tra đích đến nhánh Ngoài giờ** | L1 đối chiếu | Xem nhánh `Out-of-Office` dẫn tới đâu | Dẫn tới phát File âm thanh thông báo nghỉ / Hộp thư thoại | Để trống hoặc dẫn nhầm vào nhóm trực máy nhánh: Cấu hình lại đích đến. |
+| **5. Tự gọi thử kiểm chứng** | L1 thực hiện | Dùng điện thoại gọi vào hotline tại thời điểm hiện tại | Kịch bản chạy đúng theo khung giờ thực tế | Chạy sai kịch bản: Kiểm tra lại thứ tự ưu tiên của các Time Condition. |
+
+---
+
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
+
+<Steps>
+  <Step title="Cấu hình lịch làm việc bù (Thứ Bảy làm việc)">
+    1. Đăng nhập Portal quản trị ODS.
+    2. Vào mục **Kịch bản cuộc gọi (Call Routing)** -> Chọn **Thời gian làm việc (Time Conditions)**.
+    3. Chọn quy tắc thời gian đang áp dụng cho Hotline.
+    4. Nếu công ty làm việc sáng thứ Bảy: Bấm **Thêm khung giờ** -> Chọn thứ: `Saturday` -> Đặt giờ từ: `08:00` đến `12:00`.
+    5. Bấm **Lưu cấu hình** và kiểm tra lại.
+  </Step>
+
+  <Step title="Cấu hình lịch nghỉ Lễ / Tết (Holidays)">
+    1. Trong mục **Time Conditions**, chuyển sang tab **Ngày nghỉ lễ (Holidays / Special Days)**.
+    2. Bấm **Thêm ngày nghỉ**:
+       - Chọn ngày bắt đầu và ngày kết thúc nghỉ lễ (ví dụ nghỉ Tết: từ ngày 28 tháng Chạp đến hết mùng 5 Tết).
+       - Chọn kịch bản xử lý trong ngày lễ: Phát file âm thanh chúc mừng năm mới và thông báo ngày làm việc trở lại.
+    3. Bấm **Lưu cấu hình**.
+  </Step>
+
+  <Step title="Đồng bộ lại múi giờ GMT+7">
+    - Nếu phát hiện múi giờ của tenant bị sai: Vào *Cài đặt chung (General Settings)* -> Mục *Múi giờ (Timezone)* -> Chọn chuẩn `Asia/Ho_Chi_Minh (GMT+7)` -> Bấm Lưu.
+    - Lưu ý: Sau khi đổi múi giờ, cần kiểm tra lại toàn bộ các mốc giờ bắt đầu/kết thúc của các Time Condition xem có bị lệch giờ không.
+  </Step>
+</Steps>
+
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket cho L2 khi:
+
+- [ ] **Lỗi đồng hồ máy chủ (Server Clock Drift):** Múi giờ trên Portal đã chọn GMT+7 nhưng đồng hồ phần cứng của máy chủ PBX Core bị chạy sai giờ hệ thống.
+- [ ] **Kịch bản đa tầng phức tạp (Nested Time Conditions):** Khách hàng có nhiều chi nhánh ở các múi giờ khác nhau hoặc kịch bản rẽ nhánh thời gian lồng ghép nhiều lớp bị lỗi vòng lặp logic.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Lỗi kịch bản Thời gian làm việc (Time Condition Issue)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Đầu số Hotline: [HOTLINE]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[HIỆN TƯỢNG CỤ THỂ]:
+- [ ] Trong giờ làm việc nhưng bị rơi vào nhánh Ngoài giờ
+- [ ] Hết giờ làm việc nhưng vẫn đổ chuông máy bàn
+- [ ] Lệch giờ hệ thống
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Múi giờ tenant trên Portal: [Đã chọn GMT+7 Asia/Ho_Chi_Minh]
+2. Cấu hình Time Condition: [Khung giờ 08:00 - 17:30 Monday - Saturday]
+3. Lịch Holiday: [Không có ngày nghỉ trùng lặp]
+4. Tự gọi thử nghiệm: [Thời điểm hiện tại XX:XX vẫn bị rơi vào nhánh Ngoài giờ]
+
+[NỘI DUNG CẦN L2 HỖ TRỢ]:
+- Kiểm tra đồng hồ hệ thống (ntp date) trên cụm máy chủ PBX Core của tenant [TENANT_ID].
+- Rà soát cú pháp dialplan Time Condition trong Asterisk/FreeSWITCH.
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Thông báo đã cập nhật lịch làm việc bù
+> *"Dạ ODS đã hỗ trợ bổ sung khung giờ làm việc cho ngày thứ Bảy trên hệ thống tổng đài theo đúng lịch làm việc của công ty mình rồi nhé ạ. Em đã dùng số cá nhân gọi thử vào hotline [HOTLINE] và cuộc gọi đã đổ chuông trực tiếp vào nhóm trực máy bàn bình thường rồi ạ. Anh/chị kiểm tra lại giúp em nhé!"*
+
+### Mẫu 2: Hướng dẫn cấu hình kịch bản nghỉ Lễ Tết
+> *"Dạ trước mỗi kỳ nghỉ lễ dài ngày, anh/chị có thể chủ động cài đặt lịch nghỉ trên Portal: Vào mục 'Kịch bản cuộc gọi' -> 'Thời gian làm việc' -> Thêm khoảng thời gian nghỉ lễ và chọn phát file âm thanh thông báo nghỉ nhé ạ. Sau khi hết ngày nghỉ, hệ thống sẽ tự động chuyển về kịch bản làm việc bình thường mà không cần thao tác lại nha."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Gọi thử trong giờ làm việc:** Dùng điện thoại gọi vào hotline trong khung giờ làm việc ➔ Cuộc gọi đổ chuông đúng máy nhánh/hàng đợi trực.
+2. **Gọi thử ngoài giờ làm việc:** Gọi vào hotline ngoài khung giờ quy định ➔ Hệ thống phát đúng file thông báo ngoài giờ và kết thúc an toàn.
+3. **Đối chiếu CDR:** Lịch sử cuộc gọi ghi nhận cuộc gọi đi đúng nhánh kịch bản mong muốn.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Thứ Bảy làm việc bù nhưng hotline báo hết giờ làm việc | Time Condition chỉ cài thứ Hai đến thứ Sáu | Thêm khung giờ sáng thứ Bảy (08:00 - 12:00) | Khách gọi vào đổ chuông bình thường | `#TK-TIME-01` |
+| *Template* | Cuộc gọi bị lệch đúng 7 tiếng | Tenant mới tạo bị mặc định múi giờ UTC | Chuyển múi giờ sang GMT+7 Asia/Ho_Chi_Minh | Giờ hoạt động chuẩn xác theo giờ Việt Nam | `#TK-TIME-02` |
+

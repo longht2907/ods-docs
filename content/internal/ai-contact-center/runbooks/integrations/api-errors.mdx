@@ -1,77 +1,152 @@
 ---
-title: API trả lỗi
-description: Runbook L1 thu thập request/response an toàn và phân loại lỗi 4xx, 5xx hoặc timeout khi tích hợp API ODS.
+title: Lỗi tích hợp API
+description: Runbook L1 tiếp nhận, phân loại mã lỗi HTTP 4xx, 5xx, timeout, kiểm tra an toàn và thu thập dữ liệu chuyển cấp khi tích hợp API ODS.
 ---
 
-<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
-  Không yêu cầu khách hàng gửi token đầy đủ. Không retry thao tác tạo/sửa/xóa nếu chưa xác nhận idempotency vì có thể tạo dữ liệu hoặc cuộc gọi trùng.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Phạm vi L1
+Áp dụng khi lập trình viên hoặc đối tác tích hợp phần mềm (CRM, ERP, Website) của khách hàng phản ánh **gọi API ODS bị lỗi**:
+- Nhận về các mã lỗi HTTP `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `429 Too Many Requests`.
+- Nhận về mã lỗi máy chủ `500 Internal Server Error`, `502 Bad Gateway`, `504 Gateway Timeout`.
+- API gọi khởi tạo cuộc gọi (Click-to-Call) nhưng điện thoại không đổ chuông, hoặc API truy vấn lịch sử cuộc gọi/ghi âm không trả về dữ liệu.
 
-Áp dụng khi API trả HTTP error, timeout, response không đúng kỳ vọng hoặc chỉ lỗi trên một môi trường/endpoint.
+### Phân biệt với các sự cố gần giống
+- **Tổng đài không bắn Webhook sự kiện về CRM**: Xem [Webhook không nhận được](/internal/ai-contact-center/runbooks/integrations/webhook-not-received).
+- **Máy nhánh trong CRM dùng WebRTC không nghe gọi được**: Xem [Sự cố Softphone PC](/internal/ai-contact-center/runbooks/extensions/softphone).
 
-## Triệu chứng
+---
 
-- HTTP 400/401/403/404/409/429, 5xx hoặc timeout.
-- Response body có mã lỗi nhưng khách hàng chưa xác định nguyên nhân.
-- Cùng request trước đây hoạt động nhưng hiện thất bại hoặc chỉ lỗi production.
+## 2. Tiếp nhận và kiểm tra nhanh
 
-### Phân nhánh nhanh
+L1 cần phân loại ngay nhóm lỗi dựa trên mã phản hồi HTTP Status Code:
 
-| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
-| --- | --- | --- |
-| `400` hoặc `422` | Request/payload không hợp lệ | Đối chiếu field, kiểu dữ liệu và encoding với API Reference |
-| `401` hoặc `403` | Authentication, credential hoặc permission | Kiểm tra môi trường/quyền; không yêu cầu gửi token đầy đủ |
-| `404` | Sai endpoint/resource hoặc resource không tồn tại | Đối chiếu base URL, path và ID tài nguyên |
-| `409` | Xung đột trạng thái hoặc dữ liệu đã tồn tại | Không retry mù; kiểm tra trạng thái resource trước |
-| `429` | Vượt rate limit | Tôn trọng `Retry-After`; giảm nhịp gọi thay vì tăng retry |
-| `5xx` hoặc timeout | Lỗi dịch vụ/network; mutation có thể đã được xử lý | Lưu Request ID và kiểm tra kết quả trước khi retry |
+| Nhóm mã lỗi HTTP | Nhận định ban đầu | Hướng xử lý L1 |
+| :--- | :--- | :--- |
+| **`400` / `422` Bad Request** | Request gửi lên sai cú pháp JSON, thiếu tham số bắt buộc hoặc sai định dạng số điện thoại. | Hướng dẫn khách hàng đối chiếu tài liệu [Tài liệu API ODS](/docs/ai-contact-center/api). |
+| **`401` / `403` Unauthorized** | API Key bị sai, tài khoản API hết hạn, IP gọi API chưa nằm trong IP Whitelist hoặc máy nhánh không có quyền. | Kiểm tra trạng thái API Key và IP Whitelist trên Portal. |
+| **`404` Not Found** | Sai đường dẫn URL Endpoint hoặc mã cuộc gọi (`call_id`) không tồn tại trên hệ thống. | Đối chiếu lại Base URL và Endpoint chính xác. |
+| **`429` Too Many Requests** | Khách hàng bắn request với tần suất vượt quá giới hạn định mức (Rate Limit). | Hướng dẫn khách hàng giảm nhịp gọi API và tuân thủ header `Retry-After`. |
+| **`5xx` hoặc Timeout** | Lỗi nội bộ hệ thống ODS, quá tải database hoặc cụm dịch vụ Core gián đoạn. | **Chuyển cấp L2 / Đội phát triển Core xử lý ngay.** |
 
-## Cần hỏi khách hàng
+---
 
-- Endpoint, HTTP method, môi trường, thời điểm/múi giờ và Request/Correlation ID.
-- Status code, response body và request body đã che credential/PII.
-- Tần suất, phạm vi và thay đổi gần nhất ở code/config/network.
-- Request là đọc dữ liệu hay mutation; đã retry bao nhiêu lần.
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra L1
+Thu thập thông tin theo 2 nhóm (yêu cầu khách hàng che thông tin nhạy cảm):
 
-1. Đối chiếu endpoint/method/header/content type và field bắt buộc với API Reference.
-2. Kiểm tra credential có tồn tại/hết hạn/đúng môi trường nhưng không sao chép giá trị vào ticket.
-3. Phân loại: 4xx thường thuộc request/auth/quyền; 429 thuộc giới hạn; 5xx/timeout cần phía dịch vụ.
-4. So request lỗi với request thành công đã sanitize, gồm kiểu dữ liệu và encoding.
-5. Kiểm tra DNS/TLS/network khi không nhận được HTTP response.
+### Thông tin tối thiểu bắt buộc
+1. **Endpoint API đang gọi:** Đường dẫn URL cụ thể (ví dụ: `POST /api/v1/calls/click-to-call`)?
+2. **Mã phản hồi HTTP Status Code:** Mã lỗi nhận được là gì (`400`, `401`, `403`, `500`)?
+3. **Mốc thời gian gọi:** Thời điểm chính xác thực hiện request (kèm giây)?
+4. **Nội dung Response Body:** Toàn bộ chuỗi JSON trả về từ server ODS (đặc biệt là các trường `error_code`, `message`, `request_id`)?
 
-## Xử lý trong phạm vi L1
+### Thông tin bổ sung (Hỏi khi cần)
+- IP máy chủ backend của khách hàng đang gửi request đi là gì (IP Public)?
+- Đoạn mã JSON Request Body mẫu (đã xóa/che mật khẩu, số điện thoại thật đổi thành số mẫu)?
 
-- Sửa endpoint/method/header/payload khi sai khác rõ với tài liệu đã công bố.
-- Làm mới credential theo quy trình chính thức nếu hết hạn; không gửi token qua chat.
-- Với 429, tuân thủ `Retry-After` nếu response có cung cấp; không tăng vòng lặp retry.
-- Chỉ retry GET/read an toàn; mutation cần idempotency key hoặc xác nhận chưa tạo dữ liệu.
+---
 
-## Điểm dừng và chuyển cấp
+## 4. Checklist kiểm tra an toàn cho L1
 
-- Request hợp lệ vẫn 5xx/timeout hoặc nhiều khách hàng cùng lỗi.
-- Response contract khác tài liệu, dữ liệu đã được tạo nhưng client nhận timeout.
-- Cần trace service/database, kiểm tra rate limit/quyền hoặc khôi phục dữ liệu.
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-## Dữ liệu chuyển cấp
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Đối chiếu Endpoint với tài liệu API** | L1 đối chiếu | So sánh URL khách hàng gửi với [Tài liệu API chính thức](/docs/ai-contact-center/api) | Khớp chính xác phương thức (`POST`/`GET`), đúng Base URL | Khách hàng dùng nhầm HTTP thay vì HTTPS, hoặc sai tên trường: Hướng dẫn sửa lại đúng đặc tả. |
+| **2. Kiểm tra trạng thái API Key trên Portal** | L1 tra cứu | Xem trên Portal ODS xem API Key của tenant có đang `Active` không | API Key kích hoạt bình thường | API Key bị khóa, xóa hoặc hết hạn: Hướng dẫn quản trị viên tạo lại Key mới. |
+| **3. Kiểm tra IP Whitelist (Nếu có bật)** | L1 đối chiếu | Xem danh sách IP được phép gọi API trên Portal ODS | IP Public của khách hàng nằm trong danh sách Whitelist | IP khách hàng chưa được cấp phép: Quản trị viên khách hàng tự thêm IP vào Portal. |
+| **4. Kiểm tra mã lỗi nghiệp vụ** | L1 đọc log | Đọc trường `message` trong Response JSON | Thông báo lỗi rõ ràng (VD: `Extension not found`, `Invalid phone format`) | Hướng dẫn khách hàng sửa đúng giá trị máy nhánh hoặc định dạng số điện thoại. |
+| **5. Thử nghiệm request đọc an toàn (Read-only)** | L1 thực hiện | Thử gọi 1 API `GET` tra cứu thông tin cơ bản bằng công cụ nội bộ | Trả về `200 OK` nhanh chóng | Trả về `500 Internal Error`: Dịch vụ API Backend ODS đang gặp lỗi. |
 
-- Endpoint/method/environment, timestamp, status, Request ID và latency.
-- Sanitized headers/body/response; thay token bằng `[REDACTED]`.
-- Số lần retry và bằng chứng kiểm tra dữ liệu đã/ chưa được tạo.
+---
 
-## Trả lời mẫu
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-> **Tiếp nhận:** ODS đã ghi nhận API trả lỗi. Vui lòng cung cấp endpoint, method, thời điểm, status code, Request ID và request/response đã che token cùng dữ liệu cá nhân.
+1. **Chuẩn hóa dữ liệu đầu vào:**
+   - Hướng dẫn khách hàng định dạng số điện thoại chuẩn (ví dụ số 10 chữ số bắt đầu bằng `0`, loại bỏ khoảng trắng, dấu ngoặc, dấu cộng).
+   - Đảm bảo header `Content-Type: application/json` và charset UTF-8 được khai báo đầy đủ trong request.
 
-> **Chuyển cấp:** Request đã được đối chiếu với tài liệu nhưng lỗi vẫn tái hiện. ODS đã chuyển đội API kiểm tra theo Request ID; tạm thời không retry mutation để tránh dữ liệu trùng.
+2. **Khắc phục lỗi 429 (Rate Limit):**
+   - Giải thích cho lập trình viên khách hàng cần đặt cơ chế xếp hàng (Queue) và giãn cách tần suất gọi API, không bắn đồng thời hàng trăm request mỗi giây.
 
-## Nguyên nhân thường gặp và tra cứu
+3. **Nguyên tắc an toàn với API phát sinh cuộc gọi (Mutation API):**
+   - Tuyệt đối không bấm gửi lại (Retry) liên tục các request Click-to-Call hoặc tạo chiến dịch khi nhận mã timeout, vì cuộc gọi có thể đã được đẩy vào hàng đợi tổng đài và sẽ gây gọi lặp lại nhiều lần cho người nhận.
 
-- Sai endpoint/method/header/payload, credential hết hạn hoặc thiếu quyền.
-- Rate limit, network/TLS, service 5xx hoặc timeout sau khi backend đã xử lý.
+---
 
-- [API Reference AI Contact Center](/docs/ai-contact-center/api)
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket lên L2 / Đội phát triển API Backend khi:
+
+- [ ] **Mã lỗi 5xx kéo dài:** Server trả về `500 Internal Server Error`, `502 Bad Gateway` hoặc không phản hồi trên các request đã chuẩn hóa.
+- [ ] **Nhiều khách hàng cùng bị lỗi:** Sự cố gián đoạn cổng API diện rộng trên toàn hệ thống.
+- [ ] **Lệch đặc tả hợp đồng (Contract Mismatch):** Response trả về sai khác với tài liệu API đã công bố chính thức nhưng code backend chưa cập nhật.
+- [ ] **Request trừ tiền/tạo cuộc gọi thành công nhưng client nhận timeout:** Cần kiểm tra trạng thái giao dịch trong cơ sở dữ liệu.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Lỗi tích hợp API ODS (API Error)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Endpoint gọi lỗi: [POST /api/v1/calls/click-to-call]
+- Thời điểm phát sinh: [HH:MM:SS DD/MM/YYYY GMT+7]
+- Mã phản hồi HTTP: [HTTP 500 / 504 Gateway Timeout]
+
+[CHI TIẾT REQUEST & RESPONSE]:
+- Request ID (nếu có trong header/body): [REQ_ID]
+- IP Public gửi request: [IP_CLIENT]
+- Request Body mẫu (đã che dữ liệu nhạy cảm):
+```json
+{
+  "extension": "101",
+  "phone_number": "090xxxxxxx"
+}
+```
+- Response Body nhận về:
+```json
+{
+  "error_code": "INTERNAL_ERROR",
+  "message": "Database query timeout"
+}
+```
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Trạng thái API Key: [Active trên Portal]
+2. Cú pháp JSON: [Đã đối chiếu đúng đặc tả API Reference]
+3. Tần suất gọi: [Không vượt rate limit]
+
+[NỘI DUNG CẦN L2 / DEV HỖ TRỢ]:
+- Kiểm tra log dịch vụ API Gateway và worker xử lý tại thời điểm [HH:MM:SS].
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và xin thông tin request
+> *"Dạ ODS đã tiếp nhận thông tin về việc tích hợp API gặp mã lỗi [MÃ_HTTP]. Để hỗ trợ kiểm tra log hệ thống chính xác, phía kỹ thuật anh/chị vui lòng cung cấp giúp em: Đường dẫn Endpoint đang gọi, mã lỗi JSON phản hồi nhận được và mốc thời gian gọi chính xác kèm Request ID (nếu có) ạ. Lưu ý anh/chị che giúp em phần mật khẩu/API Key trước khi gửi nhé ạ. Em cảm ơn anh/chị!"*
+
+### Mẫu 2: Hướng dẫn sửa tham số 400 Bad Request
+> *"Dạ qua đối chiếu phản hồi lỗi, trường [TÊN_TRƯỜNG] trong request body dường như đang bị sai định dạng / thiếu tham số bắt buộc theo đặc tả. Anh/chị vui lòng tham khảo lại định dạng chuẩn tại [Tài liệu API ODS](/docs/ai-contact-center/api) và thử lại giúp em nhé ạ."*
+
+### Mẫu 3: Thông báo chuyển cấp chuyên sâu
+> *"Dạ em đã kiểm tra thông số API Key của doanh nghiệp mình hoàn toàn chính xác. Do mã lỗi phản hồi xuất phát từ cụm máy chủ xử lý dữ liệu backend, em đã chuyển toàn bộ log request tới đội ngũ Kỹ sư Hệ thống để kiểm tra và khắc phục ngay ạ."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Gọi thử nghiệm bằng request đối chứng:** Sử dụng công cụ kiểm thử (Postman hoặc Curl) gửi 1 request mẫu trên môi trường test.
+2. **Kiểm tra mã phản hồi:** Xác nhận server trả về `200 OK` (hoặc `201 Created`) với đầy đủ cấu trúc dữ liệu mong đợi.
+3. **Xác nhận từ lập trình viên đối tác:** Nhận được phản hồi xác nhận tích hợp đã chạy thông suốt từ phía kỹ thuật khách hàng.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Gọi Click-to-Call báo 403 Forbidden | Máy nhánh gọi đi bị tắt quyền Click-to-Call trên Portal | Quản trị viên bật lại quyền tính năng cho máy nhánh | Gọi API tạo cuộc gọi thành công | `#TK-EXAMPLE` |
 

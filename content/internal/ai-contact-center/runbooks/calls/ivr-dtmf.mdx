@@ -1,0 +1,148 @@
+---
+title: Bấm phím IVR không nhận và lỗi lời chào
+description: Runbook L1 tiếp nhận, kiểm tra chuẩn nhận diện phím DTMF, cấu hình nhánh Timeout/Invalid và chuẩn kỹ thuật file âm thanh lời chào (WAV PCM 8000Hz Mono).
+---
+
+## 1. Khi nào dùng bài này?
+
+Áp dụng khi khách hàng phản ánh sự cố liên quan đến **hệ thống lời chào tương tác tự động (IVR - Interactive Voice Response)**:
+- Người gọi nghe thấy lời chào: *"Bấm phím 1 gặp Kinh doanh, phím 2 gặp Kỹ thuật..."*, đã bấm phím trên bàn phím điện thoại nhưng hệ thống **không chuyển nhánh**, cứ phát lại lời chào hoặc tự động ngắt máy.
+- Người gọi bấm phím quá nhanh (ngay khi vừa nghe chuông) hoặc bấm từ một số dòng điện thoại thông minh/nhà mạng nhất định thì không nhận.
+- Khách hàng không bấm phím nào thì cuộc gọi bị ngắt ngay lập tức thay vì đổ chuông sang nhân viên tiếp tân.
+- File ghi âm lời chào mới tải lên tổng đài bị **rè tiếng, chói gắt, méo tiếng** hoặc hệ thống báo lỗi không nạp được file âm thanh.
+
+### Phân biệt với các sự cố gần giống
+- **Đầu số hotline hoàn toàn không đổ chuông**: Xem [Không nhận được cuộc gọi đến](/internal/ai-contact-center/runbooks/calls/inbound-failed).
+- **Phân phối vào máy nhánh nhưng nhân viên không nghe được tiếng**: Xem [Âm thanh một chiều / rè](/internal/ai-contact-center/runbooks/calls/one-way-audio).
+- **Rơi sai kịch bản do hết giờ làm việc**: Xem [Sự cố Thời gian làm việc](/internal/ai-contact-center/runbooks/calls/time-conditions).
+
+---
+
+## 2. Tiếp nhận và kiểm tra nhanh
+
+Khi tiếp nhận sự cố IVR, L1 phân loại nhanh theo 3 nhóm nguyên nhân kỹ thuật:
+
+| Hiện tượng quan sát | Nguyên nhân kỹ thuật cốt lõi | Hướng xử lý nhanh L1 |
+| :--- | :--- | :--- |
+| **Bấm phím 1, 2 nhưng hệ thống cứ đọc lại lời chào** | Tổng đài không nhận được tín hiệu mã phím (lệch chuẩn **DTMF Type** giữa SIP Trunk nhà mạng và PBX: `RFC2833` vs `In-band` vs `SIP INFO`). | Kiểm tra chuẩn DTMF của Trunk; thử bấm giữ phím số lâu hơn 1 giây. |
+| **Không bấm phím gì thì bị ngắt máy luôn** | Kịch bản IVR bị thiếu nhánh **Hết thời gian chờ (Timeout)** và nhánh **Phím không hợp lệ (Invalid)**. | Bổ sung nhánh Timeout/Invalid tự động chuyển về máy nhánh Lễ tân. |
+| **File âm thanh lời chào nạp lên bị rè hoặc chói** | File tải lên sai chuẩn viễn thông (dùng MP3 chất lượng cao 320kbps Stereo thay vì chuẩn WAV Mono 8000Hz). | Hướng dẫn khách hàng convert file sang chuẩn **WAV PCM 16-bit 8000Hz Mono**. |
+
+---
+
+## 3. Thông tin cần hỏi khách hàng
+
+Thu thập thông tin theo 2 nhóm:
+
+### Thông tin tối thiểu bắt buộc
+1. **Đầu số Hotline cài đặt IVR (`[HOTLINE]`):** Đầu số nào đang bị lỗi bấm phím?
+2. **Số điện thoại người gọi đến dùng để test (`[CALLER]`):** Người gọi dùng mạng di động nào (Viettel, Vina, Mobi)?
+3. **Phím bấm cụ thể:** Bấm phím số mấy (phím 1, phím 2...) thì bị lỗi?
+4. **Hiện tượng sau khi bấm:** Hệ thống phát lại lời chào từ đầu, im lặng, hay ngắt cuộc gọi ngay?
+5. **Thời điểm xảy ra:** Mốc thời gian vừa bấm phím thử nghiệm?
+
+---
+
+## 4. Checklist kiểm tra an toàn cho L1
+
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
+
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Tự gọi thử và bấm các nhánh phím** | L1 thực hiện | Dùng di động cá nhân gọi vào hotline và bấm tuần tự phím 1, 2, 3... | Cuộc gọi chuyển ngay lập tức sang máy nhánh/hàng đợi | Bấm phím không ăn: Xác nhận lỗi DTMF hoặc lỗi kịch bản IVR. |
+| **2. Kiểm tra nhánh Timeout trong kịch bản** | L1 tra cứu | Xem cấu hình IVR trên Portal ODS | Có cấu hình nhánh `Timeout` dẫn về máy trực/lễ tân | **Không có nhánh Timeout**: Khi khách không bấm phím hệ thống tự cúp máy ➔ Bổ sung nhánh. |
+| **3. Kiểm tra nhánh Invalid trong kịch bản** | L1 tra cứu | Xem cấu hình IVR trên Portal ODS | Có cấu hình nhánh `Invalid` phát cảnh báo bấm sai | **Không có nhánh Invalid**: Bấm phím không có trong menu sẽ bị rớt cuộc gọi ➔ Bổ sung nhánh. |
+| **4. Đối chiếu chuẩn DTMF trên SIP Trunk** | L1 tra cứu | Xem cấu hình Trunk nhà mạng kết nối đầu số | Chuẩn DTMF đang đặt là `RFC2833` (hoặc `RFC4733`) | Đang đặt `In-band` hoặc `SIP INFO`: Gây lỗi không nhận diện phím bấm từ smartphone di động. |
+| **5. Kiểm tra thông số file âm thanh tải lên** | L1 kiểm tra | Xem file âm thanh trong mục Quản lý file ghi âm | Định dạng `.WAV`, dung lượng < 10MB, Mono | File đuôi `.MP3`, Stereo, bitrate cao: Gây rè tiếng hoặc lỗi phát âm thanh. |
+
+---
+
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
+
+<Steps>
+  <Step title="Bổ sung 2 nhánh dự phòng bắt buộc (Timeout & Invalid) cho IVR">
+    Để đảm bảo 100% cuộc gọi của khách hàng không bị rớt khi gặp sự cố bấm phím:
+    1. Đăng nhập Portal quản trị ODS -> Vào mục **Kịch bản cuộc gọi (Call Routing)** -> **Menu tương tác (IVR)**.
+    2. Chọn IVR đang áp dụng cho Hotline.
+    3. Cấu hình 2 nhánh an toàn:
+       - **Nhánh Hết thời gian (Timeout):** Đặt thời gian chờ bấm phím là `5 giây`. Đích đến (Destination): Chuyển thẳng về máy nhánh Lễ tân (hoặc nhóm trực chính).
+       - **Nhánh Bấm sai phím (Invalid):** Đích đến: Phát thông báo *"Phím bấm không hợp lệ, xin vui lòng chờ máy"* và chuyển về Lễ tân.
+    4. Bấm **Lưu cấu hình**.
+  </Step>
+
+  <Step title="Chuẩn hóa định dạng file âm thanh Lời chào viễn thông">
+    Khi khách hàng cung cấp file ghi âm mới, hướng dẫn (hoặc hỗ trợ convert giúp khách bằng phần mềm chuyên dụng như Audacity / GoldWave / Online Audio Converter) theo **đúng 4 thông số kỹ thuật viễn thông chuẩn**:
+    - **Định dạng container:** `.WAV` (Waveform Audio File Format).
+    - **Chuẩn mã hóa (Codec):** `PCM 16-bit signed`.
+    - **Tần số lấy mẫu (Sample Rate):** `8000 Hz` (chuẩn thoại viễn thông Narrowband G.711) hoặc tối đa `16000 Hz` (Wideband).
+    - **Số kênh (Channels):** `Mono` (**Bắt buộc 1 kênh** — tuyệt đối không dùng Stereo vì PBX chỉ xử lý đơn kênh).
+  </Step>
+
+  <Step title="Hướng dẫn khách hàng kiểm tra bấm phím trên điện thoại">
+    - Nhắc khách hàng khi gọi thử: Chờ lời chào bắt đầu đọc khoảng 1-2 giây rồi mới bấm phím số.
+    - Nếu dùng smartphone cảm ứng, bấm dứt khoát vào phím số và quan sát xem âm thanh "tít" của phím có phát ra không.
+  </Step>
+</Steps>
+
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket cho L2 khi:
+
+- [ ] **Lỗi DTMF diện rộng từ một nhà mạng cụ thể:** Tất cả người gọi dùng mạng Viettel gọi vào không bấm được phím, nhưng người gọi mạng MobiFone bấm bình thường (nghi vấn lệch DTMF Payload type giữa Telco và PBX ODS).
+- [ ] **Kịch bản IVR đa cấp (Multi-level IVR) bị lỗi vòng lặp:** Khách hàng bấm phím nhánh cấp 2 nhưng bị nhảy ngược về menu cấp 1 hoặc rớt cuộc gọi do lỗi cấu hình context Asterisk.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Không nhận diện phím bấm IVR (DTMF Mismatch)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Đầu số Hotline: [HOTLINE]
+- Nhà mạng cung cấp đầu số: [Viettel / VNPT / FPT / CMC]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[CHI TIẾT KIỂM TRA PHÍM BẤM]:
+- Số điện thoại gọi thử: [CALLER] (Mạng: Viettel / Mobi / Vina)
+- Phím bấm thử nghiệm: [Phím 1 / Phím 2]
+- Hiện tượng: [Không chuyển nhánh, phát lại lời chào từ đầu]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Kịch bản IVR: [Đã có nhánh Timeout và Invalid]
+2. Chuẩn DTMF cấu hình: [RFC2833]
+3. File âm thanh: [Chuẩn WAV 8000Hz Mono]
+
+[NỘI DUNG CẦN L2 HỖ TRỢ]:
+- Kiểm tra SIP trace bản tin INFO / RTP Named Telephone Event (RFC2833) xem PBX có nhận được mã phím từ nhà mạng [TÊN_NHÀ_MẠNG] không.
+- Kiểm tra thông số `dtmfmode` và `payload type` của SIP Trunk [HOTLINE].
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Hướng dẫn xuất file âm thanh chuẩn viễn thông
+> *"Dạ để file lời chào tổng đài phát trong trẻo, không bị rè tiếng và không chiếm dung lượng hệ thống, anh/chị xuất file ghi âm theo đúng chuẩn kỹ thuật viễn thông giúp em: Đuôi file `.WAV`, chuẩn âm thanh `PCM 16-bit`, tần số lấy mẫu `8000Hz` và chọn chế độ `Mono` (1 kênh đơn) nhé ạ. Sau khi xuất xong anh/chị nạp lại lên hệ thống là nghe sẽ rất to rõ nha."*
+
+### Mẫu 2: Thông báo bổ sung nhánh chuyển tiếp an toàn khi khách không bấm phím
+> *"Dạ em đã hỗ trợ cấu hình thêm nhánh dự phòng an toàn trên hệ thống lời chào: Khi khách hàng gọi vào mà không bấm phím hoặc bấm phím chưa đúng, sau 5 giây tổng đài sẽ tự động chuyển tiếp cuộc gọi về thẳng máy nhánh của bộ phận Lễ tân/Trực tổng đài, đảm bảo không bị rớt bất kỳ cuộc gọi nào của khách hàng nhé ạ!"*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Bấm phím chuyển nhánh thành công:** Dùng điện thoại gọi vào hotline, bấm thử các nhánh phím số ➔ Cuộc gọi lập tức chuyển tiếp chính xác sang máy nhánh phụ trách.
+2. **Không bấm phím chuyển về Lễ tân:** Gọi vào và không bấm phím nào ➔ Sau 5 giây cuộc gọi tự động đổ chuông vào máy tiếp tân.
+3. **Chất lượng file âm thanh:** Lời chào phát to rõ, trong trẻo, không bị rè hoặc méo tiếng.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Khách gọi vào nghe lời chào nhưng không bấm phím được | Thuê bao di động người gọi dùng chuẩn In-band trong khi Trunk ODS đặt RFC2833 | Đổi chuẩn DTMF trên Trunk sang Auto/RFC2833 tương thích | Nhận diện phím bấm bình thường | `#TK-DTMF-01` |
+| *Template* | File lời chào nạp lên bị rè chói gắt | Khách tải file MP3 320kbps Stereo | Convert sang WAV PCM 16-bit 8000Hz Mono | Âm thanh trong trẻo, to rõ | `#TK-AUDIO-02` |
+

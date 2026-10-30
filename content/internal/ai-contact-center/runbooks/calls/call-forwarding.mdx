@@ -1,0 +1,149 @@
+---
+title: Chuyển tiếp cuộc gọi không thành công
+description: Runbook L1 tiếp nhận, phân tích cơ chế 2 Chặng (Leg 1 / Leg 2), kiểm tra Outbound Route, Caller ID đại diện và xử lý sự cố chuyển tiếp cuộc gọi ra số di động thất bại.
+---
+
+## 1. Khi nào dùng bài này?
+
+Áp dụng khi điện thoại viên hoặc doanh nghiệp phản ánh **tính năng chuyển tiếp cuộc gọi (Call Forwarding / Chuyển hướng khi bận, không nghe hoặc ngoài giờ)** không hoạt động:
+- Khách hàng bên ngoài gọi vào hotline, kịch bản chuyển tiếp cuộc gọi ra số di động cá nhân của nhân viên trực/giám đốc nhưng chỉ nghe tiếng tút bận rồi tự động ngắt máy.
+- Cuộc gọi đổ chuông ở máy nhánh bàn một vài hồi chuông rồi im lặng, số di động cá nhân cài đặt chuyển tiếp hoàn toàn không reo chuông.
+- Trên Portal lịch sử cuộc gọi (CDR) ghi nhận cuộc gọi của khách hàng đến hotline nhưng không thấy cuộc gọi nào phát sinh tới số di động.
+
+### Phân biệt với các sự cố gần giống
+- **Chuyển máy giữa 2 nhân viên nội bộ (Transfer) bị rớt máy**: Xem [Sự cố Chuyển máy nội bộ](/internal/ai-contact-center/runbooks/calls/call-transfer).
+- **Không thực hiện được cuộc gọi ra ngoài trực tiếp**: Xem [Không gọi ra được](/internal/ai-contact-center/runbooks/calls/outbound-failed).
+- **Không nhận được cuộc gọi từ bên ngoài gọi vào**: Xem [Không nhận được cuộc gọi đến](/internal/ai-contact-center/runbooks/calls/inbound-failed).
+
+---
+
+## 2. Bản chất kỹ thuật cốt lõi: Cơ chế 2 Chặng (2 Legs)
+
+> [!IMPORTANT]
+> **Nguyên tắc viễn thông**: Chuyển tiếp cuộc gọi (Call Forwarding) trên tổng đài ảo không phải là thao tác nối dây thụ động, mà bản chất là **hai cuộc gọi độc lập được hệ thống ghép cầu âm thanh (Bridged)**:
+> - **Chặng 1 (Leg 1 - Inbound):** Khách hàng bên ngoài gọi vào Hotline tổng đài ODS (Cuộc gọi vào — Miễn phí cho tổng đài).
+> - **Chặng 2 (Leg 2 - Outbound):** Tổng đài tự động trích xuất 1 đầu số và **khởi tạo cuộc gọi mới gọi ra số di động cá nhân** của nhân viên (Cuộc gọi ra — **Bắt buộc có cước viễn thông và cần quyền gọi ra**).
+
+Khi chuyển tiếp thất bại, nguyên nhân **99% nằm ở Chặng 2 (Leg 2)**:
+
+| Nguyên nhân kỹ thuật Chặng 2 (Leg 2) | Biểu hiện trên hệ thống | Hướng xử lý nhanh L1 |
+| :--- | :--- | :--- |
+| **Tài khoản cước viễn thông = 0đ** | Tổng đài không thể khởi tạo Leg 2 gọi ra số di động vì hết tiền cước. | Kiểm tra số dư tài khoản cước viễn thông trên Portal; hướng dẫn nạp tiền. |
+| **Chưa gán Đầu số đại diện (Caller ID)** | Khi đẩy cuộc gọi Leg 2 ra nhà mạng, tổng đài thiếu số chủ gọi hợp lệ ➔ Nhà mạng từ chối ngay. | Cấu hình Outbound Caller ID hợp lệ trong kịch bản chuyển tiếp. |
+| **Thiếu Outbound Route cho kịch bản** | Kịch bản chuyển tiếp hoặc máy nhánh chưa được cấp quyền gọi ra qua SIP Trunk nhà mạng. | Gán nhóm quyền Outbound Rule cho máy nhánh/kịch bản. |
+| **Sai định dạng số di động đích** | Nhập thừa/thiếu số `0` ở đầu hoặc copy-paste dính ký tự lạ/khoảng trắng. | Chuẩn hóa số di động thành 10 chữ số chuẩn (VD: `0901234567`). |
+
+---
+
+## 3. Thông tin cần hỏi khách hàng
+
+Thu thập thông tin theo 2 nhóm:
+
+### Thông tin tối thiểu bắt buộc
+1. **Đầu số hotline khách gọi vào (`[HOTLINE]`):** Số hotline công ty đang cài đặt chuyển tiếp?
+2. **Số di động cá nhân nhận chuyển tiếp (`[FORWARD_TO]`):** Số điện thoại di động cài đặt nhận cuộc gọi?
+3. **Số máy nhánh cài đặt chuyển tiếp (`[EXT]`):** Máy nhánh nào đang bật tính năng Forwarding?
+4. **Mốc thời gian gọi thử:** Thời điểm vừa gọi thử nghiệm vào hotline bị lỗi?
+5. **Số điện thoại dùng để gọi thử (`[TEST_CALLER]`):** Số điện thoại dùng để đóng vai khách hàng gọi vào test?
+
+---
+
+## 4. Checklist kiểm tra an toàn cho L1
+
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
+
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiểm tra số dư tài khoản cước** | L1 tra cứu | Xem số dư cước viễn thông trả trước của tenant trên Portal | Tài khoản cước viễn thông `> 0đ` | **Số dư = 0đ**: Tổng đài bị nhà mạng khóa chiều gọi ra ➔ Không thể tạo Leg 2. |
+| **2. Kiểm tra định dạng số đích** | L1 đối chiếu | Xem trường số điện thoại nhận chuyển tiếp trong cấu hình | Đúng 10 chữ số di động (VD `098xxxxxxx`) | Nhập `8498...` hoặc dính khoảng trắng: Hướng dẫn sửa lại đúng 10 chữ số chuẩn. |
+| **3. Tra cứu lịch sử CDR trên Portal** | L1 tra cứu | Tìm theo số gọi thử `[TEST_CALLER]` tại thời điểm lỗi | Xuất hiện 2 bản ghi: 1 Inbound và 1 Outbound | **Chỉ có Inbound, không có Outbound**: Lỗi cấu hình kịch bản chưa kích hoạt nhánh chuyển tiếp. |
+| **4. Kiểm tra Outbound Caller ID** | L1 tra cứu | Xem cấu hình đầu số gọi ra của kịch bản chuyển tiếp | Có chọn 1 đầu số hotline hợp lệ của doanh nghiệp | **Để trống Caller ID**: Nhà mạng viễn thông từ chối cuộc gọi Leg 2 do thiếu số chủ gọi. |
+| **5. Thử gọi trực tiếp số di động đích** | L1 / Khách hàng | Dùng máy nhánh `[EXT]` bấm gọi trực tiếp số `[FORWARD_TO]` | Số di động đổ chuông reo to rõ | Báo bận/không gọi được: Bản thân máy nhánh chưa có quyền gọi ra hoặc số di động bị khóa. |
+
+---
+
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
+
+<Steps>
+  <Step title="Kiểm tra và nạp số dư cước viễn thông">
+    - Giải thích cho khách hàng hiểu rõ: Cuộc gọi chuyển tiếp tới số di động cá nhân là cuộc gọi phát sinh cước viễn thông như một cuộc gọi di động thông thường.
+    - Hướng dẫn quản trị viên kiểm tra số dư trên Portal ODS và nạp bổ sung tiền cước trả trước nếu số dư cạn kiệt.
+  </Step>
+
+  <Step title="Cấu hình đầy đủ thông số Chặng 2 (Leg 2) trên Portal">
+    1. Đăng nhập Portal quản trị ODS.
+    2. Vào mục **Cấu hình máy nhánh (Extensions)** hoặc **Kịch bản cuộc gọi (Call Flow)** -> Tìm mục **Chuyển tiếp cuộc gọi (Call Forwarding)**.
+    3. Kiểm tra 3 thông số bắt buộc:
+       - **Số điện thoại nhận:** Nhập đúng định dạng `09xxxxxxxx` (10 chữ số thuần túy, không dấu cách).
+       - **Đầu số gọi ra (Outbound Caller ID):** Chọn đích danh số Hotline chính của công ty (đầu số đã được nhà mạng cấp phép).
+       - **Thời gian chờ trước khi chuyển (Ring Timeout):** Nếu cài đặt *"Chuyển tiếp khi không nghe máy"*, đặt thời gian chuông reo máy bàn từ 15 - 20 giây trước khi đẩy cuộc gọi sang số di động.
+    4. Bấm **Lưu cấu hình**.
+  </Step>
+
+  <Step title="Phân lập kiểm tra bằng cuộc gọi trực tiếp">
+    - Hướng dẫn nhân viên dùng máy nhánh bấm gọi trực tiếp số di động đó:
+      + Nếu gọi trực tiếp **thành công**: Lỗi do cấu hình kịch bản chuyển tiếp (Caller ID hoặc Timeout).
+      + Nếu gọi trực tiếp **thất bại**: Máy nhánh chưa được cấp quyền gọi ra ngoài (Outbound Route), xử lý theo runbook [Không gọi ra được](/internal/ai-contact-center/runbooks/calls/outbound-failed).
+  </Step>
+</Steps>
+
+---
+
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket cho L2 khi:
+
+- [ ] **CDR ghi nhận Leg 2 bị Carrier từ chối:** Có bản ghi gọi ra số di động nhưng nhận mã `SIP 403 Forbidden` hoặc `SIP 503 Service Unavailable` từ nhà mạng viễn thông.
+- [ ] **Lỗi vòng lặp chuyển tiếp (Forwarding Loop):** Kịch bản chuyển tiếp bị cấu hình lặp vòng (Số hotline forward sang số A, số A lại forward ngược lại số hotline) gây nghẽn kênh tổng đài.
+- [ ] **Khách hàng yêu cầu giữ nguyên số điện thoại người gọi gốc (Preserve Original Caller ID):** Do quy định của nhà mạng viễn thông Việt Nam, tổng đài chỉ được hiển thị số chủ gọi là đầu số thuộc sở hữu của doanh nghiệp, không thể tùy tiện hiển thị số của khách hàng khi gọi sang số di động (trừ khi có gói dịch vụ chuyên biệt đã được nhà mạng phê duyệt).
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Chuyển tiếp cuộc gọi (Call Forwarding) thất bại
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Đầu số Hotline tiếp nhận: [HOTLINE]
+- Số máy nhánh cài chuyển tiếp: [EXT]
+- Số di động đích nhận cuộc gọi: [FORWARD_TO]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Số dư tài khoản cước: [Còn đủ số dư khả dụng]
+2. Cấu hình Caller ID Leg 2: [Đã gán đầu số hotline hợp lệ]
+3. Thử gọi trực tiếp từ máy nhánh: [Gọi trực tiếp ra số di động thành công]
+4. Tra cứu CDR: [Có ghi nhận Inbound Leg 1, Leg 2 báo lỗi mã SIP XXX]
+
+[NỘI DUNG CẦN L2 HỖ TRỢ]:
+- Kiểm tra SIP trace bản tin INVITE của Leg 2 gửi sang SIP Trunk nhà mạng.
+- Rà soát kịch bản dialplan chuyển tiếp cuộc gọi của tenant [TENANT_ID].
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Giải thích nguyên nhân cước viễn thông cho cuộc gọi chuyển tiếp
+> *"Dạ ODS xin phép giải thích để anh/chị nắm rõ cơ chế hoạt động: Khi khách gọi vào hotline và hệ thống chuyển tiếp sang số di động cá nhân của mình, tổng đài sẽ tự động phát sinh 1 cuộc gọi ra từ hotline tới số di động đó (tương đương với việc nhân viên dùng hotline gọi ra ngoài, có phát sinh cước viễn thông thông thường). Anh/chị kiểm tra giúp em tài khoản cước trên tổng đài có đang còn số dư không nhé ạ!"*
+
+### Mẫu 2: Hướng dẫn kiểm tra định dạng số điện thoại
+> *"Dạ anh/chị kiểm tra lại số di động cài đặt nhận cuộc gọi trên Portal giúp em xem đã nhập đúng chuẩn 10 chữ số (ví dụ `0901234567`) chưa ạ, mình lưu ý không gõ khoảng trắng hay dấu chấm giữa các số để tổng đài quay số chuẩn xác nhé ạ."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Vượt qua bài test gọi thử nghiệm:** Dùng một số điện thoại ngoài gọi vào hotline, chờ máy bàn reo hết thời gian timeout ➔ Xác nhận số điện thoại di động cá nhân đổ chuông reo to rõ.
+2. **Đàm thoại 2 chiều thông suốt:** Bấm nghe trên điện thoại di động, xác nhận nói chuyện 2 chiều to rõ với người gọi thử.
+3. **Đối chiếu CDR:** Trên Portal xuất hiện đầy đủ 2 bản ghi: 1 bản ghi cuộc gọi vào Hotline (`Inbound`) và 1 bản ghi cuộc gọi ra số di động (`Outbound`) đều ở trạng thái `ANSWERED`.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Khách gọi vào hotline chuyển tiếp ra số di động bị tút bận | Tài khoản cước viễn thông của tenant = 0đ không khởi tạo được Leg 2 | Khách hàng nạp thêm cước viễn thông | Cuộc gọi chuyển tiếp thành công sang di động | `#TK-FWD-01` |
+| *Template* | Cuộc gọi chuyển tiếp không reo chuông điện thoại di động | Kịch bản chuyển tiếp để trống Outbound Caller ID bị Telco từ chối | Chọn đầu số hotline làm Caller ID trong kịch bản | Di động đổ chuông reo to rõ | `#TK-FWD-02` |
+

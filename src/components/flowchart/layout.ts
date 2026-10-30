@@ -20,9 +20,16 @@ export function flowchartSize(data: FlowchartData) {
   const maxCol = Math.max(...data.nodes.map((node) => node.col), 0);
   const minRow = Math.min(...data.nodes.map((node) => node.row), 1);
   const maxRow = Math.max(...data.nodes.map((node) => node.row), 1);
-  // Reserve edge-label space even for inferred loop ports, not only explicit ones.
-  const padLeft = 160;
-  const padRight = 160;
+  // Dự phòng khoảng đệm thông minh theo cấu trúc sơ đồ
+  const hasLeftElements = minCol < 0 || data.edges.some((e) => e.fromPort === 'left' && e.toPort === 'left');
+  const padLeft = hasLeftElements ? 160 : 64;
+
+  const hasRightElements = maxCol > 1 || data.edges.some((e) =>
+    (e.fromPort === 'right' && e.toPort === 'right') ||
+    (e.variant === 'loop' && e.toPort === 'right')
+  );
+  const padRight = hasRightElements ? 120 : 64;
+
   return {
     minCol, minRow, padLeft,
     width: Math.max((maxCol - minCol + 1) * COL_SPACING + padLeft + padRight, 640),

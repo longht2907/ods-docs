@@ -1,0 +1,178 @@
+---
+title: Điện thoại bàn IP Phone
+description: Runbook L1 tiếp nhận, kiểm tra kết nối mạng LAN, nguồn PoE, phím DND, tay nghe handset và xử lý sự cố trên điện thoại bàn IP Yealink, Grandstream, Fanvil.
+---
+
+## 1. Khi nào dùng bài này?
+
+Áp dụng khi điện thoại viên sử dụng **điện thoại bàn IP Phone phần cứng (Yealink, Grandstream, Fanvil, Htek...)** gặp sự cố:
+- Màn hình điện thoại hiển thị lỗi kết nối mạng: `Network Unavailable`, `No Service`, `Initializing`, hoặc nhấp nháy đèn cổng mạng.
+- Điện thoại liên tục khởi động lại (Reboot loop) hoặc không lên nguồn khi cắm dây mạng PoE/adapter.
+- Có cuộc gọi vào nhưng điện thoại bàn không reo chuông, màn hình hiện biểu tượng `DND` (Do Not Disturb).
+- Nhấc tay nghe (Handset) lên nhưng không nghe thấy âm hiệu quay số (Dial tone), hoặc bấm các phím số không có phản hồi.
+- Đàm thoại một bên không nghe thấy do cắm lỏng dây xoắn tay nghe hoặc cắm nhầm cổng Headset.
+
+### Phân biệt ranh giới lỗi để tránh nhầm lẫn
+- **Lỗi phần cứng/cáp nối IP Phone (Thuộc bài này)**: Cáp mạng lỏng, cắm nhầm cổng PC/Internet, dây xoắn handset bị đứt ngầm, bật nhầm DND.
+- **Lỗi ứng dụng trên máy tính Softphone PC**: Xem [Sự cố Softphone PC](/internal/ai-contact-center/runbooks/extensions/softphone).
+- **Lỗi ứng dụng di động ODS Phone trên iOS/Android**: Xem [Sự cố ODS Phone Mobile](/internal/ai-contact-center/runbooks/extensions/ods-phone-app).
+- **Lỗi âm thanh một chiều do NAT/SIP ALG**: Phần cứng điện thoại và tay nghe hoạt động bình thường, gọi nội bộ nghe rõ nhưng gọi ra ngoài bị mất tiếng do Router chặn RTP. Xem [Âm thanh một chiều / rè](/internal/ai-contact-center/runbooks/calls/one-way-audio).
+
+---
+
+## 2. Tiếp nhận và kiểm tra nhanh
+
+Khi tiếp nhận phản ánh về điện thoại bàn, L1 kiểm tra nhanh màn hình và đèn tín hiệu của máy:
+
+| Dấu hiệu trên màn hình / Đèn LED | Nhận định ban đầu | Hướng xử lý nhanh |
+| :--- | :--- | :--- |
+| **Màn hình hiện chữ `DND` (Do Not Disturb)** | Máy đang bật chế độ Không làm phiền; mọi cuộc gọi đến sẽ bị từ chối tự động. | Nhấn phím mềm `DND` dưới màn hình để tắt. |
+| **Màn hình hiện `Network Unavailable` hoặc biểu tượng cáp mạng gạch chéo** | Cáp mạng LAN bị lỏng, cắm nhầm cổng `PC` thay vì cổng `Internet`, hoặc Switch mạng văn phòng mất kết nối. | Kiểm tra cắm lại dây mạng vào đúng cổng mạng chính `Internet/LAN`. |
+| **Đèn màn hình tối đen, máy không lên nguồn** | Hỏng nguồn Adapter 5V hoặc cổng Switch PoE không cấp đủ nguồn điện. | Thử đổi adapter nguồn khác hoặc cắm sang cổng switch PoE khác. |
+| **Nhấc máy không có tiếng tút (Dial tone)** | Dây xoắn cắm giữa tay cầm và thân máy bị lỏng, hoặc nút nảy gác máy (Hook switch) bị kẹt. | Rút cắm lại đầu cáp xoắn RJ9, gõ nhẹ vào nút gác máy. |
+
+<Callout type="warn">
+  **CẢNH BÁO AN TOÀN TUYỆT ĐỐI**: Kỹ sư L1 **tuyệt đối không hướng dẫn khách hàng nhấn giữ phím OK để Factory Reset điện thoại bàn**. Việc reset sẽ xóa sạch tài khoản SIP, thông số VLAN, template cấu hình auto-provisioning và biến máy thành thiết bị trắng cần kỹ thuật tới tận nơi cài đặt lại.
+</Callout>
+
+---
+
+## 3. Thông tin cần hỏi khách hàng
+
+Thu thập thông tin theo 2 nhóm:
+
+### Thông tin tối thiểu bắt buộc
+1. **Số máy nhánh (`[EXT]`):** Máy nhánh được dán nhãn trên thân điện thoại bàn?
+2. **Hãng và Model máy:** Điện thoại Yealink (T19P, T30P, T31P, T46U), Grandstream (GRP2601, GXP1610) hay hãng khác?
+3. **Hiện tượng chính xác trên màn hình:** Màn hình đang hiển thị dòng chữ gì, góc trên có biểu tượng gì lạ không?
+4. **Địa chỉ IP của điện thoại:** Hướng dẫn khách hàng nhấn phím **OK** (trên máy Yealink) để xem dòng `IPv4` hiển thị trên màn hình là bao nhiêu (ví dụ: `192.168.1.50`)?
+
+### Thông tin bổ sung (Hỏi khi cần)
+- Điện thoại dùng nguồn cắm điện trực tiếp qua cục sạc (Adapter) hay cắm dây mạng tự cấp nguồn (PoE)?
+- Các điện thoại bàn của các nhân viên ngồi bên cạnh có bị tình trạng tương tự không?
+
+---
+
+## 4. Checklist kiểm tra an toàn cho L1
+
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
+
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Trạng thái DND** | Khách hàng | Nhìn vào góc trên bên phải màn hình điện thoại bàn | Không có biểu tượng DND | Hiện chữ `DND` hoặc biểu tượng cấm: Bấm phím mềm DND để tắt. |
+| **2. Địa chỉ IP của máy** | Khách hàng | Nhấn phím cứng **OK** ở cụm phím điều hướng | Dòng IPv4 hiển thị địa chỉ IP nội bộ (`192.168.x.x`) | Hiển thị `0.0.0.0` hoặc `Network Failed`: Điện thoại chưa nhận mạng từ Router. |
+| **3. Cổng cắm dây mạng mặt sau** | Khách hàng | Xem dây mạng từ ổ cắm tường đang cắm vào cổng nào | Cắm vào cổng có nhãn **Internet** (hoặc **WAN / LAN**) | Cắm nhầm vào cổng phụ có nhãn `PC`: Cắm lại sang cổng `Internet`. |
+| **4. Âm lượng chuông reo** | Khách hàng | Khi điện thoại đang gác máy, bấm phím cứng **(+)** | Thanh âm lượng chuông tăng lên mức cao nhất | Âm lượng đang ở mức 0: Tăng âm lượng lên. |
+| **5. Trạng thái trên Portal ODS** | L1 tra cứu | Xem danh sách máy nhánh trên Portal | Máy nhánh hiển thị `Online` / `Registered` | Hiển thị `Offline`: Kiểm tra kết nối mạng văn phòng hoặc chuyển cấp L2. |
+
+---
+
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
+
+<Steps>
+  <Step title="Khắc phục kết nối mạng LAN vật lý">
+    - Hướng dẫn nhân viên rút đầu cáp mạng ở mặt sau điện thoại ra, nghe tiếng "tách" khóa chốt, sau đó cắm chắc chắn lại vào cổng **Internet / LAN** (không cắm cổng PC).
+    - Quan sát 2 đèn LED nhỏ tích hợp ngay tại cổng mạng phía sau thân máy: đèn phải sáng đứng hoặc nhấp nháy xanh/vàng biểu thị có tín hiệu đường truyền.
+  </Step>
+
+  <Step title="Khởi động lại điện thoại (Reboot an toàn)">
+    - Rút dây mạng PoE (hoặc rút đầu cắm nguồn Adapter 5V tròn) ra khỏi máy.
+    - Đợi 10 giây để xả hết điện tích trong tụ bộ nhớ, sau đó cắm lại nguồn chắc chắn.
+    - Đợi điện thoại khởi động lại trong khoảng 1 – 2 phút cho đến khi màn hình hiển thị ngày giờ và số máy nhánh.
+  </Step>
+
+  <Step title="Cắm lại các giắc cắm âm thanh Handset">
+    - Dây xoắn tay nghe (Handset) phải cắm chắc vào cổng có biểu tượng **Chiếc ống nghe điện thoại** ở cạnh bên hoặc mặt dưới thân máy.
+    - Không cắm nhầm sang cổng có biểu tượng **Tai nghe chụp đầu (Headset)** hoặc cổng mở rộng `EXT`.
+  </Step>
+</Steps>
+
+---
+
+## 6. Quy trình Test Call kiểm chứng trực tiếp trên máy bàn
+
+<Callout type="info">
+  **Nguyên tắc Test Call**: Bắt buộc thử nghiệm cuộc gọi trực tiếp trên chính chiếc điện thoại bàn đang gặp vấn đề. Không suy đoán trạng thái dựa trên các máy nhánh khác.
+</Callout>
+
+<Steps>
+  <Step title="Bước 1: Test gọi đi nội bộ (Outbound Dial Test)">
+    - Nhấc tay nghe Handset khỏi giá đỡ -> Áp vào tai xác nhận có âm hiệu quay số dài (`Dial tone`).
+    - Bấm số máy nhánh của đồng nghiệp ngồi bên cạnh (ví dụ: `102`) -> Bấm phím **Send** (hoặc phím `#`).
+    - Máy nhánh bên cạnh đổ chuông reo -> Nhờ đồng nghiệp nhấc máy đàm thoại 2 chiều.
+    - Xác nhận âm thanh rõ ràng ở cả hai phía -> Đặt tay nghe xuống giá đỡ để gác máy.
+  </Step>
+
+  <Step title="Bước 2: Test nhận cuộc gọi đến (Inbound Ring Test)">
+    - Đặt điện thoại ở trạng thái rỗi bình thường trên bàn làm việc.
+    - Nhờ đồng nghiệp bấm gọi trực tiếp vào số máy nhánh này.
+    - **Quan sát máy bàn:**
+      + Chuông điện thoại phải reo to rõ.
+      + Đèn LED báo hiệu trên đỉnh máy nhấp nháy đỏ.
+      + Màn hình LCD hiển thị chính xác số máy nhánh người gọi đến.
+    - Nhấc tay nghe lên và đàm thoại bình thường.
+  </Step>
+</Steps>
+
+---
+
+## 7. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket cho L2 / Đội Kỹ thuật Phần cứng khi:
+
+- [ ] **Màn hình báo lỗi phần mềm hệ thống:** Màn hình hiện dòng chữ `Firmware Corrupted`, `Post Mode` hoặc bị kẹt vô tận ở logo khởi động.
+- [ ] **Điện thoại nhận đúng IP nhưng không tải được cấu hình Provisioning:** Màn hình báo `Update Failed` khi tải template cấu hình từ máy chủ ODS Auto-provisioning.
+- [ ] **Toàn bộ dãy điện thoại bàn trong văn phòng cùng Offline:** Nghi vấn sự cố Switch mạng nội bộ hoặc đường truyền cáp quang văn phòng khách hàng bị đứt.
+- [ ] **Nút phím cứng hoặc màn hình bị hỏng vật lý:** Phím số bị liệt, vỡ màn hình LCD hoặc chập mạch nguồn cần bảo hành đổi trả thiết bị.
+
+---
+
+## 8. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Sự cố điện thoại bàn IP Phone phần cứng
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Số máy nhánh: [EXT]
+- Model điện thoại: [Yealink T30P / Grandstream GRP2601]
+- Địa chỉ MAC của máy (xem dưới đáy điện thoại): [XX:XX:XX:XX:XX:XX]
+- Địa chỉ IP nội bộ: [192.168.1.XXX]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[TRIỆU CHỨNG CỤ THỂ]:
+- [ ] Màn hình báo Network Unavailable dù đã cắm đúng cổng Internet
+- [ ] Máy bị khởi động lại liên tục khi cắm cáp
+- [ ] Bật nguồn không lên dù đã đổi ổ cắm điện
+- [ ] Báo lỗi Register Failed dù thông số SIP đúng
+
+[KẾT QUẢ ĐÃ XỬ LÝ L1]:
+1. Cổng cáp mạng: [Đã cắm đúng cổng Internet/WAN phía sau]
+2. Nguồn điện: [Đã rút cắm lại nguồn khởi động lại máy]
+3. Trạng thái DND & Âm lượng: [DND đã tắt, âm lượng tối đa]
+4. Tuyệt đối không Factory Reset: [Đã xác nhận giữ nguyên cấu hình]
+
+[NỘI DUNG CẦN L2 / PHẦN CỨNG HỖ TRỢ]:
+- Kiểm tra trạng thái máy nhánh trên Provisioning Server.
+- Cân nhắc phương án điều phối kỹ thuật kiểm tra cáp mạng nội bộ hoặc đổi máy thay thế.
+```
+
+---
+
+## 9. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và xin thông tin màn hình
+> *"Dạ ODS đã tiếp nhận phản ánh về việc điện thoại bàn máy nhánh [EXT] hoạt động chưa ổn định. Để hỗ trợ kiểm tra nhanh nhất, anh/chị nhìn giúp em trên màn hình máy bàn đang hiển thị dòng chữ gì, và khi nhấn phím OK ở giữa máy thì màn hình có hiện ra dãy số địa chỉ IP (ví dụ 192.168...) không nhé ạ. Em cảm ơn anh/chị!"*
+
+### Mẫu 2: Hướng dẫn kiểm tra DND và dây cắm
+> *"Dạ anh/chị kiểm tra giúp em góc trên màn hình máy có đang hiện chữ 'DND' không ạ. Nếu có, mình bấm vào phím mềm DND ngay dưới màn hình để tắt đi giúp em nhé. Đồng thời anh/chị kiểm tra mặt sau điện thoại xem dây mạng đã được cắm chắc chắn vào cổng có chữ 'Internet' (hoặc cổng mạng chính) chưa nha."*
+
+### Mẫu 3: Hướng dẫn test call trực tiếp
+> *"Dạ sau khi khởi động lại máy, anh/chị nhấc tay nghe lên và bấm gọi thử sang một máy nhánh đồng nghiệp bên cạnh xem có tiếng tút và đàm thoại rõ không nhé ạ. Sau đó em sẽ gọi lại vào máy nhánh của mình để kiểm tra chuông reo nha."*
+
+---
+
+## 10. Xác nhận khôi phục
+
+1. **Màn hình hiển thị sẵn sàng:** Màn hình điện thoại hiển thị đúng ngày giờ hệ thống, hiển thị số máy nhánh và không có biểu tượng cảnh báo lỗi mạng.
+2. **Vượt qua bài test call trực tiếp:** Nhấc máy gọi đi được và nhận cuộc gọi đến chuông reo to rõ, đàm thoại 2 chiều trong trẻo qua tay nghe handset.
+3. **Trạng thái trên Portal ODS:** Trạng thái máy nhánh chuyển sang `Online` với User-Agent hiển thị đúng model máy (ví dụ: `Yealink SIP-T30P`).
+

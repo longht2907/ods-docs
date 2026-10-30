@@ -1,78 +1,145 @@
 ---
-title: Đầu số bị chặn / báo spam
-description: Runbook L1 phân biệt cuộc gọi bị nhà mạng từ chối với đầu số bị ứng dụng người nhận gắn nhãn spam.
+title: Đầu số bị chặn hoặc báo spam
+description: Runbook L1 tiếp nhận, phân loại giữa chặn kết nối viễn thông và bị gắn nhãn nhận diện cuộc gọi rác, hướng dẫn thu thập dữ liệu an toàn.
 ---
 
-<Callout title="Bản nháp L1 — chờ xác nhận" type="warn">
-  Không cam kết thời gian hoặc kết quả gỡ nhãn spam. Không hướng dẫn đổi CLI, giả mạo đầu số hay né chính sách nhà mạng.
-</Callout>
+## 1. Khi nào dùng bài này?
 
-## Phạm vi L1
+Áp dụng khi khách hàng phản ánh cuộc gọi từ đầu số doanh nghiệp gặp vấn đề về **chặn kết nối hoặc bị gắn nhãn nhận diện**:
+- **Trường hợp A — Cuộc gọi bị nhà mạng chặn:** Bấm gọi tới thuê bao nhà mạng nhất định (hoặc toàn bộ) bị từ chối ngay lập tức, nghe thông báo chặn chiều hoặc CDR trả về mã `SIP 603 Decline` / `SIP 403 Forbidden` từ phía nhà mạng viễn thông.
+- **Trường hợp B — Bị gắn nhãn Spam / Cuộc gọi rác:** Cuộc gọi vẫn đổ chuông và đàm thoại bình thường, nhưng trên màn hình điện thoại của người nhận hiển thị dòng chữ cảnh báo (ví dụ: *"Spam"*, *"Cuộc gọi làm phiền"*, *"Dịch vụ tài chính"*, *"Bất động sản"*).
 
-Áp dụng khi cuộc gọi bị từ chối/chặn hoặc người nhận thấy nhãn spam. Hai hiện tượng phải tách riêng vì cơ chế và đơn vị xử lý khác nhau.
+### Phân biệt với các sự cố gần giống
+- **Kênh kết nối Trunk với nhà mạng bị mất tín hiệu hoàn toàn**: Xem [Trunk SIP nhà mạng mất kết nối](/internal/ai-contact-center/runbooks/carriers/trunk-down).
+- **Chỉ 1 máy nhánh gọi ra bị lỗi do sai quyền/cấu hình**: Xem [Không gọi ra được](/internal/ai-contact-center/runbooks/calls/outbound-failed).
 
-## Triệu chứng
+---
 
-- Cuộc gọi không kết nối tới một hay nhiều nhà mạng/nhóm thuê bao.
-- Thuê bao đích báo bận, từ chối hoặc thông báo hạn chế.
-- Cuộc gọi vẫn kết nối nhưng người nhận thấy nhãn spam/tên không mong muốn.
+## 2. Tiếp nhận và kiểm tra nhanh
 
-### Phân nhánh nhanh
+L1 cần tách bạch ngay bản chất kỹ thuật của vấn đề:
 
-| Dấu hiệu | Nhận định ban đầu | Hành động tiếp theo |
-| --- | --- | --- |
-| Cuộc gọi kết nối nhưng hiện nhãn spam | Nhãn nhận diện, không phải lỗi kết nối | Thu thập ảnh, ứng dụng/thiết bị và phạm vi xuất hiện |
-| Chỉ một thiết bị người nhận hiện nhãn | Có thể là dữ liệu cục bộ hoặc một nhà cung cấp nhận diện | Kiểm tra thêm thiết bị/nhà mạng khác trước khi chuyển cấp |
-| Nhiều thuê bao cùng nhà mạng từ chối | Có thể là chính sách hoặc chặn phía Carrier | Thu thập mã kết thúc và các mẫu cùng nhà mạng |
-| Mọi hướng gọi đều bị từ chối | Có thể đầu số bị khóa hoặc route lỗi | Dừng gọi thử hàng loạt và chuyển Carrier/L2 |
-| Chỉ một thuê bao đích không nhận | Chưa đủ bằng chứng đầu số bị chặn | Đề nghị kiểm tra trạng thái thuê bao và thử số đối chứng |
+| Dấu hiệu quan sát | Bản chất kỹ thuật | Đơn vị / Cơ chế xử lý |
+| :--- | :--- | :--- |
+| **Cuộc gọi kết nối bình thường nhưng hiện chữ "Spam"** | Nhãn nhận diện từ ứng dụng bên thứ 3 (Truecaller, Whoscall) hoặc dịch vụ chống spam của nhà mạng. | Không phải lỗi hạ tầng; cần thu thập ảnh chụp để hỗ trợ gửi yêu cầu gỡ nhãn. |
+| **Chỉ 1 người nhận thấy nhãn spam, người khác không thấy** | Dữ liệu gắn cờ cục bộ trên danh bạ/ứng dụng của chính người nhận đó. | Khách hàng nhờ người nhận tự bỏ chặn/đánh dấu an toàn. |
+| **Gọi tới một nhà mạng cụ thể (VD Viettel) đều bị ngắt ngay** | Nhà mạng đối phương chặn dải số theo cơ chế tự động phát hiện cuộc gọi rác (Nghị định 91). | Thu thập mẫu CDR và chuyển nhóm Carrier làm việc với nhà mạng. |
+| **Mọi cuộc gọi ra đều bị từ chối từ phía nhà mạng** | Đầu số có thể bị nhà mạng khóa chiều tạm thời do có khiếu nại cước hoặc nghi vấn vi phạm. | Dừng gọi thử và chuyển cấp khẩn cấp tới Quản lý Nhà mạng. |
 
-## Cần hỏi khách hàng
+---
 
-- Đầu số gọi ra, số đích mẫu, nhà mạng đích và thời điểm/múi giờ.
-- Cuộc gọi có kết nối hay chỉ bị gắn nhãn; thông báo chính xác.
-- Lỗi ở mọi số đích hay chỉ một thiết bị/ứng dụng nhận diện.
-- Tần suất gọi, loại chiến dịch và thời điểm bắt đầu xuất hiện nhãn.
+## 3. Thông tin cần hỏi khách hàng
 
-## Kiểm tra L1
+Thu thập thông tin theo 2 nhóm:
 
-1. Đối chiếu ít nhất hai số đích thuộc nhà mạng/thiết bị khác nhau.
-2. Kiểm tra CDR/mã kết thúc để phân biệt network rejection với cuộc gọi đã kết nối.
-3. Xác định nhãn từ ứng dụng/điện thoại người nhận hay thông báo nhà mạng.
-4. Đối chiếu giới hạn nhà mạng và quyền gọi theo tài liệu nội bộ.
-5. Ghi nhận có trùng chiến dịch gọi số lượng lớn hay không; không tự kết luận spam.
+### Thông tin tối thiểu bắt buộc
+1. **Đầu số thực hiện cuộc gọi (`[CALLER_ID]`):** Đầu số hotline cụ thể đang bị phản ánh?
+2. **Loại sự cố đang gặp:** Cuộc gọi bị chặn không kết nối được hay cuộc gọi vẫn nghe gọi được nhưng bị hiện chữ spam?
+3. **Số điện thoại người nhận mẫu (`[CALLEE]`):** Ít nhất 2 số điện thoại thực tế gặp hiện tượng này?
+4. **Ảnh chụp màn hình từ phía người nhận:** Nhờ khách hàng xin ảnh chụp màn hình hiển thị chính xác chữ gì trên điện thoại người nhận.
 
-## Xử lý trong phạm vi L1
+### Thông tin bổ sung (Hỏi khi cần)
+- Đầu số này đang dùng cho mục đích gì (chăm sóc khách hàng cũ, telesale bán hàng hay gọi nhắc nợ)?
+- Tần suất cuộc gọi trong ngày gần đây có tăng vọt bất thường không? Doanh nghiệp đã đăng ký dịch vụ cuộc gọi thương hiệu (Voice Brandname) cho đầu số này chưa?
 
-- Giải thích khác biệt giữa lỗi kết nối và nhãn hiển thị phía người nhận.
-- Hướng dẫn tuân thủ danh sách gọi, tần suất và nội dung theo chính sách đã duyệt.
-- Thu thập mẫu tối thiểu để nhóm Carrier làm việc với nhà mạng/đơn vị nhận diện.
-- Nếu chỉ một thiết bị có nhãn, kiểm tra thêm thiết bị khác trước khi kết luận diện rộng.
+---
 
-## Điểm dừng và chuyển cấp
+## 4. Checklist kiểm tra an toàn cho L1
 
-- Nhiều số đích/nhà mạng cùng từ chối cuộc gọi.
-- Có carrier rejection hoặc đầu số bị khóa quyền gọi.
-- Nhãn spam xuất hiện diện rộng và cần khiếu nại chính thức.
-- Cần nhà mạng xử lý, đổi quyền gọi hoặc cung cấp hồ sơ pháp lý chủ thể đầu số.
+Kỹ sư L1 thực hiện kiểm tra quan sát (Read-only) theo bảng sau:
 
-## Dữ liệu chuyển cấp
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Xác định tình trạng kết nối trên CDR** | L1 tra cứu | Xem mã kết thúc cuộc gọi trên Portal ODS | Có thời lượng đàm thoại (`Duration` > 0) | Cuộc gọi đã kết nối -> **Xác nhận thuộc Trường hợp B (Nhãn nhận diện)**, không phải lỗi đường truyền. |
+| **2. Tra cứu mã SIP kết thúc** | L1 tra cứu | Kiểm tra xem có mã `603 Decline` hoặc `403 Forbidden` từ Telco không | Mã ngắt bình thường từ người dùng | Nhận mã `603` từ nhà mạng: Nhà mạng chủ động chặn cuộc gọi. |
+| **3. Gọi thử vào số đối chứng nội bộ** | L1 thực hiện | Bấm gọi từ đầu số đó vào một số di động cá nhân không cài ứng dụng lọc rác | Đổ chuông bình thường, hiển thị đúng số | Cuộc gọi vẫn đổ chuông: Xác nhận hạ tầng tổng đài ODS hoạt động tốt. |
+| **4. Kiểm tra nguồn gốc nhãn hiển thị** | L1 quan sát ảnh | Xem ảnh chụp màn hình khách hàng cung cấp | Không có nhãn cảnh báo | Nhãn từ Truecaller/Whoscall (có logo app) hoặc nhãn từ nhà mạng Viettel/VNPT. |
+| **5. Đối chiếu hồ sơ Voice Brandname** | L1 tra cứu | Xem trên hệ thống xem đầu số đã đăng ký Brandname chưa | Đã đăng ký tên thương hiệu chính thức | Chưa đăng ký: Cuộc gọi hiển thị số thô rất dễ bị thuật toán chống spam của nhà mạng gắn cờ. |
 
-- Đầu số nguồn, nhà mạng, thời điểm và phạm vi.
-- Mẫu cuộc gọi đã che dữ liệu, Call-ID/mã SIP và trạng thái CDR.
-- Screenshot nhãn spam kèm tên ứng dụng/thiết bị; không đính kèm toàn bộ danh sách khách hàng.
+---
 
-## Trả lời mẫu
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
 
-> **Tiếp nhận:** ODS đã ghi nhận phản ánh đầu số bị chặn hoặc hiển thị nhãn spam. Anh/chị vui lòng xác nhận cuộc gọi có kết nối hay không và cung cấp mẫu, thời điểm cùng ảnh đã che dữ liệu cá nhân.
+<Steps>
+  <Step title="Giải thích cơ chế gắn nhãn nhận diện cuộc gọi rác cho khách hàng">
+    - Phân tích rõ cho khách hàng hiểu sự khác biệt giữa **Lỗi kỹ thuật đường truyền** và **Nhãn nhận diện hiển thị phía thiết bị người nhận**.
+    - Khi doanh nghiệp thực hiện nhiều cuộc gọi trong thời gian ngắn tới người lạ hoặc bị nhiều người dùng bấm "Báo cáo cuộc gọi rác", các ứng dụng cộng đồng (Truecaller, Whoscall) hoặc thuật toán AI chống cuộc gọi rác của nhà mạng (Nghị định 91) sẽ tự động gắn cờ cảnh báo.
+  </Step>
 
-> **Chuyển cấp:** ODS đã chuyển đội phụ trách nhà mạng kiểm tra. Kết quả gỡ nhãn phụ thuộc chính sách nhà mạng/đơn vị nhận diện nên chưa thể cam kết thời gian tại L1.
+  <Step title="Tư vấn giải pháp Voice Brandname (Cuộc gọi định danh thương hiệu)">
+    - Hướng dẫn doanh nghiệp đăng ký dịch vụ **Voice Brandname (Cuộc gọi hiển thị tên thương hiệu)**:
+      + Thay vì hiển thị dãy số điện thoại thông thường dễ bị gắn nhãn spam, màn hình người nhận sẽ hiển thị trực tiếp Tên thương hiệu doanh nghiệp (ví dụ: `ODS`, `TEN_CONG_TY`).
+      + Được nhà mạng viễn thông bảo hộ tính hợp pháp và loại trừ khỏi danh sách lọc cuộc gọi rác.
+  </Step>
 
-## Nguyên nhân thường gặp và tra cứu
+  <Step title="Thu thập hồ sơ hỗ trợ gửi yêu cầu gỡ nhãn">
+    - Hướng dẫn khách hàng cung cấp ảnh chụp nhãn hiển thị và thông tin pháp lý doanh nghiệp (Giấy phép kinh doanh, hợp đồng thuê đầu số) để chuyển bộ phận Pháp chế/Carrier ODS làm việc với các nhà cung cấp dữ liệu danh bạ xin gỡ nhãn an toàn.
+  </Step>
+</Steps>
 
-- Ứng dụng nhận diện cuộc gọi tự gắn nhãn hoặc nhà mạng áp chính sách chống spam.
-- Đầu số bị hạn chế hướng/quyền gọi; tần suất gọi cao làm tăng phản ánh.
+---
 
-- [Giới hạn nhà mạng](/internal/ai-contact-center/knowledge-base/carrier-limitations)
-- [Rule gọi ra](/internal/ai-contact-center/knowledge-base/outbound-rules)
-- [Trunk SIP lỗi](/internal/ai-contact-center/runbooks/carriers/trunk-down)
+## 6. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket lên L2 / Bộ phận Pháp chế & Nhà mạng (Carrier/Legal) khi:
+
+- [ ] **Đầu số bị nhà mạng khóa hoàn toàn:** Toàn bộ cuộc gọi ra đều bị nhà mạng từ chối với mã `603 Decline` hoặc có công văn từ nhà mạng về việc tạm ngừng phục vụ đầu số.
+- [ ] **Nhãn spam xuất hiện diện rộng:** Nhãn spam hiển thị trên hầu hết các thuê bao nhận cuộc gọi, ảnh hưởng nghiêm trọng đến uy tín thương hiệu của khách hàng.
+- [ ] **Yêu cầu hỗ trợ gỡ nhãn chính thức:** Khách hàng cung cấp đầy đủ giấy tờ định danh và yêu cầu ODS hỗ trợ khiếu nại tới các đơn vị sở hữu ứng dụng hoặc nhà mạng viễn thông.
+
+---
+
+## 7. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Đầu số bị nhà mạng chặn / Gắn nhãn Spam
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Đầu số bị ảnh hưởng: [CALLER_ID]
+- Loại sự cố: [Bị nhà mạng từ chối kết nối / Bị hiển thị nhãn Spam]
+- Nhà mạng cung cấp đầu số: [Viettel / VNPT / FPT / CMC / Mobifone]
+
+[CHI TIẾT TRIỆU CHỨNG]:
+- Tên nhãn hiển thị: [VD: "Cuộc gọi làm phiền" / "Spam" / "Môi giới tài chính"]
+- Nguồn gắn nhãn: [Truecaller / Ứng dụng lọc cuộc gọi rác / Nhà mạng đích]
+- Mẫu số bị ảnh hưởng: [Số CALLEE 1 - Nhà mạng Viettel], [Số CALLEE 2 - Nhà mạng Mobifone]
+- Mã phản hồi SIP (nếu bị chặn): [SIP 603 Decline / SIP 403 Forbidden]
+
+[KẾT QUẢ ĐÃ KIỂM TRA L1]:
+1. Kiểm tra CDR: [Cuộc gọi vẫn kết nối được / Cuộc gọi bị từ chối ngay]
+2. Gọi thử đối chứng: [Đã gọi thử vào số nội bộ và xác nhận hiện tượng]
+3. Trạng thái Voice Brandname: [Doanh nghiệp chưa đăng ký Brandname]
+
+[NỘI DUNG CẦN BỘ PHẬN CHUYÊN TRÁCH HỖ TRỢ]:
+- Kiểm tra trạng thái đầu số trên cổng quản lý của nhà mạng.
+- Tiếp nhận hồ sơ của khách hàng để gửi yêu cầu hỗ trợ gỡ nhãn spam tới đơn vị phụ trách.
+```
+
+---
+
+## 8. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và xin thông tin ảnh chụp
+> *"Dạ ODS đã tiếp nhận thông tin về việc đầu số [CALLER_ID] bị gắn nhãn cảnh báo khi gọi ra. Để xác định chính xác nguồn gốc gắn nhãn (do ứng dụng lọc danh bạ hay từ phía nhà mạng viễn thông), anh/chị vui lòng chụp lại màn hình cuộc gọi từ phía người nhận và gửi giúp em nhé ạ. Em cảm ơn anh/chị!"*
+
+### Mẫu 2: Giải thích cơ chế gắn nhãn và tư vấn giải pháp
+> *"Dạ qua hình ảnh anh/chị cung cấp, nhãn hiển thị này xuất phát từ cơ chế đánh giá của ứng dụng cộng đồng / bộ lọc tự động khi nhận thấy tần suất cuộc gọi cao. ODS sẽ tiếp nhận thông tin và chuyển tới bộ phận chuyên trách để hỗ trợ gửi yêu cầu rà soát tới đơn vị quản lý danh bạ. Đồng thời, để giải quyết dứt điểm và nâng cao uy tín cuộc gọi, ODS khuyến nghị công ty mình nên đăng ký giải pháp Cuộc gọi tên thương hiệu (Voice Brandname) ạ."*
+
+### Mẫu 3: Thông báo chuyển cấp chuyên sâu
+> *"Dạ em đã ghi nhận đầy đủ mẫu hình ảnh và số điện thoại bị ảnh hưởng của đầu số [CALLER_ID]. Em đã chuyển thông tin tới bộ phận Quản lý Đầu số và Nhà mạng của ODS để phối hợp xử lý rà soát luồng gọi cho doanh nghiệp mình ạ."*
+
+---
+
+## 9. Xác nhận khôi phục
+
+1. **Thực hiện cuộc gọi kiểm chứng:** Bấm gọi từ đầu số tới số thuê bao trước đó gặp hiện tượng bị chặn hoặc gắn nhãn.
+2. **Quan sát màn hình:** Xác nhận cuộc gọi đổ chuông, kết nối ổn định và nhãn cảnh báo đã được gỡ bỏ hoặc chuyển sang trạng thái an toàn.
+3. **Lưu ý:** Đối với việc gỡ nhãn từ các ứng dụng bên thứ 3 (như Truecaller), việc cập nhật cơ sở dữ liệu trên thiết bị người dùng có thể mất một khoảng thời gian nhất định tùy theo chu kỳ đồng bộ ứng dụng.
+
+---
+
+## 10. Case thực tế và cập nhật
+
+| Ngày ghi nhận | Triệu chứng | Nguyên nhân đã xác nhận | Cách xử lý | Kết quả kiểm chứng | Ticket tham chiếu |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| *Template* | Gọi sang mạng Viettel bị báo 603 Decline | Tần suất gọi ra trên 100 cuộc/giờ khiến bộ lọc nhà mạng tạm chặn | Doanh nghiệp hoàn thiện hồ sơ đăng ký mục đích sử dụng với nhà mạng | Viettel mở lại luồng kết nối bình thường | `#TK-EXAMPLE` |
+

@@ -1,0 +1,199 @@
+---
+title: Softphone trên máy tính
+description: Runbook L1 tiếp nhận, kiểm tra quyền Microphone hệ điều hành, thiết bị âm thanh Audio Device, chuẩn phím DTMF và xử lý sự cố Softphone máy tính (Zoiper, MicroSIP, ODS Phone Desktop).
+---
+
+## 1. Khi nào dùng bài này?
+
+Áp dụng khi điện thoại viên sử dụng **phần mềm Softphone cài trên máy tính (PC / Laptop chạy Windows hoặc macOS)** gặp sự cố:
+- Cuộc gọi kết nối thành công nhưng đối phương không nghe thấy tiếng điện thoại viên nói do **chưa cấp quyền Microphone trên Windows/macOS** hoặc chọn nhầm thiết bị thu âm.
+- Không nghe thấy chuông reo hoặc không nghe thấy tiếng đối phương do softphone phát âm thanh ra loa ngoài máy tính thay vì tai nghe cắm tai.
+- Bấm phím số trong lúc gọi (bấm phím tương tác IVR / chuyển máy) nhưng tổng đài bên kia không nhận được tín hiệu do **sai chuẩn DTMF**.
+- Ứng dụng Softphone (Zoiper, MicroSIP, ODS Phone Desktop) bị đơ, treo bàn phím số hoặc tự động thoát sau khi cắm rút tai nghe.
+- Máy tính bật phần mềm VPN cá nhân làm thay đổi đường truyền kết nối tới Server SIP của ODS.
+
+### Phân biệt ranh giới lỗi để tránh nhầm lẫn
+- **Lỗi quyền hệ điều hành & Thiết bị âm thanh máy tính (Thuộc bài này)**: Cài đặt Windows Privacy chặn Micro, chọn nhầm micro webcam thay vì tai nghe USB, tai nghe bị rút lỏng. Thử mở ứng dụng ghi âm máy tính (*Voice Recorder*) nói thử cũng không nhận tiếng.
+- **Lỗi âm thanh một chiều do hạ tầng mạng (Media / RTP)**: Micro và tai nghe máy tính hoạt động hoàn hảo, thử ghi âm máy rất to rõ, gọi nội bộ nghe rõ nhưng gọi ra ngoài bị mất tiếng do Router bật SIP ALG hoặc Firewall chặn cổng RTP UDP. Xem [Âm thanh một chiều / rè](/internal/ai-contact-center/runbooks/calls/one-way-audio).
+- **Lỗi trên ứng dụng di động ODS Phone iOS/Android**: Xem [Sự cố ODS Phone Mobile](/internal/ai-contact-center/runbooks/extensions/ods-phone-app).
+- **Lỗi trên điện thoại bàn IP Phone cứng**: Xem [Sự cố IP Phone](/internal/ai-contact-center/runbooks/extensions/ip-phone).
+
+---
+
+## 2. Tiếp nhận và kiểm tra nhanh
+
+Khi tiếp nhận phản ánh về Softphone máy tính, L1 kiểm tra nhanh theo 4 tình huống:
+
+| Dấu hiệu quan sát | Nguyên nhân cốt lõi | Hướng xử lý nhanh |
+| :--- | :--- | :--- |
+| **Bên kia không nghe thấy điện thoại viên nói** | Hệ điều hành Windows/macOS chưa bật quyền **Microphone Privacy** cho ứng dụng, hoặc Softphone chọn nhầm Micro của Webcam. | Bật quyền Microphone trong Cài đặt hệ điều hành và chọn đích danh tên tai nghe USB. |
+| **Không nghe thấy chuông hoặc tiếng thoại phát ra loa laptop** | Softphone đang đặt thiết bị đầu ra (Playback Device / Ringing Device) là loa tích hợp của máy tính. | Chọn lại thiết bị đầu ra trong Cài đặt Softphone sang tên tai nghe Headset. |
+| **Bấm phím số tương tác IVR không ăn** | Cài đặt chuẩn DTMF Type trong tài khoản máy nhánh đang chọn nhầm `In-band` hoặc `SIP INFO`. | Chuyển chuẩn DTMF sang `RFC2833` (hoặc `RFC 4733`). |
+| **Mở softphone báo lỗi Timeout / Không đăng ký được** | Máy tính đang bật VPN (1.1.1.1, OpenVPN, Cisco AnyConnect) làm thay đổi đường định tuyến mạng. | Tắt phần mềm VPN và khởi động lại Softphone. |
+
+---
+
+## 3. Thông tin cần hỏi khách hàng
+
+Thu thập thông tin theo 2 nhóm:
+
+### Thông tin tối thiểu bắt buộc
+1. **Số máy nhánh (`[EXT]`):** Máy nhánh cài trên máy tính?
+2. **Tên phần mềm Softphone:** Zoiper (bản Free hay Pro), MicroSIP, ODS Phone Desktop hay phần mềm nào khác?
+3. **Hệ điều hành:** Máy tính chạy Windows 10, Windows 11 hay macOS?
+4. **Loại tai nghe đang dùng:** Tai nghe cổng USB (Jabra, Logitech, Yealink), tai nghe chân tròn Jack 3.5mm hay tai nghe không dây Bluetooth?
+
+### Thông tin bổ sung (Hỏi khi cần)
+- Thử mở ứng dụng ghi âm sẵn có của máy tính (Voice Recorder trên Windows) nói thử xem vạch sóng âm thanh có nhảy không?
+- Máy tính đang kết nối Internet qua dây cáp mạng LAN hay bắt sóng Wi-Fi văn phòng?
+
+---
+
+## 4. Checklist kiểm tra an toàn cho L1
+
+Kỹ sư L1 hướng dẫn khách hàng kiểm tra tuần tự các thiết lập:
+
+| Bước | Thực hiện | Cách kiểm tra | Kết quả bình thường | Kết quả bất thường & Hướng xử lý |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Quyền Microphone hệ điều hành** | Khách hàng | Vào cài đặt Privacy -> Quyền Microphone | Mục cho phép Desktop Apps truy cập đang `ON` | Đang bị `OFF`: Toàn bộ ứng dụng gọi điện bị chặn micro -> Bật sang `ON`. |
+| **2. Thiết bị âm thanh (Audio Device)** | Khách hàng | Mở Cài đặt Softphone -> Mục *Audio* -> Xem *Input / Output* | Đang chọn đúng tên tai nghe USB | Đang chọn nhầm `Default Device` hoặc Webcam: Chọn đích danh tên tai nghe Headset. |
+| **3. Phím Mute vật lý trên dây** | Khách hàng | Nhìn vào cụm nút điều khiển trên dây cắm tai nghe | Đèn LED không đỏ, nút gạt Mute đang mở | Đèn Mute đang đỏ hoặc gạt nhầm sang Mute: Bấm mở mic. |
+| **4. Chuẩn phím DTMF** | Khách hàng | Vào cài đặt tài khoản máy nhánh -> Mục *DTMF Type* | Đang chọn chuẩn `RFC2833` | Đang chọn nhầm chuẩn khác: Đổi về `RFC2833` để nhận diện phím bấm tổng đài. |
+| **5. Trạng thái VPN** | Khách hàng | Nhìn xuống khay hệ thống (Taskbar góc phải màn hình) | Không có kết nối VPN nào đang kích hoạt | Đang bật VPN cá nhân/quốc tế: Tắt VPN để đường truyền SIP đi thẳng. |
+
+---
+
+## 5. Hướng xử lý cơ bản (Ít rủi ro trong quyền hạn L1)
+
+### Hướng dẫn phân quyền Microphone theo hệ điều hành
+
+<Tabs items={['Windows (10 / 11)', 'macOS']}>
+  <Tab value="Windows (10 / 11)">
+    1. Bấm phím **Windows + I** để mở **Settings**.
+    2. Chọn **Privacy & security** (hoặc *Privacy*) -> Chọn **Microphone**.
+    3. Đảm bảo 2 mục sau đều ở trạng thái **ON**:
+       - *Microphone access* (Cho phép truy cập micro trên thiết bị này).
+       - *Let desktop apps access your microphone* (Cho phép ứng dụng máy tính truy cập micro).
+  </Tab>
+
+  <Tab value="macOS">
+    1. Mở **System Settings** (hoặc *System Preferences*).
+    2. Chọn **Privacy & Security** -> Chọn mục **Microphone**.
+    3. Tìm ứng dụng Softphone trong danh sách (ví dụ: *Zoiper*, *ODS Phone*) và gạt bật công tắc cho phép truy cập.
+    4. Nếu vừa bật quyền, khởi động lại ứng dụng Softphone để macOS áp dụng quyền thu âm.
+  </Tab>
+</Tabs>
+
+### Các bước chuẩn hóa thiết bị âm thanh
+
+<Steps>
+  <Step title="Chọn đích danh thiết bị âm thanh trong Softphone">
+    Trong phần mềm Softphone (như Zoiper / MicroSIP), không để chế độ âm thanh là `Default Device`, mà bấm vào danh sách chọn chính xác:
+    - **Microphone / Input Device**: Chọn đúng tên tai nghe (ví dụ: `Microphone (Jabra EVOLVE 20)`).
+    - **Speaker / Output Device**: Chọn đúng tên tai nghe (ví dụ: `Headset Earphone (Jabra EVOLVE 20)`).
+    - **Ringing Device**: Có thể chọn Loa tích hợp máy tính (`Speakers`) để khi không đeo tai nghe vẫn nghe thấy tiếng chuông reo báo có cuộc gọi đến.
+  </Step>
+
+  <Step title="Khởi động lại tiến trình Softphone khi cắm rút tai nghe">
+    Nếu cắm hoặc rút tai nghe làm Softphone bị treo driver âm thanh:
+    - Thoát hẳn ứng dụng Softphone (chuột phải vào biểu tượng app ở khay Taskbar chọn Exit, hoặc tắt trong Task Manager).
+    - Mở lại ứng dụng để phần mềm nhận diện lại danh sách thiết bị âm thanh mới nhất.
+  </Step>
+
+  <Step title="Đổi cổng cắm USB">
+    Nếu máy tính không nhận diện được tai nghe: rút giắc cắm USB ra, cắm sang cổng USB phía sau thùng máy (đối với PC để bàn) để đảm bảo nguồn điện ổn định, tránh cắm qua hub chia USB rời không đủ nguồn.
+  </Step>
+</Steps>
+
+---
+
+## 6. Quy trình Test Call kiểm chứng trực tiếp trên máy nhánh PC
+
+<Callout type="info">
+  **Nguyên tắc Test Call**: Bắt buộc thử nghiệm cuộc gọi trực tiếp trên chính máy nhánh đang cài trên máy tính đó. Không suy đoán trạng thái dựa trên các máy nhánh khác.
+</Callout>
+
+<Steps>
+  <Step title="Bước 1: Test gọi đi và kiểm tra Microphone (Outbound Test)">
+    - Đeo tai nghe Headset vào tai -> Mở giao diện bàn phím quay số trên Softphone.
+    - Bấm gọi số máy nhánh của đồng nghiệp ngồi bên cạnh (ví dụ: `102`) -> Bấm nút **Call**.
+    - Khi đồng nghiệp nhấc máy đàm thoại:
+      + Điện thoại viên nói chuyện vào mic -> Xác nhận bên kia nghe rõ ràng, không bị rè hoặc đứt quãng.
+      + Đồng nghiệp nói chuyện -> Xác nhận âm thanh truyền vào tai nghe trong trẻo.
+    - Bấm nút **End Call (Gác máy)** kết thúc cuộc gọi.
+  </Step>
+
+  <Step title="Bước 2: Test nhận cuộc gọi đến và kiểm tra chuông (Inbound Test)">
+    - Đặt Softphone mở ở trạng thái sẵn sàng (chấm tròn xanh lá `Online / Registered`).
+    - Nhờ đồng nghiệp bấm gọi trực tiếp vào số máy nhánh này.
+    - **Quan sát màn hình và âm thanh:**
+      + Softphone bật cửa sổ popup cuộc gọi đến ra phía trước các ứng dụng khác.
+      + Tai nghe hoặc loa máy tính phát tiếng chuông reo to rõ.
+    - Bấm nút **Answer (Nghe máy)** màu xanh -> Xác nhận đàm thoại thông suốt cả 2 chiều.
+  </Step>
+</Steps>
+
+---
+
+## 7. Khi nào dừng và chuyển cấp?
+
+Dừng xử lý và chuyển ticket cho L2 khi:
+
+- [ ] **Softphone liên tục báo lỗi 401/403 dù thông số chính xác:** Nghi vấn địa chỉ IP mạng văn phòng của khách hàng bị bộ lọc tường lửa tổng đài (Fail2ban) chặn do trước đó có máy tính nhập sai mật khẩu nhiều lần.
+- [ ] **Đã cấp đầy đủ quyền micro nhưng cuộc gọi vẫn mất tiếng:** Kiểm tra SIP trace thấy luồng RTP không gửi gói tin âm thanh lên PBX.
+- [ ] **Xung đột phần mềm bảo mật doanh nghiệp:** Phần mềm Antivirus / EDR của công ty khách hàng tự động chặn hoặc khóa cổng kết nối của phần mềm Softphone.
+
+---
+
+## 8. Mẫu ticket chuyển cấp
+
+```markdown
+[TÓM TẮT SỰ CỐ]: Sự cố Softphone máy tính (PC/Laptop)
+- Mã Tenant / Khách hàng: [TENANT_ID]
+- Số máy nhánh: [EXT]
+- Phần mềm sử dụng: [Zoiper v5.X / MicroSIP v3.X]
+- Hệ điều hành: [Windows 11 Pro 64-bit]
+- Loại tai nghe: [Tai nghe Jabra Evolve 20 USB]
+- Thời điểm phát sinh: [HH:MM DD/MM/YYYY GMT+7]
+
+[TRIỆU CHỨNG CỤ THỂ]:
+- [ ] Cuộc gọi kết nối nhưng bên kia không nghe thấy tiếng (Micro không nhận)
+- [ ] Không bấm được phím tương tác IVR (DTMF không nhận)
+- [ ] Softphone báo lỗi kết nối Registration Failed
+
+[KẾT QUẢ ĐÃ XỬ LÝ L1]:
+1. Quyền Microphone Windows: [Đã bật ON trong Windows Settings]
+2. Cài đặt Audio Device: [Đã chọn đúng đích danh tai nghe Jabra USB]
+3. Thử nghiệm ghi âm máy tính: [Dùng Voice Recorder thu tiếng rất tốt]
+4. Trạng thái VPN: [Máy tính không bật VPN]
+5. Chuẩn DTMF: [Đã đối chiếu chuẩn RFC2833]
+
+[NỘI DUNG CẦN L2 HỖ TRỢ]:
+- Kiểm tra SIP trace bản tin SDP xem địa chỉ IP và cổng RTP của máy nhánh [EXT].
+- Kiểm tra xem PBX có nhận được luồng âm thanh từ phía IP văn phòng không.
+```
+
+---
+
+## 9. Mẫu phản hồi khách hàng
+
+### Mẫu 1: Tiếp nhận và hướng dẫn kiểm tra micro
+> *"Dạ ODS đã tiếp nhận phản ánh về việc phần mềm gọi điện trên máy tính của máy nhánh [EXT] gọi đi nhưng bên kia không nghe tiếng. Để kiểm tra nhanh quyền thu âm của máy tính, anh/chị thao tác giúp em:
+> 1. Vào Cài đặt Windows (Settings) -> Chọn Privacy & Security -> Chọn Microphone.
+> 2. Đảm bảo mục 'Let desktop apps access your microphone' đang được bật Mở (ON).
+> 3. Kiểm tra trên dây tai nghe xem nút gạt Mute có đang bị đỏ không nhé ạ."*
+
+### Mẫu 2: Hướng dẫn chọn lại thiết bị âm thanh
+> *"Dạ anh/chị mở phần mềm softphone lên, vào mục Cài đặt (Audio/Audio Devices) giúp em. Tại dòng Micro và Loa, anh/chị bấm chọn đích danh tên chiếc tai nghe USB mình đang cắm (thay vì để mặc định) rồi gọi thử một cuộc xem âm thanh 2 chiều đã to rõ chưa nha."*
+
+### Mẫu 3: Hướng dẫn test call trực tiếp
+> *"Dạ sau khi chỉnh xong, anh/chị đeo tai nghe và bấm gọi thử sang một máy nhánh đồng nghiệp bên cạnh giúp em xem cả hai bên nói chuyện có nghe to rõ không nhé ạ. Em cảm ơn anh/chị!"*
+
+---
+
+## 10. Xác nhận khôi phục
+
+1. **Biểu tượng Softphone sẵn sàng:** Phần mềm hiển thị trạng thái đã đăng ký (chấm xanh lá).
+2. **Vượt qua bài test call 2 chiều:** Bấm gọi đi và nhận cuộc gọi đều phát chuông, bấm nghe nói chuyện 2 chiều rõ ràng qua tai nghe.
+3. **Bấm phím tương tác thành công:** Bấm thử phím số tương tác cuộc gọi nhận diện chính xác.
+

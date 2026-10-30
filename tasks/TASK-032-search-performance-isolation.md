@@ -1,7 +1,7 @@
 ---
-status: in-progress
+status: done
 branch: task/TASK-032-search-performance-isolation
-commit: ""
+commit: 74db5aa
 verified-by: npm run verify:task
 ---
 

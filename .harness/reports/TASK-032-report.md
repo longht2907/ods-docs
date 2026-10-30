@@ -3,7 +3,8 @@
 ## Trạng thái
 
 - Branch: `task/TASK-032-search-performance-isolation`
-- Task: `in-progress` — PR #34 được mở lại để bổ sung Search result UX theo nghiệm thu trực tiếp của Human.
+- Task: `done` — Search result UX tại commit `74db5aa`; PR #34 CI `verify` rerun xanh
+  trong 2m41s, run `41090293950`.
 - Môi trường đo: Windows 10.0.19045, Node.js 22.23.4, Next.js 16.4.3,
   125 public MDX và 80 internal MDX.
 
@@ -33,6 +34,7 @@ Kiểm chứng bổ sung:
 | Impeccable detector | PASS — `[]`, không có finding trên Search component/CSS |
 | `ODS_DOCS_SITE_URL=https://ods-docs-ci.invalid; npm run verify:task` | PASS — toàn bộ route/UI/search/internal-content/flowchart suite |
 | Runtime internal `cancel` | PASS — inline code được highlight, URL chỉ thuộc `/internal/ai-contact-center/**` |
+| PR #34 CI `verify` | PASS — commit `74db5aa`, rerun 2m41s, run `41090293950` |
 
 Lần chạy `test:api-ui` riêng đầu tiên dừng ở regression tab persistence có tính timing. Lần
 chạy tiếp theo phát hiện assertion Search mới đọc selected item trước `ArrowDown`; Human đã duyệt

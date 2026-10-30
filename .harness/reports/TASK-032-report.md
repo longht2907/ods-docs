@@ -3,7 +3,7 @@
 ## Trạng thái
 
 - Branch: `task/TASK-032-search-performance-isolation`
-- Task: `in-progress` — mở lại theo phản hồi Human về service scope trong `/internal`.
+- Task: `done` — PR #34 CI `verify` xanh cho commit triển khai `77c9dcc`.
 - Môi trường đo: Windows 10.0.19045, Node.js 22.23.4, Next.js 16.4.3,
   125 public MDX và 80 internal MDX.
 
@@ -146,7 +146,7 @@ Production warm vẫn nhanh; p95 outlier sau sửa xuất hiện dưới tải l
 | Impeccable detector trên `src/components/search-dialog.tsx` | PASS — không có finding từ source scan |
 | `git diff --check` | PASS |
 | Local dev service-scope API | PASS — 4 service tags, 0 URL ngoài scope; public internal canary = 0 |
-| PR #34 CI `verify` trước phản hồi | PASS — run `41022239139`; chờ CI mới sau push |
+| PR #34 CI `verify` | PASS — 2m41s, run `41079832245` |
 
 Hai lần chạy `verify:task` đầu dừng ở production metadata validation vì thiếu
 `ODS_DOCS_SITE_URL`, sau đó vì dùng loopback origin. Lần chạy cuối dùng origin HTTPS chỉ

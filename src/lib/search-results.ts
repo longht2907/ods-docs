@@ -4,9 +4,17 @@ export const SEARCH_PAGE_LIMIT = 6;
 export const SEARCH_SNIPPET_LIMIT = 2;
 export const SEARCH_ENGINE_RESULT_LIMIT = SEARCH_PAGE_LIMIT * (SEARCH_SNIPPET_LIMIT + 1);
 export const SEARCH_PRODUCT_TAGS = ['ai-contact-center', 'cloudfile'] as const;
+export const INTERNAL_SEARCH_SERVICE_TAGS = [
+  'ai-contact-center',
+  'data-center',
+  'network',
+  'software-license',
+] as const;
+export const INTERNAL_SEARCH_CACHE_CONTROL = 'private, no-store, must-revalidate';
 
 export type SearchProductTag = (typeof SEARCH_PRODUCT_TAGS)[number];
-export type SearchScope = SearchProductTag | 'all' | 'internal';
+export type InternalSearchServiceTag = (typeof INTERNAL_SEARCH_SERVICE_TAGS)[number];
+export type SearchScope = SearchProductTag | InternalSearchServiceTag | 'all' | 'internal';
 
 export interface SearchScopeOption {
   value: SearchScope;
@@ -15,7 +23,15 @@ export interface SearchScopeOption {
 
 export interface SearchClientOptions {
   api: '/api/search' | '/api/search/internal';
-  tag?: SearchProductTag;
+  tag?: SearchProductTag | InternalSearchServiceTag;
+}
+
+export function createInternalSearchResponse(results: SortedResult[]): Response {
+  return Response.json(results, {
+    headers: {
+      'Cache-Control': INTERNAL_SEARCH_CACHE_CONTROL,
+    },
+  });
 }
 
 const publicScopeOptions: ReadonlyArray<SearchScopeOption> = [
@@ -25,12 +41,21 @@ const publicScopeOptions: ReadonlyArray<SearchScopeOption> = [
 ];
 
 const internalScopeOptions: ReadonlyArray<SearchScopeOption> = [
-  { value: 'internal', label: 'Tài liệu nội bộ' },
-  ...publicScopeOptions,
+  { value: 'internal', label: 'Tất cả tài liệu nội bộ' },
+  { value: 'ai-contact-center', label: 'Tổng đài' },
+  { value: 'data-center', label: 'Data Center' },
+  { value: 'network', label: 'Network' },
+  { value: 'software-license', label: 'License phần mềm' },
 ];
 
 export function parseSearchProductTag(value: string | null): SearchProductTag | undefined {
   return SEARCH_PRODUCT_TAGS.find((tag) => tag === value);
+}
+
+export function parseInternalSearchServiceTag(
+  value: string | null,
+): InternalSearchServiceTag | undefined {
+  return INTERNAL_SEARCH_SERVICE_TAGS.find((tag) => tag === value);
 }
 
 export function getSearchProductTag(pathname: string): SearchProductTag | undefined {
@@ -39,12 +64,20 @@ export function getSearchProductTag(pathname: string): SearchProductTag | undefi
   );
 }
 
+export function getInternalSearchServiceTag(
+  pathname: string,
+): InternalSearchServiceTag | undefined {
+  return INTERNAL_SEARCH_SERVICE_TAGS.find(
+    (tag) => pathname === `/internal/${tag}` || pathname.startsWith(`/internal/${tag}/`),
+  );
+}
+
 export function isInternalSearchPath(pathname: string): boolean {
   return pathname === '/internal' || pathname.startsWith('/internal/');
 }
 
 export function getSearchRouteScope(pathname: string): SearchScope {
-  if (isInternalSearchPath(pathname)) return 'internal';
+  if (isInternalSearchPath(pathname)) return getInternalSearchServiceTag(pathname) ?? 'internal';
   return getSearchProductTag(pathname) ?? 'all';
 }
 
@@ -52,18 +85,42 @@ export function getSearchScopeOptions(pathname: string): ReadonlyArray<SearchSco
   return isInternalSearchPath(pathname) ? internalScopeOptions : publicScopeOptions;
 }
 
-export function getSearchClientOptions(scope: SearchScope): SearchClientOptions {
-  if (scope === 'internal') return { api: '/api/search/internal' };
+export function getSearchClientOptions(scope: SearchScope, pathname: string): SearchClientOptions {
+  if (isInternalSearchPath(pathname)) {
+    return {
+      api: '/api/search/internal',
+      tag: scope === 'internal' ? undefined : parseInternalSearchServiceTag(scope),
+    };
+  }
+
   return {
     api: '/api/search',
-    tag: scope === 'all' ? undefined : scope,
+    tag: scope === 'all' || scope === 'internal' ? undefined : parseSearchProductTag(scope),
   };
 }
 
 function cleanSearchContent(content: string): string {
   return content
     .replace(/\*\*([^*]+?)\s*\*\*/g, '$1')
-    .replace(/__([^_]+?)\s*__/g, '$1');
+    .replace(/__([^_]+?)\s*__/g, '$1')
+    .replace(/`([^`\n]+)`/g, '$1');
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function highlightMissingQuery(content: string, query: string): string {
+  const normalizedQuery = query.trim();
+  if (!normalizedQuery) return content;
+
+  const queryPattern = new RegExp(escapeRegExp(normalizedQuery), 'giu');
+  return content
+    .split(/(<mark>[\s\S]*?<\/mark>)/giu)
+    .map((segment) => segment.startsWith('<mark>')
+      ? segment
+      : segment.replace(queryPattern, '<mark>$&</mark>'))
+    .join('');
 }
 
 function searchableText(content: string): string {
@@ -103,7 +160,10 @@ export function prepareSearchResults(results: SortedResult[], query: string): So
     .map((group, position) => ({ group, position, priority: getGroupPriority(group, query) }))
     .sort((left, right) => right.priority - left.priority || left.position - right.position)
     .flatMap(({ group }) => group)
-    .map((item) => ({ ...item, content: cleanSearchContent(item.content) }));
+    .map((item) => ({
+      ...item,
+      content: highlightMissingQuery(cleanSearchContent(item.content), query),
+    }));
 
   return limitSearchResults(prioritized);
 }

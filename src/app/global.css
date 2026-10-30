@@ -116,6 +116,35 @@ html > body[data-scroll-locked] {
   text-overflow: ellipsis;
 }
 
+.ods-search-result[data-result-type='page'] > div:last-child {
+  color: var(--color-fd-foreground);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.ods-search-result[aria-selected='true'] {
+  background: color-mix(in oklab, #f97316 10%, var(--color-fd-accent));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, #f97316 28%, transparent);
+}
+
+.ods-search-result .text-fd-primary.underline {
+  border-radius: 0.2rem;
+  background: color-mix(in oklab, #f97316 16%, transparent);
+  box-decoration-break: clone;
+  color: #c2410c;
+  font-weight: 650;
+  padding-inline: 0.08em;
+  text-decoration-color: color-mix(in oklab, #ea580c 65%, transparent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.16em;
+}
+
+.dark .ods-search-result .text-fd-primary.underline {
+  background: color-mix(in oklab, #fb923c 20%, transparent);
+  color: #fdba74;
+  text-decoration-color: #fb923c;
+}
+
 .ods-search-result[data-result-type='text'] > div:last-child,
 .ods-search-result[data-result-type='heading'] > div:last-child {
   display: -webkit-box;
@@ -143,6 +172,13 @@ html > body[data-scroll-locked] {
   font-size: 0.75rem;
 }
 
+.ods-search-count {
+  margin-inline-start: auto;
+  color: var(--color-fd-muted-foreground);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .ods-search-scope select {
   min-width: 0;
   border: 0;
@@ -157,6 +193,49 @@ html > body[data-scroll-locked] {
   border-radius: 0.25rem;
   outline: 2px solid var(--color-fd-ring);
   outline-offset: 2px;
+}
+
+.ods-search-help {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-top: 1px solid var(--color-fd-border);
+  padding: 0.5rem 0.75rem;
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.6875rem;
+}
+
+.ods-search-help span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ods-search-help kbd {
+  min-width: 1.35rem;
+  border: 1px solid var(--color-fd-border);
+  border-bottom-color: color-mix(in oklab, var(--color-fd-foreground) 28%, var(--color-fd-border));
+  border-radius: 0.3rem;
+  background: var(--color-fd-muted);
+  padding: 0.1rem 0.3rem;
+  color: var(--color-fd-foreground);
+  font-family: inherit;
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .ods-search-help {
+    display: none;
+  }
+
+  .ods-search-count {
+    overflow: hidden;
+    max-width: 7rem;
+    text-overflow: ellipsis;
+  }
 }
 
 .ods-search-suggestion:focus-visible,

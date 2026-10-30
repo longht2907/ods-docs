@@ -4,10 +4,30 @@ import { execSync } from 'node:child_process';
 import net from 'node:net';
 import { spawnStandaloneServer } from './helpers/standalone-server.mjs';
 import {
+  createInternalSearchResponse,
   getSearchClientOptions,
   getSearchRouteScope,
   getSearchScopeOptions,
+  prepareSearchResults,
 } from '../../src/lib/search-results.ts';
+
+const inlineCodeHighlight = prepareSearchResults([
+  {
+    id: 'inline-code-highlight',
+    type: 'page',
+    content: 'Mã ngắt `487 Cancel`',
+    breadcrumbs: ['Tổng đài'],
+    url: '/internal/ai-contact-center/runbooks/calls/example',
+  },
+], 'cancel');
+assert(
+  inlineCodeHighlight[0]?.content.includes('<mark>Cancel</mark>'),
+  'Search chưa highlight keyword nằm trong inline code',
+);
+assert(
+  !inlineCodeHighlight[0]?.content.includes('`'),
+  'Search result còn giữ backtick làm keyword khó đọc',
+);
 
 const queries = [
   'nhân viên',
@@ -93,10 +113,32 @@ function assert(condition, message) {
 }
 
 async function main() {
-  assert(getSearchRouteScope('/internal/ai-contact-center/runbooks') === 'internal', 'Internal route không mặc định scope internal');
-  assert(getSearchClientOptions('internal').api === '/api/search/internal', 'Scope internal không gọi internal Search API');
-  assert(getSearchClientOptions('all').api === '/api/search', 'Scope public all không gọi public Search API');
-  assert(getSearchClientOptions('cloudfile').tag === 'cloudfile', 'Scope CloudFile không truyền đúng tag');
+  assert(getSearchRouteScope('/internal') === 'internal', 'Internal root không mặc định toàn bộ tài liệu nội bộ');
+  assert(
+    getSearchRouteScope('/internal/ai-contact-center/runbooks') === 'ai-contact-center',
+    'Route AI Contact Center không mặc định đúng service scope',
+  );
+  assert(
+    getSearchRouteScope('/internal/network/runbooks') === 'network',
+    'Route Network không mặc định đúng service scope',
+  );
+  assert(
+    getSearchClientOptions('internal', '/internal').api === '/api/search/internal',
+    'Scope internal không gọi internal Search API',
+  );
+  const internalAiClient = getSearchClientOptions(
+    'ai-contact-center',
+    '/internal/ai-contact-center/runbooks',
+  );
+  assert(
+    internalAiClient.api === '/api/search/internal' && internalAiClient.tag === 'ai-contact-center',
+    'AI Contact Center trong internal đang gọi hoặc lọc public Search',
+  );
+  assert(getSearchClientOptions('all', '/docs').api === '/api/search', 'Scope public all không gọi public Search API');
+  assert(
+    getSearchClientOptions('cloudfile', '/docs/cloudfile').tag === 'cloudfile',
+    'Scope CloudFile public không truyền đúng tag',
+  );
   assert(
     !getSearchScopeOptions('/docs').some((option) => option.value === 'internal'),
     'Public Search làm lộ scope internal',
@@ -104,6 +146,34 @@ async function main() {
   assert(
     getSearchScopeOptions('/internal').some((option) => option.value === 'internal'),
     'Internal Search thiếu scope nội bộ',
+  );
+  const internalScopes = getSearchScopeOptions('/internal').map((option) => option.value);
+  assert(
+    JSON.stringify(internalScopes) === JSON.stringify([
+      'internal',
+      'ai-contact-center',
+      'data-center',
+      'network',
+      'software-license',
+    ]),
+    'Internal Search không khớp service scope của Support Wiki',
+  );
+  for (const internalScope of ['ai-contact-center', 'data-center', 'network', 'software-license']) {
+    const options = getSearchClientOptions(internalScope, '/internal/' + internalScope);
+    assert(
+      options.api === '/api/search/internal' && options.tag === internalScope,
+      'Scope ' + internalScope + ' không dùng đúng internal endpoint/tag',
+    );
+  }
+
+  const privateResponse = createInternalSearchResponse([]);
+  assert(
+    privateResponse.headers.get('cache-control') === 'private, no-store, must-revalidate',
+    'Internal Search response thiếu Cache-Control private/no-store',
+  );
+  assert(
+    JSON.stringify(await privateResponse.json()) === '[]',
+    'Internal Search empty response thay đổi JSON contract',
   );
 
   const port = await getFreePort();
@@ -191,6 +261,24 @@ async function main() {
       'Tag không hợp lệ làm lộ kết quả internal',
     );
 
+    const internalCanary = await search(baseUrl, 'sngrep');
+    assert(
+      internalCanary.data.length === 0,
+      'Public Search trả token sngrep chỉ tồn tại trong internal runbook',
+    );
+
+    const internalCanaryBypass = await search(baseUrl, 'sngrep', 'internal');
+    assert(
+      internalCanaryBypass.data.length === 0,
+      'Public Search bị bypass bằng tag=internal',
+    );
+
+    const internalServiceBypass = await search(baseUrl, 'sngrep', 'data-center');
+    assert(
+      internalServiceBypass.data.length === 0,
+      'Public Search bị bypass bằng internal service tag',
+    );
+
     const anchored = (await search(baseUrl, 'webhook')).data.find((item) => item.url.includes('#'));
     assert(anchored, 'Không có kết quả heading/snippet mang anchor');
     const [pagePath, hash] = anchored.url.split('#');
@@ -201,6 +289,15 @@ async function main() {
 
     const internal = await fetch(`${baseUrl}/api/search/internal?query=webhook`, { redirect: 'manual' });
     assert(internal.status === 401, `Anonymous internal Search trả ${internal.status}, mong đợi 401`);
+
+    const internalBypass = await fetch(
+      `${baseUrl}/api/search/internal?query=sngrep&scope=all&tag=ai-contact-center`,
+      { redirect: 'manual' },
+    );
+    assert(
+      internalBypass.status === 401,
+      `Query param bypass internal Search trả ${internalBypass.status}, mong đợi 401`,
+    );
 
     console.log('[test:search PASS] Extraction, grouping, anchors, Vietnamese/API keywords và public/internal boundary đều đạt.');
   } catch (error) {

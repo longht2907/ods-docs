@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
+import type { SortedResult } from 'fumadocs-core/search';
 import { useDocsSearch } from 'fumadocs-core/search/client';
-import { fetchClient } from 'fumadocs-core/search/client/fetch';
 import {
   SearchDialog,
   SearchDialogClose,
@@ -21,9 +21,16 @@ import {
   getSearchClientOptions,
   getSearchRouteScope,
   getSearchScopeOptions,
+  isInternalSearchPath,
+  parseInternalSearchServiceTag,
   parseSearchProductTag,
   type SearchScope,
 } from '@/lib/search-results';
+import {
+  clearInternalSearchCache,
+  createAbortableSearchClient,
+  createSearchRequestCoordinator,
+} from '@/lib/search-client';
 
 function compactBreadcrumbs(breadcrumbs: ReactNode[] | undefined): ReactNode[] | undefined {
   if (!breadcrumbs || breadcrumbs.length === 0) return undefined;
@@ -43,22 +50,40 @@ export default function OdsSearchDialog(props: SharedProps) {
   const routeScope = getSearchRouteScope(pathname);
   const scopeOptions = getSearchScopeOptions(pathname);
   const [scope, setScope] = useState<SearchScope>(routeScope);
-  const client = useMemo(() => fetchClient(getSearchClientOptions(scope)), [scope]);
+  const cache = useRef(new Map<string, SortedResult[]>()).current;
+  const coordinator = useMemo(createSearchRequestCoordinator, []);
+  const client = useMemo(
+    () => createAbortableSearchClient({
+      ...getSearchClientOptions(scope, pathname),
+      cache,
+      coordinator,
+    }),
+    [cache, coordinator, pathname, scope],
+  );
   const { search, setSearch, query } = useDocsSearch({ client, delayMs: 100 });
 
   useEffect(() => {
+    coordinator.abort();
     setScope(routeScope);
-  }, [routeScope]);
+    setSearch('');
+    if (!isInternalSearchPath(pathname)) clearInternalSearchCache(cache);
+  }, [cache, coordinator, pathname, routeScope, setSearch]);
 
   useEffect(() => {
-    if (!props.open && search) setSearch('');
-  }, [props.open, search, setSearch]);
+    if (!props.open) {
+      coordinator.abort();
+      if (search) setSearch('');
+    }
+  }, [coordinator, props.open, search, setSearch]);
+
+  useEffect(() => () => coordinator.abort(), [coordinator]);
 
   const items = query.isLoading || query.error
     ? []
     : query.data === 'empty' || query.data === undefined
       ? null
       : query.data;
+  const pageCount = items?.filter((item) => item.type === 'page').length ?? 0;
 
   const Empty = () => (
     <div className="ods-search-state" role="status" aria-live="polite">
@@ -113,8 +138,10 @@ export default function OdsSearchDialog(props: SharedProps) {
               const value = event.currentTarget.value;
               if (value === 'all' || value === 'internal') setScope(value);
               else {
-                const product = parseSearchProductTag(value);
-                if (product) setScope(product);
+                const selectedScope = isInternalSearchPath(pathname)
+                  ? parseInternalSearchServiceTag(value)
+                  : parseSearchProductTag(value);
+                if (selectedScope) setScope(selectedScope);
               }
             }}
           >
@@ -124,8 +151,18 @@ export default function OdsSearchDialog(props: SharedProps) {
               </option>
             ))}
           </select>
+          {pageCount > 0 ? (
+            <output className="ods-search-count" aria-live="polite">
+              {pageCount} bài phù hợp
+            </output>
+          ) : null}
         </div>
         <SearchDialogList items={items} Empty={Empty} Item={Item} aria-label="Kết quả tìm kiếm" />
+        <div className="ods-search-help" aria-hidden="true">
+          <span><kbd>↑</kbd><kbd>↓</kbd> Di chuyển</span>
+          <span><kbd>Enter</kbd> Mở</span>
+          <span><kbd>Esc</kbd> Đóng</span>
+        </div>
       </SearchDialogContent>
     </SearchDialog>
   );

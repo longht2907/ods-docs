@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
+import type { SortedResult } from 'fumadocs-core/search';
 import { useDocsSearch } from 'fumadocs-core/search/client';
-import { fetchClient } from 'fumadocs-core/search/client/fetch';
 import {
   SearchDialog,
   SearchDialogClose,
@@ -24,6 +24,11 @@ import {
   parseSearchProductTag,
   type SearchScope,
 } from '@/lib/search-results';
+import {
+  clearInternalSearchCache,
+  createAbortableSearchClient,
+  createSearchRequestCoordinator,
+} from '@/lib/search-client';
 
 function compactBreadcrumbs(breadcrumbs: ReactNode[] | undefined): ReactNode[] | undefined {
   if (!breadcrumbs || breadcrumbs.length === 0) return undefined;
@@ -43,16 +48,33 @@ export default function OdsSearchDialog(props: SharedProps) {
   const routeScope = getSearchRouteScope(pathname);
   const scopeOptions = getSearchScopeOptions(pathname);
   const [scope, setScope] = useState<SearchScope>(routeScope);
-  const client = useMemo(() => fetchClient(getSearchClientOptions(scope)), [scope]);
+  const cache = useRef(new Map<string, SortedResult[]>()).current;
+  const coordinator = useMemo(createSearchRequestCoordinator, []);
+  const client = useMemo(
+    () => createAbortableSearchClient({
+      ...getSearchClientOptions(scope),
+      cache,
+      coordinator,
+    }),
+    [cache, coordinator, scope],
+  );
   const { search, setSearch, query } = useDocsSearch({ client, delayMs: 100 });
 
   useEffect(() => {
+    coordinator.abort();
     setScope(routeScope);
-  }, [routeScope]);
+    setSearch('');
+    if (routeScope !== 'internal') clearInternalSearchCache(cache);
+  }, [cache, coordinator, pathname, routeScope, setSearch]);
 
   useEffect(() => {
-    if (!props.open && search) setSearch('');
-  }, [props.open, search, setSearch]);
+    if (!props.open) {
+      coordinator.abort();
+      if (search) setSearch('');
+    }
+  }, [coordinator, props.open, search, setSearch]);
+
+  useEffect(() => () => coordinator.abort(), [coordinator]);
 
   const items = query.isLoading || query.error
     ? []

@@ -22,7 +22,8 @@
     "verify:task": "npm run verify:code && npm run check:scope && npm run build && npm run test:routes && npm run test:api-ui && npm run test:home-ui && npm run test:search && npm run test:internal-content && npm run test:flowchart",
     "media:package": "node scripts/package-media.mjs",
     "test:internal-content": "node --experimental-strip-types harness/tests/internal-content.test.mjs",
-    "test:flowchart": "node harness/tests/flowchart-regression.test.mjs"
+    "test:flowchart": "node harness/tests/flowchart-regression.test.mjs",
+    "benchmark:search": "node harness/benchmarks/search-performance.mjs"
   },
   "dependencies": {
     "fumadocs-core": "16.15.10",

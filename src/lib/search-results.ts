@@ -4,6 +4,7 @@ export const SEARCH_PAGE_LIMIT = 6;
 export const SEARCH_SNIPPET_LIMIT = 2;
 export const SEARCH_ENGINE_RESULT_LIMIT = SEARCH_PAGE_LIMIT * (SEARCH_SNIPPET_LIMIT + 1);
 export const SEARCH_PRODUCT_TAGS = ['ai-contact-center', 'cloudfile'] as const;
+export const INTERNAL_SEARCH_CACHE_CONTROL = 'private, no-store, must-revalidate';
 
 export type SearchProductTag = (typeof SEARCH_PRODUCT_TAGS)[number];
 export type SearchScope = SearchProductTag | 'all' | 'internal';
@@ -16,6 +17,14 @@ export interface SearchScopeOption {
 export interface SearchClientOptions {
   api: '/api/search' | '/api/search/internal';
   tag?: SearchProductTag;
+}
+
+export function createInternalSearchResponse(results: SortedResult[]): Response {
+  return Response.json(results, {
+    headers: {
+      'Cache-Control': INTERNAL_SEARCH_CACHE_CONTROL,
+    },
+  });
 }
 
 const publicScopeOptions: ReadonlyArray<SearchScopeOption> = [

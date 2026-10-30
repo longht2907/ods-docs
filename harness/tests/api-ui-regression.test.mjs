@@ -380,14 +380,35 @@ async function testSearchDialog(client, baseUrl) {
   );
 
   let delayedWebhook = false;
+  let delayedWebhookNetworkId;
+  let abortedWebhook = false;
+  let forceSearchError = false;
+  let searchRequestCount = 0;
+  await client.send('Network.enable');
+  client.on('Network.loadingFailed', (event) => {
+    if (event.requestId === delayedWebhookNetworkId && event.canceled) abortedWebhook = true;
+  });
   client.on('Fetch.requestPaused', (event) => {
     const url = new URL(event.request.url);
-    if (url.pathname === '/api/search' && url.searchParams.get('query') === 'webhook') {
-      delayedWebhook = true;
-      setTimeout(() => client.send('Fetch.continueRequest', { requestId: event.requestId }), 700);
+    if (url.pathname.startsWith('/api/search')) searchRequestCount += 1;
+    if (forceSearchError && url.searchParams.get('query') === 'ods-force-error') {
+      client.send('Fetch.fulfillRequest', {
+        requestId: event.requestId,
+        responseCode: 500,
+        responseHeaders: [{ name: 'Content-Type', value: 'text/plain; charset=utf-8' }],
+        body: Buffer.from('forced search failure').toString('base64'),
+      }).catch(() => {});
       return;
     }
-    client.send('Fetch.continueRequest', { requestId: event.requestId });
+    if (url.pathname === '/api/search' && url.searchParams.get('query') === 'webhook') {
+      delayedWebhook = true;
+      delayedWebhookNetworkId = event.networkId;
+      setTimeout(() => {
+        client.send('Fetch.continueRequest', { requestId: event.requestId }).catch(() => {});
+      }, 700);
+      return;
+    }
+    client.send('Fetch.continueRequest', { requestId: event.requestId }).catch(() => {});
   });
   await client.send('Fetch.enable', {
     patterns: [{ urlPattern: '*/api/search*', requestStage: 'Request' }],
@@ -450,6 +471,7 @@ async function testSearchDialog(client, baseUrl) {
   await client.send('Fetch.disable');
 
   assert(/CloudFile/i.test(race.text), 'Response webhook cũ đã ghi đè query cloudfile mới');
+  assert(abortedWebhook, 'Request webhook cũ không bị AbortController hủy');
   assert(race.pageCount <= 8, `Search dialog render ${race.pageCount} bài`);
   assert(race.resultCount <= 32, `Search dialog render ${race.resultCount} items`);
   assert(!race.horizontalOverflow, 'Search dialog bị tràn ngang');
@@ -472,6 +494,41 @@ async function testSearchDialog(client, baseUrl) {
   }
   const warmStableMs = Math.round((performance.now() - warmStarted) * 10) / 10;
   assert(warmStable, 'Query warm máy nhánh không render ổn định');
+
+  await setSearch('xqzvplmnjk');
+  let noResultReady = false;
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    noResultReady = await evaluate(
+      client,
+      `document.getElementById('fd-search-dialog-content')?.textContent?.includes('Không tìm thấy kết quả phù hợp.')`,
+    );
+    if (noResultReady) break;
+    await delay(25);
+  }
+  assert(noResultReady, 'Query không có kết quả không hiển thị empty state riêng');
+
+  forceSearchError = true;
+  await client.send('Fetch.enable', {
+    patterns: [{ urlPattern: '*/api/search*', requestStage: 'Request' }],
+  });
+  await setSearch('ods-force-error');
+  let errorReady = false;
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    errorReady = await evaluate(
+      client,
+      `document.getElementById('fd-search-dialog-content')?.textContent?.includes('Không thể tải kết quả. Vui lòng thử lại.')`,
+    );
+    if (errorReady) break;
+    await delay(25);
+  }
+  assert(errorReady, 'API error bị biến thành empty state');
+  forceSearchError = false;
+  await client.send('Fetch.disable');
+
+  const requestsBeforeClear = searchRequestCount;
+  await setSearch('');
+  await delay(250);
+  assert(searchRequestCount === requestsBeforeClear, 'Query rỗng vẫn phát Search request');
 
   if (process.env.TASK023_WRITE_SCREENSHOT === '1') {
     const outputDir = path.join('.harness', 'reports', 'assets', 'TASK-023');

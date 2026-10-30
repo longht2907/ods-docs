@@ -4,6 +4,7 @@ import { execSync } from 'node:child_process';
 import net from 'node:net';
 import { spawnStandaloneServer } from './helpers/standalone-server.mjs';
 import {
+  createInternalSearchResponse,
   getSearchClientOptions,
   getSearchRouteScope,
   getSearchScopeOptions,
@@ -106,6 +107,16 @@ async function main() {
     'Internal Search thiếu scope nội bộ',
   );
 
+  const privateResponse = createInternalSearchResponse([]);
+  assert(
+    privateResponse.headers.get('cache-control') === 'private, no-store, must-revalidate',
+    'Internal Search response thiếu Cache-Control private/no-store',
+  );
+  assert(
+    JSON.stringify(await privateResponse.json()) === '[]',
+    'Internal Search empty response thay đổi JSON contract',
+  );
+
   const port = await getFreePort();
   const baseUrl = `http://127.0.0.1:${port}`;
   const env = { ...process.env };
@@ -191,6 +202,18 @@ async function main() {
       'Tag không hợp lệ làm lộ kết quả internal',
     );
 
+    const internalCanary = await search(baseUrl, 'sngrep');
+    assert(
+      internalCanary.data.length === 0,
+      'Public Search trả token sngrep chỉ tồn tại trong internal runbook',
+    );
+
+    const internalCanaryBypass = await search(baseUrl, 'sngrep', 'internal');
+    assert(
+      internalCanaryBypass.data.length === 0,
+      'Public Search bị bypass bằng tag=internal',
+    );
+
     const anchored = (await search(baseUrl, 'webhook')).data.find((item) => item.url.includes('#'));
     assert(anchored, 'Không có kết quả heading/snippet mang anchor');
     const [pagePath, hash] = anchored.url.split('#');
@@ -201,6 +224,15 @@ async function main() {
 
     const internal = await fetch(`${baseUrl}/api/search/internal?query=webhook`, { redirect: 'manual' });
     assert(internal.status === 401, `Anonymous internal Search trả ${internal.status}, mong đợi 401`);
+
+    const internalBypass = await fetch(
+      `${baseUrl}/api/search/internal?query=sngrep&scope=all&tag=ai-contact-center`,
+      { redirect: 'manual' },
+    );
+    assert(
+      internalBypass.status === 401,
+      `Query param bypass internal Search trả ${internalBypass.status}, mong đợi 401`,
+    );
 
     console.log('[test:search PASS] Extraction, grouping, anchors, Vietnamese/API keywords và public/internal boundary đều đạt.');
   } catch (error) {

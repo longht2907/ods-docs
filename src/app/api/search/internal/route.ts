@@ -1,6 +1,7 @@
 import { internalSource } from '@/lib/source';
 import { createFromSource } from 'fumadocs-core/search/server';
 import {
+  createInternalSearchResponse,
   prepareSearchResults,
   SEARCH_ENGINE_RESULT_LIMIT,
   SEARCH_SNIPPET_LIMIT,
@@ -17,8 +18,8 @@ const search = createFromSource(internalSource, {
 
 export async function GET(request: Request): Promise<Response> {
   const query = new URL(request.url).searchParams.get('query')?.trim();
-  if (!query) return Response.json([]);
+  if (!query) return createInternalSearchResponse([]);
 
   const results = await search.search(query, { limit: SEARCH_ENGINE_RESULT_LIMIT });
-  return Response.json(prepareSearchResults(results, query));
+  return createInternalSearchResponse(prepareSearchResults(results, query));
 }
